@@ -220,3 +220,74 @@ export const IconSend = (p: Props) => (
     <path d="M21 3l-6.8 18-3.7-7.5L3 9.8 21 3z" />
   </Svg>
 );
+
+export const IconEye = (p: Props) => (
+  <Svg {...p}>
+    <path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z" />
+    <circle cx="12" cy="12" r="3" />
+  </Svg>
+);
+
+export const IconEyeOff = (p: Props) => (
+  <Svg {...p}>
+    <path d="M3 3l18 18" />
+    <path d="M10.6 5.7A10 10 0 0112 5.5c6.5 0 10 6.5 10 6.5a17 17 0 01-3.2 4M6.6 6.6C3.9 8.4 2 12 2 12s3.5 6.5 10 6.5a9.7 9.7 0 004.3-1" />
+    <path d="M9.9 9.9a3 3 0 004.2 4.2" />
+  </Svg>
+);
+
+export const IconHome = (p: Props) => (
+  <Svg {...p}>
+    <path d="M3 11l9-7 9 7" />
+    <path d="M5 10v10h5v-6h4v6h5V10" />
+  </Svg>
+);
+
+export const IconLogout = (p: Props) => (
+  <Svg {...p}>
+    <path d="M10 4H6a2 2 0 00-2 2v12a2 2 0 002 2h4" />
+    <path d="M15 8l5 4-5 4M20 12H9" />
+  </Svg>
+);
+
+export const IconApps = (p: Props) => (
+  <Svg {...p}>
+    <circle cx="5" cy="5" r="1.6" fill="currentColor" stroke="none" />
+    <circle cx="12" cy="5" r="1.6" fill="currentColor" stroke="none" />
+    <circle cx="19" cy="5" r="1.6" fill="currentColor" stroke="none" />
+    <circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none" />
+    <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" />
+    <circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none" />
+    <circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none" />
+    <circle cx="12" cy="19" r="1.6" fill="currentColor" stroke="none" />
+    <circle cx="19" cy="19" r="1.6" fill="currentColor" stroke="none" />
+  </Svg>
+);
+
+export const IconChevronRight = (p: Props) => (
+  <Svg {...p}>
+    <path d="M9 6l6 6-6 6" />
+  </Svg>
+);
+
+export const IconChevronDown = (p: Props) => (
+  <Svg {...p}>
+    <path d="M6 9l6 6 6-6" />
+  </Svg>
+);
+
+export const IconHelp = (p: Props) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M9.5 9.5a2.5 2.5 0 015 0c0 1.7-2.5 2-2.5 3.5M12 17h.01" />
+  </Svg>
+);
+
+export const IconGoogle = (p: Props) => (
+  <svg viewBox="0 0 24 24" className={p.className ?? 'h-[18px] w-[18px]'} aria-hidden="true">
+    <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 01-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-8.9z" />
+    <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3a7.2 7.2 0 01-10.8-3.8H1.3v3.1A12 12 0 0012 24z" />
+    <path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 010-4.6V6.6H1.3a12 12 0 000 10.8l4-3.1z" />
+    <path fill="#EA4335" d="M12 4.8c1.8 0 3.4.6 4.6 1.8l3.4-3.4A12 12 0 001.3 6.6l4 3.1A7.2 7.2 0 0112 4.8z" />
+  </svg>
+);

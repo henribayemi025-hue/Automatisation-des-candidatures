@@ -1,7 +1,9 @@
 import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
-import { useAuth } from './lib/auth';
+import { useCollab } from './lib/collab';
+import { useDB } from './lib/store';
 import Auth from './pages/Auth';
+import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
 import Assistant from './pages/Assistant';
 import PointOfSale from './pages/PointOfSale';
@@ -24,50 +26,94 @@ import Statements from './pages/Statements';
 import ChartOfAccounts from './pages/ChartOfAccounts';
 import Audit from './pages/Audit';
 import AuditTrail from './pages/AuditTrail';
+import Team from './pages/Team';
 import Settings from './pages/Settings';
 
-export default function App() {
-  const { user, guest, loading } = useAuth();
+function Splash() {
+  return (
+    <div className="grid min-h-screen place-items-center bg-base">
+      <div className="animate-pulse text-center leading-tight">
+        <span className="block font-display text-[28px] font-bold text-teal">Finjaro</span>
+        <span className="block text-[11px] font-bold uppercase tracking-[0.22em] text-[#8C6A3D]">Accounting</span>
+      </div>
+    </div>
+  );
+}
 
-  if (loading) {
-    return (
-      <div className="grid min-h-screen place-items-center bg-cream dark:bg-ink-950">
-        <div className="grid h-12 w-12 animate-pulse place-items-center rounded-2xl bg-gradient-to-br from-brass to-brand-500 font-display text-2xl font-bold text-ink-950">
-          F
+function LocalConflict() {
+  const { localConflict, resolveLocalConflict, workspace } = useCollab();
+  if (!localConflict) return null;
+  const l = localConflict.localDb;
+  return (
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/50 p-0 sm:items-center sm:p-6">
+      <div className="w-full max-w-lg rounded-t-card bg-white p-6 sm:rounded-card">
+        <h2 className="font-display text-[24px] font-bold">Deux versions de vos données</h2>
+        <p className="mt-2 text-body text-muted">
+          Cet appareil contient du travail fait sans compte ({l.products.length} produit(s), {l.sales.length} vente(s),{' '}
+          {l.expenses.length} dépense(s)), et votre espace en ligne contient déjà des données. Rien ne sera écrasé sans votre accord.
+        </p>
+        <div className="mt-5 space-y-2">
+          <button onClick={() => void resolveLocalConflict('keep-cloud')} className="btn-primary w-full justify-start text-left">
+            Continuer avec l’espace en ligne
+          </button>
+          <p className="px-1 text-caption text-muted">Recommandé. Le travail local de cet appareil est mis de côté.</p>
+          {workspace?.role === 'owner' && (
+            <>
+              <button onClick={() => void resolveLocalConflict('import-local')} className="btn-ghost w-full justify-start text-left">
+                Remplacer l’espace en ligne par le travail de cet appareil
+              </button>
+              <p className="px-1 text-caption text-[#A63030]">Les données en ligne actuelles seront perdues. Choisissez ceci seulement si vous êtes sûr.</p>
+            </>
+          )}
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
+export default function App() {
+  const { user, guest, loading, workspace, sync } = useCollab();
+  const db = useDB();
+
+  if (loading) return <Splash />;
   if (!user && !guest) return <Auth />;
+  if (user && !workspace && sync !== 'error') return <Splash />;
+
+  const needsOnboarding = !db.company.onboarded && (!workspace || workspace.role === 'owner');
+  if (needsOnboarding) return <Onboarding />;
 
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/assistant" element={<Assistant />} />
-        <Route path="/pos" element={<PointOfSale />} />
-        <Route path="/caisse" element={<CashRegister />} />
-        <Route path="/produits" element={<Products />} />
-        <Route path="/achats" element={<Purchases />} />
-        <Route path="/stock" element={<Stock />} />
-        <Route path="/ventes" element={<Sales />} />
-        <Route path="/devis" element={<Quotes />} />
-        <Route path="/tiers" element={<Parties />} />
-        <Route path="/dettes" element={<Debts />} />
-        <Route path="/depenses" element={<Expenses />} />
-        <Route path="/analyse" element={<Analytics />} />
-        <Route path="/rapports" element={<Reports />} />
-        <Route path="/livre-caisse" element={<CashBook />} />
-        <Route path="/journal" element={<Journal />} />
-        <Route path="/grand-livre" element={<GeneralLedger />} />
-        <Route path="/balance" element={<TrialBalance />} />
-        <Route path="/etats" element={<Statements />} />
-        <Route path="/plan-comptable" element={<ChartOfAccounts />} />
-        <Route path="/audit" element={<Audit />} />
-        <Route path="/historique" element={<AuditTrail />} />
-        <Route path="/parametres" element={<Settings />} />
-      </Routes>
-    </Layout>
+    <>
+      <LocalConflict />
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/assistant" element={<Assistant />} />
+          <Route path="/pos" element={<PointOfSale />} />
+          <Route path="/caisse" element={<CashRegister />} />
+          <Route path="/produits" element={<Products />} />
+          <Route path="/achats" element={<Purchases />} />
+          <Route path="/stock" element={<Stock />} />
+          <Route path="/ventes" element={<Sales />} />
+          <Route path="/devis" element={<Quotes />} />
+          <Route path="/tiers" element={<Parties />} />
+          <Route path="/dettes" element={<Debts />} />
+          <Route path="/depenses" element={<Expenses />} />
+          <Route path="/analyse" element={<Analytics />} />
+          <Route path="/rapports" element={<Reports />} />
+          <Route path="/livre-caisse" element={<CashBook />} />
+          <Route path="/journal" element={<Journal />} />
+          <Route path="/grand-livre" element={<GeneralLedger />} />
+          <Route path="/balance" element={<TrialBalance />} />
+          <Route path="/etats" element={<Statements />} />
+          <Route path="/plan-comptable" element={<ChartOfAccounts />} />
+          <Route path="/audit" element={<Audit />} />
+          <Route path="/historique" element={<AuditTrail />} />
+          <Route path="/equipe" element={<Team />} />
+          <Route path="/parametres" element={<Settings />} />
+          <Route path="*" element={<Dashboard />} />
+        </Routes>
+      </Layout>
+    </>
   );
 }

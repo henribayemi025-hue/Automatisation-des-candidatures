@@ -45,7 +45,7 @@ export default function Assistant() {
   return (
     <>
       <PageHeader
-        title="Finia IA"
+        title="Assistant"
         subtitle="Interrogez vos chiffres en langage naturel — les réponses sont calculées sur vos écritures réelles"
       />
 

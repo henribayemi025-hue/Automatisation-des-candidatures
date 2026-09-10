@@ -20,7 +20,8 @@ export const CURRENCIES: Currency[] = [
 ];
 
 export function currency(code: string): Currency {
-  return CURRENCIES.find((c) => c.code === code) ?? CURRENCIES[2];
+  // Aucune devise n'est supposée : sans choix explicite, on affiche le code tel quel.
+  return CURRENCIES.find((c) => c.code === code) ?? { code, symbol: code, decimals: 2 };
 }
 
 export function factor(code: string): number {

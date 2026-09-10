@@ -26,6 +26,36 @@ export default function Products() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(BLANK);
+  const [grid, setGrid] = useState(false);
+  const [sort, setSort] = useState<'name' | 'price' | 'margin' | 'stock'>('name');
+
+  /** Saisie directe dans la cellule, enregistrée dès qu'on quitte la case. */
+  function Cell({ product, field }: { product: Product; field: 'price' | 'cost' | 'reorderPoint' | 'category' }) {
+    const money = field === 'price' || field === 'cost';
+    const initial = money ? String(toMajor(product[field], currency)) : String(product[field]);
+    return (
+      <input
+        defaultValue={initial}
+        inputMode={field === 'category' ? 'text' : 'decimal'}
+        aria-label={field}
+        className="field w-full min-w-[96px] py-1.5 num"
+        onBlur={(e) => {
+          const raw = e.target.value;
+          if (raw === initial) return;
+          const patch =
+            field === 'category'
+              ? { category: raw }
+              : field === 'reorderPoint'
+                ? { reorderPoint: Number(raw) || 0 }
+                : { [field]: toMinor(raw || 0, currency) };
+          saveProduct({ ...product, ...patch });
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+        }}
+      />
+    );
+  }
 
   const categories = useMemo(
     () => [...new Set(db.products.map((p) => p.category).filter(Boolean))],
@@ -34,7 +64,8 @@ export default function Products() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return db.products.filter((p) => {
+    const list = db.products.filter((p) => {
+      if (p.archived) return false;
       if (category && p.category !== category) return false;
       if (!q) return true;
       return (
@@ -43,7 +74,14 @@ export default function Products() {
         p.barcode.toLowerCase().includes(q)
       );
     });
-  }, [db.products, query, category]);
+    const by: Record<typeof sort, (a: Product, b: Product) => number> = {
+      name: (a, b) => a.name.localeCompare(b.name),
+      price: (a, b) => b.price - a.price,
+      margin: (a, b) => b.price - b.cost - (a.price - a.cost),
+      stock: (a, b) => a.stock - b.stock,
+    };
+    return list.sort(by[sort]);
+  }, [db.products, query, category, sort]);
 
   function openNew() {
     setEditing(null);
@@ -117,6 +155,9 @@ export default function Products() {
         subtitle={`${db.products.length} référence(s) au catalogue`}
         actions={
           <>
+            <button onClick={() => setGrid((g) => !g)} className={grid ? 'btn-dark' : 'btn-ghost'} title="Modifier les prix directement dans le tableau, comme dans un tableur">
+              {grid ? 'Quitter le mode tableau' : 'Mode tableau'}
+            </button>
             <button onClick={exportCsv} className="btn-ghost">
               <IconDownload className="h-4 w-4" />
               Export CSV
@@ -147,7 +188,19 @@ export default function Products() {
             </option>
           ))}
         </select>
+        <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className="field w-auto" aria-label="Trier">
+          <option value="name">Trier : nom</option>
+          <option value="price">Trier : prix le plus élevé</option>
+          <option value="margin">Trier : meilleure marge</option>
+          <option value="stock">Trier : stock le plus bas</option>
+        </select>
       </div>
+
+      {grid && (
+        <p className="mb-3 rounded-input bg-[#FBF1DF] px-4 py-2.5 text-caption text-ink">
+          Mode tableau : modifiez une case et quittez-la, c’est enregistré. Le stock se corrige depuis l’écran Stock (chaque mouvement est tracé).
+        </p>
+      )}
 
       <div className="card p-0">
         {filtered.length ? (
@@ -161,9 +214,9 @@ export default function Products() {
                     <div className="font-semibold">{p.name}</div>
                     {p.sku && <div className="text-xs text-slate-400">{p.sku}</div>}
                   </td>
-                  <td className="td text-slate-500">{p.category || '—'}</td>
-                  <td className="td font-semibold num">{formatMoney(p.price, currency)}</td>
-                  <td className="td num text-slate-500">{formatMoney(p.cost, currency)}</td>
+                  <td className="td text-slate-500">{grid ? <Cell product={p} field="category" /> : p.category || '—'}</td>
+                  <td className="td font-semibold num">{grid ? <Cell product={p} field="price" /> : formatMoney(p.price, currency)}</td>
+                  <td className="td num text-slate-500">{grid ? <Cell product={p} field="cost" /> : formatMoney(p.cost, currency)}</td>
                   <td className="td num">
                     <span className={margin >= 0 ? 'text-teal-600' : 'text-rose-600'}>
                       {formatMoney(margin, currency)}
@@ -171,13 +224,20 @@ export default function Products() {
                     <span className="ml-1 text-xs text-slate-400">({rate.toFixed(0)} %)</span>
                   </td>
                   <td className="td">
-                    {p.stock <= 0 ? (
-                      <Badge tone="danger">Rupture</Badge>
-                    ) : p.stock <= p.reorderPoint ? (
-                      <Badge tone="warn">{p.stock} — bas</Badge>
-                    ) : (
-                      <Badge tone="success">{p.stock}</Badge>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {p.stock <= 0 ? (
+                        <Badge tone="danger">Rupture</Badge>
+                      ) : p.stock <= p.reorderPoint ? (
+                        <Badge tone="warn">{p.stock} — bas</Badge>
+                      ) : (
+                        <Badge tone="success">{p.stock}</Badge>
+                      )}
+                      {grid && (
+                        <span className="flex items-center gap-1 text-[11px] text-muted">
+                          seuil <Cell product={p} field="reorderPoint" />
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="td text-right">
                     <button onClick={() => openEdit(p)} className="text-sm font-semibold text-brand-600">

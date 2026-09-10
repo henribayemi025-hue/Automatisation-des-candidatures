@@ -1,15 +1,13 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { accountCode, buildChart } from './chart';
+import { accountCode } from './chart';
 import type { AccountKey } from './chart';
+import { applyEvent, emptyDB, normalizeDB, saleTotals } from './reducer';
 import type {
-  Account,
   Company,
   Customer,
   DB,
-  Expense,
   JournalCode,
-  JournalEntry,
   JournalLine,
   Minor,
   PaymentMethod,
@@ -19,63 +17,44 @@ import type {
   Sale,
   SaleLine,
   Supplier,
+  WorkspaceEvent,
 } from './types';
 
-const STORAGE_KEY = 'finia.db.v1';
-const USER = 'henri bayemi';
-
 export function newId(): string {
-  return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
 export function today(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function now(): string {
-  return new Date().toISOString();
-}
+const CACHE_PREFIX = 'finia.cache.';
 
-const DEFAULT_COMPANY: Company = {
-  name: 'Mon entreprise',
-  currency: 'XAF',
-  country: '',
-  city: '',
-  sector: '',
-  phone: '',
-  chart: 'SYSCOHADA',
-  vatEnabled: false,
-  vatRateBp: 1925,
-  fiscalYearStart: '01-01',
-};
-
-function emptyDB(): DB {
-  return {
-    company: DEFAULT_COMPANY,
-    accounts: buildChart(DEFAULT_COMPANY.chart),
-    entries: [],
-    products: [],
-    customers: [],
-    suppliers: [],
-    sales: [],
-    purchases: [],
-    expenses: [],
-    movements: [],
-    debts: [],
-    sessions: [],
-    audit: [],
-  };
-}
-
-function load(): DB {
+export function loadCache(scope: string): DB | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return emptyDB();
-    const parsed = JSON.parse(raw) as Partial<DB>;
-    return { ...emptyDB(), ...parsed };
+    const raw = localStorage.getItem(CACHE_PREFIX + scope);
+    return raw ? normalizeDB(JSON.parse(raw)) : null;
   } catch {
-    return emptyDB();
+    return null;
   }
+}
+
+export function saveCache(scope: string, db: DB) {
+  try {
+    localStorage.setItem(CACHE_PREFIX + scope, JSON.stringify(db));
+  } catch {
+    // Stockage plein ou indisponible : le cloud reste la source de vérité.
+  }
+}
+
+export function hasContent(db: DB | null): boolean {
+  return !!db && (db.products.length > 0 || db.entries.length > 0 || db.sales.length > 0 || db.expenses.length > 0);
+}
+
+interface Actor {
+  id: string | null;
+  name: string;
 }
 
 interface SaleInput {
@@ -111,11 +90,23 @@ interface ManualEntryInput {
   lines: JournalLine[];
 }
 
-interface StoreValue {
-  db: DB;
-  setCompany: (patch: Partial<Company>) => void;
+type Listener = (ev: WorkspaceEvent) => void;
+
+export interface StoreActions {
   code: (key: AccountKey) => string;
+  /** Lecture synchrone de l'état courant, sans dépendre du rendu. */
+  getState: () => DB;
+  /** Identité de la personne qui agit, portée par chaque événement. */
+  setActor: (actor: Actor) => void;
+  /** Espace de stockage local courant ('guest' ou identifiant d'espace). */
+  setScope: (scope: string) => void;
+  replaceState: (db: DB) => void;
+  applyRemote: (events: WorkspaceEvent[]) => void;
+  subscribe: (listener: Listener) => () => void;
+
+  setCompany: (patch: Partial<Company>) => void;
   saveProduct: (product: Omit<Product, 'id' | 'createdAt'> & { id?: string }) => void;
+  archiveProduct: (productId: string) => void;
   saveCustomer: (customer: Omit<Customer, 'id' | 'createdAt'> & { id?: string }) => Customer;
   saveSupplier: (supplier: Omit<Supplier, 'id' | 'createdAt'> & { id?: string }) => Supplier;
   recordSale: (input: SaleInput) => Sale;
@@ -130,218 +121,123 @@ interface StoreValue {
   openSession: (opening: Minor) => void;
   closeSession: (counted: Minor) => void;
   resetAll: () => void;
-  loadDemo: () => void;
-  /** Remplace l'état complet (hydratation depuis le cloud). */
-  hydrate: (db: DB) => void;
+}
+
+export interface StoreValue extends StoreActions {
+  db: DB;
 }
 
 const StoreContext = createContext<StoreValue | null>(null);
+const ActionsContext = createContext<StoreActions | null>(null);
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [db, setDb] = useState<DB>(load);
+  const [db, setDb] = useState<DB>(() => loadCache('guest') ?? emptyDB());
+  const dbRef = useRef(db);
+  dbRef.current = db;
+  const actor = useRef<Actor>({ id: null, name: 'Utilisateur' });
+  const scope = useRef('guest');
+  const listeners = useRef(new Set<Listener>());
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-  }, [db]);
+  const commit = useCallback((next: DB) => {
+    dbRef.current = next;
+    setDb(next);
+    saveCache(scope.current, next);
+  }, []);
 
-  const code = useCallback(
-    (key: AccountKey) => accountCode(db.company.chart, key),
-    [db.company.chart],
-  );
-
-  /** Applique une mutation en ajoutant systématiquement une trace d'audit. */
-  const commit = useCallback(
-    (
-      mutate: (draft: DB) => { entity: string; entityId: string; action: string; summary: string },
-    ) => {
-      setDb((prev) => {
-        const draft: DB = structuredClone(prev);
-        const meta = mutate(draft);
-        draft.audit = [
-          {
-            id: newId(),
-            at: now(),
-            user: USER,
-            action: meta.action,
-            entity: meta.entity,
-            entityId: meta.entityId,
-            summary: meta.summary,
-          },
-          ...draft.audit,
-        ].slice(0, 2000);
-        return draft;
-      });
-    },
-    [],
-  );
-
-  const setCompany = useCallback(
-    (patch: Partial<Company>) => {
-      commit((draft) => {
-        const before = draft.company;
-        draft.company = { ...before, ...patch };
-        if (patch.chart && patch.chart !== before.chart) {
-          draft.accounts = mergeChart(draft.accounts, buildChart(patch.chart));
-        }
-        return {
-          entity: 'company',
-          entityId: 'company',
-          action: 'UPDATE',
-          summary: `Paramètres mis à jour (${Object.keys(patch).join(', ')})`,
-        };
-      });
+  /** Crée l'événement, l'applique localement tout de suite, puis prévient la synchro. */
+  const dispatch = useCallback(
+    (type: string, payload: Record<string, unknown>): WorkspaceEvent => {
+      const ev: WorkspaceEvent = {
+        id: newId(),
+        at: new Date().toISOString(),
+        actorId: actor.current.id,
+        actorName: actor.current.name,
+        type,
+        payload,
+      };
+      // Validation stricte avant diffusion : une écriture déséquilibrée lève ici,
+      // jamais chez les autres membres.
+      commit(applyEvent(dbRef.current, ev));
+      listeners.current.forEach((l) => l(ev));
+      return ev;
     },
     [commit],
   );
 
-  const value = useMemo<StoreValue>(() => {
-    const chart = db.company.chart;
-    const acc = (key: AccountKey) => accountCode(chart, key);
-
-    const methodAccount = (method: PaymentMethod): string => {
-      switch (method) {
-        case 'CASH':
-          return acc('CASH');
-        case 'MOBILE':
-          return acc('MOBILE_MONEY');
-        case 'CARD':
-        case 'BANK':
-          return acc('BANK');
-        case 'CREDIT':
-          return acc('CUSTOMERS');
-      }
-    };
-
-    const post = (
-      draft: DB,
-      entry: Omit<JournalEntry, 'id' | 'createdAt' | 'createdBy' | 'posted'>,
-    ): JournalEntry => {
-      const debit = entry.lines.reduce((s, l) => s + l.debit, 0);
-      const credit = entry.lines.reduce((s, l) => s + l.credit, 0);
-      if (debit !== credit) {
-        throw new Error(`Écriture déséquilibrée (${debit} ≠ ${credit}) : ${entry.label}`);
-      }
-      const full: JournalEntry = {
-        ...entry,
-        lines: entry.lines.filter((l) => l.debit !== 0 || l.credit !== 0),
-        id: newId(),
-        createdAt: now(),
-        createdBy: USER,
-        posted: true,
-      };
-      draft.entries.push(full);
-      return full;
-    };
-
-    const nextNumber = (prefix: string, count: number) =>
-      `${prefix}-${String(count + 1).padStart(5, '0')}`;
-
-    const saleTotals = (lines: SaleLine[], discount: Minor) => {
-      const gross = lines.reduce((s, l) => s + l.unitPrice * l.qty, 0);
-      const net = Math.max(0, gross - discount);
-      const vat = db.company.vatEnabled ? Math.round((net * db.company.vatRateBp) / 10000) : 0;
-      const cost = lines.reduce((s, l) => s + l.unitCost * l.qty, 0);
-      return { gross, net, vat, total: net + vat, cost };
-    };
+  // Identité stable : les composants et la synchro peuvent en dépendre sans boucle.
+  const actions = useMemo<StoreActions>(() => {
+    const chart = () => dbRef.current.company.chart;
+    const nextNumber = (prefix: string, count: number) => `${prefix}-${String(count + 1).padStart(5, '0')}`;
 
     return {
-      db,
-      setCompany,
-      code,
+      code: (key) => accountCode(chart(), key),
+      getState: () => dbRef.current,
+
+      setActor(a) {
+        actor.current = a;
+      },
+      setScope(s) {
+        scope.current = s;
+      },
+      replaceState(next) {
+        commit(normalizeDB(next));
+      },
+      applyRemote(events) {
+        let next = dbRef.current;
+        for (const ev of events) {
+          try {
+            next = applyEvent(next, ev);
+          } catch {
+            // Un événement invalide venu d'ailleurs n'abîme pas l'état local.
+          }
+        }
+        commit(next);
+      },
+      subscribe(listener) {
+        listeners.current.add(listener);
+        return () => listeners.current.delete(listener);
+      },
+
+      setCompany(patch) {
+        dispatch('company.update', { patch });
+      },
 
       saveProduct(input) {
-        commit((draft) => {
-          if (input.id) {
-            const idx = draft.products.findIndex((p) => p.id === input.id);
-            draft.products[idx] = { ...draft.products[idx], ...input } as Product;
-            return {
-              entity: 'product',
-              entityId: input.id,
-              action: 'UPDATE',
-              summary: `Produit modifié : ${input.name}`,
-            };
-          }
-          const product: Product = {
-            ...input,
-            id: newId(),
-            createdAt: now(),
-          } as Product;
-          draft.products.push(product);
-          if (product.stock > 0) {
-            draft.movements.unshift({
-              id: newId(),
-              date: today(),
-              productId: product.id,
-              productName: product.name,
-              type: 'IN',
-              qty: product.stock,
-              resulting: product.stock,
-              reason: 'Stock initial',
-              ref: 'INIT',
-              by: USER,
-            });
-            const amount = product.stock * product.cost;
-            if (amount > 0) {
-              post(draft, {
-                date: today(),
-                journal: 'OD',
-                ref: `INIT-${product.sku || product.id.slice(0, 5)}`,
-                label: `Stock initial ${product.name}`,
-                sourceType: 'product',
-                sourceId: product.id,
-                lines: [
-                  { account: acc('INVENTORY'), label: 'Stock initial', debit: amount, credit: 0 },
-                  { account: acc('CAPITAL'), label: 'Apport en nature', debit: 0, credit: amount },
-                ],
-              });
-            }
-          }
-          return {
-            entity: 'product',
-            entityId: product.id,
-            action: 'CREATE',
-            summary: `Produit créé : ${product.name}`,
-          };
-        });
+        const existing = input.id ? dbRef.current.products.find((p) => p.id === input.id) : undefined;
+        const product: Product = {
+          ...(existing ?? { id: newId(), createdAt: new Date().toISOString() }),
+          ...input,
+          id: existing?.id ?? input.id ?? newId(),
+          createdAt: existing?.createdAt ?? new Date().toISOString(),
+        } as Product;
+        dispatch('product.save', { product, movementId: newId(), entryId: newId() });
+      },
+
+      archiveProduct(productId) {
+        dispatch('product.archive', { productId });
       },
 
       saveCustomer(input) {
-        const customer: Customer = { ...input, id: input.id ?? newId(), createdAt: now() };
-        commit((draft) => {
-          const idx = draft.customers.findIndex((c) => c.id === customer.id);
-          if (idx >= 0) draft.customers[idx] = customer;
-          else draft.customers.push(customer);
-          return {
-            entity: 'customer',
-            entityId: customer.id,
-            action: idx >= 0 ? 'UPDATE' : 'CREATE',
-            summary: `Client : ${customer.name}`,
-          };
-        });
+        const customer: Customer = { ...input, id: input.id ?? newId(), createdAt: new Date().toISOString() };
+        dispatch('customer.save', { customer });
         return customer;
       },
 
       saveSupplier(input) {
-        const supplier: Supplier = { ...input, id: input.id ?? newId(), createdAt: now() };
-        commit((draft) => {
-          const idx = draft.suppliers.findIndex((s) => s.id === supplier.id);
-          if (idx >= 0) draft.suppliers[idx] = supplier;
-          else draft.suppliers.push(supplier);
-          return {
-            entity: 'supplier',
-            entityId: supplier.id,
-            action: idx >= 0 ? 'UPDATE' : 'CREATE',
-            summary: `Fournisseur : ${supplier.name}`,
-          };
-        });
+        const supplier: Supplier = { ...input, id: input.id ?? newId(), createdAt: new Date().toISOString() };
+        dispatch('supplier.save', { supplier });
         return supplier;
       },
 
       recordSale(input) {
-        const t = saleTotals(input.lines, input.discount);
+        const t = saleTotals(dbRef.current.company, input.lines, input.discount);
+        const isQuote = !!input.asQuote;
         const sale: Sale = {
           id: newId(),
-          number: nextNumber(input.asQuote ? 'DV' : 'FA', db.sales.length),
+          number: nextNumber(
+            isQuote ? 'DV' : 'FA',
+            dbRef.current.sales.filter((s) => (isQuote ? s.status === 'QUOTE' : s.status !== 'QUOTE')).length,
+          ),
           date: today(),
           customerId: input.customerId,
           customerName: input.customerName || 'Client passager',
@@ -349,43 +245,39 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           discount: input.discount,
           vat: t.vat,
           total: t.total,
-          paid: input.asQuote ? 0 : input.paid,
+          paid: isQuote ? 0 : Math.min(input.paid, t.total),
           method: input.method,
-          status: input.asQuote ? 'QUOTE' : 'CONFIRMED',
-          cashier: USER,
-          createdAt: now(),
+          status: isQuote ? 'QUOTE' : 'CONFIRMED',
+          cashier: actor.current.name,
+          createdAt: new Date().toISOString(),
         };
-
-        commit((draft) => {
-          draft.sales.unshift(sale);
-          if (!input.asQuote) applySaleSideEffects(draft, sale, t);
-          return {
-            entity: 'sale',
-            entityId: sale.id,
-            action: input.asQuote ? 'QUOTE' : 'CREATE',
-            summary: `${input.asQuote ? 'Devis' : 'Vente'} ${sale.number} — ${sale.customerName}`,
-          };
+        dispatch('sale.record', {
+          sale,
+          ids: {
+            movements: input.lines.map(() => newId()),
+            saleEntry: newId(),
+            cogsEntry: newId(),
+            debt: newId(),
+          },
         });
         return sale;
       },
 
       confirmQuote(saleId, method, paid) {
-        commit((draft) => {
-          const sale = draft.sales.find((s) => s.id === saleId);
-          if (!sale) throw new Error('Devis introuvable');
-          sale.status = 'CONFIRMED';
-          sale.method = method;
-          sale.paid = paid;
-          sale.number = nextNumber('FA', draft.sales.filter((s) => s.status === 'CONFIRMED').length);
-          sale.date = today();
-          const t = saleTotals(sale.lines, sale.discount);
-          applySaleSideEffects(draft, sale, t);
-          return {
-            entity: 'sale',
-            entityId: sale.id,
-            action: 'CONFIRM',
-            summary: `Devis converti en vente ${sale.number}`,
-          };
+        const sale = dbRef.current.sales.find((s) => s.id === saleId);
+        if (!sale) throw new Error('Devis introuvable');
+        dispatch('quote.confirm', {
+          saleId,
+          method,
+          paid: Math.min(paid, sale.total),
+          number: nextNumber('FA', dbRef.current.sales.filter((s) => s.status !== 'QUOTE').length),
+          date: today(),
+          ids: {
+            movements: sale.lines.map(() => newId()),
+            saleEntry: newId(),
+            cogsEntry: newId(),
+            debt: newId(),
+          },
         });
       },
 
@@ -393,441 +285,117 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         const total = input.lines.reduce((s, l) => s + l.unitCost * l.qty, 0);
         const purchase: Purchase = {
           id: newId(),
-          number: nextNumber('BC', db.purchases.length),
+          number: nextNumber('BC', dbRef.current.purchases.length),
           date: today(),
           supplierId: input.supplierId,
           supplierName: input.supplierName || 'Fournisseur',
           lines: input.lines,
           total,
-          paid: input.paid,
+          paid: Math.min(input.paid, total),
           status: 'PENDING',
-          createdAt: now(),
+          createdAt: new Date().toISOString(),
         };
-        commit((draft) => {
-          draft.purchases.unshift(purchase);
-          return {
-            entity: 'purchase',
-            entityId: purchase.id,
-            action: 'CREATE',
-            summary: `Bon de commande ${purchase.number} — ${purchase.supplierName}`,
-          };
-        });
+        dispatch('purchase.record', { purchase });
         return purchase;
       },
 
       receivePurchase(purchaseId) {
-        commit((draft) => {
-          const purchase = draft.purchases.find((p) => p.id === purchaseId);
-          if (!purchase) throw new Error('Achat introuvable');
-          if (purchase.status === 'RECEIVED') throw new Error('Achat déjà réceptionné');
-          purchase.status = 'RECEIVED';
-
-          for (const line of purchase.lines) {
-            const product = draft.products.find((p) => p.id === line.productId);
-            if (!product) continue;
-            const before = product.stock;
-            const beforeValue = before * product.cost;
-            product.stock = before + line.qty;
-            // Prix moyen pondéré : le coût unitaire suit les réceptions successives.
-            product.cost =
-              product.stock > 0
-                ? Math.round((beforeValue + line.qty * line.unitCost) / product.stock)
-                : line.unitCost;
-            draft.movements.unshift({
-              id: newId(),
-              date: today(),
-              productId: product.id,
-              productName: product.name,
-              type: 'IN',
-              qty: line.qty,
-              resulting: product.stock,
-              reason: 'Réception achat',
-              ref: purchase.number,
-              by: USER,
-            });
-          }
-
-          const vat = draft.company.vatEnabled
-            ? Math.round((purchase.total * draft.company.vatRateBp) / 10000)
-            : 0;
-          const ttc = purchase.total + vat;
-
-          post(draft, {
-            date: purchase.date,
-            journal: 'AC',
-            ref: purchase.number,
-            label: `Achat ${purchase.supplierName}`,
-            sourceType: 'purchase',
-            sourceId: purchase.id,
-            lines: [
-              { account: acc('INVENTORY'), label: 'Entrée en stock', debit: purchase.total, credit: 0 },
-              { account: acc('VAT_DEDUCTIBLE'), label: 'TVA déductible', debit: vat, credit: 0 },
-              { account: acc('SUPPLIERS'), label: purchase.supplierName, debit: 0, credit: ttc },
-            ],
-          });
-
-          if (purchase.paid > 0) {
-            post(draft, {
-              date: purchase.date,
-              journal: 'CA',
-              ref: `${purchase.number}-RGL`,
-              label: `Règlement achat ${purchase.number}`,
-              sourceType: 'purchase',
-              sourceId: purchase.id,
-              lines: [
-                { account: acc('SUPPLIERS'), label: 'Règlement fournisseur', debit: purchase.paid, credit: 0 },
-                { account: acc('CASH'), label: 'Sortie de caisse', debit: 0, credit: purchase.paid },
-              ],
-            });
-          }
-
-          const remaining = ttc - purchase.paid;
-          if (remaining > 0) {
-            draft.debts.unshift({
-              id: newId(),
-              party: 'SUPPLIER',
-              partyId: purchase.supplierId,
-              partyName: purchase.supplierName,
-              origin: `Achat ${purchase.number}`,
-              sourceId: purchase.id,
-              date: purchase.date,
-              amount: remaining,
-              payments: [],
-              createdAt: now(),
-            });
-          }
-
-          return {
-            entity: 'purchase',
-            entityId: purchase.id,
-            action: 'RECEIVE',
-            summary: `Réception ${purchase.number} — stock et écritures mis à jour`,
-          };
+        const purchase = dbRef.current.purchases.find((p) => p.id === purchaseId);
+        if (!purchase) throw new Error('Achat introuvable');
+        if (purchase.status === 'RECEIVED') throw new Error('Achat déjà réceptionné');
+        dispatch('purchase.receive', {
+          purchaseId,
+          date: today(),
+          ids: { movements: purchase.lines.map(() => newId()), entry: newId(), payment: newId(), debt: newId() },
         });
       },
 
       addExpense(input) {
-        commit((draft) => {
-          const expense: Expense = {
+        dispatch('expense.add', {
+          expense: {
             id: newId(),
             date: input.date,
             category: input.category,
-            account: accountCode(draft.company.chart, input.accountKey),
+            account: accountCode(chart(), input.accountKey),
             description: input.description,
             amount: input.amount,
             method: input.method,
-            createdAt: now(),
-          };
-          draft.expenses.unshift(expense);
-          post(draft, {
-            date: expense.date,
-            journal: 'CA',
-            ref: `DEP-${expense.id.slice(0, 5).toUpperCase()}`,
-            label: expense.description || expense.category,
-            sourceType: 'expense',
-            sourceId: expense.id,
-            lines: [
-              { account: expense.account, label: expense.category, debit: expense.amount, credit: 0 },
-              { account: methodAccount(expense.method), label: 'Décaissement', debit: 0, credit: expense.amount },
-            ],
-          });
-          return {
-            entity: 'expense',
-            entityId: expense.id,
-            action: 'CREATE',
-            summary: `Dépense ${expense.category} enregistrée`,
-          };
+            createdAt: new Date().toISOString(),
+          },
+          entryId: newId(),
         });
       },
 
       adjustStock(productId, qty, reason) {
-        commit((draft) => {
-          const product = draft.products.find((p) => p.id === productId);
-          if (!product) throw new Error('Produit introuvable');
-          const before = product.stock;
-          product.stock = before + qty;
-          draft.movements.unshift({
-            id: newId(),
-            date: today(),
-            productId,
-            productName: product.name,
-            type: qty >= 0 ? 'IN' : 'OUT',
-            qty: Math.abs(qty),
-            resulting: product.stock,
-            reason,
-            ref: 'AJUST',
-            by: USER,
-          });
-          const amount = Math.abs(qty) * product.cost;
-          if (amount > 0) {
-            const gain = qty > 0;
-            post(draft, {
-              date: today(),
-              journal: 'OD',
-              ref: `AJ-${product.sku || product.id.slice(0, 5)}`,
-              label: `Ajustement stock ${product.name} — ${reason}`,
-              sourceType: 'stock',
-              sourceId: productId,
-              lines: gain
-                ? [
-                    { account: acc('INVENTORY'), label: 'Entrée', debit: amount, credit: 0 },
-                    { account: acc('INVENTORY_CHANGE'), label: reason, debit: 0, credit: amount },
-                  ]
-                : [
-                    { account: acc('INVENTORY_CHANGE'), label: reason, debit: amount, credit: 0 },
-                    { account: acc('INVENTORY'), label: 'Sortie', debit: 0, credit: amount },
-                  ],
-            });
-          }
-          return {
-            entity: 'stock',
-            entityId: productId,
-            action: 'ADJUST',
-            summary: `Ajustement ${qty > 0 ? '+' : ''}${qty} sur ${product.name} (${reason})`,
-          };
-        });
+        if (!dbRef.current.products.some((p) => p.id === productId)) throw new Error('Produit introuvable');
+        dispatch('stock.adjust', { productId, qty, reason, date: today(), movementId: newId(), entryId: newId() });
       },
 
       payDebt(debtId, amount, method) {
-        commit((draft) => {
-          const debt = draft.debts.find((d) => d.id === debtId);
-          if (!debt) throw new Error('Dette introuvable');
-          debt.payments.push({ id: newId(), date: today(), amount, method });
-          const customerSide = debt.party === 'CUSTOMER';
-          post(draft, {
-            date: today(),
-            journal: 'CA',
-            ref: `RGL-${debt.id.slice(0, 5).toUpperCase()}`,
-            label: `${customerSide ? 'Encaissement' : 'Règlement'} ${debt.partyName}`,
-            sourceType: 'debt',
-            sourceId: debt.id,
-            lines: customerSide
-              ? [
-                  { account: methodAccount(method), label: 'Encaissement', debit: amount, credit: 0 },
-                  { account: acc('CUSTOMERS'), label: debt.partyName, debit: 0, credit: amount },
-                ]
-              : [
-                  { account: acc('SUPPLIERS'), label: debt.partyName, debit: amount, credit: 0 },
-                  { account: methodAccount(method), label: 'Décaissement', debit: 0, credit: amount },
-                ],
-          });
-          return {
-            entity: 'debt',
-            entityId: debt.id,
-            action: 'PAYMENT',
-            summary: `Règlement enregistré sur ${debt.partyName}`,
-          };
+        if (!dbRef.current.debts.some((d) => d.id === debtId)) throw new Error('Dette introuvable');
+        dispatch('debt.pay', {
+          debtId,
+          payment: { id: newId(), date: today(), amount, method },
+          entryId: newId(),
         });
       },
 
       addManualEntry(input) {
-        commit((draft) => {
-          const entry = post(draft, {
-            date: input.date,
-            journal: input.journal,
-            ref: `OD-${String(draft.entries.length + 1).padStart(4, '0')}`,
-            label: input.label,
-            lines: input.lines,
-          });
-          return {
-            entity: 'entry',
-            entityId: entry.id,
-            action: 'CREATE',
-            summary: `Écriture manuelle ${entry.ref} : ${entry.label}`,
-          };
+        const debit = input.lines.reduce((s, l) => s + l.debit, 0);
+        const credit = input.lines.reduce((s, l) => s + l.credit, 0);
+        if (debit !== credit) throw new Error(`Écriture déséquilibrée (${debit} ≠ ${credit})`);
+        dispatch('entry.manual', {
+          entryId: newId(),
+          date: input.date,
+          journal: input.journal,
+          ref: `OD-${String(dbRef.current.entries.length + 1).padStart(4, '0')}`,
+          label: input.label,
+          lines: input.lines,
         });
       },
 
       reverseEntry(entryId) {
-        commit((draft) => {
-          const original = draft.entries.find((e) => e.id === entryId);
-          if (!original) throw new Error('Écriture introuvable');
-          if (original.reversedBy) throw new Error('Écriture déjà extournée');
-          const reversal = post(draft, {
-            date: today(),
-            journal: original.journal,
-            ref: `EXT-${original.ref}`,
-            label: `Extourne de ${original.ref} — ${original.label}`,
-            sourceType: original.sourceType,
-            sourceId: original.sourceId,
-            reverses: original.id,
-            lines: original.lines.map((l) => ({
-              account: l.account,
-              label: l.label,
-              debit: l.credit,
-              credit: l.debit,
-            })),
-          });
-          original.reversedBy = reversal.id;
-          return {
-            entity: 'entry',
-            entityId: original.id,
-            action: 'REVERSE',
-            summary: `Écriture ${original.ref} extournée par ${reversal.ref}`,
-          };
-        });
+        const original = dbRef.current.entries.find((e) => e.id === entryId);
+        if (!original) throw new Error('Écriture introuvable');
+        if (original.reversedBy) throw new Error('Écriture déjà extournée');
+        dispatch('entry.reverse', { entryId, reversalId: newId(), date: today() });
       },
 
       openSession(opening) {
-        commit((draft) => {
-          if (draft.sessions.some((s) => !s.closedAt)) throw new Error('Une session est déjà ouverte');
-          const session = {
+        if (dbRef.current.sessions.some((s) => !s.closedAt)) throw new Error('Une session est déjà ouverte');
+        dispatch('session.open', {
+          session: {
             id: newId(),
-            openedAt: now(),
+            openedAt: new Date().toISOString(),
             closedAt: null,
-            cashier: USER,
+            cashier: actor.current.name,
             opening,
             expected: null,
             counted: null,
             variance: null,
-          };
-          draft.sessions.unshift(session);
-          return {
-            entity: 'session',
-            entityId: session.id,
-            action: 'OPEN',
-            summary: 'Ouverture de session de caisse',
-          };
+          },
         });
       },
 
       closeSession(counted) {
-        commit((draft) => {
-          const session = draft.sessions.find((s) => !s.closedAt);
-          if (!session) throw new Error('Aucune session ouverte');
-          const cashCode = accountCode(draft.company.chart, 'CASH');
-          let movement = 0;
-          for (const entry of draft.entries) {
-            if (entry.createdAt < session.openedAt) continue;
-            for (const line of entry.lines) {
-              if (line.account === cashCode) movement += line.debit - line.credit;
-            }
-          }
-          const expected = session.opening + movement;
-          session.closedAt = now();
-          session.expected = expected;
-          session.counted = counted;
-          session.variance = counted - expected;
-          if (session.variance !== 0) {
-            const short = session.variance < 0;
-            const amount = Math.abs(session.variance);
-            post(draft, {
-              date: today(),
-              journal: 'OD',
-              ref: `CAISSE-${session.id.slice(0, 5).toUpperCase()}`,
-              label: `Écart de caisse à la clôture (${short ? 'manquant' : 'excédent'})`,
-              sourceType: 'session',
-              sourceId: session.id,
-              lines: short
-                ? [
-                    { account: accountCode(draft.company.chart, 'MISC_EXPENSE'), label: 'Écart de caisse', debit: amount, credit: 0 },
-                    { account: cashCode, label: 'Manquant', debit: 0, credit: amount },
-                  ]
-                : [
-                    { account: cashCode, label: 'Excédent', debit: amount, credit: 0 },
-                    { account: accountCode(draft.company.chart, 'MISC_REVENUE'), label: 'Écart de caisse', debit: 0, credit: amount },
-                  ],
-            });
-          }
-          return {
-            entity: 'session',
-            entityId: session.id,
-            action: 'CLOSE',
-            summary: `Clôture de caisse — écart ${session.variance}`,
-          };
-        });
+        const session = dbRef.current.sessions.find((s) => !s.closedAt);
+        if (!session) throw new Error('Aucune session ouverte');
+        dispatch('session.close', { sessionId: session.id, counted, entryId: newId() });
       },
 
       resetAll() {
-        setDb(emptyDB());
-      },
-
-      hydrate(next) {
-        setDb({ ...emptyDB(), ...next });
-      },
-
-      loadDemo() {
-        setDb((prev) => buildDemo(prev.company));
+        dispatch('workspace.reset', {});
       },
     };
+  }, [commit, dispatch]);
 
-    function applySaleSideEffects(
-      draft: DB,
-      sale: Sale,
-      t: { net: Minor; vat: Minor; total: Minor; cost: Minor },
-    ) {
-      for (const line of sale.lines) {
-        const product = draft.products.find((p) => p.id === line.productId);
-        if (!product) continue;
-        product.stock -= line.qty;
-        draft.movements.unshift({
-          id: newId(),
-          date: sale.date,
-          productId: product.id,
-          productName: product.name,
-          type: 'OUT',
-          qty: line.qty,
-          resulting: product.stock,
-          reason: 'Vente',
-          ref: sale.number,
-          by: USER,
-        });
-      }
+  const value = useMemo<StoreValue>(() => ({ ...actions, db }), [actions, db]);
 
-      const unpaid = sale.total - sale.paid;
-      post(draft, {
-        date: sale.date,
-        journal: 'VT',
-        ref: sale.number,
-        label: `Vente ${sale.customerName}`,
-        sourceType: 'sale',
-        sourceId: sale.id,
-        lines: [
-          { account: methodAccount(sale.method === 'CREDIT' ? 'CASH' : sale.method), label: 'Encaissement', debit: sale.paid, credit: 0 },
-          { account: acc('CUSTOMERS'), label: sale.customerName, debit: unpaid, credit: 0 },
-          { account: acc('SALES'), label: 'Chiffre d’affaires', debit: 0, credit: t.net },
-          { account: acc('VAT_COLLECTED'), label: 'TVA collectée', debit: 0, credit: t.vat },
-        ],
-      });
-
-      if (t.cost > 0) {
-        post(draft, {
-          date: sale.date,
-          journal: 'OD',
-          ref: `${sale.number}-CMV`,
-          label: `Coût des marchandises vendues ${sale.number}`,
-          sourceType: 'sale',
-          sourceId: sale.id,
-          lines: [
-            { account: acc('INVENTORY_CHANGE'), label: 'Coût des ventes', debit: t.cost, credit: 0 },
-            { account: acc('INVENTORY'), label: 'Sortie de stock', debit: 0, credit: t.cost },
-          ],
-        });
-      }
-
-      if (unpaid > 0) {
-        draft.debts.unshift({
-          id: newId(),
-          party: 'CUSTOMER',
-          partyId: sale.customerId,
-          partyName: sale.customerName,
-          origin: `Vente ${sale.number}`,
-          sourceId: sale.id,
-          date: sale.date,
-          amount: unpaid,
-          payments: [],
-          createdAt: now(),
-        });
-      }
-    }
-  }, [db, commit, code, setCompany]);
-
-  return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
-}
-
-function mergeChart(existing: Account[], next: Account[]): Account[] {
-  const custom = existing.filter((a) => !a.system);
-  return [...next, ...custom];
+  return (
+    <ActionsContext.Provider value={actions}>
+      <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
+    </ActionsContext.Provider>
+  );
 }
 
 export function useStore(): StoreValue {
@@ -836,13 +404,12 @@ export function useStore(): StoreValue {
   return ctx;
 }
 
-export function useDB(): DB {
-  return useStore().db;
+export function useStoreActions(): StoreActions {
+  const ctx = useContext(ActionsContext);
+  if (!ctx) throw new Error('useStoreActions doit être utilisé dans StoreProvider');
+  return ctx;
 }
 
-function buildDemo(company: Company): DB {
-  const base = emptyDB();
-  base.company = company;
-  base.accounts = buildChart(company.chart);
-  return base;
+export function useDB(): DB {
+  return useStore().db;
 }

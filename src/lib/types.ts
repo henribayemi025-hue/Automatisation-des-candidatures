@@ -11,6 +11,9 @@ export interface Currency {
   decimals: number;
 }
 
+/** SIMPLE : vocabulaire courant, comptabilité masquée. EXPERT : tout est visible. */
+export type AppMode = 'SIMPLE' | 'EXPERT';
+
 export interface Company {
   name: string;
   currency: string;
@@ -24,6 +27,9 @@ export interface Company {
   /** Taux de TVA en points de base (1950 = 19,5 %). */
   vatRateBp: number;
   fiscalYearStart: string; // MM-DD
+  mode: AppMode;
+  onboarded: boolean;
+  goals: string[];
 }
 
 export type AccountClass = 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -221,8 +227,6 @@ export interface AuditLog {
   entity: string;
   entityId: string;
   summary: string;
-  before?: unknown;
-  after?: unknown;
 }
 
 export interface DB {
@@ -239,4 +243,36 @@ export interface DB {
   debts: Debt[];
   sessions: CashSession[];
   audit: AuditLog[];
+}
+
+/**
+ * Un événement = une action métier, immuable, rejouable dans l'ordre.
+ * L'état complet se reconstruit depuis un instantané + les événements suivants.
+ */
+export interface WorkspaceEvent {
+  id: string;
+  seq?: number;
+  at: ISODate;
+  actorId: string | null;
+  actorName: string;
+  type: string;
+  payload: Record<string, unknown>;
+}
+
+export type MemberRole = 'owner' | 'manager' | 'cashier' | 'accountant';
+
+export interface Member {
+  workspaceId: string;
+  email: string;
+  userId: string | null;
+  role: MemberRole;
+  displayName: string | null;
+  status: 'invited' | 'active' | 'removed';
+}
+
+export interface Presence {
+  key: string;
+  name: string;
+  avatar: string | null;
+  page: string;
 }

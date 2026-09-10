@@ -14,20 +14,14 @@ export function useMoney() {
   return (value: Minor) => formatMoney(value, company.currency);
 }
 
-export function PageHeader({
-  title,
-  subtitle,
-  actions,
-}: {
-  title: string;
-  subtitle?: string;
-  actions?: ReactNode;
-}) {
+export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) {
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>}
+      <div className="min-w-0">
+        <h1 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[34px]" style={{ textWrap: 'balance' }}>
+          {title}
+        </h1>
+        {subtitle && <p className="mt-1 text-body text-muted">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
@@ -49,44 +43,17 @@ export function StatCard({
 }) {
   const toneClass =
     tone === 'dark'
-      ? 'bg-ink-900 text-white border-ink-900 dark:bg-white dark:text-ink-900 dark:border-white'
+      ? 'rounded-card border border-teal bg-gradient-to-br from-teal to-brand-700 p-5 text-white shadow-[0_12px_28px_rgba(194,94,56,0.28)]'
       : 'card';
-  const valueClass =
-    tone === 'positive'
-      ? 'text-teal-600 dark:text-teal-400'
-      : tone === 'negative'
-        ? 'text-rose-600 dark:text-rose-400'
-        : '';
+  const valueClass = tone === 'positive' ? 'text-[#2A9D8F]' : tone === 'negative' ? 'text-[#D14343]' : '';
   return (
     <div className={`${toneClass} flex flex-col gap-3`}>
       <div className="flex items-start justify-between gap-3">
-        <span
-          className={`text-xs font-semibold uppercase tracking-wide ${
-            tone === 'dark' ? 'text-white/60 dark:text-ink-900/60' : 'text-slate-500 dark:text-slate-400'
-          }`}
-        >
-          {label}
-        </span>
-        {icon && (
-          <span
-            className={`rounded-xl p-2 ${
-              tone === 'dark' ? 'bg-white/10 dark:bg-ink-900/10' : 'bg-slate-100 dark:bg-white/5'
-            }`}
-          >
-            {icon}
-          </span>
-        )}
+        <span className={`text-[11px] font-semibold uppercase tracking-wide ${tone === 'dark' ? 'text-white/75' : 'text-muted'}`}>{label}</span>
+        {icon && <span className={`rounded-input p-2 ${tone === 'dark' ? 'bg-white/15 text-white' : 'bg-base'}`}>{icon}</span>}
       </div>
-      <div className={`text-2xl font-extrabold tracking-tight num ${valueClass}`}>{value}</div>
-      {hint && (
-        <div
-          className={`text-xs ${
-            tone === 'dark' ? 'text-white/60 dark:text-ink-900/60' : 'text-slate-500 dark:text-slate-400'
-          }`}
-        >
-          {hint}
-        </div>
-      )}
+      <div className={`font-display text-[26px] font-bold tracking-tight num ${valueClass}`}>{value}</div>
+      {hint && <div className={`text-caption ${tone === 'dark' ? 'text-white/75' : 'text-muted'}`}>{hint}</div>}
     </div>
   );
 }
@@ -94,37 +61,21 @@ export function StatCard({
 export function Empty({ title, hint, icon }: { title: string; hint?: string; icon?: ReactNode }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
-      {icon && <div className="text-slate-300 dark:text-slate-600">{icon}</div>}
-      <p className="font-semibold text-slate-600 dark:text-slate-300">{title}</p>
-      {hint && <p className="max-w-sm text-sm text-slate-400 dark:text-slate-500">{hint}</p>}
+      {icon && <div className="text-hairline">{icon}</div>}
+      <p className="text-body font-semibold text-ink">{title}</p>
+      {hint && <p className="max-w-sm text-caption text-muted">{hint}</p>}
     </div>
   );
 }
 
-export function Modal({
-  open,
-  onClose,
-  title,
-  children,
-  wide,
-}: {
-  open: boolean;
-  onClose: () => void;
-  title: string;
-  children: ReactNode;
-  wide?: boolean;
-}) {
+export function Modal({ open, onClose, title, children, wide }: { open: boolean; onClose: () => void; title: string; children: ReactNode; wide?: boolean }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink-950/50 p-0 backdrop-blur-sm sm:items-center sm:p-6">
-      <div
-        className={`max-h-[92vh] w-full overflow-y-auto rounded-t-3xl bg-white p-6 shadow-2xl scrollbar-thin dark:bg-ink-900 sm:rounded-3xl ${
-          wide ? 'sm:max-w-3xl' : 'sm:max-w-lg'
-        }`}
-      >
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-0 backdrop-blur-[2px] sm:items-center sm:p-6">
+      <div className={`max-h-[92vh] w-full overflow-y-auto rounded-t-card bg-white p-5 shadow-2xl scrollbar-thin sm:rounded-card sm:p-6 ${wide ? 'sm:max-w-3xl' : 'sm:max-w-lg'}`}>
         <div className="mb-5 flex items-start justify-between gap-4">
-          <h2 className="text-lg font-bold">{title}</h2>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10">
+          <h2 className="font-display text-[22px] font-bold text-ink">{title}</h2>
+          <button onClick={onClose} aria-label="Fermer" className="rounded-full p-1.5 text-muted hover:bg-base">
             <IconX />
           </button>
         </div>
@@ -134,37 +85,23 @@ export function Modal({
   );
 }
 
-export function Field({
-  label,
-  children,
-  hint,
-}: {
-  label: string;
-  children: ReactNode;
-  hint?: string;
-}) {
+export function Field({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) {
   return (
     <div>
       <label className="label">{label}</label>
       {children}
-      {hint && <p className="mt-1 text-xs text-slate-400">{hint}</p>}
+      {hint && <p className="mt-1 text-[12px] text-muted">{hint}</p>}
     </div>
   );
 }
 
-export function Badge({
-  children,
-  tone = 'neutral',
-}: {
-  children: ReactNode;
-  tone?: 'neutral' | 'success' | 'warn' | 'danger' | 'info';
-}) {
+export function Badge({ children, tone = 'neutral' }: { children: ReactNode; tone?: 'neutral' | 'success' | 'warn' | 'danger' | 'info' }) {
   const tones = {
-    neutral: 'bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-300',
-    success: 'bg-teal-100 text-teal-700 dark:bg-teal-500/15 dark:text-teal-300',
-    warn: 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300',
-    danger: 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300',
-    info: 'bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300',
+    neutral: 'bg-base text-muted',
+    success: 'bg-[#EAF6EA] text-[#1F6F65]',
+    warn: 'bg-[#FDF6E3] text-[#8C6A0B]',
+    danger: 'bg-[#FDEDED] text-[#A63030]',
+    info: 'bg-teal-light text-teal',
   };
   return <span className={`chip ${tones[tone]}`}>{children}</span>;
 }
@@ -174,9 +111,9 @@ export function Table({ head, children }: { head: string[]; children: ReactNode 
     <div className="overflow-x-auto scrollbar-thin">
       <table className="w-full min-w-[640px] border-collapse">
         <thead>
-          <tr className="bg-slate-50/80 dark:bg-white/5">
-            {head.map((h) => (
-              <th key={h} className="th">
+          <tr className="bg-base/70">
+            {head.map((h, i) => (
+              <th key={`${h}-${i}`} className="th">
                 {h}
               </th>
             ))}
@@ -188,19 +125,7 @@ export function Table({ head, children }: { head: string[]; children: ReactNode 
   );
 }
 
-export function DateRange({
-  from,
-  to,
-  onFrom,
-  onTo,
-  onApply,
-}: {
-  from: string;
-  to: string;
-  onFrom: (v: string) => void;
-  onTo: (v: string) => void;
-  onApply?: () => void;
-}) {
+export function DateRange({ from, to, onFrom, onTo, onApply }: { from: string; to: string; onFrom: (v: string) => void; onTo: (v: string) => void; onApply?: () => void }) {
   return (
     <div className="flex flex-wrap items-end gap-3">
       <Field label="Du">

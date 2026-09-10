@@ -1,14 +1,22 @@
 import { useState } from 'react';
-import { useAuth } from '../lib/auth';
+import { useCollab } from '../lib/collab';
 import { Field } from '../components/UI';
-import { IconBook, IconScale, IconShield, IconSparkle } from '../components/Icons';
+import { IconBook, IconEye, IconEyeOff, IconGoogle, IconMonitor, IconShield, IconSparkle, IconUsers } from '../components/Icons';
+
+const PILLARS = [
+  { icon: <IconMonitor />, title: 'Vendre en 3 clics', text: 'Un comptoir simple, le stock et la caisse suivent tout seuls.' },
+  { icon: <IconUsers />, title: 'Travailler à plusieurs', text: 'Caissier, gérant, comptable sur le même espace, en direct.' },
+  { icon: <IconBook />, title: 'Une vraie comptabilité', text: 'Journal, bilan, audit — visibles seulement si vous le voulez.' },
+  { icon: <IconSparkle />, title: 'Un assistant partout', text: 'Il explique chaque écran et répond avec vos vrais chiffres.' },
+];
 
 export default function Auth() {
-  const { signIn, signUp, continueAsGuest } = useAuth();
+  const { signIn, signUp, signInWithGoogle, continueAsGuest } = useCollab();
   const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
+  const [show, setShow] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
@@ -17,98 +25,82 @@ export default function Auth() {
     e.preventDefault();
     setError('');
     setNotice('');
-    if (mode === 'signup' && password !== confirm) {
-      setError('Les deux mots de passe ne correspondent pas.');
+    if (mode === 'signup' && name.trim().length < 2) {
+      setError('Indiquez votre prénom ou votre nom.');
       return;
     }
     setBusy(true);
-    const err =
-      mode === 'login' ? await signIn(email.trim(), password) : await signUp(email.trim(), password);
+    const err = mode === 'login' ? await signIn(email.trim(), password) : await signUp(email.trim(), password, name.trim());
     setBusy(false);
     if (err) setError(err);
-    else if (mode === 'signup')
-      setNotice('Compte créé. Si un email de confirmation est demandé, vérifiez votre boîte de réception puis connectez-vous.');
+    else if (mode === 'signup') setNotice('Compte créé. Si un email de confirmation vous est envoyé, ouvrez-le puis connectez-vous.');
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-cream dark:bg-ink-950 lg:flex-row">
-      <div className="flex flex-col justify-between bg-ink-900 p-8 text-slate-300 lg:w-[46%] lg:p-12">
-        <div className="flex items-center gap-2.5">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-brass to-brand-500 font-display text-xl font-bold text-ink-950">
-            F
-          </div>
+    <div className="min-h-screen bg-base">
+      <div className="mx-auto grid min-h-screen max-w-[1180px] items-center gap-10 px-5 py-10 lg:grid-cols-[1.1fr_1fr] lg:px-8">
+        <section>
           <div className="leading-tight">
-            <div className="font-display text-lg font-bold text-white">Finia</div>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brass">
-              Accounting
-            </div>
+            <span className="block font-display text-[26px] font-bold text-teal">Finjaro</span>
+            <span className="block text-[11px] font-bold uppercase tracking-[0.22em] text-[#8C6A3D]">Accounting</span>
           </div>
-        </div>
 
-        <div className="py-10">
-          <h1 className="font-display text-3xl font-bold leading-tight text-white sm:text-4xl">
-            Votre gestion,
+          <h1 className="mt-8 font-display text-[38px] font-bold leading-[1.08] text-ink sm:text-[52px]">
+            Votre boutique,
             <br />
-            <span className="text-brass">votre comptabilité.</span>
+            <span className="text-teal">tenue au propre.</span>
           </h1>
-          <p className="mt-4 max-w-md text-[15px] leading-relaxed text-slate-400">
-            Ventes, caisse, stock, dépenses — et derrière chaque opération, une vraie écriture en
-            partie double : journal, grand livre, balance, bilan, audit.
+          <p className="mt-5 max-w-lg text-body leading-relaxed text-muted sm:text-[17px]">
+            Ventes, caisse, stock, dettes — et derrière chaque opération, une comptabilité juste,
+            sans avoir besoin d’être comptable.
           </p>
-          <ul className="mt-8 space-y-3 text-sm">
-            <li className="flex items-center gap-3">
-              <IconBook className="h-[18px] w-[18px] text-brass" />
-              Plan comptable SYSCOHADA, PCG ou générique
-            </li>
-            <li className="flex items-center gap-3">
-              <IconScale className="h-[18px] w-[18px] text-brass" />
-              Balance et bilan toujours équilibrés, vérifiés en continu
-            </li>
-            <li className="flex items-center gap-3">
-              <IconShield className="h-[18px] w-[18px] text-brass" />
-              Piste d'audit horodatée de chaque opération
-            </li>
-            <li className="flex items-center gap-3">
-              <IconSparkle className="h-[18px] w-[18px] text-brass" />
-              Assistant IA qui répond sur vos chiffres réels
-            </li>
+
+          <ul className="mt-9 grid gap-3 sm:grid-cols-2">
+            {PILLARS.map((p) => (
+              <li key={p.title} className="flex gap-3 rounded-card border border-hairline bg-white p-4">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-input bg-teal-light text-teal">{p.icon}</span>
+                <span>
+                  <span className="block text-body font-semibold text-ink">{p.title}</span>
+                  <span className="block text-caption text-muted">{p.text}</span>
+                </span>
+              </li>
+            ))}
           </ul>
-        </div>
 
-        <p className="text-xs text-slate-500">
-          Vos données sont sauvegardées en ligne et retrouvables depuis n'importe quel appareil.
-        </p>
-      </div>
-
-      <div className="flex flex-1 items-center justify-center p-6 sm:p-12">
-        <form onSubmit={submit} className="w-full max-w-sm">
-          <h2 className="font-display text-2xl font-bold">
-            {mode === 'login' ? 'Se connecter' : 'Créer mon compte'}
-          </h2>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            {mode === 'login'
-              ? 'Retrouvez votre espace de gestion.'
-              : 'Gratuit pour démarrer — aucune carte bancaire requise.'}
+          <p className="mt-6 flex items-center gap-2 text-caption text-muted">
+            <IconShield className="h-4 w-4 text-[#2A9D8F]" />
+            Sauvegardé en ligne, retrouvable depuis n’importe quel appareil. Le même compte que sur Finjaro.
           </p>
-          <p className="mt-2 text-xs text-slate-400">
-            Si vous avez déjà un compte sur une autre application Finjaro, connectez-vous avec les
-            mêmes identifiants.
+        </section>
+
+        <section className="rounded-card border border-hairline bg-white p-6 shadow-[0_18px_40px_rgba(23,27,38,0.08)] sm:p-8">
+          <h2 className="font-display text-[26px] font-bold text-ink">{mode === 'login' ? 'Se connecter' : 'Créer mon compte'}</h2>
+          <p className="mt-1 text-caption text-muted">
+            {mode === 'login' ? 'Retrouvez votre espace.' : 'Gratuit pour démarrer — aucune carte bancaire.'}
           </p>
 
-          {error && (
-            <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300">
-              {error}
-            </div>
-          )}
-          {notice && (
-            <div className="mt-4 rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-700 dark:border-teal-500/30 dark:bg-teal-500/10 dark:text-teal-300">
-              {notice}
-            </div>
-          )}
+          <button type="button" onClick={() => void signInWithGoogle()} className="btn-ghost mt-5 w-full">
+            <IconGoogle />
+            Continuer avec Google
+          </button>
+          <div className="my-4 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-wider text-muted">
+            <span className="h-px flex-1 bg-hairline" />
+            ou par email
+            <span className="h-px flex-1 bg-hairline" />
+          </div>
 
-          <div className="mt-6 space-y-4">
+          {error && <div className="mb-4 rounded-input border border-[#D14343]/30 bg-[#FDEDED] px-4 py-3 text-caption text-[#A63030]">{error}</div>}
+          {notice && <div className="mb-4 rounded-input border border-[#2A9D8F]/30 bg-[#EAF6EA] px-4 py-3 text-caption text-[#1F6F65]">{notice}</div>}
+
+          <form onSubmit={submit} className="space-y-4">
+            {mode === 'signup' && (
+              <Field label="Votre nom">
+                <input id="auth-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="Ex. Awa Ndiaye" className="field" />
+              </Field>
+            )}
             <Field label="Email">
               <input
+                id="auth-email"
                 type="email"
                 required
                 autoComplete="email"
@@ -119,77 +111,58 @@ export default function Auth() {
               />
             </Field>
             <Field label="Mot de passe">
-              <input
-                type="password"
-                required
-                minLength={6}
-                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="6 caractères minimum"
-                className="field"
-              />
-            </Field>
-            {mode === 'signup' && (
-              <Field label="Confirmer le mot de passe">
+              <div className="relative">
                 <input
-                  type="password"
+                  id="auth-password"
+                  type={show ? 'text' : 'password'}
                   required
-                  autoComplete="new-password"
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  className="field"
+                  minLength={6}
+                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="6 caractères minimum"
+                  className="field pr-11"
                 />
-              </Field>
-            )}
-          </div>
+                <button
+                  type="button"
+                  onClick={() => setShow((v) => !v)}
+                  aria-label={show ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-muted hover:bg-base hover:text-ink"
+                >
+                  {show ? <IconEyeOff /> : <IconEye />}
+                </button>
+              </div>
+            </Field>
 
-          <button type="submit" disabled={busy} className="btn-primary mt-6 w-full">
-            {busy ? 'Un instant…' : mode === 'login' ? 'Se connecter' : 'Créer mon compte'}
-          </button>
+            <button type="submit" disabled={busy} className="btn-primary w-full">
+              {busy ? 'Un instant…' : mode === 'login' ? 'Se connecter' : 'Créer mon compte'}
+            </button>
+          </form>
 
-          <div className="mt-4 text-center text-sm text-slate-500">
+          <p className="mt-4 text-center text-caption text-muted">
             {mode === 'login' ? (
               <>
                 Pas encore de compte ?{' '}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode('signup');
-                    setError('');
-                  }}
-                  className="font-semibold text-brand-600"
-                >
+                <button type="button" onClick={() => { setMode('signup'); setError(''); }} className="font-semibold text-teal">
                   Créer un compte
                 </button>
               </>
             ) : (
               <>
-                Déjà un compte ?{' '}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode('login');
-                    setError('');
-                  }}
-                  className="font-semibold text-brand-600"
-                >
+                Déjà un compte Finjaro ?{' '}
+                <button type="button" onClick={() => { setMode('login'); setError(''); }} className="font-semibold text-teal">
                   Se connecter
                 </button>
               </>
             )}
-          </div>
+          </p>
 
-          <div className="mt-8 border-t border-hairline pt-5 text-center dark:border-white/10">
-            <button
-              type="button"
-              onClick={continueAsGuest}
-              className="text-sm font-medium text-slate-400 underline-offset-4 hover:text-slate-600 hover:underline dark:hover:text-slate-300"
-            >
-              Essayer sans compte (données locales uniquement)
+          <div className="mt-6 border-t border-hairline pt-4 text-center">
+            <button type="button" onClick={continueAsGuest} className="text-caption font-medium text-muted underline-offset-4 hover:text-ink hover:underline">
+              Essayer sans compte (données sur cet appareil seulement)
             </button>
           </div>
-        </form>
+        </section>
       </div>
     </div>
   );

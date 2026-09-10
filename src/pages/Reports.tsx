@@ -132,7 +132,7 @@ export default function Reports() {
 </style></head><body>
 <header>
   <div>
-    <div class="brand">Finia Accounting</div>
+    <div class="brand">Finjaro Accounting</div>
     <h1>${def.title}</h1>
     <div class="muted">${def.subtitle}</div>
   </div>
@@ -159,7 +159,7 @@ export default function Reports() {
 </table>
 <footer>
   <span>Édité le ${new Date().toLocaleString('fr-FR')}</span>
-  <span>${rows.length} ligne(s) — document généré par Finia Accounting</span>
+  <span>${rows.length} ligne(s) — document généré par Finjaro Accounting</span>
 </footer>
 <script>window.onload=function(){window.print()}</script>
 </body></html>`;

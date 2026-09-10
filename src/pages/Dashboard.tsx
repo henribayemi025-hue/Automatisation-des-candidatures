@@ -13,6 +13,7 @@ import { useDB } from '../lib/store';
 import { dailySeries, productPerformance, snapshot } from '../lib/metrics';
 import { factor, formatMoney, formatNumber } from '../lib/money';
 import { Empty, Money, PageHeader, StatCard } from '../components/UI';
+import StartGuide from '../components/StartGuide';
 import { IconAlert, IconBox, IconCard, IconChart, IconTrend, IconWallet } from '../components/Icons';
 
 export default function Dashboard() {
@@ -26,9 +27,11 @@ export default function Dashboard() {
   return (
     <>
       <PageHeader
-        title="Tableau de bord"
-        subtitle={`${db.company.name} — vue temps réel de l'activité`}
+        title={`Bonjour, ${db.company.name}`}
+        subtitle="Où en est votre activité aujourd'hui"
       />
+
+      <StartGuide />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard

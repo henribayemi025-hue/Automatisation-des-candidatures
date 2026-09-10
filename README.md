@@ -1,29 +1,36 @@
-# Finia Accounting
+# Finjaro Accounting
 
-Gestion commerciale et comptabilité en partie double pour les petites entreprises.
-Fonctionne entièrement dans le navigateur (les données restent en local).
+Gestion commerciale et comptabilité en partie double pour les boutiques et petites
+entreprises, dans l'environnement d'applications Finjaro. Conçue pour être utilisable
+par un mécanicien ou une commerçante, et complète pour un comptable.
 
-## Modules
+En ligne : https://automatisation-des-candidatures.finjaro.workers.dev
 
-**Gestion** — tableau de bord, point de vente, sessions de caisse (fond, écart, clôture),
-produits (PMP, seuils de réappro, export CSV), achats & réceptions fournisseurs,
-stock & mouvements tracés, ventes, devis convertibles, clients & fournisseurs.
+## Ce que fait l'application
 
-**Finance** — créances clients et dettes fournisseurs avec règlements partiels,
-dépenses par poste de charge, analyse (marges par produit, tendances, catégories),
-rapports imprimables en PDF.
+**Démarrage guidé** — métier, entreprise, devise (jamais imposée), objectifs ; l'écran
+s'adapte : mode **Simple** (vocabulaire courant, comptabilité en coulisses) ou mode
+**Expert** (journal, grand livre, balance, bilan, plan comptable, audit).
 
-**Comptabilité (type Sage)** — plan comptable SYSCOHADA / PCG / générique,
-journal des écritures en partie double (saisie manuelle + génération automatique
-depuis chaque opération), extourne, grand livre, balance générale,
-bilan & compte de résultat, livre de caisse.
+**Au quotidien** — vendre (point de vente), caisse (fond, clôture, écart), produits
+(avec saisie type tableur), stock et mouvements tracés, achats et réceptions, ventes,
+devis, clients et fournisseurs, dettes et crédits, dépenses, résultats, documents à
+imprimer, livre de caisse.
 
-**Contrôle** — module d'audit (contrôles d'équilibre, rapprochements
-métier/comptabilité, score de conformité), piste d'audit horodatée de toutes
-les opérations.
+**Comptabilité** — chaque opération génère automatiquement son écriture en partie
+double (SYSCOHADA, PCG ou générique). Journal, grand livre, balance, bilan et compte
+de résultat, extourne, module d'audit (contrôles automatiques et rapprochements).
 
-**Finia IA** — assistant qui répond en langage naturel sur les chiffres réels
-(CA, marges, créances, stock, anomalies), calculé localement.
+**À plusieurs, en direct** — comptes utilisateurs (email ou Google, le même compte que
+sur Finjaro), espace de travail partagé, invitation par email avec rôles (gérant,
+caissier, comptable), personnes connectées visibles en haut, historique de qui a fait
+quoi. Chaque action est un événement ajouté au journal `finia_events` : rien n'est
+jamais écrasé, deux appareils convergent vers le même état, le travail hors ligne est
+mis en file puis envoyé.
+
+**Assistant partout** — bouton flottant sur chaque écran : explique à quoi sert
+l'écran, quand l'utiliser, un exemple concret, et répond aux questions avec les vrais
+chiffres (« qui me doit de l'argent ? », « quelle est ma marge ? »).
 
 ## Démarrer
 
@@ -33,9 +40,13 @@ npm run dev        # http://localhost:5173
 npm run build      # production dans dist/
 ```
 
+## Base de données
+
+Projet Supabase partagé de l'environnement Finjaro. Cette application n'utilise que
+les objets préfixés `finia_` (`finia_workspaces`, `finia_members`, `finia_events`),
+toujours en ajout, jamais en modification des tables de la marketplace.
+
 ## Stack
 
-React 18 · TypeScript · Vite · Tailwind CSS · Recharts.
-Palette « Terre & Or » (crème, terracotta, laiton).
-Montants stockés en unités mineures entières (pas de flottants).
-Multi-devises (XAF, EUR, USD, …) sans devise imposée par défaut.
+React 18 · TypeScript · Vite · Tailwind CSS · Recharts · Supabase (auth, Postgres,
+temps réel). Palette « Terre & Or » de Finjaro. Montants en unités mineures entières.

@@ -33,8 +33,8 @@ export default function AuditTrail() {
   return (
     <>
       <PageHeader
-        title="Piste d'audit"
-        subtitle="Journal inaltérable de toutes les opérations effectuées dans le système"
+        title="Historique"
+        subtitle="Qui a fait quoi, et quand — chaque action de chaque membre, impossible à effacer"
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -68,7 +68,7 @@ export default function AuditTrail() {
 
       <div className="card p-0">
         {filtered.length ? (
-          <Table head={['Horodatage', 'Utilisateur', 'Action', 'Entité', 'Détail']}>
+          <Table head={['Horodatage', 'Qui', 'Action', 'Quoi', 'Détail']}>
             {filtered.map((a) => (
               <tr key={a.id} className="row">
                 <td className="td num text-slate-500">

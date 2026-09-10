@@ -1,37 +1,44 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { useDB } from '../lib/store';
-import { useAuth } from '../lib/auth';
+import { canAccess, useCollab } from '../lib/collab';
+import AppSwitcher from './AppSwitcher';
+import AssistantDrawer from './AssistantDrawer';
+import ModuleIntro from './ModuleIntro';
+import PresenceAvatars, { Avatar } from './PresenceAvatars';
+import TabBar, { TAB_BAR_SPACE } from './TabBar';
 import {
   IconBook,
   IconBox,
   IconCard,
   IconCart,
   IconChart,
+  IconChevronDown,
   IconDoc,
-  IconGrid,
   IconHistory,
+  IconHome,
   IconLayers,
-  IconMenu,
+  IconLogout,
   IconMonitor,
-  IconMoon,
   IconReceipt,
   IconScale,
   IconSettings,
   IconShield,
   IconSparkle,
-  IconSun,
   IconUsers,
   IconWallet,
   IconX,
 } from './Icons';
 
+type Area = 'sell' | 'stock' | 'finance' | 'accounting' | 'team' | 'settings';
+
 interface NavItem {
   to: string;
   label: string;
   icon: ReactNode;
-  badge?: string;
+  area: Area;
+  expert?: boolean;
 }
 
 interface NavGroup {
@@ -42,188 +49,247 @@ interface NavGroup {
 const NAV: NavGroup[] = [
   {
     items: [
-      { to: '/', label: 'Tableau de bord', icon: <IconGrid /> },
-      { to: '/assistant', label: 'Finia IA', icon: <IconSparkle />, badge: 'IA' },
-      { to: '/pos', label: 'Point de vente', icon: <IconMonitor /> },
-      { to: '/caisse', label: 'Caisse', icon: <IconWallet /> },
+      { to: '/', label: 'Accueil', icon: <IconHome />, area: 'sell' },
+      { to: '/pos', label: 'Vendre', icon: <IconMonitor />, area: 'sell' },
+      { to: '/caisse', label: 'Caisse', icon: <IconWallet />, area: 'sell' },
     ],
   },
   {
-    title: 'Gestion',
+    title: 'Ma boutique',
     items: [
-      { to: '/produits', label: 'Produits', icon: <IconBox /> },
-      { to: '/achats', label: 'Achats & réappro', icon: <IconCart /> },
-      { to: '/stock', label: 'Stock & mouvements', icon: <IconLayers /> },
-      { to: '/ventes', label: 'Ventes', icon: <IconReceipt /> },
-      { to: '/devis', label: 'Devis', icon: <IconDoc /> },
-      { to: '/tiers', label: 'Clients & fournisseurs', icon: <IconUsers /> },
+      { to: '/produits', label: 'Produits', icon: <IconBox />, area: 'stock' },
+      { to: '/stock', label: 'Stock', icon: <IconLayers />, area: 'stock' },
+      { to: '/achats', label: 'Achats', icon: <IconCart />, area: 'stock' },
+      { to: '/tiers', label: 'Clients & fournisseurs', icon: <IconUsers />, area: 'sell' },
     ],
   },
   {
-    title: 'Finance',
+    title: 'Mon argent',
     items: [
-      { to: '/dettes', label: 'Dettes & créances', icon: <IconCard /> },
-      { to: '/depenses', label: 'Dépenses', icon: <IconWallet /> },
-      { to: '/analyse', label: 'Analyse', icon: <IconChart /> },
-      { to: '/rapports', label: 'Rapports', icon: <IconDoc /> },
+      { to: '/ventes', label: 'Ventes', icon: <IconReceipt />, area: 'sell' },
+      { to: '/devis', label: 'Devis', icon: <IconDoc />, area: 'sell' },
+      { to: '/dettes', label: 'Dettes & crédits', icon: <IconCard />, area: 'finance' },
+      { to: '/depenses', label: 'Dépenses', icon: <IconWallet />, area: 'finance' },
+      { to: '/analyse', label: 'Résultats', icon: <IconChart />, area: 'finance' },
+      { to: '/rapports', label: 'Documents', icon: <IconDoc />, area: 'finance' },
+      { to: '/livre-caisse', label: 'Livre de caisse', icon: <IconBook />, area: 'finance' },
     ],
   },
   {
     title: 'Comptabilité',
     items: [
-      { to: '/livre-caisse', label: 'Livre de caisse', icon: <IconBook /> },
-      { to: '/journal', label: 'Journal des écritures', icon: <IconReceipt /> },
-      { to: '/grand-livre', label: 'Grand livre', icon: <IconBook /> },
-      { to: '/balance', label: 'Balance générale', icon: <IconScale /> },
-      { to: '/etats', label: 'Bilan & résultat', icon: <IconChart /> },
-      { to: '/plan-comptable', label: 'Plan comptable', icon: <IconLayers /> },
+      { to: '/journal', label: 'Journal des écritures', icon: <IconReceipt />, area: 'accounting', expert: true },
+      { to: '/grand-livre', label: 'Grand livre', icon: <IconBook />, area: 'accounting', expert: true },
+      { to: '/balance', label: 'Balance générale', icon: <IconScale />, area: 'accounting', expert: true },
+      { to: '/etats', label: 'Bilan & résultat', icon: <IconChart />, area: 'accounting', expert: true },
+      { to: '/plan-comptable', label: 'Plan comptable', icon: <IconLayers />, area: 'accounting', expert: true },
+      { to: '/audit', label: 'Audit', icon: <IconShield />, area: 'accounting', expert: true },
     ],
   },
   {
-    title: 'Contrôle',
+    title: 'Plus',
     items: [
-      { to: '/audit', label: 'Audit', icon: <IconShield /> },
-      { to: '/historique', label: "Piste d'audit", icon: <IconHistory /> },
-      { to: '/parametres', label: 'Paramètres', icon: <IconSettings /> },
+      { to: '/equipe', label: 'Équipe', icon: <IconUsers />, area: 'team' },
+      { to: '/historique', label: 'Historique', icon: <IconHistory />, area: 'finance' },
+      { to: '/assistant', label: 'Assistant', icon: <IconSparkle />, area: 'sell' },
+      { to: '/parametres', label: 'Paramètres', icon: <IconSettings />, area: 'settings' },
     ],
   },
 ];
 
-function useTheme() {
-  const [dark, setDark] = useState(() => localStorage.getItem('finia.theme') === 'dark');
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', dark);
-    localStorage.setItem('finia.theme', dark ? 'dark' : 'light');
-  }, [dark]);
-  return { dark, toggle: () => setDark((d) => !d) };
-}
-
 const SYNC_LABEL = {
-  offline: { text: 'Local', dot: 'bg-slate-400' },
-  syncing: { text: 'Synchronisation…', dot: 'bg-amber-500 animate-pulse' },
-  synced: { text: 'Sauvegardé en ligne', dot: 'bg-teal-500' },
-  error: { text: 'Erreur de synchronisation', dot: 'bg-rose-500' },
+  offline: { text: 'Local', dot: 'bg-muted' },
+  syncing: { text: 'Synchronisation…', dot: 'bg-brass animate-pulse' },
+  synced: { text: 'Sauvegardé en ligne', dot: 'bg-[#2A9D8F]' },
+  pending: { text: 'En attente de réseau', dot: 'bg-brass' },
+  error: { text: 'Hors ligne', dot: 'bg-[#D14343]' },
 } as const;
 
 export default function Layout({ children }: { children: ReactNode }) {
   const { company } = useDB();
-  const { user, sync, signOut } = useAuth();
-  const { dark, toggle } = useTheme();
+  const { user, sync, pending, signOut, workspace, workspaces, switchWorkspace, invitations, acceptInvitation, displayName, avatarUrl, setPage } =
+    useCollab();
   const [open, setOpen] = useState(false);
+  const [menu, setMenu] = useState(false);
   const location = useLocation();
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const expert = company.mode === 'EXPERT';
+  const role = workspace?.role ?? null;
 
   useEffect(() => {
     setOpen(false);
-  }, [location.pathname]);
+    setMenu(false);
+    setPage(location.pathname);
+  }, [location.pathname, setPage]);
+
+  useEffect(() => {
+    if (!menu) return;
+    const close = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenu(false);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [menu]);
+
+  const groups = NAV.map((g) => ({
+    ...g,
+    items: g.items.filter((it) => (expert || !it.expert) && canAccess(role, it.area)),
+  })).filter((g) => g.items.length > 0);
+
+  const status = user ? SYNC_LABEL[sync] : SYNC_LABEL.offline;
+
+  const sidebar = (
+    <>
+      <div className="flex items-center justify-between px-5 pb-4 pt-5">
+        <NavLink to="/" className="leading-tight">
+          <span className="block font-display text-[22px] font-bold text-teal">Finjaro</span>
+          <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C6A3D]">Accounting</span>
+        </NavLink>
+        <button onClick={() => setOpen(false)} className="rounded-full p-1.5 text-muted lg:hidden" aria-label="Fermer">
+          <IconX />
+        </button>
+      </div>
+
+      <nav className="flex-1 overflow-y-auto px-3 pb-6 scrollbar-thin">
+        {groups.map((group, i) => (
+          <div key={i} className="mb-4">
+            {group.title && (
+              <div className="px-3 pb-1.5 pt-2 text-[10px] font-bold uppercase tracking-[0.16em] text-muted">{group.title}</div>
+            )}
+            {group.items.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === '/'}
+                className={({ isActive }) =>
+                  `mb-0.5 flex items-center gap-3 rounded-input px-3 py-2.5 text-body transition ${
+                    isActive ? 'bg-teal-light font-semibold text-teal' : 'text-ink hover:bg-base'
+                  }`
+                }
+              >
+                {item.icon}
+                <span className="flex-1">{item.label}</span>
+              </NavLink>
+            ))}
+          </div>
+        ))}
+      </nav>
+
+      <div className="border-t border-hairline px-5 py-4">
+        <div className="text-caption font-semibold text-ink">{workspace?.name ?? company.name}</div>
+        <div className="text-[11px] text-muted">
+          {company.mode === 'EXPERT' ? 'Mode expert' : 'Mode simple'} · {company.currency || 'devise à choisir'}
+        </div>
+      </div>
+    </>
+  );
 
   return (
     <div className="flex min-h-screen">
-      {open && (
-        <button
-          aria-label="Fermer le menu"
-          onClick={() => setOpen(false)}
-          className="fixed inset-0 z-30 bg-ink-950/50 backdrop-blur-sm lg:hidden"
-        />
-      )}
+      {open && <button aria-label="Fermer le menu" onClick={() => setOpen(false)} className="fixed inset-0 z-40 bg-ink/40 backdrop-blur-sm lg:hidden" />}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-[264px] flex-col bg-ink-900 text-slate-300 transition-transform lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[272px] flex-col border-r border-hairline bg-white transition-transform lg:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-between px-5 py-5">
-          <div className="flex items-center gap-2.5">
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brass to-brand-500 font-display text-lg font-bold text-ink-950">
-              F
-            </div>
-            <div className="leading-tight">
-              <div className="font-display text-[17px] font-bold text-white">Finia</div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brass">
-                Accounting
-              </div>
-            </div>
-          </div>
-          <button onClick={() => setOpen(false)} className="rounded-lg p-1.5 text-slate-400 lg:hidden">
-            <IconX />
-          </button>
-        </div>
-
-        <nav className="flex-1 overflow-y-auto px-3 pb-4 scrollbar-thin">
-          {NAV.map((group, i) => (
-            <div key={i} className="mb-4">
-              {group.title && (
-                <div className="px-3 pb-2 pt-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
-                  {group.title}
-                </div>
-              )}
-              {group.items.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end={item.to === '/'}
-                  className={({ isActive }) =>
-                    `mb-0.5 flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition ${
-                      isActive
-                        ? 'bg-brand-500/20 text-white shadow-[inset_2px_0_0_0] shadow-brass'
-                        : 'text-slate-400 hover:bg-white/5 hover:text-slate-100'
-                    }`
-                  }
-                >
-                  {item.icon}
-                  <span className="flex-1">{item.label}</span>
-                  {item.badge && (
-                    <span className="rounded-md bg-brand-500 px-1.5 py-0.5 text-[9px] font-extrabold text-ink-950">
-                      {item.badge}
-                    </span>
-                  )}
-                </NavLink>
-              ))}
-            </div>
-          ))}
-        </nav>
-
-        <div className="border-t border-white/10 px-5 py-4">
-          <div className="text-[13px] font-semibold text-white">{company.name}</div>
-          <div className="text-[11px] text-slate-500">
-            {company.chart} · {company.currency}
-          </div>
-        </div>
+        {sidebar}
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col lg:ml-[264px]">
-        <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-hairline bg-cream/90 px-4 py-3 backdrop-blur dark:border-white/10 dark:bg-ink-900/90 sm:px-6">
-          <button onClick={() => setOpen(true)} className="rounded-lg p-2 hover:bg-slate-100 dark:hover:bg-white/10 lg:hidden">
-            <IconMenu />
-          </button>
-          <span
-            className="hidden items-center gap-2 rounded-full border border-hairline bg-white px-3 py-1.5 text-xs font-medium text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-400 sm:inline-flex"
-            title={user ? user.email ?? '' : 'Mode local : créez un compte pour sauvegarder en ligne'}
-          >
-            <span className={`h-2 w-2 rounded-full ${SYNC_LABEL[user ? sync : 'offline'].dot}`} />
-            {user ? SYNC_LABEL[sync].text : 'Local (sans compte)'}
-          </span>
+      <div className="flex min-w-0 flex-1 flex-col lg:ml-[272px]">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-hairline bg-white px-3 sm:px-5">
+          <AppSwitcher />
+
+          {workspaces.length > 1 ? (
+            <div className="relative">
+              <select
+                value={workspace?.id ?? ''}
+                onChange={(e) => switchWorkspace(e.target.value)}
+                aria-label="Espace de travail"
+                className="appearance-none rounded-input border border-hairline bg-white py-1.5 pl-3 pr-8 text-caption font-semibold"
+              >
+                {workspaces.map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.name}
+                  </option>
+                ))}
+              </select>
+              <IconChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+            </div>
+          ) : (
+            <span className="hidden truncate text-caption font-semibold text-ink sm:block">{workspace?.name ?? company.name}</span>
+          )}
+
           <div className="flex-1" />
-          <span className="hidden text-xs font-medium text-slate-500 dark:text-slate-400 sm:block">
-            {new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+
+          <PresenceAvatars />
+
+          <span
+            className="hidden items-center gap-2 rounded-pill border border-hairline bg-base px-3 py-1.5 text-[12px] font-medium text-muted md:inline-flex"
+            title={user ? (user.email ?? '') : 'Mode local : créez un compte pour sauvegarder en ligne et travailler à plusieurs'}
+          >
+            <span className={`h-2 w-2 rounded-full ${status.dot}`} />
+            {user ? status.text : 'Local (sans compte)'}
+            {pending > 0 && <span className="rounded-pill bg-brass px-1.5 text-[10px] font-bold text-ink">{pending}</span>}
           </span>
-          <button
-            onClick={toggle}
-            aria-label="Changer de thème"
-            className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-white/10"
-          >
-            {dark ? <IconSun /> : <IconMoon />}
-          </button>
-          <button
-            onClick={() => void signOut()}
-            title={user ? `Déconnecter ${user.email ?? ''}` : 'Quitter le mode local'}
-            className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-xs font-bold uppercase text-white"
-          >
-            {(user?.email ?? 'ME').slice(0, 2)}
-          </button>
+
+          <div ref={menuRef} className="relative">
+            <button onClick={() => setMenu((v) => !v)} aria-label="Mon compte" className="rounded-full">
+              <Avatar name={displayName} src={avatarUrl} size={34} />
+            </button>
+            {menu && (
+              <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-card border border-hairline bg-white p-2 shadow-[0_18px_40px_rgba(23,27,38,0.16)]">
+                <div className="px-3 py-2">
+                  <div className="text-body font-semibold text-ink">{displayName}</div>
+                  <div className="truncate text-caption text-muted">{user?.email ?? 'Sans compte — données sur cet appareil'}</div>
+                </div>
+                <div className="my-1 border-t border-hairline" />
+                <NavLink to="/parametres" className="flex items-center gap-3 rounded-input px-3 py-2 text-body hover:bg-base">
+                  <IconSettings />
+                  Paramètres
+                </NavLink>
+                <NavLink to="/equipe" className="flex items-center gap-3 rounded-input px-3 py-2 text-body hover:bg-base">
+                  <IconUsers />
+                  Équipe
+                </NavLink>
+                <button
+                  onClick={() => void signOut()}
+                  className="flex w-full items-center gap-3 rounded-input px-3 py-2 text-left text-body text-[#D14343] hover:bg-[#FDEDED]"
+                >
+                  <IconLogout />
+                  {user ? 'Se déconnecter' : 'Quitter le mode local'}
+                </button>
+              </div>
+            )}
+          </div>
         </header>
 
-        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+        {invitations.length > 0 && (
+          <div className="border-b border-brass/40 bg-[#FBF1DF] px-4 py-3 text-caption text-ink sm:px-6">
+            {invitations.map((inv) => (
+              <div key={inv.id} className="flex flex-wrap items-center gap-3">
+                <span>
+                  Vous êtes invité à rejoindre l’espace <strong>{inv.name}</strong>.
+                </span>
+                <button onClick={() => void acceptInvitation(inv.id)} className="btn-primary px-3 py-1.5 text-caption">
+                  Rejoindre
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <main className={`flex-1 px-4 pt-5 sm:px-6 lg:px-8 lg:pt-7 ${TAB_BAR_SPACE}`}>
+          <div className="mx-auto max-w-[1280px]">
+            <ModuleIntro />
+            {children}
+          </div>
+        </main>
       </div>
+
+      <TabBar onMenu={() => setOpen(true)} />
+      <AssistantDrawer />
     </div>
   );
 }
