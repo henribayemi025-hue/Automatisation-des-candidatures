@@ -971,4 +971,8 @@ export const EN: Record<string, string> = {
   'J’ai un compte': 'I have an account',
   'Vous travaillez sans compte : vos données restent sur cet appareil. Créez un compte pour les retrouver partout et travailler à plusieurs.':
     'You are working without an account: your data stays on this device. Create an account to find it anywhere and work as a team.',
+
+  'Votre session s’est terminée sur cet appareil. Reconnectez-vous : votre travail est en sécurité dans votre compte.':
+    'Your session ended on this device. Sign in again: your work is safe in your account.',
+  'Dernier compte utilisé ici : {email}': 'Last account used here: {email}',
 };

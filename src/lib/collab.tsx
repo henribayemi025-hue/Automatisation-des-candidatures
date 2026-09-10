@@ -30,6 +30,9 @@ interface CollabValue {
   signUp: (email: string, password: string, name: string) => Promise<string | null>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
+  /** Vrai si une session enregistrée a expiré : on le dit au lieu de basculer en mode local. */
+  sessionExpired: boolean;
+  lastEmail: string;
   continueAsGuest: () => void;
 
   workspace: Workspace | null;
@@ -52,6 +55,8 @@ interface CollabValue {
 
 const CollabContext = createContext<CollabValue | null>(null);
 const GUEST_KEY = 'finia.guest';
+const AUTH_KEY = 'finia.auth';
+const EMAIL_KEY = 'finia.last-email';
 const LAST_WS_KEY = 'finia.workspace';
 const OUTBOX_PREFIX = 'finia.outbox.';
 const COMPACT_AFTER = 300;
@@ -125,6 +130,8 @@ export function CollabProvider({ children }: { children: ReactNode }) {
   const [sync, setSync] = useState<SyncStatus>('offline');
   const [pending, setPending] = useState(0);
   const [localConflict, setLocalConflict] = useState<LocalConflict | null>(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
+  const [lastEmail, setLastEmail] = useState(() => localStorage.getItem(EMAIL_KEY) ?? '');
 
   const lastSeq = useRef(0);
   const snapshotSeq = useRef(0);
@@ -138,11 +145,31 @@ export function CollabProvider({ children }: { children: ReactNode }) {
 
   // ---------- Session ----------
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user ?? null);
+    void (async () => {
+      const { data } = await supabase.auth.getSession();
+      let session = data.session;
+      // Jeton enregistré mais session absente (expirée, appareil resté fermé, réseau coupé) :
+      // on tente de la reprendre avant de considérer la personne comme déconnectée.
+      if (!session && localStorage.getItem(AUTH_KEY)) {
+        const { data: refreshed } = await supabase.auth.refreshSession();
+        session = refreshed.session;
+        if (!session) setSessionExpired(true);
+      }
+      if (session?.user.email) {
+        localStorage.setItem(EMAIL_KEY, session.user.email);
+        setLastEmail(session.user.email);
+      }
+      setUser(session?.user ?? null);
       setLoading(false);
-    });
+    })();
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setSessionExpired(false);
+        if (session.user.email) {
+          localStorage.setItem(EMAIL_KEY, session.user.email);
+          setLastEmail(session.user.email);
+        }
+      }
       setUser((prev) => (prev?.id === session?.user?.id ? prev : (session?.user ?? null)));
     });
     return () => sub.subscription.unsubscribe();
@@ -456,6 +483,8 @@ export function CollabProvider({ children }: { children: ReactNode }) {
       user,
       loading,
       guest,
+      sessionExpired,
+      lastEmail,
       displayName: nameOf(user),
       avatarUrl: avatarOf(user),
 
@@ -484,6 +513,7 @@ export function CollabProvider({ children }: { children: ReactNode }) {
       },
       continueAsGuest() {
         localStorage.setItem(GUEST_KEY, '1');
+        setSessionExpired(false);
         setGuest(true);
       },
 
@@ -572,7 +602,7 @@ export function CollabProvider({ children }: { children: ReactNode }) {
         }
       },
     }),
-    [user, loading, guest, workspace, workspaces, members, invitations, presence, sync, pending, localConflict, rebuild, loadWorkspace],
+    [user, loading, guest, sessionExpired, lastEmail, workspace, workspaces, members, invitations, presence, sync, pending, localConflict, rebuild, loadWorkspace],
   );
 
   return <CollabContext.Provider value={value}>{children}</CollabContext.Provider>;

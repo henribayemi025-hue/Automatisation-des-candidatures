@@ -13,10 +13,10 @@ const PILLARS = [
 ];
 
 export default function Auth() {
-  const { signIn, signUp, signInWithGoogle, continueAsGuest } = useCollab();
+  const { signIn, signUp, signInWithGoogle, continueAsGuest, sessionExpired, lastEmail } = useCollab();
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(lastEmail);
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(false);
   const [error, setError] = useState('');
@@ -93,6 +93,14 @@ export default function Auth() {
             <span className="h-px flex-1 bg-hairline" />
           </div>
 
+          {sessionExpired && !error && (
+            <div className="mb-4 rounded-input border border-brass/40 bg-[#FBF1DF] px-4 py-3 text-caption text-ink">
+              {t('Votre session s’est terminée sur cet appareil. Reconnectez-vous : votre travail est en sécurité dans votre compte.')}
+            </div>
+          )}
+          {lastEmail && !sessionExpired && mode === 'login' && (
+            <p className="mb-4 text-caption text-muted">{t('Dernier compte utilisé ici : {email}', { email: lastEmail })}</p>
+          )}
           {error && <div className="mb-4 rounded-input border border-[#D14343]/30 bg-[#FDEDED] px-4 py-3 text-caption text-[#A63030]">{error}</div>}
           {notice && <div className="mb-4 rounded-input border border-[#2A9D8F]/30 bg-[#EAF6EA] px-4 py-3 text-caption text-[#1F6F65]">{notice}</div>}
 

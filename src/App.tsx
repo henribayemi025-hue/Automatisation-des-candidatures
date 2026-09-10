@@ -73,11 +73,12 @@ function LocalConflict() {
 }
 
 export default function App() {
-  const { user, guest, loading, workspace, sync } = useCollab();
+  const { user, guest, loading, workspace, sync, sessionExpired } = useCollab();
   const db = useDB();
 
   if (loading) return <Splash />;
-  if (!user && !guest) return <Auth />;
+  // Une session expirée reprend la main sur le mode local : on propose la connexion plutôt que de basculer sans rien dire.
+  if (!user && (!guest || sessionExpired)) return <Auth />;
   if (user && !workspace && sync !== 'error') return <Splash />;
 
   const needsOnboarding = !db.company.onboarded && (!workspace || workspace.role === 'owner');
