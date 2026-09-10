@@ -1,5 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
+import { useAuth } from './lib/auth';
+import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 import Assistant from './pages/Assistant';
 import PointOfSale from './pages/PointOfSale';
@@ -25,6 +27,20 @@ import AuditTrail from './pages/AuditTrail';
 import Settings from './pages/Settings';
 
 export default function App() {
+  const { user, guest, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-cream dark:bg-ink-950">
+        <div className="grid h-12 w-12 animate-pulse place-items-center rounded-2xl bg-gradient-to-br from-brass to-brand-500 font-display text-2xl font-bold text-ink-950">
+          F
+        </div>
+      </div>
+    );
+  }
+
+  if (!user && !guest) return <Auth />;
+
   return (
     <Layout>
       <Routes>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { useDB } from '../lib/store';
+import { useAuth } from '../lib/auth';
 import {
   IconBook,
   IconBox,
@@ -97,8 +98,16 @@ function useTheme() {
   return { dark, toggle: () => setDark((d) => !d) };
 }
 
+const SYNC_LABEL = {
+  offline: { text: 'Local', dot: 'bg-slate-400' },
+  syncing: { text: 'Synchronisation…', dot: 'bg-amber-500 animate-pulse' },
+  synced: { text: 'Sauvegardé en ligne', dot: 'bg-teal-500' },
+  error: { text: 'Erreur de synchronisation', dot: 'bg-rose-500' },
+} as const;
+
 export default function Layout({ children }: { children: ReactNode }) {
   const { company } = useDB();
+  const { user, sync, signOut } = useAuth();
   const { dark, toggle } = useTheme();
   const [open, setOpen] = useState(false);
   const location = useLocation();
@@ -186,6 +195,13 @@ export default function Layout({ children }: { children: ReactNode }) {
           <button onClick={() => setOpen(true)} className="rounded-lg p-2 hover:bg-slate-100 dark:hover:bg-white/10 lg:hidden">
             <IconMenu />
           </button>
+          <span
+            className="hidden items-center gap-2 rounded-full border border-hairline bg-white px-3 py-1.5 text-xs font-medium text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-400 sm:inline-flex"
+            title={user ? user.email ?? '' : 'Mode local : créez un compte pour sauvegarder en ligne'}
+          >
+            <span className={`h-2 w-2 rounded-full ${SYNC_LABEL[user ? sync : 'offline'].dot}`} />
+            {user ? SYNC_LABEL[sync].text : 'Local (sans compte)'}
+          </span>
           <div className="flex-1" />
           <span className="hidden text-xs font-medium text-slate-500 dark:text-slate-400 sm:block">
             {new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
@@ -197,9 +213,13 @@ export default function Layout({ children }: { children: ReactNode }) {
           >
             {dark ? <IconSun /> : <IconMoon />}
           </button>
-          <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-xs font-bold text-white">
-            HB
-          </div>
+          <button
+            onClick={() => void signOut()}
+            title={user ? `Déconnecter ${user.email ?? ''}` : 'Quitter le mode local'}
+            className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-xs font-bold uppercase text-white"
+          >
+            {(user?.email ?? 'ME').slice(0, 2)}
+          </button>
         </header>
 
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</main>

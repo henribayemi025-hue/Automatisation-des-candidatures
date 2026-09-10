@@ -1,0 +1,11 @@
+name = "finia-accounting"
+compatibility_date = "2025-06-01"
+
+[assets]
+directory = "./dist"
+not_found_handling = "single-page-application"
+
+# Déploiement : connecter ce dépôt GitHub dans le tableau de bord Cloudflare
+# (Workers & Pages → Create → Import a repository).
+# Commande de build : npm run build
+# Commande de déploiement : npx wrangler deploy

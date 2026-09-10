@@ -131,6 +131,8 @@ interface StoreValue {
   closeSession: (counted: Minor) => void;
   resetAll: () => void;
   loadDemo: () => void;
+  /** Remplace l'état complet (hydratation depuis le cloud). */
+  hydrate: (db: DB) => void;
 }
 
 const StoreContext = createContext<StoreValue | null>(null);
@@ -738,6 +740,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
       resetAll() {
         setDb(emptyDB());
+      },
+
+      hydrate(next) {
+        setDb({ ...emptyDB(), ...next });
       },
 
       loadDemo() {
