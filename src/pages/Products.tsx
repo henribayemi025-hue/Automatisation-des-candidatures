@@ -4,6 +4,9 @@ import { formatMoney, toMajor, toMinor } from '../lib/money';
 import type { Product } from '../lib/types';
 import { Badge, Empty, Field, Modal, PageHeader, Table } from '../components/UI';
 import { IconBox, IconDownload, IconPlus, IconSearch } from '../components/Icons';
+import ImportProducts from '../components/ImportProducts';
+import { exportXlsx } from '../lib/xlsx';
+import { Link } from 'react-router-dom';
 
 const BLANK = {
   name: '',
@@ -27,6 +30,26 @@ export default function Products() {
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(BLANK);
   const [grid, setGrid] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+
+  function exportExcel() {
+    exportXlsx(
+      'produits',
+      'Produits',
+      filtered.map((p) => ({
+        Nom: p.name,
+        Référence: p.sku,
+        'Code-barres': p.barcode,
+        Catégorie: p.category,
+        Marque: p.brand,
+        [`Prix de vente (${currency})`]: toMajor(p.price, currency),
+        [`Coût d'achat (${currency})`]: toMajor(p.cost, currency),
+        Marge: toMajor(p.price - p.cost, currency),
+        Stock: p.stock,
+        "Seuil d'alerte": p.reorderPoint,
+      })),
+    );
+  }
   const [sort, setSort] = useState<'name' | 'price' | 'margin' | 'stock'>('name');
 
   /** Saisie directe dans la cellule, enregistrée dès qu'on quitte la case. */
@@ -158,9 +181,15 @@ export default function Products() {
             <button onClick={() => setGrid((g) => !g)} className={grid ? 'btn-dark' : 'btn-ghost'} title="Modifier les prix directement dans le tableau, comme dans un tableur">
               {grid ? 'Quitter le mode tableau' : 'Mode tableau'}
             </button>
-            <button onClick={exportCsv} className="btn-ghost">
+            <button onClick={() => setImportOpen(true)} className="btn-ghost">
               <IconDownload className="h-4 w-4" />
-              Export CSV
+              Importer
+            </button>
+            <button onClick={exportExcel} className="btn-ghost" title="Fichier Excel prêt pour un comptable">
+              Excel
+            </button>
+            <button onClick={exportCsv} className="btn-ghost">
+              CSV
             </button>
             <button onClick={openNew} className="btn-primary">
               <IconPlus className="h-4 w-4" />
@@ -257,6 +286,8 @@ export default function Products() {
         )}
       </div>
 
+      <ImportProducts open={importOpen} onClose={() => setImportOpen(false)} />
+
       <Modal open={open} onClose={() => setOpen(false)} title={editing ? 'Modifier le produit' : 'Nouveau produit'} wide>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
@@ -282,12 +313,21 @@ export default function Products() {
           <Field label={`Coût d'achat (${currency})`}>
             <input value={form.cost} onChange={(e) => setForm({ ...form, cost: e.target.value })} inputMode="decimal" className="field num" />
           </Field>
-          {!editing && (
-            <Field label="Stock initial" hint="Comptabilisé en apport au plan comptable">
+          {editing ? (
+            <Field label="Stock actuel" hint="Le stock se corrige depuis l’écran Stock pour garder la trace de chaque mouvement.">
+              <div className="flex items-center gap-3">
+                <span className="field w-auto bg-base num">{editing.stock}</span>
+                <Link to="/stock" onClick={() => setOpen(false)} className="text-caption font-semibold text-teal">
+                  Ajuster le stock
+                </Link>
+              </div>
+            </Field>
+          ) : (
+            <Field label="Quantité en stock aujourd’hui" hint="Ce que vous avez déjà en rayon. Vous pourrez l’ajuster ensuite.">
               <input value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} inputMode="numeric" className="field num" />
             </Field>
           )}
-          <Field label="Seuil de réappro">
+          <Field label="M’alerter quand il en reste moins de" hint="L’appli vous prévient qu’il faut recommander.">
             <input value={form.reorderPoint} onChange={(e) => setForm({ ...form, reorderPoint: e.target.value })} inputMode="numeric" className="field num" />
           </Field>
         </div>

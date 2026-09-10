@@ -2,6 +2,8 @@ import { Fragment, useMemo, useState } from 'react';
 import { useDB } from '../lib/store';
 import { trialBalance } from '../lib/ledger';
 import { CLASS_LABELS } from '../lib/chart';
+import { toMajor } from '../lib/money';
+import { exportXlsx } from '../lib/xlsx';
 import type { AccountClass } from '../lib/types';
 import { Badge, Empty, Field, Money, PageHeader, StatCard } from '../components/UI';
 import { IconScale } from '../components/Icons';
@@ -32,7 +34,32 @@ export default function TrialBalance() {
 
   return (
     <>
-      <PageHeader title="Balance générale" subtitle="Totaux et soldes de tous les comptes mouvementés" />
+      <PageHeader
+        title="Balance générale"
+        subtitle="Totaux et soldes de tous les comptes mouvementés"
+        actions={
+          <button
+            onClick={() =>
+              exportXlsx(
+                'balance',
+                'Balance',
+                balances.map((b) => ({
+                  Compte: b.account.code,
+                  Intitulé: b.account.label,
+                  Classe: b.account.class,
+                  'Total débit': toMajor(b.debit, db.company.currency),
+                  'Total crédit': toMajor(b.credit, db.company.currency),
+                  Solde: toMajor(b.balance, db.company.currency),
+                  Sens: b.account.normal === 'DEBIT' ? 'D' : 'C',
+                })),
+              )
+            }
+            className="btn-ghost"
+          >
+            Excel
+          </button>
+        }
+      />
 
       <div className="card mb-4 flex flex-wrap items-end gap-3">
         <Field label="Du">

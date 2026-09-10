@@ -1,11 +1,14 @@
 name = "automatisation-des-candidatures"
+main = "src/worker.js"
 compatibility_date = "2025-06-01"
 
 [assets]
 directory = "./dist"
+binding = "ASSETS"
 not_found_handling = "single-page-application"
+# /api/* est traité par le worker (src/worker.js), tout le reste par les assets.
+run_worker_first = ["/api/*"]
 
-# Déploiement : connecter ce dépôt GitHub dans le tableau de bord Cloudflare
-# (Workers & Pages → Create → Import a repository).
-# Commande de build : npm run build
-# Commande de déploiement : npx wrangler deploy
+# Secret attendu : GEMINI_API_KEY (Settings → Variables and Secrets du worker).
+# Déploiement : ce dépôt est connecté à Cloudflare, chaque poussée déploie.
+# Build : npm run build — Deploy : npx wrangler deploy

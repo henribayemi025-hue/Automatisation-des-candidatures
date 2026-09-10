@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useStore, today } from '../lib/store';
 import { entriesInRange } from '../lib/ledger';
-import { toMinor } from '../lib/money';
+import { toMajor, toMinor } from '../lib/money';
+import { exportXlsx } from '../lib/xlsx';
 import type { JournalCode, JournalLine } from '../lib/types';
 import { Badge, Empty, Field, Modal, Money, PageHeader, StatCard } from '../components/UI';
 import { IconPlus, IconReceipt, IconX } from '../components/Icons';
@@ -80,10 +81,36 @@ export default function Journal() {
         title="Journal des écritures"
         subtitle="Toutes les écritures en partie double, générées ou saisies"
         actions={
-          <button onClick={() => setOpen(true)} className="btn-primary">
-            <IconPlus className="h-4 w-4" />
-            Écriture manuelle
-          </button>
+          <>
+            <button
+              onClick={() =>
+                exportXlsx(
+                  'journal',
+                  'Journal',
+                  entries.flatMap((e) =>
+                    e.lines.map((l) => ({
+                      Date: e.date,
+                      Journal: e.journal,
+                      Pièce: e.ref,
+                      Libellé: e.label,
+                      Compte: l.account,
+                      Intitulé: db.accounts.find((a) => a.code === l.account)?.label ?? '',
+                      Débit: toMajor(l.debit, db.company.currency),
+                      Crédit: toMajor(l.credit, db.company.currency),
+                    })),
+                  ),
+                )
+              }
+              className="btn-ghost"
+              title="Export Excel pour le cabinet"
+            >
+              Excel
+            </button>
+            <button onClick={() => setOpen(true)} className="btn-primary">
+              <IconPlus className="h-4 w-4" />
+              Écriture manuelle
+            </button>
+          </>
         }
       />
 
