@@ -17,9 +17,11 @@ const usage = new Map();
 
 function geminiKey(env) {
   if (env.GEMINI_API_KEY) return env.GEMINI_API_KEY;
-  // La clé peut avoir été enregistrée sous un autre nom dans le tableau de bord.
+  // La clé peut avoir été enregistrée sous un autre nom dans le tableau de bord :
+  // on accepte tout nom évocateur, ou toute valeur qui a la forme d'une clé Google.
   for (const [k, v] of Object.entries(env)) {
-    if (/gemini|google.*key|ai.*key/i.test(k) && typeof v === 'string' && v.length > 20) return v;
+    if (typeof v !== 'string' || v.length < 20) continue;
+    if (/gemini|google|api[_-]?key|ia|ai/i.test(k) || /^AIza[0-9A-Za-z_-]{20,}$/.test(v)) return v;
   }
   return null;
 }
@@ -212,7 +214,11 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     if (url.pathname === '/api/assistant') return handleAssistant(req, env);
-    if (url.pathname === '/api/health') return json({ ok: true, ai: !!geminiKey(env) });
+    if (url.pathname === '/api/health') {
+      // Noms des variables vues par le worker (jamais les valeurs), pour diagnostiquer.
+      const vars = Object.keys(env).filter((k) => k !== 'ASSETS');
+      return json({ ok: true, ai: !!geminiKey(env), variables: vars });
+    }
     return env.ASSETS.fetch(req);
   },
 };

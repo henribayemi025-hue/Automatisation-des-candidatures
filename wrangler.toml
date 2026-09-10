@@ -1,6 +1,9 @@
 name = "automatisation-des-candidatures"
 main = "src/worker.js"
 compatibility_date = "2025-06-01"
+# Conserve les variables saisies dans le tableau de bord : sans cette ligne,
+# chaque déploiement efface les variables de type « Texte ».
+keep_vars = true
 
 [assets]
 directory = "./dist"
