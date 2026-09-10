@@ -3,6 +3,7 @@ import { useDB } from '../lib/store';
 import { formatMoney } from '../lib/money';
 import type { Minor } from '../lib/types';
 import { IconX } from './Icons';
+import { t } from '../lib/i18n';
 
 export function Money({ value, className }: { value: Minor; className?: string }) {
   const { company } = useDB();
@@ -75,7 +76,7 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
       <div className={`max-h-[92vh] w-full overflow-y-auto rounded-t-card bg-white p-5 shadow-2xl scrollbar-thin sm:rounded-card sm:p-6 ${wide ? 'sm:max-w-3xl' : 'sm:max-w-lg'}`}>
         <div className="mb-5 flex items-start justify-between gap-4">
           <h2 className="font-display text-[22px] font-bold text-ink">{title}</h2>
-          <button onClick={onClose} aria-label="Fermer" className="rounded-full p-1.5 text-muted hover:bg-base">
+          <button onClick={onClose} aria-label={t('Fermer')} className="rounded-full p-1.5 text-muted hover:bg-base">
             <IconX />
           </button>
         </div>
@@ -128,15 +129,15 @@ export function Table({ head, children }: { head: string[]; children: ReactNode 
 export function DateRange({ from, to, onFrom, onTo, onApply }: { from: string; to: string; onFrom: (v: string) => void; onTo: (v: string) => void; onApply?: () => void }) {
   return (
     <div className="flex flex-wrap items-end gap-3">
-      <Field label="Du">
+      <Field label={t('Du')}>
         <input type="date" value={from} onChange={(e) => onFrom(e.target.value)} className="field" />
       </Field>
-      <Field label="Au">
+      <Field label={t('Au')}>
         <input type="date" value={to} onChange={(e) => onTo(e.target.value)} className="field" />
       </Field>
       {onApply && (
         <button onClick={onApply} className="btn-primary">
-          Mettre à jour
+          {t('Mettre à jour')}
         </button>
       )}
     </div>

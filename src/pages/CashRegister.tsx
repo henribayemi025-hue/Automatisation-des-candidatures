@@ -4,6 +4,7 @@ import { accountCode } from '../lib/chart';
 import { toMinor } from '../lib/money';
 import { Badge, Empty, Field, Money, PageHeader, Table } from '../components/UI';
 import { IconWallet } from '../components/Icons';
+import { locale, t } from '../lib/i18n';
 
 export default function CashRegister() {
   const { db, openSession, closeSession } = useStore();
@@ -38,7 +39,7 @@ export default function CashRegister() {
 
   return (
     <>
-      <PageHeader title="Caisse" subtitle="Ouverture, contrôle et clôture de la session de caisse" />
+      <PageHeader title={t('Caisse')} subtitle={t('Ouverture, contrôle et clôture de la session de caisse')} />
 
       {error && (
         <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300">
@@ -49,10 +50,10 @@ export default function CashRegister() {
       {current ? (
         <div className="grid gap-4 lg:grid-cols-[380px_1fr]">
           <div className="card">
-            <Badge tone="success">Session ouverte</Badge>
+            <Badge tone="success">{t('Session ouverte')}</Badge>
             <p className="mt-3 text-sm text-slate-500">
-              Ouverte le{' '}
-              {new Date(current.openedAt).toLocaleString('fr-FR', {
+              {t('Ouverte le')}{' '}
+              {new Date(current.openedAt).toLocaleString(locale(), {
                 dateStyle: 'short',
                 timeStyle: 'short',
               })}{' '}
@@ -60,20 +61,20 @@ export default function CashRegister() {
             </p>
             <dl className="mt-4 space-y-2 text-sm">
               <div className="flex justify-between">
-                <dt className="text-slate-500">Fond de départ</dt>
+                <dt className="text-slate-500">{t('Fond de départ')}</dt>
                 <dd>
                   <Money value={current.opening} />
                 </dd>
               </div>
               <div className="flex justify-between font-semibold">
-                <dt>Solde théorique</dt>
+                <dt>{t('Solde théorique')}</dt>
                 <dd>
                   <Money value={expected} />
                 </dd>
               </div>
             </dl>
             <div className="mt-5 border-t border-slate-100 pt-4 dark:border-white/10">
-              <Field label="Montant compté en caisse">
+              <Field label={t('Montant compté en caisse')}>
                 <input
                   value={counted}
                   onChange={(e) => setCounted(e.target.value)}
@@ -84,7 +85,7 @@ export default function CashRegister() {
               </Field>
               {counted !== '' && (
                 <p className="mt-2 text-sm">
-                  Écart :{' '}
+                  {t('Écart :')}{' '}
                   <span
                     className={
                       toMinor(counted, currency) - expected === 0
@@ -100,16 +101,16 @@ export default function CashRegister() {
                 onClick={() => run(() => closeSession(toMinor(counted || 0, currency)))}
                 className="btn-dark mt-4 w-full"
               >
-                Clôturer la caisse
+                {t('Clôturer la caisse')}
               </button>
               <p className="mt-2 text-xs text-slate-400">
-                Un écart génère automatiquement une écriture d'ajustement au journal des opérations diverses.
+                {t('Un écart génère automatiquement une écriture d\'ajustement au journal des opérations diverses.')}
               </p>
             </div>
           </div>
 
           <div className="card">
-            <h2 className="mb-3 font-bold">Mouvements de caisse de la session</h2>
+            <h2 className="mb-3 font-bold">{t('Mouvements de caisse de la session')}</h2>
             <Table head={['Date', 'Libellé', 'Entrée', 'Sortie']}>
               {db.entries
                 .filter(
@@ -138,13 +139,13 @@ export default function CashRegister() {
         <div className="card max-w-md">
           <h2 className="flex items-center gap-2 font-bold">
             <IconWallet className="h-[18px] w-[18px] text-slate-400" />
-            Aucune session ouverte
+            {t('Aucune session ouverte')}
           </h2>
           <p className="mt-1 text-sm text-slate-500">
-            Déclarez le fond de caisse de départ pour ouvrir la session.
+            {t('Déclarez le fond de caisse de départ pour ouvrir la session.')}
           </p>
           <div className="mt-4">
-            <Field label={`Fond de caisse (${currency})`}>
+            <Field label={t('Fond de caisse ({c})', { c: currency })}>
               <input
                 value={opening}
                 onChange={(e) => setOpening(e.target.value)}
@@ -158,13 +159,13 @@ export default function CashRegister() {
             onClick={() => run(() => openSession(toMinor(opening || 0, currency)))}
             className="btn-primary mt-4 w-full"
           >
-            Ouvrir la caisse
+            {t('Ouvrir la caisse')}
           </button>
         </div>
       )}
 
       <div className="card mt-6 p-0">
-        <h2 className="px-5 pb-3 pt-5 font-bold">Historique des sessions</h2>
+        <h2 className="px-5 pb-3 pt-5 font-bold">{t('Historique des sessions')}</h2>
         {db.sessions.filter((s) => s.closedAt).length ? (
           <Table head={['Caissier', 'Ouverture', 'Clôture', 'Fond', 'Théorique', 'Compté', 'Écart']}>
             {db.sessions
@@ -173,10 +174,10 @@ export default function CashRegister() {
                 <tr key={s.id} className="row">
                   <td className="td">{s.cashier}</td>
                   <td className="td text-slate-500">
-                    {new Date(s.openedAt).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}
+                    {new Date(s.openedAt).toLocaleString(locale(), { dateStyle: 'short', timeStyle: 'short' })}
                   </td>
                   <td className="td text-slate-500">
-                    {new Date(s.closedAt!).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}
+                    {new Date(s.closedAt!).toLocaleString(locale(), { dateStyle: 'short', timeStyle: 'short' })}
                   </td>
                   <td className="td num">
                     <Money value={s.opening} />
@@ -189,7 +190,7 @@ export default function CashRegister() {
                   </td>
                   <td className="td num">
                     {s.variance === 0 ? (
-                      <Badge tone="success">Conforme</Badge>
+                      <Badge tone="success">{t('Conforme')}</Badge>
                     ) : (
                       <Badge tone={(s.variance ?? 0) < 0 ? 'danger' : 'warn'}>
                         <Money value={s.variance ?? 0} />
@@ -200,7 +201,7 @@ export default function CashRegister() {
               ))}
           </Table>
         ) : (
-          <Empty title="Aucune session enregistrée" />
+          <Empty title={t('Aucune session enregistrée')} />
         )}
       </div>
     </>

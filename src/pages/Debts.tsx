@@ -5,6 +5,7 @@ import { toMajor, toMinor } from '../lib/money';
 import type { PaymentMethod } from '../lib/types';
 import { Badge, Empty, Field, Modal, Money, PageHeader, StatCard, Table } from '../components/UI';
 import { IconCard, IconCheck } from '../components/Icons';
+import { t } from '../lib/i18n';
 
 type Tab = 'CUSTOMER' | 'SUPPLIER';
 
@@ -48,10 +49,10 @@ export default function Debts() {
 
       <div className="mb-4 flex gap-2">
         <button onClick={() => setTab('CUSTOMER')} className={isCustomer ? 'btn-dark' : 'btn-ghost'}>
-          Clients débiteurs
+          {t('Clients débiteurs')}
         </button>
         <button onClick={() => setTab('SUPPLIER')} className={!isCustomer ? 'btn-dark' : 'btn-ghost'}>
-          Fournisseurs
+          {t('Fournisseurs')}
         </button>
       </div>
 
@@ -63,15 +64,15 @@ export default function Debts() {
           tone="dark"
         />
         <StatCard
-          label="La plus ancienne"
+          label={t('La plus ancienne')}
           value={oldest ? oldest.date : '—'}
           hint={oldest ? oldest.partyName : 'Aucun encours'}
         />
         <StatCard
-          label="Réglé ce mois"
+          label={t('Réglé ce mois')}
           value={<Money value={recovered} />}
           tone="positive"
-          hint="Encaissements et décaissements"
+          hint={t('Encaissements et décaissements')}
         />
       </div>
 
@@ -109,7 +110,7 @@ export default function Debts() {
                       }}
                       className="text-sm font-semibold text-brand-600"
                     >
-                      Enregistrer un règlement
+                      {t('Enregistrer un règlement')}
                     </button>
                   </td>
                 </tr>
@@ -119,7 +120,7 @@ export default function Debts() {
         ) : (
           <Empty
             title={isCustomer ? 'Aucune créance en cours' : 'Aucune dette en cours'}
-            hint="Tous les comptes sont à jour."
+            hint={t('Tous les comptes sont à jour.')}
             icon={<IconCheck className="h-10 w-10 text-teal-500" />}
           />
         )}
@@ -127,7 +128,7 @@ export default function Debts() {
 
       {all.some((d) => outstanding(d) === 0) && (
         <div className="card mt-6 p-0">
-          <h2 className="px-5 pb-3 pt-5 font-bold">Soldés</h2>
+          <h2 className="px-5 pb-3 pt-5 font-bold">{t('Soldés')}</h2>
           <Table head={['Tiers', 'Origine', 'Date', 'Montant']}>
             {all
               .filter((d) => outstanding(d) === 0)
@@ -145,42 +146,42 @@ export default function Debts() {
         </div>
       )}
 
-      <Modal open={!!target} onClose={() => setPayId(null)} title="Enregistrer un règlement">
+      <Modal open={!!target} onClose={() => setPayId(null)} title={t('Enregistrer un règlement')}>
         {target && (
           <>
             <div className="mb-4 rounded-xl bg-slate-50 p-4 text-sm dark:bg-white/5">
               <div className="font-semibold">{target.partyName}</div>
               <div className="text-slate-500">{target.origin}</div>
               <div className="mt-2">
-                Reste dû : <Money value={outstanding(target)} className="font-bold" />
+                {t('Reste dû :')} <Money value={outstanding(target)} className="font-bold" />
               </div>
             </div>
             <div className="space-y-4">
-              <Field label="Montant du règlement">
+              <Field label={t('Montant du règlement')}>
                 <input value={amountRaw} onChange={(e) => setAmountRaw(e.target.value)} inputMode="decimal" className="field num" />
               </Field>
-              <Field label="Moyen de paiement">
+              <Field label={t('Moyen de paiement')}>
                 <select value={method} onChange={(e) => setMethod(e.target.value as PaymentMethod)} className="field">
-                  <option value="CASH">Espèces</option>
-                  <option value="MOBILE">Mobile money</option>
-                  <option value="CARD">Carte</option>
-                  <option value="BANK">Virement</option>
+                  <option value="CASH">{t('Espèces')}</option>
+                  <option value="MOBILE">{t('Mobile money')}</option>
+                  <option value="CARD">{t('Carte')}</option>
+                  <option value="BANK">{t('Virement')}</option>
                 </select>
               </Field>
               <button
                 onClick={() => setAmountRaw(String(toMajor(outstanding(target), db.company.currency)))}
                 className="text-sm font-semibold text-brand-600"
               >
-                Solder entièrement
+                {t('Solder entièrement')}
               </button>
             </div>
             <div className="mt-6 flex justify-end gap-2">
               <button onClick={() => setPayId(null)} className="btn-ghost">
-                Annuler
+                {t('Annuler')}
               </button>
               <button onClick={submit} className="btn-primary">
                 <IconCard className="h-4 w-4" />
-                Enregistrer
+                {t('Enregistrer')}
               </button>
             </div>
           </>

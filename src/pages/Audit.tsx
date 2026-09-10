@@ -4,6 +4,7 @@ import { balanceSheet, isBalanced, runAuditChecks, trialBalance } from '../lib/l
 import { outstanding } from '../lib/metrics';
 import { Badge, Money, PageHeader, StatCard, Table } from '../components/UI';
 import { IconAlert, IconCheck, IconShield, IconX } from '../components/Icons';
+import { t } from '../lib/i18n';
 
 export default function Audit() {
   const db = useDB();
@@ -57,30 +58,30 @@ export default function Audit() {
   return (
     <>
       <PageHeader
-        title="Audit"
-        subtitle="Contrôles de cohérence exécutés sur l'intégralité des écritures"
+        title={t('Audit')}
+        subtitle={t('Contrôles de cohérence exécutés sur l\'intégralité des écritures')}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          label="Score de conformité"
+          label={t('Score de conformité')}
           value={`${score} / 100`}
           tone="dark"
-          hint={errors.length ? 'Anomalies bloquantes détectées' : 'Aucune anomalie bloquante'}
+          hint={errors.length ? t('Anomalies bloquantes détectées') : t('Aucune anomalie bloquante')}
         />
-        <StatCard label="Contrôles exécutés" value={checks.length} />
+        <StatCard label={t('Contrôles exécutés')} value={checks.length} />
         <StatCard
-          label="Erreurs"
+          label={t('Erreurs')}
           value={errors.length}
           tone={errors.length ? 'negative' : 'positive'}
         />
-        <StatCard label="Avertissements" value={warnings.length} tone={warnings.length ? 'negative' : 'default'} />
+        <StatCard label={t('Avertissements')} value={warnings.length} tone={warnings.length ? 'negative' : 'default'} />
       </div>
 
       <div className="card mt-6">
         <h2 className="mb-4 flex items-center gap-2 font-bold">
           <IconShield className="h-[18px] w-[18px] text-brand-600" />
-          Contrôles automatiques
+          {t('Contrôles automatiques')}
         </h2>
         <ul className="space-y-2">
           {checks.map((c) => (
@@ -112,7 +113,7 @@ export default function Audit() {
                 )}
               </span>
               <div className="min-w-0">
-                <div className="text-sm font-semibold">{c.label}</div>
+                <div className="text-sm font-semibold">{t(c.label)}</div>
                 <div className="text-sm text-slate-600 dark:text-slate-400">{c.detail}</div>
               </div>
             </li>
@@ -121,16 +122,16 @@ export default function Audit() {
       </div>
 
       <div className="card mt-6 p-0">
-        <h2 className="px-5 pb-1 pt-5 font-bold">Rapprochements métier / comptabilité</h2>
+        <h2 className="px-5 pb-1 pt-5 font-bold">{t('Rapprochements métier / comptabilité')}</h2>
         <p className="px-5 pb-3 text-sm text-slate-500">
-          Un écart signale une donnée saisie hors du circuit comptable.
+          {t('Un écart signale une donnée saisie hors du circuit comptable.')}
         </p>
         <Table head={['Poste', 'Solde métier', 'Solde comptable', 'Écart', 'Statut']}>
           {reconciliations.map((r) => (
             <tr key={r.label} className="row">
               <td className="td">
-                <div className="font-semibold">{r.label}</div>
-                <div className="text-xs text-slate-400">{r.hint}</div>
+                <div className="font-semibold">{t(r.label)}</div>
+                <div className="text-xs text-slate-400">{t(r.hint)}</div>
               </td>
               <td className="td num">
                 <Money value={r.business} />
@@ -142,7 +143,7 @@ export default function Audit() {
                 <Money value={r.gap} />
               </td>
               <td className="td">
-                {r.gap === 0 ? <Badge tone="success">Rapproché</Badge> : <Badge tone="danger">Écart</Badge>}
+                {r.gap === 0 ? <Badge tone="success">{t('Rapproché')}</Badge> : <Badge tone="danger">{t('Écart')}</Badge>}
               </td>
             </tr>
           ))}
@@ -151,28 +152,28 @@ export default function Audit() {
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <div className="card">
-          <h2 className="mb-3 font-bold">Équation comptable</h2>
+          <h2 className="mb-3 font-bold">{t('Équation comptable')}</h2>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <dt className="text-slate-500">Total actif</dt>
+              <dt className="text-slate-500">{t('Total actif')}</dt>
               <dd>
                 <Money value={sheet.totalAssets} />
               </dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-slate-500">Total dettes</dt>
+              <dt className="text-slate-500">{t('Total dettes')}</dt>
               <dd>
                 <Money value={sheet.totalLiabilities} />
               </dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-slate-500">Capitaux propres + résultat</dt>
+              <dt className="text-slate-500">{t('Capitaux propres + résultat')}</dt>
               <dd>
                 <Money value={sheet.totalEquity + sheet.netIncome} />
               </dd>
             </div>
             <div className="flex justify-between border-t border-slate-200 pt-2 font-bold dark:border-white/10">
-              <dt>Écart</dt>
+              <dt>{t('Écart')}</dt>
               <dd className={sheet.difference === 0 ? 'text-teal-600' : 'text-rose-600'}>
                 <Money value={sheet.difference} />
               </dd>
@@ -181,7 +182,7 @@ export default function Audit() {
         </div>
 
         <div className="card">
-          <h2 className="mb-3 font-bold">Écritures à corriger</h2>
+          <h2 className="mb-3 font-bold">{t('Écritures à corriger')}</h2>
           {unbalanced.length ? (
             <ul className="space-y-2 text-sm">
               {unbalanced.map((e) => (
@@ -193,7 +194,7 @@ export default function Audit() {
           ) : (
             <p className="flex items-center gap-2 text-sm text-teal-600">
               <IconCheck className="h-4 w-4" />
-              Aucune écriture déséquilibrée.
+              {t('Aucune écriture déséquilibrée.')}
             </p>
           )}
         </div>

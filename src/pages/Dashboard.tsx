@@ -15,6 +15,7 @@ import { factor, formatMoney, formatNumber } from '../lib/money';
 import { Empty, Money, PageHeader, StatCard } from '../components/UI';
 import StartGuide from '../components/StartGuide';
 import { IconAlert, IconBox, IconCard, IconChart, IconTrend, IconWallet } from '../components/Icons';
+import { t } from '../lib/i18n';
 
 export default function Dashboard() {
   const db = useDB();
@@ -27,36 +28,36 @@ export default function Dashboard() {
   return (
     <>
       <PageHeader
-        title={`Bonjour, ${db.company.name}`}
-        subtitle="Où en est votre activité aujourd'hui"
+        title={t('Bonjour, {name}', { name: db.company.name })}
+        subtitle={t('Où en est votre activité aujourd\'hui')}
       />
 
       <StartGuide />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          label="CA du jour"
+          label={t('CA du jour')}
           value={<Money value={s.revenueToday} />}
-          hint={`${s.salesToday} vente(s) aujourd'hui`}
+          hint={t("{n} vente(s) aujourd'hui", { n: s.salesToday })}
           icon={<IconTrend className="h-[18px] w-[18px] text-teal-600" />}
         />
         <StatCard
-          label="CA du mois"
+          label={t('CA du mois')}
           value={<Money value={s.revenueMonth} />}
-          hint={`${s.salesMonth} vente(s) ce mois`}
+          hint={t('{n} vente(s) ce mois', { n: s.salesMonth })}
           icon={<IconChart className="h-[18px] w-[18px] text-sky-600" />}
         />
         <StatCard
-          label="Résultat net"
+          label={t('Résultat net')}
           value={<Money value={s.netIncome} />}
           tone={s.netIncome >= 0 ? 'positive' : 'negative'}
-          hint="Produits − charges du mois"
+          hint={t('Produits − charges du mois')}
           icon={<IconCard className="h-[18px] w-[18px] text-violet-600" />}
         />
         <StatCard
-          label="Trésorerie"
+          label={t('Trésorerie')}
           value={<Money value={s.cashOnHand} />}
-          hint="Caisse + mobile + banque"
+          hint={t('Caisse + mobile + banque')}
           tone="dark"
           icon={<IconWallet className="h-[18px] w-[18px]" />}
         />
@@ -64,27 +65,27 @@ export default function Dashboard() {
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          label="Créances clients"
+          label={t('Créances clients')}
           value={<Money value={s.receivables} />}
-          hint="À encaisser"
+          hint={t('À encaisser')}
           icon={<IconCard className="h-[18px] w-[18px] text-amber-600" />}
         />
         <StatCard
-          label="Dettes fournisseurs"
+          label={t('Dettes fournisseurs')}
           value={<Money value={s.payables} />}
-          hint="À régler"
+          hint={t('À régler')}
           icon={<IconCard className="h-[18px] w-[18px] text-rose-600" />}
         />
         <StatCard
-          label="Valeur du stock"
+          label={t('Valeur du stock')}
           value={<Money value={s.stockValue} />}
-          hint={`${s.outOfStock} rupture(s) · ${s.lowStock} stock bas`}
+          hint={t('{out} rupture(s) · {low} stock bas', { out: s.outOfStock, low: s.lowStock })}
           icon={<IconBox className="h-[18px] w-[18px] text-slate-600" />}
         />
         <StatCard
-          label="Dépenses du mois"
+          label={t('Dépenses du mois')}
           value={<Money value={s.expensesMonth} />}
-          hint="Hors coût des marchandises"
+          hint={t('Hors coût des marchandises')}
           icon={<IconWallet className="h-[18px] w-[18px] text-rose-600" />}
         />
       </div>
@@ -93,7 +94,7 @@ export default function Dashboard() {
         <div className="card lg:col-span-2">
           <h2 className="mb-4 flex items-center gap-2 font-bold">
             <IconChart className="h-[18px] w-[18px] text-brand-600" />
-            Revenus et dépenses (30 derniers jours)
+            {t('Revenus et dépenses (30 derniers jours)')}
           </h2>
           {hasData ? (
             <div className="h-72">
@@ -124,8 +125,8 @@ export default function Dashboard() {
             </div>
           ) : (
             <Empty
-              title="Aucune donnée sur la période"
-              hint="Enregistrez une première vente au point de vente pour voir la courbe se remplir."
+              title={t('Aucune donnée sur la période')}
+              hint={t('Enregistrez une première vente au point de vente pour voir la courbe se remplir.')}
               icon={<IconChart className="h-10 w-10" />}
             />
           )}
@@ -133,7 +134,7 @@ export default function Dashboard() {
 
         <div className="flex flex-col gap-4">
           <div className="card">
-            <h2 className="mb-3 font-bold">Top produits</h2>
+            <h2 className="mb-3 font-bold">{t('Top produits')}</h2>
             {top.length ? (
               <ul className="space-y-3">
                 {top.map((p, i) => (
@@ -149,7 +150,7 @@ export default function Dashboard() {
                 ))}
               </ul>
             ) : (
-              <p className="py-6 text-center text-sm text-slate-400">Aucune vente encore</p>
+              <p className="py-6 text-center text-sm text-slate-400">{t('Aucune vente encore')}</p>
             )}
           </div>
 
@@ -157,31 +158,31 @@ export default function Dashboard() {
             <div className="card border-amber-200 bg-amber-50 dark:border-amber-500/20 dark:bg-amber-500/10">
               <h2 className="mb-2 flex items-center gap-2 font-bold text-amber-900 dark:text-amber-200">
                 <IconAlert className="h-[18px] w-[18px]" />
-                Alertes de stock
+                {t('Alertes de stock')}
               </h2>
               <p className="text-sm text-amber-800 dark:text-amber-200/80">
-                {s.outOfStock} produit(s) en rupture, {s.lowStock} sous le seuil de réappro.
+                {s.outOfStock} {t('produit(s) en rupture,')} {s.lowStock} {t('sous le seuil de réappro.')}
               </p>
               <Link to="/stock" className="btn-ghost mt-3 w-full">
-                Voir le stock
+                {t('Voir le stock')}
               </Link>
             </div>
           )}
 
           <div className="card">
-            <h2 className="mb-3 font-bold">Raccourcis</h2>
+            <h2 className="mb-3 font-bold">{t('Raccourcis')}</h2>
             <div className="grid grid-cols-2 gap-2">
               <Link to="/pos" className="btn-primary">
-                Vendre
+                {t('Vendre')}
               </Link>
               <Link to="/depenses" className="btn-ghost">
-                Dépense
+                {t('Dépense')}
               </Link>
               <Link to="/achats" className="btn-ghost">
-                Achat
+                {t('Achat')}
               </Link>
               <Link to="/etats" className="btn-ghost">
-                États
+                {t('États')}
               </Link>
             </div>
           </div>

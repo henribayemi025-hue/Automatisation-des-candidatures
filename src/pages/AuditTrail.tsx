@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useDB } from '../lib/store';
 import { Badge, Empty, Field, PageHeader, StatCard, Table } from '../components/UI';
 import { IconHistory } from '../components/Icons';
+import { locale, t } from '../lib/i18n';
 
 const ACTION_TONE: Record<string, 'success' | 'info' | 'warn' | 'danger' | 'neutral'> = {
   CREATE: 'success',
@@ -33,20 +34,20 @@ export default function AuditTrail() {
   return (
     <>
       <PageHeader
-        title="Historique"
-        subtitle="Qui a fait quoi, et quand — chaque action de chaque membre, impossible à effacer"
+        title={t('Historique')}
+        subtitle={t('Qui a fait quoi, et quand — chaque action de chaque membre, impossible à effacer')}
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label="Opérations enregistrées" value={db.audit.length} tone="dark" />
-        <StatCard label="Aujourd'hui" value={todayCount} />
-        <StatCard label="Types d'entités suivies" value={entities.length} />
+        <StatCard label={t('Opérations enregistrées')} value={db.audit.length} tone="dark" />
+        <StatCard label={t('Aujourd\'hui')} value={todayCount} />
+        <StatCard label={t('Types d\'entités suivies')} value={entities.length} />
       </div>
 
       <div className="card mt-6 mb-4 flex flex-wrap items-end gap-3">
-        <Field label="Entité">
+        <Field label={t('Entité')}>
           <select value={entity} onChange={(e) => setEntity(e.target.value)} className="field">
-            <option value="">Toutes</option>
+            <option value="">{t('Toutes')}</option>
             {entities.map((e) => (
               <option key={e} value={e}>
                 {e}
@@ -54,9 +55,9 @@ export default function AuditTrail() {
             ))}
           </select>
         </Field>
-        <Field label="Action">
+        <Field label={t('Action')}>
           <select value={action} onChange={(e) => setAction(e.target.value)} className="field">
-            <option value="">Toutes</option>
+            <option value="">{t('Toutes')}</option>
             {actions.map((a) => (
               <option key={a} value={a}>
                 {a}
@@ -72,7 +73,7 @@ export default function AuditTrail() {
             {filtered.map((a) => (
               <tr key={a.id} className="row">
                 <td className="td num text-slate-500">
-                  {new Date(a.at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'medium' })}
+                  {new Date(a.at).toLocaleString(locale(), { dateStyle: 'short', timeStyle: 'medium' })}
                 </td>
                 <td className="td font-medium">{a.user}</td>
                 <td className="td">
@@ -85,8 +86,8 @@ export default function AuditTrail() {
           </Table>
         ) : (
           <Empty
-            title="Aucune opération enregistrée"
-            hint="Chaque action dans l'application est tracée ici, avec son auteur et son horodatage."
+            title={t('Aucune opération enregistrée')}
+            hint={t('Chaque action dans l\'application est tracée ici, avec son auteur et son horodatage.')}
             icon={<IconHistory className="h-10 w-10" />}
           />
         )}

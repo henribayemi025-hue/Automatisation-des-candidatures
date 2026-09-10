@@ -5,6 +5,7 @@ import { toMinor } from '../lib/money';
 import type { PaymentMethod } from '../lib/types';
 import { Empty, Field, Modal, Money, PageHeader, Table } from '../components/UI';
 import { IconDoc, IconPlus } from '../components/Icons';
+import { t } from '../lib/i18n';
 
 export default function Quotes() {
   const { db, confirmQuote } = useStore();
@@ -27,12 +28,12 @@ export default function Quotes() {
   return (
     <>
       <PageHeader
-        title="Devis"
+        title={t('Devis')}
         subtitle={`${quotes.length} devis en attente de conversion`}
         actions={
           <Link to="/pos" className="btn-primary">
             <IconPlus className="h-4 w-4" />
-            Nouveau devis (au point de vente)
+            {t('Nouveau devis (au point de vente)')}
           </Link>
         }
       />
@@ -51,7 +52,7 @@ export default function Quotes() {
                 </td>
                 <td className="td text-right">
                   <button onClick={() => setConvertId(q.id)} className="text-sm font-semibold text-brand-600">
-                    Convertir en vente
+                    {t('Convertir en vente')}
                   </button>
                 </td>
               </tr>
@@ -59,41 +60,41 @@ export default function Quotes() {
           </Table>
         ) : (
           <Empty
-            title="Aucun devis en attente"
-            hint="Créez un devis depuis le point de vente : il ne touche ni le stock ni la comptabilité tant qu'il n'est pas converti."
+            title={t('Aucun devis en attente')}
+            hint={t('Créez un devis depuis le point de vente : il ne touche ni le stock ni la comptabilité tant qu\'il n\'est pas converti.')}
             icon={<IconDoc className="h-10 w-10" />}
           />
         )}
       </div>
 
-      <Modal open={!!target} onClose={() => setConvertId(null)} title="Convertir le devis en vente">
+      <Modal open={!!target} onClose={() => setConvertId(null)} title={t('Convertir le devis en vente')}>
         {target && (
           <>
             <p className="mb-4 text-sm text-slate-500">
               {target.number} — {target.customerName} — <Money value={target.total} />
             </p>
             <div className="space-y-4">
-              <Field label="Moyen de paiement">
+              <Field label={t('Moyen de paiement')}>
                 <select value={method} onChange={(e) => setMethod(e.target.value as PaymentMethod)} className="field">
-                  <option value="CASH">Espèces</option>
-                  <option value="MOBILE">Mobile money</option>
-                  <option value="CARD">Carte</option>
-                  <option value="BANK">Virement</option>
-                  <option value="CREDIT">Crédit</option>
+                  <option value="CASH">{t('Espèces')}</option>
+                  <option value="MOBILE">{t('Mobile money')}</option>
+                  <option value="CARD">{t('Carte')}</option>
+                  <option value="BANK">{t('Virement')}</option>
+                  <option value="CREDIT">{t('Crédit')}</option>
                 </select>
               </Field>
               {method === 'CREDIT' && (
-                <Field label="Acompte versé" hint="Le solde devient une créance client">
+                <Field label={t('Acompte versé')} hint={t('Le solde devient une créance client')}>
                   <input value={paidRaw} onChange={(e) => setPaidRaw(e.target.value)} inputMode="decimal" className="field num" />
                 </Field>
               )}
             </div>
             <div className="mt-6 flex justify-end gap-2">
               <button onClick={() => setConvertId(null)} className="btn-ghost">
-                Annuler
+                {t('Annuler')}
               </button>
               <button onClick={submit} className="btn-primary">
-                Confirmer la vente
+                {t('Confirmer la vente')}
               </button>
             </div>
           </>

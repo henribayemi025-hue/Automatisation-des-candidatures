@@ -5,6 +5,7 @@ import { outstanding } from '../lib/metrics';
 import type { PurchaseLine } from '../lib/types';
 import { Badge, Empty, Field, Money, PageHeader, StatCard, Table, Modal } from '../components/UI';
 import { IconCart, IconPlus, IconX } from '../components/Icons';
+import { t } from '../lib/i18n';
 
 type Filter = 'ALL' | 'PENDING' | 'RECEIVED';
 
@@ -46,7 +47,7 @@ export default function Purchases() {
 
   function submit() {
     if (!lines.length) {
-      setError('Ajoutez au moins un produit.');
+      setError(t('Ajoutez au moins un produit.'));
       return;
     }
     recordPurchase({
@@ -75,12 +76,12 @@ export default function Purchases() {
   return (
     <>
       <PageHeader
-        title="Achats & approvisionnements"
-        subtitle="Commandes fournisseurs et réceptions de stock"
+        title={t('Achats & approvisionnements')}
+        subtitle={t('Commandes fournisseurs et réceptions de stock')}
         actions={
           <button onClick={() => setOpen(true)} className="btn-primary">
             <IconPlus className="h-4 w-4" />
-            Nouveau bon de commande
+            {t('Nouveau bon de commande')}
           </button>
         }
       />
@@ -92,10 +93,10 @@ export default function Purchases() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Total achats" value={<Money value={stats.total} />} hint="Commandes réceptionnées" />
-        <StatCard label="Total payé" value={<Money value={stats.paid} />} tone="positive" />
-        <StatCard label="Commandes en attente" value={stats.pending} hint="À réceptionner" />
-        <StatCard label="Dette fournisseurs" value={<Money value={stats.debt} />} tone="negative" />
+        <StatCard label={t('Total achats')} value={<Money value={stats.total} />} hint={t('Commandes réceptionnées')} />
+        <StatCard label={t('Total payé')} value={<Money value={stats.paid} />} tone="positive" />
+        <StatCard label={t('Commandes en attente')} value={stats.pending} hint={t('À réceptionner')} />
+        <StatCard label={t('Dette fournisseurs')} value={<Money value={stats.debt} />} tone="negative" />
       </div>
 
       <div className="mt-6 flex gap-2">
@@ -105,7 +106,7 @@ export default function Purchases() {
             onClick={() => setFilter(f)}
             className={filter === f ? 'btn-dark' : 'btn-ghost'}
           >
-            {f === 'ALL' ? 'Tous' : f === 'PENDING' ? 'En attente' : 'Reçus'}
+            {f === 'ALL' ? t('Tous') : f === 'PENDING' ? t('En attente') : t('Reçus')}
           </button>
         ))}
       </div>
@@ -126,17 +127,17 @@ export default function Purchases() {
                 </td>
                 <td className="td">
                   {p.status === 'RECEIVED' ? (
-                    <Badge tone="success">Reçu</Badge>
+                    <Badge tone="success">{t('Reçu')}</Badge>
                   ) : p.status === 'PENDING' ? (
-                    <Badge tone="warn">En attente</Badge>
+                    <Badge tone="warn">{t('En attente')}</Badge>
                   ) : (
-                    <Badge tone="danger">Annulé</Badge>
+                    <Badge tone="danger">{t('Annulé')}</Badge>
                   )}
                 </td>
                 <td className="td text-right">
                   {p.status === 'PENDING' && (
                     <button onClick={() => receive(p.id)} className="text-sm font-semibold text-brand-600">
-                      Réceptionner
+                      {t('Réceptionner')}
                     </button>
                   )}
                 </td>
@@ -145,16 +146,16 @@ export default function Purchases() {
           </Table>
         ) : (
           <Empty
-            title="Aucun achat trouvé"
-            hint="Créez un bon de commande, puis réceptionnez-le pour mettre à jour le stock et la comptabilité."
+            title={t('Aucun achat trouvé')}
+            hint={t('Créez un bon de commande, puis réceptionnez-le pour mettre à jour le stock et la comptabilité.')}
             icon={<IconCart className="h-10 w-10" />}
           />
         )}
       </div>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Nouveau bon de commande" wide>
+      <Modal open={open} onClose={() => setOpen(false)} title={t('Nouveau bon de commande')} wide>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Fournisseur enregistré">
+          <Field label={t('Fournisseur enregistré')}>
             <select
               value={supplierId}
               onChange={(e) => {
@@ -163,7 +164,7 @@ export default function Purchases() {
               }}
               className="field"
             >
-              <option value="">— Saisie libre —</option>
+              <option value="">{t('— Saisie libre —')}</option>
               {db.suppliers.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
@@ -172,20 +173,20 @@ export default function Purchases() {
             </select>
           </Field>
           {!supplierId && (
-            <Field label="Nom du fournisseur">
+            <Field label={t('Nom du fournisseur')}>
               <input value={supplierName} onChange={(e) => setSupplierName(e.target.value)} className="field" />
             </Field>
           )}
         </div>
 
         <div className="mt-4">
-          <Field label="Ajouter un produit">
+          <Field label={t('Ajouter un produit')}>
             <select
               value=""
               onChange={(e) => e.target.value && addLine(e.target.value)}
               className="field"
             >
-              <option value="">— Choisir un produit —</option>
+              <option value="">{t('— Choisir un produit —')}</option>
               {db.products.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
@@ -238,22 +239,22 @@ export default function Purchases() {
         )}
 
         <div className="mt-4 flex items-baseline justify-between border-t border-slate-100 pt-4 text-lg font-extrabold dark:border-white/10">
-          <span>Total commande</span>
+          <span>{t('Total commande')}</span>
           <span className="num">{formatMoney(total, currency)}</span>
         </div>
 
         <div className="mt-4">
-          <Field label={`Montant payé à la commande (${currency})`} hint="Le solde devient une dette fournisseur">
+          <Field label={t('Montant payé à la commande ({c})', { c: currency })} hint={t('Le solde devient une dette fournisseur')}>
             <input value={paidRaw} onChange={(e) => setPaidRaw(e.target.value)} inputMode="decimal" className="field num" />
           </Field>
         </div>
 
         <div className="mt-6 flex justify-end gap-2">
           <button onClick={() => setOpen(false)} className="btn-ghost">
-            Annuler
+            {t('Annuler')}
           </button>
           <button onClick={submit} className="btn-primary">
-            Créer le bon de commande
+            {t('Créer le bon de commande')}
           </button>
         </div>
       </Modal>

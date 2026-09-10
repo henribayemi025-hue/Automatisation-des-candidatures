@@ -5,6 +5,7 @@ import { supabase } from './supabase';
 import { hasContent, loadCache, useStoreActions } from './store';
 import { emptyDB, normalizeDB, replay } from './reducer';
 import type { DB, Member, MemberRole, Presence, WorkspaceEvent } from './types';
+import { t } from './i18n';
 
 export type SyncStatus = 'offline' | 'syncing' | 'synced' | 'pending' | 'error';
 
@@ -57,13 +58,13 @@ const COMPACT_AFTER = 300;
 
 function frenchError(message: string): string {
   const m = message.toLowerCase();
-  if (m.includes('invalid login credentials')) return 'Email ou mot de passe incorrect.';
+  if (m.includes('invalid login credentials')) return t('Email ou mot de passe incorrect.');
   if (m.includes('already registered') || m.includes('user already'))
-    return 'Cet email a déjà un compte. Connectez-vous avec votre mot de passe habituel — le même compte fonctionne sur toutes les applications Finjaro.';
-  if (m.includes('password should be at least')) return 'Mot de passe trop court (6 caractères minimum).';
-  if (m.includes('invalid email') || m.includes('validate email')) return 'Adresse email invalide.';
-  if (m.includes('rate limit')) return 'Trop de tentatives, réessayez dans quelques minutes.';
-  if (m.includes('network') || m.includes('fetch')) return 'Connexion impossible : vérifiez votre réseau.';
+    return t('Cet email a déjà un compte. Connectez-vous avec votre mot de passe habituel — le même compte fonctionne sur toutes les applications Finjaro.');
+  if (m.includes('password should be at least')) return t('Mot de passe trop court (6 caractères minimum).');
+  if (m.includes('invalid email') || m.includes('validate email')) return t('Adresse email invalide.');
+  if (m.includes('rate limit')) return t('Trop de tentatives, réessayez dans quelques minutes.');
+  if (m.includes('network') || m.includes('fetch')) return t('Connexion impossible : vérifiez votre réseau.');
   return message;
 }
 
@@ -488,9 +489,9 @@ export function CollabProvider({ children }: { children: ReactNode }) {
       members,
       invitations,
       async inviteMember(email, role) {
-        if (!workspace) return 'Aucun espace actif.';
+        if (!workspace) return t('Aucun espace actif.');
         const clean = email.trim().toLowerCase();
-        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(clean)) return 'Adresse email invalide.';
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(clean)) return t('Adresse email invalide.');
         const { error } = await supabase.from('finia_members').upsert(
           {
             workspace_id: workspace.id,

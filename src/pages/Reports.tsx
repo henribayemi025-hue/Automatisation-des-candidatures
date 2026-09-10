@@ -6,6 +6,7 @@ import { formatMoney } from '../lib/money';
 import type { Minor } from '../lib/types';
 import { Field, PageHeader } from '../components/UI';
 import { IconBook, IconBox, IconCard, IconDoc, IconReceipt, IconScale, IconTrend } from '../components/Icons';
+import { locale, t } from '../lib/i18n';
 
 type ReportId = 'SALES' | 'INVENTORY' | 'EXPENSES' | 'MARGINS' | 'INCOME' | 'BALANCE' | 'RECEIVABLES';
 
@@ -158,7 +159,7 @@ export default function Reports() {
   ${totals && rows.length ? `<tfoot><tr>${totals.map((c) => `<td>${c}</td>`).join('')}</tr></tfoot>` : ''}
 </table>
 <footer>
-  <span>Édité le ${new Date().toLocaleString('fr-FR')}</span>
+  <span>Édité le ${new Date().toLocaleString(locale())}</span>
   <span>${rows.length} ligne(s) — document généré par Finjaro Accounting</span>
 </footer>
 <script>window.onload=function(){window.print()}</script>
@@ -173,19 +174,19 @@ export default function Reports() {
   return (
     <>
       <PageHeader
-        title="Rapports & exports"
-        subtitle="Documents imprimables ou enregistrables en PDF depuis le navigateur"
+        title={t('Rapports & exports')}
+        subtitle={t('Documents imprimables ou enregistrables en PDF depuis le navigateur')}
       />
 
       <div className="card mb-6 flex flex-wrap items-end gap-3">
-        <Field label="Du">
+        <Field label={t('Du')}>
           <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="field" />
         </Field>
-        <Field label="Au">
+        <Field label={t('Au')}>
           <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="field" />
         </Field>
         <p className="text-xs text-slate-400">
-          La période s'applique aux rapports datés. L'inventaire et les encours sont toujours arrêtés au jour même.
+          {t('La période s\'applique aux rapports datés. L\'inventaire et les encours sont toujours arrêtés au jour même.')}
         </p>
       </div>
 
@@ -195,16 +196,16 @@ export default function Reports() {
             <div className="flex items-start justify-between">
               <span className="rounded-xl bg-brand-50 p-2.5 text-brand-600 dark:bg-brand-500/15">{r.icon}</span>
               {!r.ranged && (
-                <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Instantané</span>
+                <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{t('Instantané')}</span>
               )}
             </div>
             <div>
-              <h2 className="font-bold">{r.title}</h2>
-              <p className="text-sm text-slate-500">{r.subtitle}</p>
+              <h2 className="font-bold">{t(r.title)}</h2>
+              <p className="text-sm text-slate-500">{t(r.subtitle)}</p>
             </div>
             <button onClick={() => generate(r)} className="btn-dark mt-auto w-full">
               <IconDoc className="h-4 w-4" />
-              Générer le document
+              {t('Générer le document')}
             </button>
           </div>
         ))}

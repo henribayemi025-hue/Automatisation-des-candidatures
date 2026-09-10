@@ -1,22 +1,28 @@
 import type { DB } from './types';
+import { IconBox, IconCard, IconLayers, IconMonitor, IconSettings, IconShield, IconSparkle, IconUsers } from '../components/Icons';
+
+type IconComponent = (p: { className?: string }) => JSX.Element;
 
 export interface Sector {
   id: string;
   label: string;
   hint: string;
   gradient: string;
+  icon: IconComponent;
+  /** Photo du métier (chemin public), fournie par Beau ; sinon l'icône. */
+  image?: string;
 }
 
 /** Métiers proposés à l'accueil — le vocabulaire et les exemples s'adaptent ensuite. */
 export const SECTORS: Sector[] = [
-  { id: 'retail', label: 'Boutique / commerce', hint: 'Vêtements, épicerie, quincaillerie…', gradient: 'from-[#C25E38] to-[#8C3D22]' },
-  { id: 'food', label: 'Restaurant / alimentation', hint: 'Restaurant, snack, traiteur, boulangerie', gradient: 'from-[#B8860B] to-[#7A5A08]' },
-  { id: 'beauty', label: 'Beauté / coiffure', hint: 'Salon, barbier, onglerie, cosmétiques', gradient: 'from-[#7C5295] to-[#553C6B]' },
-  { id: 'garage', label: 'Garage / mécanique', hint: 'Réparation, pièces, entretien', gradient: 'from-[#4A5568] to-[#2D3748]' },
-  { id: 'services', label: 'Services / artisan', hint: 'Plomberie, couture, photo, conseil…', gradient: 'from-[#2F6D62] to-[#1C4A42]' },
-  { id: 'health', label: 'Pharmacie / santé', hint: 'Officine, cabinet, parapharmacie', gradient: 'from-[#8C6A3D] to-[#5C4426]' },
-  { id: 'tech', label: 'Électronique / téléphonie', hint: 'Téléphones, accessoires, réparation', gradient: 'from-[#2A3247] to-[#171B26]' },
-  { id: 'other', label: 'Autre activité', hint: 'On s’adapte à tout', gradient: 'from-[#D08363] to-[#AC4F2D]' },
+  { id: 'retail', label: 'Boutique / commerce', hint: 'Vêtements, épicerie, quincaillerie…', gradient: 'from-[#C25E38] to-[#8C3D22]', icon: IconBox },
+  { id: 'food', label: 'Restaurant / alimentation', hint: 'Restaurant, snack, traiteur, boulangerie', gradient: 'from-[#B8860B] to-[#7A5A08]', icon: IconLayers },
+  { id: 'beauty', label: 'Beauté / coiffure', hint: 'Salon, barbier, onglerie, cosmétiques', gradient: 'from-[#7C5295] to-[#553C6B]', icon: IconSparkle },
+  { id: 'garage', label: 'Garage / mécanique', hint: 'Réparation, pièces, entretien', gradient: 'from-[#4A5568] to-[#2D3748]', icon: IconSettings },
+  { id: 'services', label: 'Services / artisan', hint: 'Plomberie, couture, photo, conseil…', gradient: 'from-[#2F6D62] to-[#1C4A42]', icon: IconUsers },
+  { id: 'health', label: 'Pharmacie / santé', hint: 'Officine, cabinet, parapharmacie', gradient: 'from-[#8C6A3D] to-[#5C4426]', icon: IconShield },
+  { id: 'tech', label: 'Électronique / téléphonie', hint: 'Téléphones, accessoires, réparation', gradient: 'from-[#2A3247] to-[#171B26]', icon: IconMonitor },
+  { id: 'other', label: 'Autre activité', hint: 'On s’adapte à tout', gradient: 'from-[#D08363] to-[#AC4F2D]', icon: IconCard },
 ];
 
 export interface Goal {

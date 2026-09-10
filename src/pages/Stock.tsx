@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useStore } from '../lib/store';
 import { Badge, Empty, Field, Modal, Money, PageHeader, StatCard, Table } from '../components/UI';
 import { IconAlert, IconLayers, IconPlus } from '../components/Icons';
+import { t } from '../lib/i18n';
 
 type Tab = 'MOVEMENTS' | 'ALERTS' | 'VALUATION';
 
@@ -36,25 +37,25 @@ export default function Stock() {
   return (
     <>
       <PageHeader
-        title="Stock & mouvements"
-        subtitle="Traçabilité complète des entrées et sorties"
+        title={t('Stock & mouvements')}
+        subtitle={t('Traçabilité complète des entrées et sorties')}
         actions={
           <button onClick={() => setOpen(true)} className="btn-primary">
             <IconPlus className="h-4 w-4" />
-            Ajustement
+            {t('Ajustement')}
           </button>
         }
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Références actives" value={active.length} />
-        <StatCard label="Valeur au coût" value={<Money value={stockValue} />} tone="dark" />
-        <StatCard label="Valeur au prix de vente" value={<Money value={retailValue} />} />
+        <StatCard label={t('Références actives')} value={active.length} />
+        <StatCard label={t('Valeur au coût')} value={<Money value={stockValue} />} tone="dark" />
+        <StatCard label={t('Valeur au prix de vente')} value={<Money value={retailValue} />} />
         <StatCard
-          label="Alertes"
+          label={t('Alertes')}
           value={alerts.length}
           tone={alerts.length ? 'negative' : 'default'}
-          hint="Rupture ou stock bas"
+          hint={t('Rupture ou stock bas')}
         />
       </div>
 
@@ -72,9 +73,9 @@ export default function Stock() {
         ))}
         {tab === 'MOVEMENTS' && (
           <select value={type} onChange={(e) => setType(e.target.value)} className="field w-auto">
-            <option value="">Tous les mouvements</option>
-            <option value="IN">Entrées</option>
-            <option value="OUT">Sorties</option>
+            <option value="">{t('Tous les mouvements')}</option>
+            <option value="IN">{t('Entrées')}</option>
+            <option value="OUT">{t('Sorties')}</option>
           </select>
         )}
       </div>
@@ -105,7 +106,7 @@ export default function Stock() {
               ))}
             </Table>
           ) : (
-            <Empty title="Aucun mouvement de stock" icon={<IconLayers className="h-10 w-10" />} />
+            <Empty title={t('Aucun mouvement de stock')} icon={<IconLayers className="h-10 w-10" />} />
           ))}
 
         {tab === 'ALERTS' &&
@@ -120,15 +121,15 @@ export default function Stock() {
                     {Math.max(0, p.reorderPoint - p.stock + 1)}
                   </td>
                   <td className="td">
-                    {p.stock <= 0 ? <Badge tone="danger">Rupture</Badge> : <Badge tone="warn">Stock bas</Badge>}
+                    {p.stock <= 0 ? <Badge tone="danger">{t('Rupture')}</Badge> : <Badge tone="warn">{t('Stock bas')}</Badge>}
                   </td>
                 </tr>
               ))}
             </Table>
           ) : (
             <Empty
-              title="Aucune alerte"
-              hint="Tous les produits sont au-dessus de leur seuil de réapprovisionnement."
+              title={t('Aucune alerte')}
+              hint={t('Tous les produits sont au-dessus de leur seuil de réapprovisionnement.')}
               icon={<IconAlert className="h-10 w-10" />}
             />
           ))}
@@ -153,35 +154,35 @@ export default function Stock() {
               ))}
             </Table>
           ) : (
-            <Empty title="Aucun produit à valoriser" />
+            <Empty title={t('Aucun produit à valoriser')} />
           ))}
       </div>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Ajustement de stock">
+      <Modal open={open} onClose={() => setOpen(false)} title={t('Ajustement de stock')}>
         <div className="space-y-4">
-          <Field label="Produit">
+          <Field label={t('Produit')}>
             <select value={productId} onChange={(e) => setProductId(e.target.value)} className="field">
-              <option value="">— Choisir —</option>
+              <option value="">{t('— Choisir —')}</option>
               {active.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name} (stock : {p.stock})
+                  {p.name} {t('(stock :')} {p.stock})
                 </option>
               ))}
             </select>
           </Field>
-          <Field label="Quantité" hint="Nombre négatif pour une sortie (casse, perte, vol)">
+          <Field label={t('Quantité')} hint={t('Nombre négatif pour une sortie (casse, perte, vol)')}>
             <input value={qty} onChange={(e) => setQty(e.target.value)} inputMode="numeric" placeholder="-3" className="field num" />
           </Field>
-          <Field label="Motif">
-            <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Inventaire, casse, perte…" className="field" />
+          <Field label={t('Motif')}>
+            <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t('Inventaire, casse, perte…')} className="field" />
           </Field>
         </div>
         <div className="mt-6 flex justify-end gap-2">
           <button onClick={() => setOpen(false)} className="btn-ghost">
-            Annuler
+            {t('Annuler')}
           </button>
           <button onClick={submit} className="btn-primary">
-            Enregistrer l'ajustement
+            {t('Enregistrer l\'ajustement')}
           </button>
         </div>
       </Modal>

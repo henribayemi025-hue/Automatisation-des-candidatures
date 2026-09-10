@@ -4,6 +4,7 @@ import { formatMoney, toMinor } from '../lib/money';
 import type { PaymentMethod, SaleLine } from '../lib/types';
 import { Badge, Empty, Field, Money, PageHeader } from '../components/UI';
 import { IconBox, IconCart, IconCheck, IconDoc, IconSearch, IconX } from '../components/Icons';
+import { t } from '../lib/i18n';
 
 const METHODS: { value: PaymentMethod; label: string }[] = [
   { value: 'CASH', label: 'Espèces' },
@@ -92,7 +93,7 @@ export default function PointOfSale() {
   function submit(asQuote: boolean) {
     if (!cart.length) return;
     if (isCredit && !customerId) {
-      setFlash('Choisissez un client pour vendre à crédit.');
+      setFlash(t('Choisissez un client pour vendre à crédit.'));
       return;
     }
     const customer = db.customers.find((c) => c.id === customerId);
@@ -105,14 +106,14 @@ export default function PointOfSale() {
       paid: effectivePaid,
       asQuote,
     });
-    setFlash(`${asQuote ? 'Devis' : 'Vente'} ${sale.number} enregistré${asQuote ? '' : 'e'}.`);
+    setFlash(asQuote ? t('Devis {n} enregistré.', { n: sale.number }) : t('Vente {n} enregistrée.', { n: sale.number }));
     reset();
     setTimeout(() => setFlash(''), 4000);
   }
 
   return (
     <>
-      <PageHeader title="Point de vente" subtitle="Encaissement rapide, écritures générées automatiquement" />
+      <PageHeader title={t('Point de vente')} subtitle={t('Encaissement rapide, écritures générées automatiquement')} />
 
       {flash && (
         <div className="mb-4 flex items-center gap-2 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm font-medium text-brand-800 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-200">
@@ -129,7 +130,7 @@ export default function PointOfSale() {
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Rechercher un produit, une référence ou un code-barres…"
+              placeholder={t('Rechercher un produit, une référence ou un code-barres…')}
               className="field pl-11"
             />
           </div>
@@ -146,7 +147,7 @@ export default function PointOfSale() {
                   <div className="mb-2 flex items-start justify-between gap-2">
                     <span className="line-clamp-2 text-sm font-semibold">{p.name}</span>
                     {p.stock <= 0 ? (
-                      <Badge tone="danger">Rupture</Badge>
+                      <Badge tone="danger">{t('Rupture')}</Badge>
                     ) : p.stock <= p.reorderPoint ? (
                       <Badge tone="warn">{p.stock}</Badge>
                     ) : (
@@ -172,12 +173,12 @@ export default function PointOfSale() {
         <div className="card flex h-fit flex-col gap-4 lg:sticky lg:top-24">
           <h2 className="flex items-center gap-2 font-bold">
             <IconCart className="h-[18px] w-[18px] text-brand-600" />
-            Panier
+            {t('Panier')}
             {cart.length > 0 && <Badge tone="success">{cart.length}</Badge>}
           </h2>
 
           {cart.length === 0 ? (
-            <p className="py-8 text-center text-sm text-slate-400">Panier vide</p>
+            <p className="py-8 text-center text-sm text-slate-400">{t('Panier vide')}</p>
           ) : (
             <ul className="space-y-2">
               {cart.map((l) => (
@@ -221,9 +222,9 @@ export default function PointOfSale() {
           )}
 
           <div className="space-y-3 border-t border-slate-100 pt-4 dark:border-white/10">
-            <Field label="Client">
+            <Field label={t('Client')}>
               <select value={customerId} onChange={(e) => setCustomerId(e.target.value)} className="field">
-                <option value="">Client passager</option>
+                <option value="">{t('Client passager')}</option>
                 {db.customers.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -232,7 +233,7 @@ export default function PointOfSale() {
               </select>
             </Field>
 
-            <Field label="Remise">
+            <Field label={t('Remise')}>
               <input
                 value={discountRaw}
                 onChange={(e) => setDiscountRaw(e.target.value)}
@@ -242,7 +243,7 @@ export default function PointOfSale() {
               />
             </Field>
 
-            <Field label="Paiement">
+            <Field label={t('Paiement')}>
               <select
                 value={method}
                 onChange={(e) => setMethod(e.target.value as PaymentMethod)}
@@ -250,14 +251,14 @@ export default function PointOfSale() {
               >
                 {METHODS.map((m) => (
                   <option key={m.value} value={m.value}>
-                    {m.label}
+                    {t(m.label)}
                   </option>
                 ))}
               </select>
             </Field>
 
             {isCredit && (
-              <Field label="Acompte versé" hint="Le reste devient une créance client">
+              <Field label={t('Acompte versé')} hint={t('Le reste devient une créance client')}>
                 <input
                   value={paidRaw}
                   onChange={(e) => setPaidRaw(e.target.value)}
@@ -271,28 +272,28 @@ export default function PointOfSale() {
 
           <div className="space-y-1.5 border-t border-slate-100 pt-4 text-sm dark:border-white/10">
             <div className="flex justify-between text-slate-500">
-              <span>Sous-total</span>
+              <span>{t('Sous-total')}</span>
               <Money value={totals.gross} />
             </div>
             {discount > 0 && (
               <div className="flex justify-between text-slate-500">
-                <span>Remise</span>
+                <span>{t('Remise')}</span>
                 <span className="num">− {formatMoney(discount, currency)}</span>
               </div>
             )}
             {db.company.vatEnabled && (
               <div className="flex justify-between text-slate-500">
-                <span>TVA ({(db.company.vatRateBp / 100).toFixed(2)} %)</span>
+                <span>{db.company.taxLabel || t('TVA')} ({(db.company.vatRateBp / 100).toFixed(2)} %)</span>
                 <Money value={totals.vat} />
               </div>
             )}
             <div className="flex items-baseline justify-between pt-1 text-lg font-extrabold">
-              <span>Total</span>
+              <span>{t('Total')}</span>
               <Money value={totals.total} className="text-brand-600" />
             </div>
             {isCredit && remaining > 0 && (
               <div className="flex justify-between font-semibold text-amber-600">
-                <span>Reste à payer</span>
+                <span>{t('Reste à payer')}</span>
                 <Money value={remaining} />
               </div>
             )}
@@ -301,11 +302,11 @@ export default function PointOfSale() {
           <div className="grid grid-cols-2 gap-2">
             <button onClick={() => submit(true)} disabled={!cart.length} className="btn-ghost">
               <IconDoc className="h-4 w-4" />
-              Devis
+              {t('Devis')}
             </button>
             <button onClick={() => submit(false)} disabled={!cart.length} className="btn-primary">
               <IconCheck className="h-4 w-4" />
-              Valider
+              {t('Valider')}
             </button>
           </div>
         </div>

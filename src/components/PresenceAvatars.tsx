@@ -1,4 +1,5 @@
 import { useCollab } from '../lib/collab';
+import { t } from '../lib/i18n';
 
 const COLORS = ['#C25E38', '#2F6D62', '#7C5295', '#B8860B', '#8C6A3D'];
 
@@ -46,7 +47,7 @@ export default function PresenceAvatars() {
       </div>
       {extra > 0 && <span className="ml-1.5 text-caption font-semibold text-muted">+{extra}</span>}
       <span className="ml-2 hidden text-caption text-muted md:inline">
-        {presence.length === 1 ? 'Vous seul' : `${presence.length} en ligne`}
+        {presence.length === 1 ? t('Vous seul') : `${presence.length} ${t('en ligne')}`}
       </span>
     </div>
   );

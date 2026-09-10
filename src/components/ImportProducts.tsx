@@ -6,6 +6,7 @@ import type { ImportRow } from '../lib/importers';
 import { formatMoney } from '../lib/money';
 import { Modal } from './UI';
 import { IconDownload } from './Icons';
+import { t } from '../lib/i18n';
 
 /** Trois façons de ne pas tout retaper : boutique Finjaro, fichier Excel/CSV, ou l'assistant (photo/dictée). */
 export default function ImportProducts({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -30,7 +31,7 @@ export default function ImportProducts({ open, onClose }: { open: boolean; onClo
 
   async function fromFinjaro() {
     if (!user) {
-      setError('Connectez-vous avec votre compte Finjaro pour retrouver votre boutique.');
+      setError(t('Connectez-vous avec votre compte Finjaro pour retrouver votre boutique.'));
       return;
     }
     setBusy(true);
@@ -38,7 +39,7 @@ export default function ImportProducts({ open, onClose }: { open: boolean; onClo
     try {
       const { rows: all, converted, shops } = await fetchFinjaroProducts(user.id, currency);
       if (!shops.length) {
-        setError('Aucune boutique Finjaro trouvée sur ce compte.');
+        setError(t('Aucune boutique Finjaro trouvée sur ce compte.'));
         return;
       }
       const { fresh, skipped: sk } = dedupe(all, db);
@@ -50,7 +51,7 @@ export default function ImportProducts({ open, onClose }: { open: boolean; onClo
           ` Le prix d’achat n’existe pas sur Finjaro : à compléter pour connaître vos marges.`,
       );
     } catch {
-      setError('Impossible de lire la boutique pour le moment.');
+      setError(t('Impossible de lire la boutique pour le moment.'));
     } finally {
       setBusy(false);
     }
@@ -71,7 +72,7 @@ export default function ImportProducts({ open, onClose }: { open: boolean; onClo
       setSkipped(sk);
       setNote(`${all.length} ligne(s) lue(s) dans ${file.name}.`);
     } catch {
-      setError('Fichier illisible. Formats acceptés : .xlsx, .xls, .csv.');
+      setError(t('Fichier illisible. Formats acceptés : .xlsx, .xls, .csv.'));
     } finally {
       setBusy(false);
     }
@@ -104,12 +105,12 @@ export default function ImportProducts({ open, onClose }: { open: boolean; onClo
         reset();
         onClose();
       }}
-      title="Importer des produits"
+      title={t('Importer des produits')}
       wide
     >
       {done > 0 && (
         <div className="mb-4 rounded-input bg-[#EAF6EA] px-4 py-3 text-caption text-[#1F6F65]">
-          {done} produit(s) ajouté(s) au catalogue. Pensez à compléter les prix d’achat pour vos marges.
+          {done} {t('produit(s) ajouté(s) au catalogue. Pensez à compléter les prix d’achat pour vos marges.')}
         </div>
       )}
       {error && <div className="mb-4 rounded-input bg-[#FDEDED] px-4 py-3 text-caption text-[#A63030]">{error}</div>}
@@ -118,19 +119,19 @@ export default function ImportProducts({ open, onClose }: { open: boolean; onClo
         <div className="grid gap-3 sm:grid-cols-3">
           <button onClick={() => void fromFinjaro()} disabled={busy} className="tile items-start text-left">
             <span className="text-2xl">🛍️</span>
-            <span className="text-body font-semibold">Depuis ma boutique Finjaro</span>
-            <span className="text-caption text-muted">Vos articles déjà en ligne, en un clic.</span>
+            <span className="text-body font-semibold">{t('Depuis ma boutique Finjaro')}</span>
+            <span className="text-caption text-muted">{t('Vos articles déjà en ligne, en un clic.')}</span>
           </button>
           <button onClick={() => fileRef.current?.click()} disabled={busy} className="tile items-start text-left">
             <span className="text-2xl">📊</span>
-            <span className="text-body font-semibold">Depuis Excel ou CSV</span>
-            <span className="text-caption text-muted">Colonnes : Nom, Prix, Coût, Stock, Catégorie — dans n’importe quel ordre.</span>
+            <span className="text-body font-semibold">{t('Depuis Excel ou CSV')}</span>
+            <span className="text-caption text-muted">{t('Colonnes : Nom, Prix, Coût, Stock, Catégorie — dans n’importe quel ordre.')}</span>
             <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={(e) => void fromFile(e.target.files?.[0])} />
           </button>
           <div className="tile items-start text-left">
             <span className="text-2xl">📷</span>
-            <span className="text-body font-semibold">Photo ou dictée</span>
-            <span className="text-caption text-muted">Ouvrez l’assistant (bouton en bas à droite), photographiez votre cahier ou dictez la liste.</span>
+            <span className="text-body font-semibold">{t('Photo ou dictée')}</span>
+            <span className="text-caption text-muted">{t('Ouvrez l’assistant (bouton en bas à droite), photographiez votre cahier ou dictez la liste.')}</span>
           </div>
         </div>
       )}
@@ -138,16 +139,16 @@ export default function ImportProducts({ open, onClose }: { open: boolean; onClo
       {rows && (
         <>
           <p className="text-caption text-muted">{note}</p>
-          {skipped > 0 && <p className="mt-1 text-caption text-muted">{skipped} déjà présent(s) ou en double, ignoré(s).</p>}
+          {skipped > 0 && <p className="mt-1 text-caption text-muted">{skipped} {t('déjà présent(s) ou en double, ignoré(s).')}</p>}
           <div className="mt-3 max-h-72 overflow-auto rounded-input border border-hairline scrollbar-thin">
             <table className="w-full min-w-[520px]">
               <thead>
                 <tr className="bg-base/70">
-                  <th className="th">Produit</th>
-                  <th className="th">Catégorie</th>
-                  <th className="th text-right">Prix</th>
-                  <th className="th text-right">Coût</th>
-                  <th className="th text-right">Stock</th>
+                  <th className="th">{t('Produit')}</th>
+                  <th className="th">{t('Catégorie')}</th>
+                  <th className="th text-right">{t('Prix')}</th>
+                  <th className="th text-right">{t('Coût')}</th>
+                  <th className="th text-right">{t('Stock')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -165,11 +166,11 @@ export default function ImportProducts({ open, onClose }: { open: boolean; onClo
           </div>
           <div className="mt-4 flex justify-end gap-2">
             <button onClick={reset} className="btn-ghost">
-              Retour
+              {t('Retour')}
             </button>
             <button onClick={confirm} disabled={!rows.length} className="btn-primary">
               <IconDownload className="h-4 w-4" />
-              Importer {rows.length} produit(s)
+              {t('Importer {n} produit(s)', { n: rows.length })}
             </button>
           </div>
         </>

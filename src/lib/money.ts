@@ -1,4 +1,5 @@
 import type { Currency, Minor } from './types';
+import { locale } from './i18n';
 
 export const CURRENCIES: Currency[] = [
   { code: 'XAF', symbol: 'FCFA', decimals: 0 },
@@ -43,7 +44,7 @@ export function toMajor(amount: Minor, code: string): number {
 export function formatMoney(amount: Minor, code: string): string {
   const c = currency(code);
   const value = toMajor(amount, code);
-  const formatted = new Intl.NumberFormat('fr-FR', {
+  const formatted = new Intl.NumberFormat(locale(), {
     minimumFractionDigits: c.decimals,
     maximumFractionDigits: c.decimals,
   }).format(value);
@@ -51,12 +52,12 @@ export function formatMoney(amount: Minor, code: string): string {
 }
 
 export function formatNumber(value: number, digits = 0): string {
-  return new Intl.NumberFormat('fr-FR', {
+  return new Intl.NumberFormat(locale(), {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   }).format(value);
 }
 
 export function formatPercent(value: number): string {
-  return `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 }).format(value)} %`;
+  return `${new Intl.NumberFormat(locale(), { maximumFractionDigits: 1 }).format(value)} %`;
 }

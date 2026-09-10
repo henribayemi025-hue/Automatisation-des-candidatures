@@ -8,6 +8,7 @@ import { AIError, aiErrorMessage, askAI, buildContext, fileToImage } from '../li
 import type { AIMessage, AIProduct } from '../lib/ai';
 import { MODULE_HELP } from '../lib/guide';
 import { IconAlert, IconCheck, IconChevronRight, IconSend, IconSparkle } from './Icons';
+import { t } from '../lib/i18n';
 
 interface Message {
   id: number;
@@ -61,7 +62,7 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
     setPendingImage(null);
     setInput('');
     setNotice('');
-    const userMsg: Message = { id: ++counter.current, role: 'user', text: q || 'Voici une photo.', imageName: image?.name };
+    const userMsg: Message = { id: ++counter.current, role: 'user', text: q || t('Voici une photo.'), imageName: image?.name };
     const history = [...messages, userMsg];
     setMessages(history);
 
@@ -79,15 +80,15 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
         return;
       } catch (e) {
         setBusy(false);
-        setNotice(aiErrorMessage(e instanceof AIError ? e.code : 'unknown'));
+        setNotice(t(aiErrorMessage(e instanceof AIError ? e.code : 'unknown')));
       }
     } else if (image) {
-      setNotice('La lecture de photos demande un compte connecté. Je réponds avec le moteur local.');
+      setNotice(t('La lecture de photos demande un compte connecté. Je réponds avec le moteur local.'));
     }
 
     const a = answer(db, q || 'explique');
     const explain = /expli|cet écran|c'est quoi|ça sert/i.test(q) && help
-      ? `${help.what} ${help.when} Exemple : ${help.example}`
+      ? `${t(help.what)} ${t(help.when)} ${t('Exemple :')} ${t(help.example)}`
       : null;
     setMessages((m) => [
       ...m,
@@ -101,7 +102,7 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
       const img = await fileToImage(file);
       setPendingImage({ ...img, name: file.name });
     } catch {
-      setNotice('Impossible de lire cette image.');
+      setNotice(t('Impossible de lire cette image.'));
     }
   }
 
@@ -121,7 +122,7 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
       });
     }
     setMessages((m) => m.map((x) => (x.id === msgId ? { ...x, products: [] } : x)));
-    setMessages((m) => [...m, { id: ++counter.current, role: 'assistant', text: `${products.length} produit(s) importé(s) dans votre catalogue.`, local: true }]);
+    setMessages((m) => [...m, { id: ++counter.current, role: 'assistant', text: t('{n} produit(s) importé(s) dans votre catalogue.', { n: products.length }), local: true }]);
   }
 
   return (
@@ -129,18 +130,18 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
       <div className={`flex-1 space-y-4 overflow-y-auto scrollbar-thin ${compact ? 'px-5 py-4' : 'py-2'}`}>
         {help && (
           <div className="rounded-card bg-base p-4">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-muted">Cet écran : {help.title}</div>
-            <p className="mt-1 text-caption text-ink">{help.what}</p>
+            <div className="text-[11px] font-bold uppercase tracking-wider text-muted">{t('Cet écran :')} {t(help.title)}</div>
+            <p className="mt-1 text-caption text-ink">{t(help.what)}</p>
             <p className="mt-1.5 text-caption text-muted">
-              <span className="font-semibold text-ink">Quand ? </span>
-              {help.when}
+              <span className="font-semibold text-ink">{t('Quand ?')} </span>
+              {t(help.when)}
             </p>
           </div>
         )}
 
         {messages.length === 0 && tips.length > 0 && (
           <div>
-            <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted">À surveiller</div>
+            <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted">{t('À surveiller')}</div>
             <ul className="space-y-1.5">
               {tips.slice(0, 3).map((t, i) => (
                 <li
@@ -161,7 +162,7 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
 
         {messages.length === 0 && !user && (
           <p className="rounded-input border border-hairline px-3 py-2 text-caption text-muted">
-            Sans compte, je réponds avec un moteur local limité aux questions courantes. Connectez-vous pour l’assistant IA complet (dictée, photos, explications libres).
+            {t('Sans compte, je réponds avec un moteur local limité aux questions courantes. Connectez-vous pour l’assistant IA complet (dictée, photos, explications libres).')}
           </p>
         )}
 
@@ -182,7 +183,7 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
               )}
               {m.products && m.products.length > 0 && (
                 <div className="mt-3 rounded-input border border-hairline bg-white p-3">
-                  <div className="text-caption font-semibold text-ink">{m.products.length} produit(s) reconnu(s)</div>
+                  <div className="text-caption font-semibold text-ink">{m.products.length} {t('produit(s) reconnu(s)')}</div>
                   <ul className="mt-1 max-h-40 space-y-0.5 overflow-y-auto text-[12px] text-muted scrollbar-thin">
                     {m.products.map((p, i) => (
                       <li key={i}>
@@ -192,16 +193,16 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
                     ))}
                   </ul>
                   <button onClick={() => importProducts(m.products!, m.id)} className="btn-primary mt-2 w-full py-2 text-caption">
-                    Ajouter au catalogue
+                    {t('Ajouter au catalogue')}
                   </button>
                 </div>
               )}
               {m.goto && (
                 <button onClick={() => navigate(m.goto!)} className="mt-2 inline-flex items-center gap-1 text-caption font-semibold text-teal">
-                  Ouvrir <IconChevronRight className="h-4 w-4" />
+                  {t('Ouvrir')} <IconChevronRight className="h-4 w-4" />
                 </button>
               )}
-              {m.local && user && <div className="mt-1 text-[10px] text-muted">moteur local</div>}
+              {m.local && user && <div className="mt-1 text-[10px] text-muted">{t('moteur local')}</div>}
             </div>
           </div>
         ))}
@@ -210,7 +211,7 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
             <div className="rounded-card bg-base px-4 py-3 text-caption text-muted">
               <span className="inline-flex items-center gap-2">
                 <IconSparkle className="h-4 w-4 animate-pulse text-teal" />
-                Je regarde vos chiffres…
+                {t('Je regarde vos chiffres…')}
               </span>
             </div>
           </div>
@@ -227,15 +228,15 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
               onClick={() => void ask(q)}
               className="shrink-0 rounded-pill border border-hairline px-3 py-1.5 text-[12px] font-medium text-ink transition hover:border-teal hover:text-teal"
             >
-              {q}
+              {t(q)}
             </button>
           ))}
         </div>
         {pendingImage && (
           <div className="mb-2 flex items-center justify-between rounded-input bg-base px-3 py-2 text-caption">
-            <span>📷 {pendingImage.name} — prête à envoyer</span>
+            <span>📷 {pendingImage.name} {t('— prête à envoyer')}</span>
             <button onClick={() => setPendingImage(null)} className="font-semibold text-muted">
-              Retirer
+              {t('Retirer')}
             </button>
           </div>
         )}
@@ -247,17 +248,17 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
           className="flex gap-2"
         >
           <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => void onFile(e.target.files?.[0])} />
-          <button type="button" onClick={() => fileRef.current?.click()} title="Photographier une liste de produits, une facture, un cahier" className="btn-ghost px-3" aria-label="Ajouter une photo">
+          <button type="button" onClick={() => fileRef.current?.click()} title={t('Photographier une liste de produits, une facture, un cahier')} className="btn-ghost px-3" aria-label={t('Ajouter une photo')}>
             📷
           </button>
           <input
             id="assistant-input"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={user ? 'Posez votre question, dictez une liste…' : 'Posez votre question…'}
+            placeholder={user ? t('Posez votre question, dictez une liste…') : t('Posez votre question…')}
             className="field flex-1"
           />
-          <button type="submit" disabled={busy} className="btn-primary px-3" aria-label="Envoyer">
+          <button type="submit" disabled={busy} className="btn-primary px-3" aria-label={t('Envoyer')}>
             <IconSend className="h-4 w-4" />
           </button>
         </form>

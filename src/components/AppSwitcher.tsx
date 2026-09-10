@@ -3,6 +3,7 @@ import { useCollab } from '../lib/collab';
 import { CURRENT_APP_KEY, FALLBACK_APPS, fetchApps, fetchAudience, visibleApps } from '../lib/apps';
 import type { FinjaroApp } from '../lib/apps';
 import { IconApps, IconCheck } from './Icons';
+import { t } from '../lib/i18n';
 
 const ACCENT: Record<FinjaroApp['accent'], string> = {
   teal: 'bg-teal-light text-teal',
@@ -41,7 +42,7 @@ export default function AppSwitcher() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        aria-label="Applications Finjaro"
+        aria-label={t('Applications Finjaro')}
         aria-expanded={open}
         className="rounded-full p-2 text-muted transition hover:bg-teal-light hover:text-teal"
       >
@@ -51,7 +52,7 @@ export default function AppSwitcher() {
       {open && (
         <div className="absolute left-0 top-full z-50 mt-2 w-[320px] rounded-card border border-hairline bg-white p-2 shadow-[0_18px_40px_rgba(23,27,38,0.16)]">
           <div className="px-3 pb-2 pt-2 text-[11px] font-bold uppercase tracking-wider text-muted">
-            Applications Finjaro
+            {t('Applications Finjaro')}
           </div>
           <ul className="grid grid-cols-1 gap-1">
             {apps.map((a) => {
@@ -76,7 +77,7 @@ export default function AppSwitcher() {
                         {current && (
                           <span className="inline-flex items-center gap-1 rounded-pill bg-teal-light px-2 py-0.5 text-[10px] font-bold text-teal">
                             <IconCheck className="h-3 w-3" />
-                            Ouverte
+                            {t('Ouverte')}
                           </span>
                         )}
                       </span>

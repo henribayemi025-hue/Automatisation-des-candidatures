@@ -4,6 +4,7 @@ import { balanceSheet, incomeStatement } from '../lib/ledger';
 import { monthStart } from '../lib/metrics';
 import { formatPercent } from '../lib/money';
 import { Badge, Field, Money, PageHeader, StatCard } from '../components/UI';
+import { t } from '../lib/i18n';
 
 function Section({
   title,
@@ -31,7 +32,7 @@ function Section({
             </li>
           ))
         ) : (
-          <li className="text-sm text-slate-400">Aucun mouvement</li>
+          <li className="text-sm text-slate-400">{t('Aucun mouvement')}</li>
         )}
       </ul>
       <div className="mt-3 flex items-baseline justify-between border-t border-slate-200 pt-2 font-bold dark:border-white/10">
@@ -59,57 +60,57 @@ export default function Statements() {
   const marginRate = income.totalRevenue > 0 ? (income.netIncome / income.totalRevenue) * 100 : 0;
 
   const toRows = (list: typeof income.revenue) =>
-    list.map((b) => ({ code: b.account.code, label: b.account.label, amount: b.balance }));
+    list.map((b) => ({ code: b.account.code, label: t(b.account.label), amount: b.balance }));
 
   return (
     <>
-      <PageHeader title="Bilan & compte de résultat" subtitle="États financiers calculés depuis les écritures" />
+      <PageHeader title={t('Bilan & compte de résultat')} subtitle={t('États financiers calculés depuis les écritures')} />
 
       <div className="card mb-4 flex flex-wrap items-end gap-3">
-        <Field label="Du">
+        <Field label={t('Du')}>
           <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="field" />
         </Field>
-        <Field label="Au">
+        <Field label={t('Au')}>
           <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="field" />
         </Field>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Produits" value={<Money value={income.totalRevenue} />} tone="positive" />
-        <StatCard label="Charges" value={<Money value={income.totalExpenses} />} tone="negative" />
+        <StatCard label={t('Produits')} value={<Money value={income.totalRevenue} />} tone="positive" />
+        <StatCard label={t('Charges')} value={<Money value={income.totalExpenses} />} tone="negative" />
         <StatCard
-          label="Résultat net"
+          label={t('Résultat net')}
           value={<Money value={income.netIncome} />}
           tone="dark"
-          hint={`Marge nette ${formatPercent(marginRate)}`}
+          hint={`${t('Marge nette')} ${formatPercent(marginRate)}`}
         />
         <StatCard
-          label="Équilibre du bilan"
-          value={sheet.difference === 0 ? 'Vérifié' : 'Écart'}
+          label={t('Équilibre du bilan')}
+          value={sheet.difference === 0 ? t('Vérifié') : t('Écart')}
           tone={sheet.difference === 0 ? 'positive' : 'negative'}
-          hint="Actif = Passif + Capitaux + Résultat"
+          hint={t('Actif = Passif + Capitaux + Résultat')}
         />
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <div className="card space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="font-bold">Compte de résultat</h2>
+            <h2 className="font-bold">{t('Compte de résultat')}</h2>
             <Badge tone="info">
               {from} → {to}
             </Badge>
           </div>
           <Section
-            title="Produits"
+            title={t('Produits')}
             rows={toRows(income.revenue)}
             total={income.totalRevenue}
-            totalLabel="Total des produits"
+            totalLabel={t('Total des produits')}
           />
           <Section
-            title="Charges"
+            title={t('Charges')}
             rows={toRows(income.expenses)}
             total={income.totalExpenses}
-            totalLabel="Total des charges"
+            totalLabel={t('Total des charges')}
           />
           <div
             className={`flex items-baseline justify-between rounded-xl px-4 py-3 text-lg font-extrabold ${
@@ -118,44 +119,44 @@ export default function Statements() {
                 : 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300'
             }`}
           >
-            <span>{income.netIncome >= 0 ? 'Bénéfice net' : 'Perte nette'}</span>
+            <span>{income.netIncome >= 0 ? t('Bénéfice net') : t('Perte nette')}</span>
             <Money value={income.netIncome} />
           </div>
         </div>
 
         <div className="card space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="font-bold">Bilan</h2>
+            <h2 className="font-bold">{t('Bilan')}</h2>
             <Badge tone="info">au {to}</Badge>
           </div>
           <Section
-            title="Actif"
+            title={t('Actif')}
             rows={toRows(sheet.assets)}
             total={sheet.totalAssets}
-            totalLabel="Total actif"
+            totalLabel={t('Total actif')}
           />
           <Section
-            title="Passif — dettes"
+            title={t('Passif — dettes')}
             rows={toRows(sheet.liabilities)}
             total={sheet.totalLiabilities}
-            totalLabel="Total dettes"
+            totalLabel={t('Total dettes')}
           />
           <Section
-            title="Capitaux propres"
+            title={t('Capitaux propres')}
             rows={[
               ...toRows(sheet.equity),
-              { code: '—', label: "Résultat de l'exercice", amount: sheet.netIncome },
+              { code: '—', label: t("Résultat de l'exercice"), amount: sheet.netIncome },
             ]}
             total={sheet.totalEquity + sheet.netIncome}
-            totalLabel="Total capitaux propres"
+            totalLabel={t('Total capitaux propres')}
           />
           <div className="flex items-baseline justify-between rounded-xl bg-slate-100 px-4 py-3 font-extrabold dark:bg-white/10">
-            <span>Total passif</span>
+            <span>{t('Total passif')}</span>
             <Money value={sheet.totalLiabilities + sheet.totalEquity + sheet.netIncome} />
           </div>
           {sheet.difference !== 0 && (
             <p className="text-sm font-semibold text-rose-600">
-              Écart détecté de <Money value={sheet.difference} /> — consultez le module Audit.
+              {t('Écart détecté de')} <Money value={sheet.difference} /> {t('— consultez le module Audit.')}
             </p>
           )}
         </div>

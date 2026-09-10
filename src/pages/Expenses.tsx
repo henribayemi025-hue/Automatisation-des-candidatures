@@ -6,6 +6,7 @@ import { toMinor } from '../lib/money';
 import type { PaymentMethod } from '../lib/types';
 import { Empty, Field, Modal, Money, PageHeader, StatCard, Table } from '../components/UI';
 import { IconPlus, IconWallet } from '../components/Icons';
+import { t } from '../lib/i18n';
 
 const CATEGORY_LABEL: Record<AccountKey, string> = {
   PURCHASES: 'Achats de marchandises',
@@ -82,31 +83,31 @@ export default function Expenses() {
   return (
     <>
       <PageHeader
-        title="Dépenses"
-        subtitle="Chaque dépense est immédiatement passée en écriture comptable"
+        title={t('Dépenses')}
+        subtitle={t('Chaque dépense est immédiatement passée en écriture comptable')}
         actions={
           <button onClick={() => setOpen(true)} className="btn-primary">
             <IconPlus className="h-4 w-4" />
-            Nouvelle dépense
+            {t('Nouvelle dépense')}
           </button>
         }
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label="Total affiché" value={<Money value={total} />} tone="dark" />
-        <StatCard label="Nombre de dépenses" value={filtered.length} />
+        <StatCard label={t('Total affiché')} value={<Money value={total} />} tone="dark" />
+        <StatCard label={t('Nombre de dépenses')} value={filtered.length} />
         <StatCard
-          label="Poste principal"
-          value={byCategory[0]?.[0] ?? '—'}
+          label={t('Poste principal')}
+          value={byCategory[0] ? t(byCategory[0][0]) : '—'}
           hint={byCategory[0] ? undefined : 'Aucune dépense sur la période'}
         />
       </div>
 
       <div className="card mt-6 mb-4 flex flex-wrap items-end gap-3">
-        <Field label="Du">
+        <Field label={t('Du')}>
           <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="field" />
         </Field>
-        <Field label="Au">
+        <Field label={t('Au')}>
           <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="field" />
         </Field>
       </div>
@@ -118,7 +119,7 @@ export default function Expenses() {
               {filtered.map((e) => (
                 <tr key={e.id} className="row">
                   <td className="td text-slate-500">{e.date}</td>
-                  <td className="td font-medium">{e.category}</td>
+                  <td className="td font-medium">{t(e.category)}</td>
                   <td className="td num text-slate-500">{e.account}</td>
                   <td className="td text-slate-500">{e.description || '—'}</td>
                   <td className="td num font-semibold text-rose-600">
@@ -129,21 +130,21 @@ export default function Expenses() {
             </Table>
           ) : (
             <Empty
-              title="Aucune dépense trouvée"
-              hint="Enregistrez vos charges pour obtenir un résultat net fiable."
+              title={t('Aucune dépense trouvée')}
+              hint={t('Enregistrez vos charges pour obtenir un résultat net fiable.')}
               icon={<IconWallet className="h-10 w-10" />}
             />
           )}
         </div>
 
         <div className="card h-fit">
-          <h2 className="mb-3 font-bold">Répartition par poste</h2>
+          <h2 className="mb-3 font-bold">{t('Répartition par poste')}</h2>
           {byCategory.length ? (
             <ul className="space-y-3">
               {byCategory.map(([cat, amount]) => (
                 <li key={cat}>
                   <div className="mb-1 flex justify-between text-sm">
-                    <span className="truncate">{cat}</span>
+                    <span className="truncate">{t(cat)}</span>
                     <Money value={amount} className="font-semibold" />
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
@@ -156,18 +157,18 @@ export default function Expenses() {
               ))}
             </ul>
           ) : (
-            <p className="py-6 text-center text-sm text-slate-400">Aucune donnée</p>
+            <p className="py-6 text-center text-sm text-slate-400">{t('Aucune donnée')}</p>
           )}
         </div>
       </div>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Nouvelle dépense">
+      <Modal open={open} onClose={() => setOpen(false)} title={t('Nouvelle dépense')}>
         <div className="space-y-4">
-          <Field label="Date">
+          <Field label={t('Date')}>
             <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="field" />
           </Field>
           <Field
-            label="Poste de charge"
+            label={t('Poste de charge')}
             hint={`Compte imputé : ${accountCode(db.company.chart, accountKey)}`}
           >
             <select
@@ -177,32 +178,32 @@ export default function Expenses() {
             >
               {EXPENSE_KEYS.map((k) => (
                 <option key={k} value={k}>
-                  {CATEGORY_LABEL[k]}
+                  {t(CATEGORY_LABEL[k])}
                 </option>
               ))}
             </select>
           </Field>
-          <Field label="Description">
+          <Field label={t('Description')}>
             <input value={description} onChange={(e) => setDescription(e.target.value)} className="field" />
           </Field>
           <Field label={`Montant (${db.company.currency})`}>
             <input value={amountRaw} onChange={(e) => setAmountRaw(e.target.value)} inputMode="decimal" className="field num" />
           </Field>
-          <Field label="Payé par">
+          <Field label={t('Payé par')}>
             <select value={method} onChange={(e) => setMethod(e.target.value as PaymentMethod)} className="field">
-              <option value="CASH">Espèces (caisse)</option>
-              <option value="MOBILE">Mobile money</option>
-              <option value="BANK">Banque</option>
-              <option value="CARD">Carte</option>
+              <option value="CASH">{t('Espèces (caisse)')}</option>
+              <option value="MOBILE">{t('Mobile money')}</option>
+              <option value="BANK">{t('Banque')}</option>
+              <option value="CARD">{t('Carte')}</option>
             </select>
           </Field>
         </div>
         <div className="mt-6 flex justify-end gap-2">
           <button onClick={() => setOpen(false)} className="btn-ghost">
-            Annuler
+            {t('Annuler')}
           </button>
           <button onClick={submit} className="btn-primary">
-            Enregistrer la dépense
+            {t('Enregistrer la dépense')}
           </button>
         </div>
       </Modal>

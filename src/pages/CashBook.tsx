@@ -5,6 +5,7 @@ import { entriesInRange } from '../lib/ledger';
 import { monthStart } from '../lib/metrics';
 import { Empty, Field, Money, PageHeader, StatCard, Table } from '../components/UI';
 import { IconBook, IconDownload } from '../components/Icons';
+import { t } from '../lib/i18n';
 
 export default function CashBook() {
   const db = useDB();
@@ -82,49 +83,49 @@ export default function CashBook() {
   return (
     <>
       <PageHeader
-        title="Livre de caisse"
-        subtitle="Suivi de tous les flux de trésorerie (entrées et sorties)"
+        title={t('Livre de caisse')}
+        subtitle={t('Suivi de tous les flux de trésorerie (entrées et sorties)')}
         actions={
           <button onClick={exportCsv} className="btn-dark">
             <IconDownload className="h-4 w-4" />
-            Exporter
+            {t('Exporter')}
           </button>
         }
       />
 
       <div className="card mb-4 flex flex-wrap items-end gap-3">
-        <Field label="Du">
+        <Field label={t('Du')}>
           <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="field" />
         </Field>
-        <Field label="Au">
+        <Field label={t('Au')}>
           <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="field" />
         </Field>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard
-          label="Entrées (période)"
+          label={t('Entrées (période)')}
           value={<Money value={inflow} />}
           tone="positive"
-          hint="Ventes et encaissements"
+          hint={t('Ventes et encaissements')}
         />
         <StatCard
-          label="Sorties (période)"
+          label={t('Sorties (période)')}
           value={<Money value={outflow} />}
           tone="negative"
-          hint="Dépenses et achats"
+          hint={t('Dépenses et achats')}
         />
         <StatCard
-          label="Solde total en trésorerie"
+          label={t('Solde total en trésorerie')}
           value={<Money value={totalBalance} />}
           tone="dark"
-          hint="Caisse + banque + mobile, toutes périodes"
+          hint={t('Caisse + banque + mobile, toutes périodes')}
         />
       </div>
 
       <div className="card mt-6 p-0">
         <h2 className="px-5 pb-3 pt-5 font-bold">
-          Journal des transactions ({from} → {to})
+          {t('Journal des transactions (')}{from} → {to})
         </h2>
         {rows.length ? (
           <Table head={['Date', 'Journal', 'Compte', 'Libellé', 'Entrée (+)', 'Sortie (−)']}>
@@ -145,7 +146,7 @@ export default function CashBook() {
           </Table>
         ) : (
           <Empty
-            title="Aucune transaction financière sur cette période"
+            title={t('Aucune transaction financière sur cette période')}
             icon={<IconBook className="h-10 w-10" />}
           />
         )}

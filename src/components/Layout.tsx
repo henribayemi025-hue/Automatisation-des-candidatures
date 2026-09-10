@@ -3,6 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { useDB } from '../lib/store';
 import { canAccess, useCollab } from '../lib/collab';
+import { LanguageSwitch } from '../lib/i18n';
 import AppSwitcher from './AppSwitcher';
 import AssistantDrawer from './AssistantDrawer';
 import ModuleIntro from './ModuleIntro';
@@ -30,6 +31,7 @@ import {
   IconWallet,
   IconX,
 } from './Icons';
+import { t } from '../lib/i18n';
 
 type Area = 'sell' | 'stock' | 'finance' | 'accounting' | 'team' | 'settings';
 
@@ -143,10 +145,10 @@ export default function Layout({ children }: { children: ReactNode }) {
     <>
       <div className="flex items-center justify-between px-5 pb-4 pt-5">
         <NavLink to="/" className="leading-tight">
-          <span className="block font-display text-[22px] font-bold text-teal">Finjaro</span>
-          <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C6A3D]">Accounting</span>
+          <span className="block font-display text-[22px] font-bold text-teal">{t('Finjaro')}</span>
+          <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C6A3D]">{t('Accounting')}</span>
         </NavLink>
-        <button onClick={() => setOpen(false)} className="rounded-full p-1.5 text-muted lg:hidden" aria-label="Fermer">
+        <button onClick={() => setOpen(false)} className="rounded-full p-1.5 text-muted lg:hidden" aria-label={t('Fermer')}>
           <IconX />
         </button>
       </div>
@@ -155,7 +157,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         {groups.map((group, i) => (
           <div key={i} className="mb-4">
             {group.title && (
-              <div className="px-3 pb-1.5 pt-2 text-[10px] font-bold uppercase tracking-[0.16em] text-muted">{group.title}</div>
+              <div className="px-3 pb-1.5 pt-2 text-[10px] font-bold uppercase tracking-[0.16em] text-muted">{t(group.title)}</div>
             )}
             {group.items.map((item) => (
               <NavLink
@@ -169,7 +171,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 }
               >
                 {item.icon}
-                <span className="flex-1">{item.label}</span>
+                <span className="flex-1">{t(item.label)}</span>
               </NavLink>
             ))}
           </div>
@@ -179,7 +181,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <div className="border-t border-hairline px-5 py-4">
         <div className="text-caption font-semibold text-ink">{workspace?.name ?? company.name}</div>
         <div className="text-[11px] text-muted">
-          {company.mode === 'EXPERT' ? 'Mode expert' : 'Mode simple'} · {company.currency || 'devise à choisir'}
+          {company.mode === 'EXPERT' ? t('Mode expert') : t('Mode simple')} · {company.currency || t('devise à choisir')}
         </div>
       </div>
     </>
@@ -187,7 +189,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen">
-      {open && <button aria-label="Fermer le menu" onClick={() => setOpen(false)} className="fixed inset-0 z-40 bg-ink/40 backdrop-blur-sm lg:hidden" />}
+      {open && <button aria-label={t('Fermer le menu')} onClick={() => setOpen(false)} className="fixed inset-0 z-40 bg-ink/40 backdrop-blur-sm lg:hidden" />}
 
       <aside
         className={`fixed inset-y-0 left-0 z-50 flex w-[272px] flex-col border-r border-hairline bg-white transition-transform lg:translate-x-0 ${
@@ -206,7 +208,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               <select
                 value={workspace?.id ?? ''}
                 onChange={(e) => switchWorkspace(e.target.value)}
-                aria-label="Espace de travail"
+                aria-label={t('Espace de travail')}
                 className="appearance-none rounded-input border border-hairline bg-white py-1.5 pl-3 pr-8 text-caption font-semibold"
               >
                 {workspaces.map((w) => (
@@ -230,35 +232,36 @@ export default function Layout({ children }: { children: ReactNode }) {
             title={user ? (user.email ?? '') : 'Mode local : créez un compte pour sauvegarder en ligne et travailler à plusieurs'}
           >
             <span className={`h-2 w-2 rounded-full ${status.dot}`} />
-            {user ? status.text : 'Local (sans compte)'}
+            {user ? t(status.text) : t('Local (sans compte)')}
             {pending > 0 && <span className="rounded-pill bg-brass px-1.5 text-[10px] font-bold text-ink">{pending}</span>}
           </span>
 
           <div ref={menuRef} className="relative">
-            <button onClick={() => setMenu((v) => !v)} aria-label="Mon compte" className="rounded-full">
+            <button onClick={() => setMenu((v) => !v)} aria-label={t('Mon compte')} className="rounded-full">
               <Avatar name={displayName} src={avatarUrl} size={34} />
             </button>
             {menu && (
               <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-card border border-hairline bg-white p-2 shadow-[0_18px_40px_rgba(23,27,38,0.16)]">
                 <div className="px-3 py-2">
                   <div className="text-body font-semibold text-ink">{displayName}</div>
-                  <div className="truncate text-caption text-muted">{user?.email ?? 'Sans compte — données sur cet appareil'}</div>
+                  <div className="truncate text-caption text-muted">{user?.email ?? t('Sans compte — données sur cet appareil')}</div>
                 </div>
                 <div className="my-1 border-t border-hairline" />
+                <div className="px-3 py-2"><LanguageSwitch /></div>
                 <NavLink to="/parametres" className="flex items-center gap-3 rounded-input px-3 py-2 text-body hover:bg-base">
                   <IconSettings />
-                  Paramètres
+                  {t('Paramètres')}
                 </NavLink>
                 <NavLink to="/equipe" className="flex items-center gap-3 rounded-input px-3 py-2 text-body hover:bg-base">
                   <IconUsers />
-                  Équipe
+                  {t('Équipe')}
                 </NavLink>
                 <button
                   onClick={() => void signOut()}
                   className="flex w-full items-center gap-3 rounded-input px-3 py-2 text-left text-body text-[#D14343] hover:bg-[#FDEDED]"
                 >
                   <IconLogout />
-                  {user ? 'Se déconnecter' : 'Quitter le mode local'}
+                  {user ? t('Se déconnecter') : t('Quitter le mode local')}
                 </button>
               </div>
             )}
@@ -270,10 +273,10 @@ export default function Layout({ children }: { children: ReactNode }) {
             {invitations.map((inv) => (
               <div key={inv.id} className="flex flex-wrap items-center gap-3">
                 <span>
-                  Vous êtes invité à rejoindre l’espace <strong>{inv.name}</strong>.
+                  {t('Vous êtes invité à rejoindre l’espace')} <strong>{inv.name}</strong>.
                 </span>
                 <button onClick={() => void acceptInvitation(inv.id)} className="btn-primary px-3 py-1.5 text-caption">
-                  Rejoindre
+                  {t('Rejoindre')}
                 </button>
               </div>
             ))}

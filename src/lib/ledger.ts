@@ -1,4 +1,5 @@
 import type { Account, JournalEntry, Minor } from './types';
+import { t } from './i18n';
 
 export interface AccountBalance {
   account: Account;
@@ -184,21 +185,21 @@ export function runAuditChecks(
   const unbalanced = entries.filter((e) => !isBalanced(e));
   checks.push({
     id: 'balanced-entries',
-    label: 'Équilibre des écritures',
+    label: t('Équilibre des écritures'),
     severity: unbalanced.length ? 'ERROR' : 'OK',
     detail: unbalanced.length
       ? `${unbalanced.length} écriture(s) déséquilibrée(s) : ${unbalanced.map((e) => e.ref).join(', ')}`
-      : 'Toutes les écritures sont équilibrées (débit = crédit).',
+      : t('Toutes les écritures sont équilibrées (débit = crédit).'),
   });
 
   const sheet = balanceSheet(accounts, entries);
   checks.push({
     id: 'balance-sheet',
-    label: 'Équation du bilan',
+    label: t('Équation du bilan'),
     severity: sheet.difference === 0 ? 'OK' : 'ERROR',
     detail:
       sheet.difference === 0
-        ? 'Actif = Passif + Capitaux propres + Résultat.'
+        ? t('Actif = Passif + Capitaux propres + Résultat.')
         : `Écart de ${sheet.difference} unités mineures entre actif et passif.`,
   });
 
@@ -211,31 +212,31 @@ export function runAuditChecks(
   }
   checks.push({
     id: 'known-accounts',
-    label: 'Comptes référencés',
+    label: t('Comptes référencés'),
     severity: orphans.size ? 'ERROR' : 'OK',
     detail: orphans.size
       ? `Comptes absents du plan comptable : ${[...orphans].join(', ')}`
-      : 'Toutes les écritures pointent vers un compte du plan comptable.',
+      : t('Toutes les écritures pointent vers un compte du plan comptable.'),
   });
 
   const zeroLines = entries.filter((e) => e.lines.some((l) => l.debit === 0 && l.credit === 0));
   checks.push({
     id: 'zero-lines',
-    label: 'Lignes à zéro',
+    label: t('Lignes à zéro'),
     severity: zeroLines.length ? 'WARN' : 'OK',
     detail: zeroLines.length
       ? `${zeroLines.length} écriture(s) contiennent une ligne sans montant.`
-      : 'Aucune ligne sans montant.',
+      : t('Aucune ligne sans montant.'),
   });
 
   const bothSides = entries.filter((e) => e.lines.some((l) => l.debit > 0 && l.credit > 0));
   checks.push({
     id: 'single-side',
-    label: 'Sens unique par ligne',
+    label: t('Sens unique par ligne'),
     severity: bothSides.length ? 'ERROR' : 'OK',
     detail: bothSides.length
       ? `${bothSides.length} écriture(s) ont une ligne à la fois au débit et au crédit.`
-      : 'Chaque ligne porte un seul sens (débit ou crédit).',
+      : t('Chaque ligne porte un seul sens (débit ou crédit).'),
   });
 
   const cashAccounts = accounts.filter((a) => a.class === 5);
@@ -244,22 +245,22 @@ export function runAuditChecks(
     .filter((x) => x.b < 0);
   checks.push({
     id: 'negative-cash',
-    label: 'Trésorerie négative',
+    label: t('Trésorerie négative'),
     severity: negativeCash.length ? 'WARN' : 'OK',
     detail: negativeCash.length
       ? `Solde négatif sur : ${negativeCash.map((x) => `${x.a.code} ${x.a.label}`).join(', ')}`
-      : 'Aucun compte de trésorerie négatif.',
+      : t('Aucun compte de trésorerie négatif.'),
   });
 
   const chronology = [...entries].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   const backdated = chronology.filter((e) => e.date > e.createdAt.slice(0, 10));
   checks.push({
     id: 'future-dated',
-    label: 'Écritures postdatées',
+    label: t('Écritures postdatées'),
     severity: backdated.length ? 'WARN' : 'OK',
     detail: backdated.length
       ? `${backdated.length} écriture(s) portent une date postérieure à leur saisie.`
-      : 'Aucune écriture postdatée.',
+      : t('Aucune écriture postdatée.'),
   });
 
   return checks;

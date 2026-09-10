@@ -7,6 +7,7 @@ import { IconBox, IconDownload, IconPlus, IconSearch } from '../components/Icons
 import ImportProducts from '../components/ImportProducts';
 import { exportXlsx } from '../lib/xlsx';
 import { Link } from 'react-router-dom';
+import { t } from '../lib/i18n';
 
 const BLANK = {
   name: '',
@@ -174,26 +175,26 @@ export default function Products() {
   return (
     <>
       <PageHeader
-        title="Produits"
-        subtitle={`${db.products.length} référence(s) au catalogue`}
+        title={t('Produits')}
+        subtitle={t('{n} référence(s) au catalogue', { n: db.products.filter((p) => !p.archived).length })}
         actions={
           <>
-            <button onClick={() => setGrid((g) => !g)} className={grid ? 'btn-dark' : 'btn-ghost'} title="Modifier les prix directement dans le tableau, comme dans un tableur">
-              {grid ? 'Quitter le mode tableau' : 'Mode tableau'}
+            <button onClick={() => setGrid((g) => !g)} className={grid ? 'btn-dark' : 'btn-ghost'} title={t('Modifier les prix directement dans le tableau, comme dans un tableur')}>
+              {grid ? t('Quitter le mode tableau') : t('Mode tableau')}
             </button>
             <button onClick={() => setImportOpen(true)} className="btn-ghost">
               <IconDownload className="h-4 w-4" />
-              Importer
+              {t('Importer')}
             </button>
-            <button onClick={exportExcel} className="btn-ghost" title="Fichier Excel prêt pour un comptable">
-              Excel
+            <button onClick={exportExcel} className="btn-ghost" title={t('Fichier Excel prêt pour un comptable')}>
+              {t('Excel')}
             </button>
             <button onClick={exportCsv} className="btn-ghost">
-              CSV
+              {t('CSV')}
             </button>
             <button onClick={openNew} className="btn-primary">
               <IconPlus className="h-4 w-4" />
-              Nouveau produit
+              {t('Nouveau produit')}
             </button>
           </>
         }
@@ -205,29 +206,29 @@ export default function Products() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Rechercher (nom, référence, code-barres)…"
+            placeholder={t('Rechercher (nom, référence, code-barres)…')}
             className="field pl-11"
           />
         </div>
         <select value={category} onChange={(e) => setCategory(e.target.value)} className="field w-auto">
-          <option value="">Toutes les catégories</option>
+          <option value="">{t('Toutes les catégories')}</option>
           {categories.map((c) => (
             <option key={c} value={c}>
               {c}
             </option>
           ))}
         </select>
-        <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className="field w-auto" aria-label="Trier">
-          <option value="name">Trier : nom</option>
-          <option value="price">Trier : prix le plus élevé</option>
-          <option value="margin">Trier : meilleure marge</option>
-          <option value="stock">Trier : stock le plus bas</option>
+        <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className="field w-auto" aria-label={t('Trier')}>
+          <option value="name">{t('Trier : nom')}</option>
+          <option value="price">{t('Trier : prix le plus élevé')}</option>
+          <option value="margin">{t('Trier : meilleure marge')}</option>
+          <option value="stock">{t('Trier : stock le plus bas')}</option>
         </select>
       </div>
 
       {grid && (
         <p className="mb-3 rounded-input bg-[#FBF1DF] px-4 py-2.5 text-caption text-ink">
-          Mode tableau : modifiez une case et quittez-la, c’est enregistré. Le stock se corrige depuis l’écran Stock (chaque mouvement est tracé).
+          {t('Mode tableau : modifiez une case et quittez-la, c’est enregistré. Le stock se corrige depuis l’écran Stock (chaque mouvement est tracé).')}
         </p>
       )}
 
@@ -255,9 +256,9 @@ export default function Products() {
                   <td className="td">
                     <div className="flex items-center gap-2">
                       {p.stock <= 0 ? (
-                        <Badge tone="danger">Rupture</Badge>
+                        <Badge tone="danger">{t('Rupture')}</Badge>
                       ) : p.stock <= p.reorderPoint ? (
-                        <Badge tone="warn">{p.stock} — bas</Badge>
+                        <Badge tone="warn">{p.stock} {t('— bas')}</Badge>
                       ) : (
                         <Badge tone="success">{p.stock}</Badge>
                       )}
@@ -270,7 +271,7 @@ export default function Products() {
                   </td>
                   <td className="td text-right">
                     <button onClick={() => openEdit(p)} className="text-sm font-semibold text-brand-600">
-                      Modifier
+                      {t('Modifier')}
                     </button>
                   </td>
                 </tr>
@@ -279,8 +280,8 @@ export default function Products() {
           </Table>
         ) : (
           <Empty
-            title="Aucun produit trouvé"
-            hint="Créez votre première référence pour alimenter le point de vente et le stock."
+            title={t('Aucun produit trouvé')}
+            hint={t('Créez votre première référence pour alimenter le point de vente et le stock.')}
             icon={<IconBox className="h-10 w-10" />}
           />
         )}
@@ -288,55 +289,55 @@ export default function Products() {
 
       <ImportProducts open={importOpen} onClose={() => setImportOpen(false)} />
 
-      <Modal open={open} onClose={() => setOpen(false)} title={editing ? 'Modifier le produit' : 'Nouveau produit'} wide>
+      <Modal open={open} onClose={() => setOpen(false)} title={editing ? t('Modifier le produit') : t('Nouveau produit')} wide>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <Field label="Nom du produit">
+            <Field label={t('Nom du produit')}>
               <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="field" />
             </Field>
           </div>
-          <Field label="Référence (SKU)">
+          <Field label={t('Référence (SKU)')}>
             <input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} className="field" />
           </Field>
-          <Field label="Code-barres">
+          <Field label={t('Code-barres')}>
             <input value={form.barcode} onChange={(e) => setForm({ ...form, barcode: e.target.value })} className="field" />
           </Field>
-          <Field label="Catégorie">
+          <Field label={t('Catégorie')}>
             <input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="field" />
           </Field>
-          <Field label="Marque">
+          <Field label={t('Marque')}>
             <input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} className="field" />
           </Field>
-          <Field label={`Prix de vente (${currency})`}>
+          <Field label={t('Prix de vente ({c})', { c: currency })}>
             <input value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} inputMode="decimal" className="field num" />
           </Field>
-          <Field label={`Coût d'achat (${currency})`}>
+          <Field label={t("Coût d'achat ({c})", { c: currency })}>
             <input value={form.cost} onChange={(e) => setForm({ ...form, cost: e.target.value })} inputMode="decimal" className="field num" />
           </Field>
           {editing ? (
-            <Field label="Stock actuel" hint="Le stock se corrige depuis l’écran Stock pour garder la trace de chaque mouvement.">
+            <Field label={t('Stock actuel')} hint={t('Le stock se corrige depuis l’écran Stock pour garder la trace de chaque mouvement.')}>
               <div className="flex items-center gap-3">
                 <span className="field w-auto bg-base num">{editing.stock}</span>
                 <Link to="/stock" onClick={() => setOpen(false)} className="text-caption font-semibold text-teal">
-                  Ajuster le stock
+                  {t('Ajuster le stock')}
                 </Link>
               </div>
             </Field>
           ) : (
-            <Field label="Quantité en stock aujourd’hui" hint="Ce que vous avez déjà en rayon. Vous pourrez l’ajuster ensuite.">
+            <Field label={t('Quantité en stock aujourd’hui')} hint={t('Ce que vous avez déjà en rayon. Vous pourrez l’ajuster ensuite.')}>
               <input value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} inputMode="numeric" className="field num" />
             </Field>
           )}
-          <Field label="M’alerter quand il en reste moins de" hint="L’appli vous prévient qu’il faut recommander.">
+          <Field label={t('M’alerter quand il en reste moins de')} hint={t('L’appli vous prévient qu’il faut recommander.')}>
             <input value={form.reorderPoint} onChange={(e) => setForm({ ...form, reorderPoint: e.target.value })} inputMode="numeric" className="field num" />
           </Field>
         </div>
         <div className="mt-6 flex justify-end gap-2">
           <button onClick={() => setOpen(false)} className="btn-ghost">
-            Annuler
+            {t('Annuler')}
           </button>
           <button onClick={submit} className="btn-primary">
-            {editing ? 'Enregistrer' : 'Créer le produit'}
+            {editing ? t('Enregistrer') : t('Créer le produit')}
           </button>
         </div>
       </Modal>

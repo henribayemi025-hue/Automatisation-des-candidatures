@@ -7,6 +7,7 @@ import { accountCode } from '../lib/chart';
 import { factor, formatNumber, formatPercent } from '../lib/money';
 import { Empty, Field, Money, PageHeader, StatCard, Table } from '../components/UI';
 import { IconChart } from '../components/Icons';
+import { t } from '../lib/i18n';
 
 const PALETTE = ['#C25E38', '#0ea5e9', '#8b5cf6', '#f59e0b', '#D14343', '#14b8a6'];
 
@@ -61,37 +62,37 @@ export default function Analytics() {
 
   return (
     <>
-      <PageHeader title="Analyse" subtitle="Performance commerciale et rentabilité" />
+      <PageHeader title={t('Analyse')} subtitle={t('Performance commerciale et rentabilité')} />
 
       <div className="card mb-4 flex flex-wrap items-end gap-3">
         <button onClick={() => { setFrom(new Date(Date.now() - 6 * 864e5).toISOString().slice(0, 10)); setTo(new Date().toISOString().slice(0, 10)); }} className="btn-ghost">
-          7 jours
+          {t('7 jours')}
         </button>
         <button onClick={() => { setFrom(new Date(Date.now() - 29 * 864e5).toISOString().slice(0, 10)); setTo(new Date().toISOString().slice(0, 10)); }} className="btn-ghost">
-          30 jours
+          {t('30 jours')}
         </button>
         <button onClick={() => { setFrom(monthStart()); setTo(new Date().toISOString().slice(0, 10)); }} className="btn-ghost">
-          Ce mois
+          {t('Ce mois')}
         </button>
-        <Field label="Du">
+        <Field label={t('Du')}>
           <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="field" />
         </Field>
-        <Field label="Au">
+        <Field label={t('Au')}>
           <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="field" />
         </Field>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        <StatCard label="Chiffre d'affaires" value={<Money value={revenue} />} tone="dark" hint={`${sales.length} vente(s)`} />
-        <StatCard label="Marge brute" value={<Money value={grossMargin} />} tone="positive" />
-        <StatCard label="Charges" value={<Money value={income.totalExpenses} />} tone="negative" />
-        <StatCard label="Résultat net" value={<Money value={income.netIncome} />} tone={income.netIncome >= 0 ? 'positive' : 'negative'} />
-        <StatCard label="Taux de marge" value={formatPercent(marginRate)} />
+        <StatCard label={t('Chiffre d\'affaires')} value={<Money value={revenue} />} tone="dark" hint={`${sales.length} vente(s)`} />
+        <StatCard label={t('Marge brute')} value={<Money value={grossMargin} />} tone="positive" />
+        <StatCard label={t('Charges')} value={<Money value={income.totalExpenses} />} tone="negative" />
+        <StatCard label={t('Résultat net')} value={<Money value={income.netIncome} />} tone={income.netIncome >= 0 ? 'positive' : 'negative'} />
+        <StatCard label={t('Taux de marge')} value={formatPercent(marginRate)} />
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <div className="card lg:col-span-2">
-          <h2 className="mb-4 font-bold">Tendance des revenus (14 jours)</h2>
+          <h2 className="mb-4 font-bold">{t('Tendance des revenus (14 jours)')}</h2>
           {series.some((p) => p.revenue > 0) ? (
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -105,12 +106,12 @@ export default function Analytics() {
               </ResponsiveContainer>
             </div>
           ) : (
-            <Empty title="Aucune vente sur la période" icon={<IconChart className="h-10 w-10" />} />
+            <Empty title={t('Aucune vente sur la période')} icon={<IconChart className="h-10 w-10" />} />
           )}
         </div>
 
         <div className="card">
-          <h2 className="mb-4 font-bold">Ventes par catégorie</h2>
+          <h2 className="mb-4 font-bold">{t('Ventes par catégorie')}</h2>
           {byCategory.length ? (
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -125,24 +126,24 @@ export default function Analytics() {
               </ResponsiveContainer>
             </div>
           ) : (
-            <p className="py-10 text-center text-sm text-slate-400">Aucune donnée</p>
+            <p className="py-10 text-center text-sm text-slate-400">{t('Aucune donnée')}</p>
           )}
         </div>
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <div className="card">
-          <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">Meilleur jour</h2>
+          <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">{t('Meilleur jour')}</h2>
           <p className="text-xl font-extrabold">{bestDay ? bestDay[0] : '—'}</p>
           {bestDay && <Money value={bestDay[1]} className="text-sm text-slate-500" />}
         </div>
         <div className="card">
-          <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">Produit le plus vendu</h2>
+          <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">{t('Produit le plus vendu')}</h2>
           <p className="truncate text-xl font-extrabold">{perf[0]?.name ?? '—'}</p>
-          {perf[0] && <p className="text-sm text-slate-500">{perf[0].qty} unité(s)</p>}
+          {perf[0] && <p className="text-sm text-slate-500">{perf[0].qty} {t('unité(s)')}</p>}
         </div>
         <div className="card">
-          <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">Moyens de paiement</h2>
+          <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">{t('Moyens de paiement')}</h2>
           {byMethod.length ? (
             <ul className="space-y-1 text-sm">
               {byMethod.map(([m, v]) => (
@@ -153,13 +154,13 @@ export default function Analytics() {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-400">Aucune donnée</p>
+            <p className="text-sm text-slate-400">{t('Aucune donnée')}</p>
           )}
         </div>
       </div>
 
       <div className="card mt-6 p-0">
-        <h2 className="px-5 pb-3 pt-5 font-bold">Marges par produit</h2>
+        <h2 className="px-5 pb-3 pt-5 font-bold">{t('Marges par produit')}</h2>
         {perf.length ? (
           <Table head={['Produit', 'Quantité', 'CA', 'Coût', 'Marge', 'Taux']}>
             {perf.map((p) => (
@@ -180,7 +181,7 @@ export default function Analytics() {
             ))}
           </Table>
         ) : (
-          <Empty title="Aucune vente sur la période" />
+          <Empty title={t('Aucune vente sur la période')} />
         )}
       </div>
     </>

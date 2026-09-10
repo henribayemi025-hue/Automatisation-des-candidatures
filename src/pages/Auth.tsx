@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useCollab } from '../lib/collab';
 import { Field } from '../components/UI';
+import { LanguageSwitch } from '../lib/i18n';
 import { IconBook, IconEye, IconEyeOff, IconGoogle, IconMonitor, IconShield, IconSparkle, IconUsers } from '../components/Icons';
+import { t } from '../lib/i18n';
 
 const PILLARS = [
   { icon: <IconMonitor />, title: 'Vendre en 3 clics', text: 'Un comptoir simple, le stock et la caisse suivent tout seuls.' },
@@ -26,33 +28,35 @@ export default function Auth() {
     setError('');
     setNotice('');
     if (mode === 'signup' && name.trim().length < 2) {
-      setError('Indiquez votre prénom ou votre nom.');
+      setError(t('Indiquez votre prénom ou votre nom.'));
       return;
     }
     setBusy(true);
     const err = mode === 'login' ? await signIn(email.trim(), password) : await signUp(email.trim(), password, name.trim());
     setBusy(false);
     if (err) setError(err);
-    else if (mode === 'signup') setNotice('Compte créé. Si un email de confirmation vous est envoyé, ouvrez-le puis connectez-vous.');
+    else if (mode === 'signup') setNotice(t('Compte créé. Si un email de confirmation vous est envoyé, ouvrez-le puis connectez-vous.'));
   }
 
   return (
     <div className="min-h-screen bg-base">
       <div className="mx-auto grid min-h-screen max-w-[1180px] items-center gap-10 px-5 py-10 lg:grid-cols-[1.1fr_1fr] lg:px-8">
         <section>
+          <div className="flex items-start justify-between">
           <div className="leading-tight">
-            <span className="block font-display text-[26px] font-bold text-teal">Finjaro</span>
-            <span className="block text-[11px] font-bold uppercase tracking-[0.22em] text-[#8C6A3D]">Accounting</span>
+            <span className="block font-display text-[26px] font-bold text-teal">{t('Finjaro')}</span>
+            <span className="block text-[11px] font-bold uppercase tracking-[0.22em] text-[#8C6A3D]">{t('Accounting')}</span>
+          </div>
+          <LanguageSwitch />
           </div>
 
           <h1 className="mt-8 font-display text-[38px] font-bold leading-[1.08] text-ink sm:text-[52px]">
-            Votre boutique,
+            {t('Votre boutique,')}
             <br />
-            <span className="text-teal">tenue au propre.</span>
+            <span className="text-teal">{t('tenue au propre.')}</span>
           </h1>
           <p className="mt-5 max-w-lg text-body leading-relaxed text-muted sm:text-[17px]">
-            Ventes, caisse, stock, dettes — et derrière chaque opération, une comptabilité juste,
-            sans avoir besoin d’être comptable.
+            {t('Ventes, caisse, stock, dettes — et derrière chaque opération, une comptabilité juste, sans avoir besoin d’être comptable.')}
           </p>
 
           <ul className="mt-9 grid gap-3 sm:grid-cols-2">
@@ -60,8 +64,8 @@ export default function Auth() {
               <li key={p.title} className="flex gap-3 rounded-card border border-hairline bg-white p-4">
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-input bg-teal-light text-teal">{p.icon}</span>
                 <span>
-                  <span className="block text-body font-semibold text-ink">{p.title}</span>
-                  <span className="block text-caption text-muted">{p.text}</span>
+                  <span className="block text-body font-semibold text-ink">{t(p.title)}</span>
+                  <span className="block text-caption text-muted">{t(p.text)}</span>
                 </span>
               </li>
             ))}
@@ -69,23 +73,23 @@ export default function Auth() {
 
           <p className="mt-6 flex items-center gap-2 text-caption text-muted">
             <IconShield className="h-4 w-4 text-[#2A9D8F]" />
-            Sauvegardé en ligne, retrouvable depuis n’importe quel appareil. Le même compte que sur Finjaro.
+            {t('Sauvegardé en ligne, retrouvable depuis n’importe quel appareil. Le même compte que sur Finjaro.')}
           </p>
         </section>
 
         <section className="rounded-card border border-hairline bg-white p-6 shadow-[0_18px_40px_rgba(23,27,38,0.08)] sm:p-8">
-          <h2 className="font-display text-[26px] font-bold text-ink">{mode === 'login' ? 'Se connecter' : 'Créer mon compte'}</h2>
+          <h2 className="font-display text-[26px] font-bold text-ink">{mode === 'login' ? t('Se connecter') : t('Créer mon compte')}</h2>
           <p className="mt-1 text-caption text-muted">
-            {mode === 'login' ? 'Retrouvez votre espace.' : 'Gratuit pour démarrer — aucune carte bancaire.'}
+            {mode === 'login' ? t('Retrouvez votre espace.') : t('Gratuit pour démarrer — aucune carte bancaire.')}
           </p>
 
           <button type="button" onClick={() => void signInWithGoogle()} className="btn-ghost mt-5 w-full">
             <IconGoogle />
-            Continuer avec Google
+            {t('Continuer avec Google')}
           </button>
           <div className="my-4 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-wider text-muted">
             <span className="h-px flex-1 bg-hairline" />
-            ou par email
+            {t('ou par email')}
             <span className="h-px flex-1 bg-hairline" />
           </div>
 
@@ -94,11 +98,11 @@ export default function Auth() {
 
           <form onSubmit={submit} className="space-y-4">
             {mode === 'signup' && (
-              <Field label="Votre nom">
-                <input id="auth-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="Ex. Awa Ndiaye" className="field" />
+              <Field label={t('Votre nom')}>
+                <input id="auth-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder={t('Ex. Awa Ndiaye')} className="field" />
               </Field>
             )}
-            <Field label="Email">
+            <Field label={t('Email')}>
               <input
                 id="auth-email"
                 type="email"
@@ -106,11 +110,11 @@ export default function Auth() {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="vous@exemple.com"
+                placeholder={t('vous@exemple.com')}
                 className="field"
               />
             </Field>
-            <Field label="Mot de passe">
+            <Field label={t('Mot de passe')}>
               <div className="relative">
                 <input
                   id="auth-password"
@@ -120,13 +124,13 @@ export default function Auth() {
                   autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="6 caractères minimum"
+                  placeholder={t('6 caractères minimum')}
                   className="field pr-11"
                 />
                 <button
                   type="button"
                   onClick={() => setShow((v) => !v)}
-                  aria-label={show ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                  aria-label={show ? t('Masquer le mot de passe') : t('Afficher le mot de passe')}
                   className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-muted hover:bg-base hover:text-ink"
                 >
                   {show ? <IconEyeOff /> : <IconEye />}
@@ -135,23 +139,23 @@ export default function Auth() {
             </Field>
 
             <button type="submit" disabled={busy} className="btn-primary w-full">
-              {busy ? 'Un instant…' : mode === 'login' ? 'Se connecter' : 'Créer mon compte'}
+              {busy ? t('Un instant…') : mode === 'login' ? t('Se connecter') : t('Créer mon compte')}
             </button>
           </form>
 
           <p className="mt-4 text-center text-caption text-muted">
             {mode === 'login' ? (
               <>
-                Pas encore de compte ?{' '}
+                {t('Pas encore de compte ?')}{' '}
                 <button type="button" onClick={() => { setMode('signup'); setError(''); }} className="font-semibold text-teal">
-                  Créer un compte
+                  {t('Créer un compte')}
                 </button>
               </>
             ) : (
               <>
-                Déjà un compte Finjaro ?{' '}
+                {t('Déjà un compte Finjaro ?')}{' '}
                 <button type="button" onClick={() => { setMode('login'); setError(''); }} className="font-semibold text-teal">
-                  Se connecter
+                  {t('Se connecter')}
                 </button>
               </>
             )}
@@ -159,7 +163,7 @@ export default function Auth() {
 
           <div className="mt-6 border-t border-hairline pt-4 text-center">
             <button type="button" onClick={continueAsGuest} className="text-caption font-medium text-muted underline-offset-4 hover:text-ink hover:underline">
-              Essayer sans compte (données sur cet appareil seulement)
+              {t('Essayer sans compte (données sur cet appareil seulement)')}
             </button>
           </div>
         </section>

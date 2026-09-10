@@ -6,6 +6,7 @@ import { exportXlsx } from '../lib/xlsx';
 import type { JournalCode, JournalLine } from '../lib/types';
 import { Badge, Empty, Field, Modal, Money, PageHeader, StatCard } from '../components/UI';
 import { IconPlus, IconReceipt, IconX } from '../components/Icons';
+import { t } from '../lib/i18n';
 
 const JOURNALS: { code: JournalCode; label: string }[] = [
   { code: 'VT', label: 'Ventes' },
@@ -78,8 +79,8 @@ export default function Journal() {
   return (
     <>
       <PageHeader
-        title="Journal des écritures"
-        subtitle="Toutes les écritures en partie double, générées ou saisies"
+        title={t('Journal des écritures')}
+        subtitle={t('Toutes les écritures en partie double, générées ou saisies')}
         actions={
           <>
             <button
@@ -102,13 +103,13 @@ export default function Journal() {
                 )
               }
               className="btn-ghost"
-              title="Export Excel pour le cabinet"
+              title={t('Export Excel pour le cabinet')}
             >
-              Excel
+              {t('Excel')}
             </button>
             <button onClick={() => setOpen(true)} className="btn-primary">
               <IconPlus className="h-4 w-4" />
-              Écriture manuelle
+              {t('Écriture manuelle')}
             </button>
           </>
         }
@@ -121,29 +122,29 @@ export default function Journal() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label="Écritures affichées" value={entries.length} />
-        <StatCard label="Total mouvementé" value={<Money value={totalDebit} />} tone="dark" />
+        <StatCard label={t('Écritures affichées')} value={entries.length} />
+        <StatCard label={t('Total mouvementé')} value={<Money value={totalDebit} />} tone="dark" />
         <StatCard
-          label="Contrôle"
-          value="Équilibré"
+          label={t('Contrôle')}
+          value={t('Équilibré')}
           tone="positive"
-          hint="Aucune écriture ne peut être enregistrée hors équilibre"
+          hint={t('Aucune écriture ne peut être enregistrée hors équilibre')}
         />
       </div>
 
       <div className="card mt-6 mb-4 flex flex-wrap items-end gap-3">
         <select value={journal} onChange={(e) => setJournal(e.target.value)} className="field w-auto">
-          <option value="">Tous les journaux</option>
+          <option value="">{t('Tous les journaux')}</option>
           {JOURNALS.map((j) => (
             <option key={j.code} value={j.code}>
-              {j.code} — {j.label}
+              {j.code} — {t(j.label)}
             </option>
           ))}
         </select>
-        <Field label="Du">
+        <Field label={t('Du')}>
           <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="field" />
         </Field>
-        <Field label="Au">
+        <Field label={t('Au')}>
           <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="field" />
         </Field>
       </div>
@@ -158,12 +159,12 @@ export default function Journal() {
                   <span className="font-semibold">{e.ref}</span>
                   <span className="text-sm text-slate-500">{e.label}</span>
                   <span className="text-xs text-slate-400">{e.date}</span>
-                  {e.reverses && <Badge tone="warn">Extourne</Badge>}
-                  {e.reversedBy && <Badge tone="danger">Extournée</Badge>}
+                  {e.reverses && <Badge tone="warn">{t('Extourne')}</Badge>}
+                  {e.reversedBy && <Badge tone="danger">{t('Extournée')}</Badge>}
                   <div className="ml-auto">
                     {!e.reversedBy && !e.reverses && (
                       <button onClick={() => reverse(e.id)} className="text-xs font-semibold text-rose-600">
-                        Extourner
+                        {t('Extourner')}
                       </button>
                     )}
                   </div>
@@ -176,7 +177,7 @@ export default function Journal() {
                         return (
                           <tr key={i} className="text-sm">
                             <td className="py-1 pr-3 num text-slate-500">{l.account}</td>
-                            <td className="py-1 pr-3">{account?.label ?? '—'}</td>
+                            <td className="py-1 pr-3">{account ? t(account.label) : '—'}</td>
                             <td className="py-1 pr-3 text-slate-400">{l.label}</td>
                             <td className="py-1 pr-3 text-right num">
                               {l.debit ? <Money value={l.debit} /> : ''}
@@ -195,28 +196,28 @@ export default function Journal() {
           </div>
         ) : (
           <Empty
-            title="Aucune écriture sur la période"
-            hint="Les ventes, achats et dépenses génèrent automatiquement leurs écritures."
+            title={t('Aucune écriture sur la période')}
+            hint={t('Les ventes, achats et dépenses génèrent automatiquement leurs écritures.')}
             icon={<IconReceipt className="h-10 w-10" />}
           />
         )}
       </div>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Nouvelle écriture manuelle" wide>
+      <Modal open={open} onClose={() => setOpen(false)} title={t('Nouvelle écriture manuelle')} wide>
         <div className="grid gap-4 sm:grid-cols-3">
-          <Field label="Date">
+          <Field label={t('Date')}>
             <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="field" />
           </Field>
-          <Field label="Journal">
+          <Field label={t('Journal')}>
             <select value={code} onChange={(e) => setCode(e.target.value as JournalCode)} className="field">
               {JOURNALS.map((j) => (
                 <option key={j.code} value={j.code}>
-                  {j.code} — {j.label}
+                  {j.code} — {t(j.label)}
                 </option>
               ))}
             </select>
           </Field>
-          <Field label="Libellé">
+          <Field label={t('Libellé')}>
             <input value={label} onChange={(e) => setLabel(e.target.value)} className="field" />
           </Field>
         </div>
@@ -231,10 +232,10 @@ export default function Journal() {
                 }
                 className="field flex-1 py-1.5"
               >
-                <option value="">— Compte —</option>
+                <option value="">{t('— Compte —')}</option>
                 {db.accounts.map((a) => (
                   <option key={a.code} value={a.code}>
-                    {a.code} — {a.label}
+                    {a.code} — {t(a.label)}
                   </option>
                 ))}
               </select>
@@ -243,7 +244,7 @@ export default function Journal() {
                 onChange={(e) =>
                   setLines(lines.map((x, j) => (j === i ? { ...x, debit: e.target.value, credit: '' } : x)))
                 }
-                placeholder="Débit"
+                placeholder={t('Débit')}
                 inputMode="decimal"
                 className="field num w-28 py-1.5"
               />
@@ -252,7 +253,7 @@ export default function Journal() {
                 onChange={(e) =>
                   setLines(lines.map((x, j) => (j === i ? { ...x, credit: e.target.value, debit: '' } : x)))
                 }
-                placeholder="Crédit"
+                placeholder={t('Crédit')}
                 inputMode="decimal"
                 className="field num w-28 py-1.5"
               />
@@ -270,28 +271,28 @@ export default function Journal() {
             onClick={() => setLines([...lines, { account: '', label: '', debit: '', credit: '' }])}
             className="text-sm font-semibold text-brand-600"
           >
-            + Ajouter une ligne
+            {t('+ Ajouter une ligne')}
           </button>
         </div>
 
         <div className="mt-4 flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm dark:bg-white/5">
           <span>
-            Débit <Money value={draftDebit} className="font-bold" /> · Crédit{' '}
+            {t('Débit')} <Money value={draftDebit} className="font-bold" /> {t('· Crédit')}{' '}
             <Money value={draftCredit} className="font-bold" />
           </span>
           {balanced ? (
-            <Badge tone="success">Équilibrée</Badge>
+            <Badge tone="success">{t('Équilibrée')}</Badge>
           ) : (
-            <Badge tone="danger">Déséquilibre de {<Money value={Math.abs(draftDebit - draftCredit)} />}</Badge>
+            <Badge tone="danger">{t('Déséquilibre de')} {<Money value={Math.abs(draftDebit - draftCredit)} />}</Badge>
           )}
         </div>
 
         <div className="mt-6 flex justify-end gap-2">
           <button onClick={() => setOpen(false)} className="btn-ghost">
-            Annuler
+            {t('Annuler')}
           </button>
           <button onClick={submit} disabled={!balanced} className="btn-primary">
-            Enregistrer l'écriture
+            {t('Enregistrer l\'écriture')}
           </button>
         </div>
       </Modal>

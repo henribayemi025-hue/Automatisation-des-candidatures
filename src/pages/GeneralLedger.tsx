@@ -3,6 +3,7 @@ import { useDB } from '../lib/store';
 import { accountLedger, trialBalance } from '../lib/ledger';
 import { Empty, Field, Money, PageHeader, StatCard, Table } from '../components/UI';
 import { IconBook } from '../components/Icons';
+import { t } from '../lib/i18n';
 
 export default function GeneralLedger() {
   const db = useDB();
@@ -31,26 +32,26 @@ export default function GeneralLedger() {
 
   return (
     <>
-      <PageHeader title="Grand livre" subtitle="Détail des mouvements compte par compte" />
+      <PageHeader title={t('Grand livre')} subtitle={t('Détail des mouvements compte par compte')} />
 
       <div className="card mb-4 flex flex-wrap items-end gap-3">
         <div className="min-w-[240px] flex-1">
-          <Field label="Compte">
+          <Field label={t('Compte')}>
             <select value={code} onChange={(e) => setCode(e.target.value)} className="field">
-              <option value="">— Choisir un compte —</option>
+              <option value="">{t('— Choisir un compte —')}</option>
               {db.accounts.map((a) => (
                 <option key={a.code} value={a.code}>
-                  {a.code} — {a.label}
-                  {used.includes(a.code) ? '' : ' (sans mouvement)'}
+                  {a.code} — {t(a.label)}
+                  {used.includes(a.code) ? '' : ` ${t('(sans mouvement)')}`}
                 </option>
               ))}
             </select>
           </Field>
         </div>
-        <Field label="Du">
+        <Field label={t('Du')}>
           <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="field" />
         </Field>
-        <Field label="Au">
+        <Field label={t('Au')}>
           <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="field" />
         </Field>
       </div>
@@ -58,10 +59,10 @@ export default function GeneralLedger() {
       {account ? (
         <>
           <div className="grid gap-4 sm:grid-cols-3">
-            <StatCard label="Total débit" value={<Money value={totalDebit} />} />
-            <StatCard label="Total crédit" value={<Money value={totalCredit} />} />
+            <StatCard label={t('Total débit')} value={<Money value={totalDebit} />} />
+            <StatCard label={t('Total crédit')} value={<Money value={totalCredit} />} />
             <StatCard
-              label={`Solde ${account.normal === 'DEBIT' ? 'débiteur' : 'créditeur'}`}
+              label={account.normal === 'DEBIT' ? t('Solde débiteur') : t('Solde créditeur')}
               value={<Money value={closing} />}
               tone="dark"
             />
@@ -85,15 +86,15 @@ export default function GeneralLedger() {
                 ))}
               </Table>
             ) : (
-              <Empty title="Aucun mouvement sur ce compte pour la période" />
+              <Empty title={t('Aucun mouvement sur ce compte pour la période')} />
             )}
           </div>
         </>
       ) : (
         <div className="card">
           <Empty
-            title="Sélectionnez un compte"
-            hint="Le grand livre affiche chaque mouvement du compte choisi, avec le solde progressif."
+            title={t('Sélectionnez un compte')}
+            hint={t('Le grand livre affiche chaque mouvement du compte choisi, avec le solde progressif.')}
             icon={<IconBook className="h-10 w-10" />}
           />
         </div>

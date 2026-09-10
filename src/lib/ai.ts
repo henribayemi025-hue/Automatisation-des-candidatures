@@ -4,6 +4,7 @@ import { outstanding, productPerformance, snapshot } from './metrics';
 import { formatMoney } from './money';
 import { MODULE_HELP } from './guide';
 import type { DB } from './types';
+import { getLang } from './i18n';
 
 export interface AIMessage {
   role: 'user' | 'assistant';
@@ -31,6 +32,7 @@ export function buildContext(db: DB, pathname: string) {
   const money = (v: number) => formatMoney(v, db.company.currency);
   const help = MODULE_HELP[pathname];
   return {
+    langue_interface: getLang() === 'en' ? 'English' : 'Français',
     entreprise: db.company.name,
     activite: db.company.sector,
     devise: db.company.currency,

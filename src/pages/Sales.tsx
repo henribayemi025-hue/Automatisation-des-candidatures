@@ -4,6 +4,7 @@ import { saleRevenue } from '../lib/metrics';
 import { Badge, Empty, Modal, Money, PageHeader, StatCard, Table } from '../components/UI';
 import { IconReceipt } from '../components/Icons';
 import type { Sale } from '../lib/types';
+import { t } from '../lib/i18n';
 
 const METHOD_LABEL: Record<string, string> = {
   CASH: 'Espèces',
@@ -37,19 +38,19 @@ export default function Sales() {
 
   return (
     <>
-      <PageHeader title="Historique des ventes" subtitle="Toutes les factures émises" />
+      <PageHeader title={t('Historique des ventes')} subtitle={t('Toutes les factures émises')} />
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label="Ventes affichées" value={sales.length} />
-        <StatCard label="Chiffre d'affaires" value={<Money value={revenue} />} tone="dark" />
-        <StatCard label="Encaissé" value={<Money value={collected} />} tone="positive" />
+        <StatCard label={t('Ventes affichées')} value={sales.length} />
+        <StatCard label={t('Chiffre d\'affaires')} value={<Money value={revenue} />} tone="dark" />
+        <StatCard label={t('Encaissé')} value={<Money value={collected} />} tone="positive" />
       </div>
 
       <div className="card mt-6 mb-4 flex flex-wrap items-end gap-3">
         <select value={status} onChange={(e) => setStatus(e.target.value)} className="field w-auto">
-          <option value="">Tous les statuts</option>
-          <option value="CONFIRMED">Confirmées</option>
-          <option value="CANCELLED">Annulées</option>
+          <option value="">{t('Tous les statuts')}</option>
+          <option value="CONFIRMED">{t('Confirmées')}</option>
+          <option value="CANCELLED">{t('Annulées')}</option>
         </select>
         <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="field w-auto" />
         <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="field w-auto" />
@@ -70,23 +71,23 @@ export default function Sales() {
                   </td>
                   <td className="td">
                     <div className="flex flex-col gap-1">
-                      <span className="text-xs text-slate-500">{METHOD_LABEL[s.method]}</span>
+                      <span className="text-xs text-slate-500">{t(METHOD_LABEL[s.method])}</span>
                       {unpaid > 0 ? (
-                        <Badge tone="warn">Reste {<Money value={unpaid} />}</Badge>
+                        <Badge tone="warn">{t('Reste')} {<Money value={unpaid} />}</Badge>
                       ) : (
-                        <Badge tone="success">Payé</Badge>
+                        <Badge tone="success">{t('Payé')}</Badge>
                       )}
                     </div>
                   </td>
                   <td className="td">
                     <Badge tone={s.status === 'CONFIRMED' ? 'success' : 'danger'}>
-                      {s.status === 'CONFIRMED' ? 'Confirmée' : 'Annulée'}
+                      {s.status === 'CONFIRMED' ? t('Confirmée') : t('Annulé')}
                     </Badge>
                   </td>
                   <td className="td text-slate-500">{s.date}</td>
                   <td className="td text-right">
                     <button onClick={() => setDetail(s)} className="text-sm font-semibold text-brand-600">
-                      Détail
+                      {t('Détail')}
                     </button>
                   </td>
                 </tr>
@@ -94,7 +95,7 @@ export default function Sales() {
             })}
           </Table>
         ) : (
-          <Empty title="Aucune vente trouvée" icon={<IconReceipt className="h-10 w-10" />} />
+          <Empty title={t('Aucune vente trouvée')} icon={<IconReceipt className="h-10 w-10" />} />
         )}
       </div>
 
@@ -103,20 +104,20 @@ export default function Sales() {
           <>
             <div className="mb-4 grid gap-2 text-sm sm:grid-cols-2">
               <div>
-                <span className="text-slate-500">Client : </span>
+                <span className="text-slate-500">{t('Client :')} </span>
                 <span className="font-semibold">{detail.customerName}</span>
               </div>
               <div>
-                <span className="text-slate-500">Date : </span>
+                <span className="text-slate-500">{t('Date :')} </span>
                 <span className="font-semibold">{detail.date}</span>
               </div>
               <div>
-                <span className="text-slate-500">Caissier : </span>
+                <span className="text-slate-500">{t('Caissier :')} </span>
                 <span className="font-semibold">{detail.cashier}</span>
               </div>
               <div>
-                <span className="text-slate-500">Paiement : </span>
-                <span className="font-semibold">{METHOD_LABEL[detail.method]}</span>
+                <span className="text-slate-500">{t('Paiement :')} </span>
+                <span className="font-semibold">{t(METHOD_LABEL[detail.method])}</span>
               </div>
             </div>
 
@@ -138,7 +139,7 @@ export default function Sales() {
             <dl className="mt-4 space-y-1.5 border-t border-slate-100 pt-4 text-sm dark:border-white/10">
               {detail.discount > 0 && (
                 <div className="flex justify-between">
-                  <dt className="text-slate-500">Remise</dt>
+                  <dt className="text-slate-500">{t('Remise')}</dt>
                   <dd>
                     − <Money value={detail.discount} />
                   </dd>
@@ -146,20 +147,20 @@ export default function Sales() {
               )}
               {detail.vat > 0 && (
                 <div className="flex justify-between">
-                  <dt className="text-slate-500">TVA</dt>
+                  <dt className="text-slate-500">{t('TVA')}</dt>
                   <dd>
                     <Money value={detail.vat} />
                   </dd>
                 </div>
               )}
               <div className="flex justify-between text-lg font-extrabold">
-                <dt>Total</dt>
+                <dt>{t('Total')}</dt>
                 <dd>
                   <Money value={detail.total} />
                 </dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-slate-500">Payé</dt>
+                <dt className="text-slate-500">{t('Payé')}</dt>
                 <dd>
                   <Money value={detail.paid} />
                 </dd>
@@ -167,13 +168,13 @@ export default function Sales() {
             </dl>
 
             <div className="mt-5">
-              <h3 className="mb-2 text-sm font-bold">Écritures comptables générées</h3>
+              <h3 className="mb-2 text-sm font-bold">{t('Écritures comptables générées')}</h3>
               <ul className="space-y-1 text-xs text-slate-500">
                 {db.entries
                   .filter((e) => e.sourceId === detail.id)
                   .map((e) => (
                     <li key={e.id} className="rounded-lg bg-slate-50 px-3 py-2 dark:bg-white/5">
-                      <span className="font-semibold">{e.ref}</span> — {e.label} (journal {e.journal})
+                      <span className="font-semibold">{e.ref}</span> — {e.label} {t('(journal')} {e.journal})
                     </li>
                   ))}
               </ul>

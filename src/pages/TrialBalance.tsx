@@ -7,6 +7,7 @@ import { exportXlsx } from '../lib/xlsx';
 import type { AccountClass } from '../lib/types';
 import { Badge, Empty, Field, Money, PageHeader, StatCard } from '../components/UI';
 import { IconScale } from '../components/Icons';
+import { t } from '../lib/i18n';
 
 export default function TrialBalance() {
   const db = useDB();
@@ -35,8 +36,8 @@ export default function TrialBalance() {
   return (
     <>
       <PageHeader
-        title="Balance générale"
-        subtitle="Totaux et soldes de tous les comptes mouvementés"
+        title={t('Balance générale')}
+        subtitle={t('Totaux et soldes de tous les comptes mouvementés')}
         actions={
           <button
             onClick={() =>
@@ -56,28 +57,28 @@ export default function TrialBalance() {
             }
             className="btn-ghost"
           >
-            Excel
+            {t('Excel')}
           </button>
         }
       />
 
       <div className="card mb-4 flex flex-wrap items-end gap-3">
-        <Field label="Du">
+        <Field label={t('Du')}>
           <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="field" />
         </Field>
-        <Field label="Au">
+        <Field label={t('Au')}>
           <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="field" />
         </Field>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label="Total débit" value={<Money value={totalDebit} />} />
-        <StatCard label="Total crédit" value={<Money value={totalCredit} />} />
+        <StatCard label={t('Total débit')} value={<Money value={totalDebit} />} />
+        <StatCard label={t('Total crédit')} value={<Money value={totalCredit} />} />
         <StatCard
-          label="Contrôle d'équilibre"
-          value={balanced ? 'Équilibrée' : 'Déséquilibrée'}
+          label={t('Contrôle d\'équilibre')}
+          value={balanced ? t('Équilibrée') : t('Déséquilibrée')}
           tone={balanced ? 'positive' : 'negative'}
-          hint={balanced ? 'Débit = crédit' : `Écart de ${totalDebit - totalCredit}`}
+          hint={balanced ? t('Débit = crédit') : `${t('Écart')} ${totalDebit - totalCredit}`}
         />
       </div>
 
@@ -87,11 +88,11 @@ export default function TrialBalance() {
             <table className="w-full min-w-[720px] border-collapse">
               <thead>
                 <tr className="bg-slate-50/80 dark:bg-white/5">
-                  <th className="th">Compte</th>
-                  <th className="th">Intitulé</th>
-                  <th className="th text-right">Total débit</th>
-                  <th className="th text-right">Total crédit</th>
-                  <th className="th text-right">Solde</th>
+                  <th className="th">{t('Compte')}</th>
+                  <th className="th">{t('Intitulé')}</th>
+                  <th className="th text-right">{t('Total débit')}</th>
+                  <th className="th text-right">{t('Total crédit')}</th>
+                  <th className="th text-right">{t('Solde')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -99,13 +100,13 @@ export default function TrialBalance() {
                   <Fragment key={cls}>
                     <tr className="bg-slate-100/70 dark:bg-white/[0.07]">
                       <td colSpan={5} className="px-4 py-2 text-xs font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-                        Classe {cls} — {CLASS_LABELS[cls]}
+                        {t('Classe')} {cls} — {t(CLASS_LABELS[cls])}
                       </td>
                     </tr>
                     {rows.map((b) => (
                       <tr key={b.account.code} className="row">
                         <td className="td num font-semibold">{b.account.code}</td>
-                        <td className="td">{b.account.label}</td>
+                        <td className="td">{t(b.account.label)}</td>
                         <td className="td num text-right">
                           <Money value={b.debit} />
                         </td>
@@ -126,7 +127,7 @@ export default function TrialBalance() {
               <tfoot>
                 <tr className="border-t-2 border-slate-200 font-extrabold dark:border-white/20">
                   <td className="td" colSpan={2}>
-                    Totaux
+                    {t('Totaux')}
                   </td>
                   <td className="td num text-right">
                     <Money value={totalDebit} />
@@ -135,7 +136,7 @@ export default function TrialBalance() {
                     <Money value={totalCredit} />
                   </td>
                   <td className="td text-right">
-                    {balanced ? <Badge tone="success">OK</Badge> : <Badge tone="danger">Écart</Badge>}
+                    {balanced ? <Badge tone="success">{t('OK')}</Badge> : <Badge tone="danger">{t('Écart')}</Badge>}
                   </td>
                 </tr>
               </tfoot>
@@ -143,8 +144,8 @@ export default function TrialBalance() {
           </div>
         ) : (
           <Empty
-            title="Aucun mouvement sur la période"
-            hint="La balance se remplit dès la première vente, dépense ou écriture manuelle."
+            title={t('Aucun mouvement sur la période')}
+            hint={t('La balance se remplit dès la première vente, dépense ou écriture manuelle.')}
             icon={<IconScale className="h-10 w-10" />}
           />
         )}

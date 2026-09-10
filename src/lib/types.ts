@@ -26,6 +26,8 @@ export interface Company {
   vatEnabled: boolean;
   /** Taux de TVA en points de base (1950 = 19,5 %). */
   vatRateBp: number;
+  /** Nom local de la taxe sur la consommation : TVA, VAT, GST, IVA… */
+  taxLabel: string;
   fiscalYearStart: string; // MM-DD
   mode: AppMode;
   onboarded: boolean;
