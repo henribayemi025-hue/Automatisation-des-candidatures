@@ -90,6 +90,10 @@ export default function Auth() {
               ? 'Retrouvez votre espace de gestion.'
               : 'Gratuit pour démarrer — aucune carte bancaire requise.'}
           </p>
+          <p className="mt-2 text-xs text-slate-400">
+            Si vous avez déjà un compte sur une autre application Finjaro, connectez-vous avec les
+            mêmes identifiants.
+          </p>
 
           {error && (
             <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300">

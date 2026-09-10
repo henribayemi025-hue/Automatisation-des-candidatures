@@ -24,7 +24,8 @@ const GUEST_KEY = 'finia.guest';
 function frenchError(message: string): string {
   const m = message.toLowerCase();
   if (m.includes('invalid login credentials')) return 'Email ou mot de passe incorrect.';
-  if (m.includes('already registered')) return 'Un compte existe déjà avec cet email.';
+  if (m.includes('already registered') || m.includes('user already'))
+    return 'Cet email a déjà un compte. Connectez-vous avec votre mot de passe habituel — le même compte fonctionne sur toutes les applications Finjaro.';
   if (m.includes('password should be at least')) return 'Mot de passe trop court (6 caractères minimum).';
   if (m.includes('invalid email') || m.includes('validate email')) return 'Adresse email invalide.';
   if (m.includes('rate limit')) return 'Trop de tentatives, réessayez dans quelques minutes.';
@@ -128,7 +129,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return error ? frenchError(error.message) : null;
       },
       async signUp(email, password) {
-        const { error } = await supabase.auth.signUp({ email, password });
+        // `app` marque l'origine du compte : les comptes créés ici restent
+        // distinguables des inscriptions Finjaro dans la base partagée.
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { app: 'finia' } },
+        });
         return error ? frenchError(error.message) : null;
       },
       async signOut() {
