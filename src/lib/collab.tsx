@@ -109,7 +109,14 @@ export function CollabProvider({ children }: { children: ReactNode }) {
   const store = useStoreActions();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [guest, setGuest] = useState(() => localStorage.getItem(GUEST_KEY) === '1');
+  const [guest, setGuest] = useState(() => {
+    if (localStorage.getItem(GUEST_KEY) !== '1') return false;
+    // On ne reprend le mode local que s'il contient déjà du travail : sinon on repropose la connexion.
+    const cached = loadCache('guest');
+    if (hasContent(cached) || cached?.company.onboarded) return true;
+    localStorage.removeItem(GUEST_KEY);
+    return false;
+  });
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [members, setMembers] = useState<Member[]>([]);

@@ -968,4 +968,7 @@ export const EN: Record<string, string> = {
   '{n} produit(s) sous le seuil de réappro : préparez une commande fournisseur.': '{n} product(s) below the reorder level: prepare a supplier order.',
   "{n} anomalie(s) comptable(s) bloquante(s) détectée(s) par l'audit automatique.": '{n} blocking accounting anomaly(ies) detected by the automatic audit.',
   'Aucun produit au catalogue : commencez par créer vos références pour utiliser le point de vente.': 'No product in the catalogue: start by creating your items to use the point of sale.',
+  'J’ai un compte': 'I have an account',
+  'Vous travaillez sans compte : vos données restent sur cet appareil. Créez un compte pour les retrouver partout et travailler à plusieurs.':
+    'You are working without an account: your data stays on this device. Create an account to find it anywhere and work as a team.',
 };

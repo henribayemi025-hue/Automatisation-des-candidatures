@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '../lib/store';
+import { useCollab } from '../lib/collab';
 import { CURRENCIES } from '../lib/money';
 import { GOALS, SECTORS } from '../lib/guide';
 import { COUNTRIES, countryProfile, profileToCompany } from '../lib/countries';
@@ -9,6 +10,7 @@ import { IconCheck, IconChevronRight } from '../components/Icons';
 
 export default function Onboarding() {
   const { db, setCompany } = useStore();
+  const { user, signOut } = useCollab();
   const [step, setStep] = useState(0);
   const [sector, setSector] = useState(db.company.sector);
   const [name, setName] = useState(db.company.name === 'Mon entreprise' ? '' : db.company.name);
@@ -49,8 +51,21 @@ export default function Onboarding() {
             <span className="block font-display text-[22px] font-bold text-teal">Finjaro</span>
             <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C6A3D]">Accounting</span>
           </div>
-          <LanguageSwitch />
+          <div className="flex items-center gap-2">
+            <LanguageSwitch />
+            {!user && (
+              <button type="button" onClick={() => void signOut()} className="btn-ghost py-1.5 text-caption">
+                {t('J’ai un compte')}
+              </button>
+            )}
+          </div>
         </div>
+
+        {!user && (
+          <p className="mt-3 text-caption text-muted">
+            {t('Vous travaillez sans compte : vos données restent sur cet appareil. Créez un compte pour les retrouver partout et travailler à plusieurs.')}
+          </p>
+        )}
 
         <ol className="mt-8 flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wider">
           {steps.map((s, i) => (
