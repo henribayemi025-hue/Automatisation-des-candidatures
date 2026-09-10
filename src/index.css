@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-cream text-ink-900 antialiased dark:bg-ink-950 dark:text-slate-100;
+  }
+  h1 {
+    @apply font-display;
+  }
+  input,
+  select,
+  textarea {
+    @apply text-slate-900 dark:text-slate-100;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-hairline bg-white p-5 shadow-sm dark:border-white/10 dark:bg-ink-900;
+  }
+  .field {
+    @apply w-full rounded-xl border border-hairline bg-cream/60 px-3.5 py-2.5 text-sm outline-none transition
+           focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-500/20
+           dark:border-white/10 dark:bg-ink-800 dark:focus:bg-ink-800;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold
+           transition disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .btn-primary {
+    @apply btn bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800;
+  }
+  .btn-dark {
+    @apply btn bg-ink-900 text-white hover:bg-ink-800 dark:bg-white dark:text-ink-900 dark:hover:bg-slate-200;
+  }
+  .btn-ghost {
+    @apply btn border border-hairline bg-white text-ink-800 hover:bg-brand-50
+           dark:border-white/10 dark:bg-transparent dark:text-slate-200 dark:hover:bg-white/5;
+  }
+  .btn-danger {
+    @apply btn border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100
+           dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300;
+  }
+  .th {
+    @apply px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400;
+  }
+  .td {
+    @apply px-4 py-3 text-sm text-slate-700 dark:text-slate-200;
+  }
+  .row {
+    @apply border-t border-slate-100 transition hover:bg-slate-50/70 dark:border-white/5 dark:hover:bg-white/5;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold;
+  }
+  .num {
+    @apply tabular-nums;
+  }
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-slate-300 dark:bg-white/15;
+}
