@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../lib/store';
 import { accountCode } from '../lib/chart';
 import { toMinor } from '../lib/money';
 import { Badge, Empty, Field, Money, PageHeader, Table } from '../components/UI';
+import { IconSearch } from '../components/Icons';
 import { IconWallet } from '../components/Icons';
 import { locale, t } from '../lib/i18n';
 
@@ -12,6 +13,7 @@ export default function CashRegister() {
   const [opening, setOpening] = useState('');
   const [counted, setCounted] = useState('');
   const [error, setError] = useState('');
+  const [q, setQ] = useState('');
 
   const current = db.sessions.find((s) => !s.closedAt);
   const currency = db.company.currency;
@@ -28,6 +30,24 @@ export default function CashRegister() {
     }
     expected = current.opening + movement;
   }
+
+  /** Les mouvements de la session, filtrés par la recherche (référence, libellé, montant). */
+  const sessionMoves = useMemo(() => {
+    if (!current) return [];
+    const needle = q.trim().toLowerCase();
+    const digits = needle.replace(/[^\d]/g, '');
+    return db.entries.filter((e) => {
+      if (e.createdAt < current.openedAt) return false;
+      if (!e.lines.some((l) => l.account === cashCode)) return false;
+      if (!needle) return true;
+      if (e.label.toLowerCase().includes(needle) || e.ref.toLowerCase().includes(needle)) return true;
+      if (digits) {
+        const line = e.lines.find((l) => l.account === cashCode);
+        if (line && (String(line.debit).includes(digits) || String(line.credit).includes(digits))) return true;
+      }
+      return false;
+    });
+  }, [db.entries, current, cashCode, q]);
 
   function run(fn: () => void) {
     try {
@@ -119,14 +139,21 @@ export default function CashRegister() {
           </div>
 
           <div className="card">
-            <h2 className="mb-3 font-bold">{t('Mouvements de caisse de la session')}</h2>
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+              <h2 className="font-bold">{t('Mouvements de caisse de la session')}</h2>
+              <div className="relative min-w-[220px] flex-1 sm:max-w-xs">
+                <IconSearch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+                <input
+                  id="caisse-search"
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  placeholder={t('Chercher un ticket, un libellé, un montant…')}
+                  className="field py-1.5 pl-9 text-caption"
+                />
+              </div>
+            </div>
             <Table head={['Date', 'Libellé', 'Entrée', 'Sortie']}>
-              {db.entries
-                .filter(
-                  (e) =>
-                    e.createdAt >= current.openedAt && e.lines.some((l) => l.account === cashCode),
-                )
-                .map((e) => {
+              {sessionMoves.map((e) => {
                   const line = e.lines.find((l) => l.account === cashCode)!;
                   return (
                     <tr key={e.id} className="row">
@@ -142,6 +169,11 @@ export default function CashRegister() {
                   );
                 })}
             </Table>
+            {sessionMoves.length === 0 && (
+              <p className="py-6 text-center text-caption text-muted">
+                {q ? t('Aucun mouvement ne correspond à « {q} ».', { q }) : t('Aucun mouvement depuis l’ouverture.')}
+              </p>
+            )}
           </div>
         </div>
       ) : (

@@ -7,6 +7,7 @@ import { DEMO_KEY } from '../pages/Demo';
 import { LanguageSwitch } from '../lib/i18n';
 import { useTheme } from '../lib/theme';
 import AppSwitcher from './AppSwitcher';
+import CommandPalette from './CommandPalette';
 import AssistantDrawer from './AssistantDrawer';
 import ModuleIntro from './ModuleIntro';
 import PresenceAvatars, { Avatar } from './PresenceAvatars';
@@ -35,6 +36,7 @@ import {
   IconCamera,
   IconFolder,
   IconChat,
+  IconSearch,
 } from './Icons';
 import { t } from '../lib/i18n';
 
@@ -121,9 +123,22 @@ export default function Layout({ children }: { children: ReactNode }) {
     useCollab();
   const { resetAll } = useStoreActions();
   const { dark, setChoice } = useTheme();
+  const [palette, setPalette] = useState(false);
   const [demo, setDemo] = useState(() => localStorage.getItem(DEMO_KEY) === '1');
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
+
+  // Ctrl+K (ou ⌘K) ouvre la recherche, comme dans les outils professionnels.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setPalette(true);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   /** Quitter la démonstration : on efface l'exemple et on propose la connexion. */
   function leaveDemo() {
@@ -242,6 +257,17 @@ export default function Layout({ children }: { children: ReactNode }) {
             <span className="hidden truncate text-caption font-semibold text-ink sm:block">{workspace?.name ?? company.name}</span>
           )}
 
+          <button
+            type="button"
+            onClick={() => setPalette(true)}
+            className="ml-2 flex min-w-0 flex-1 items-center gap-2 rounded-input border border-hairline bg-base px-3 py-1.5 text-left text-caption text-muted transition hover:border-teal hover:text-ink sm:max-w-xs"
+            aria-label={t('Rechercher')}
+          >
+            <IconSearch className="h-4 w-4 shrink-0" />
+            <span className="truncate">{t('Rechercher…')}</span>
+            <kbd className="ml-auto hidden shrink-0 rounded border border-hairline px-1.5 text-[10px] lg:block">Ctrl K</kbd>
+          </button>
+
           <div className="flex-1" />
 
           <PresenceAvatars />
@@ -331,6 +357,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         </main>
       </div>
 
+      <CommandPalette open={palette} onClose={() => setPalette(false)} />
       <TabBar onMenu={() => setOpen(true)} />
       <AssistantDrawer />
     </div>
