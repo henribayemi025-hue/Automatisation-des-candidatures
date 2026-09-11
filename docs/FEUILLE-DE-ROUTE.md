@@ -20,7 +20,7 @@ certification ou une infrastructure).
 | Mode sombre certifié contrastes | plus tard |
 | Onglets internes pour comparer deux écrans | plus tard |
 | Éditeur de mise en page des factures PDF (logo, mentions) | prochain |
-| Appels audio / vidéo dans la discussion (WebRTC) | plus tard |
+| Appels audio / vidéo dans la discussion (WebRTC) | prochain |
 
 ## Point de vente et opérations
 
@@ -35,12 +35,13 @@ certification ou une infrastructure).
 | Casse et démarque en charge | fait |
 | Devis avec acompte transformé en facture | fait |
 | Retours et remboursements avec avoir | prochain |
+| Fiches recettes (nomenclature) : un plat vendu décrémente ses ingrédients, marge réelle par plat | prochain |
 | Paiement mixte (espèces + mobile money) sur un ticket | prochain |
 | Plusieurs caisses et sessions par caissier | prochain |
 | Articles au poids, étiquettes et codes internes | prochain |
 | Promotions conditionnelles, seuils de remise avec code superviseur | plus tard |
 | Vente hors ligne et resynchronisation sans conflit | plus tard |
-| Pointage du personnel, partage d'addition, envoi en cuisine, pourboires, cartes cadeaux | plus tard |
+| Tables et additions ouvertes, partage d'addition, envoi en cuisine, pourboires, cartes cadeaux, pointage du personnel | plus tard |
 
 ## Comptabilité et fiscalité
 
@@ -69,7 +70,8 @@ certification ou une infrastructure).
 | Synchronisation en direct entre membres, journal d'événements | fait |
 | Photos du fil dans un espace privé, liens signés | fait |
 | Assistant sur serveur, clé protégée, limite par utilisateur | fait |
-| Mobile money déclenché depuis la caisse (API MTN / Orange, webhooks, idempotence) | plus tard |
+| Mobile money — encaissement instantané par SMS reçu (numéro marchand personnel, sans API opérateur) | prochain |
+| Mobile money — intégration API marchand (MTN/Orange, webhooks, idempotence) : demande un compte marchand pro | plus tard |
 | WhatsApp Business (réception des messages, modèles approuvés) | plus tard |
 | Double authentification pour gérants et comptables | prochain |
 | API ouverte, connecteurs Odoo / SAP, consolidation multi-sociétés | plus tard |
