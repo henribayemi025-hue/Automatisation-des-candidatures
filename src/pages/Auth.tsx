@@ -15,7 +15,7 @@ const PILLARS = [
 ];
 
 export default function Auth() {
-  const { signIn, signUp, signInWithGoogle, continueAsGuest, sessionExpired, lastEmail } = useCollab();
+  const { signIn, signUp, signInWithGoogle, continueAsGuest, sessionExpired, authError, lastEmail } = useCollab();
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState(displayIdentity(lastEmail));
@@ -106,6 +106,13 @@ export default function Auth() {
           )}
           {lastEmail && !sessionExpired && mode === 'login' && (
             <p className="mb-4 text-caption text-muted">{t('Dernier compte utilisé ici : {email}', { email: displayIdentity(lastEmail) })}</p>
+          )}
+          {/* Quand Google refuse, il le dit dans l'adresse de retour. Avant, on
+              revenait ici sans rien afficher et on croyait à un bug muet. */}
+          {authError && !error && (
+            <div className="mb-4 rounded-input border border-[#D14343]/30 bg-[#FDEDED] px-4 py-3 text-caption text-[#A63030]">
+              {t('La connexion Google n’a pas abouti : {reason}', { reason: authError })}
+            </div>
           )}
           {error && <div className="mb-4 rounded-input border border-[#D14343]/30 bg-[#FDEDED] px-4 py-3 text-caption text-[#A63030]">{error}</div>}
           {notice && <div className="mb-4 rounded-input border border-[#2A9D8F]/30 bg-[#EAF6EA] px-4 py-3 text-caption text-[#1F6F65]">{notice}</div>}

@@ -1473,6 +1473,8 @@ export const EN: Record<string, string> = {
   'Supprimer définitivement': 'Delete for good',
   'Archiver': 'Archive',
 
+  'La connexion Google n’a pas abouti : {reason}': 'Google sign-in did not go through: {reason}',
+
   // Connexion par email ou par téléphone
   'Email ou numéro de téléphone': 'Email or phone number',
   'Le numéro sert d’identifiant. Il n’est pas vérifié par SMS : c’est le mot de passe qui protège le compte.': 'The number is only an identifier. It is not verified by text message: the password is what protects the account.',

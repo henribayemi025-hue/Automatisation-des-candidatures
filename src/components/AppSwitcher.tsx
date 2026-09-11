@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useCollab } from '../lib/collab';
 import { CURRENT_APP_KEY, FALLBACK_APPS, fetchApps, fetchAudience, visibleApps } from '../lib/apps';
 import type { FinjaroApp } from '../lib/apps';
@@ -10,6 +11,32 @@ const ACCENT: Record<FinjaroApp['accent'], string> = {
   brass: 'bg-[#FBF1DF] text-[#8C6A3D]',
   ink: 'bg-ink text-white',
 };
+
+/**
+ * Une ligne du sélecteur. L'application déjà ouverte n'est pas un lien : elle
+ * s'affiche comme une simple ligne, sans curseur de main et sans clic mort.
+ */
+function RowTag({
+  current,
+  url,
+  onDone,
+  children,
+}: {
+  current: boolean;
+  url: string;
+  onDone: () => void;
+  children: ReactNode;
+}) {
+  const className = `flex items-center gap-3 rounded-input px-3 py-2.5 transition ${
+    current ? 'cursor-default bg-base' : 'hover:bg-teal-light'
+  }`;
+  if (current) return <div className={className}>{children}</div>;
+  return (
+    <a href={url} target="_blank" rel="noreferrer" onClick={onDone} className={className}>
+      {children}
+    </a>
+  );
+}
 
 /** Sélecteur en grille « comme Google » : lit finjaro_apps, marque l'application ouverte. */
 export default function AppSwitcher({ align = 'start' }: { align?: 'start' | 'end' }) {
@@ -65,14 +92,13 @@ export default function AppSwitcher({ align = 'start' }: { align?: 'start' | 'en
               const current = a.key === CURRENT_APP_KEY;
               return (
                 <li key={a.key}>
-                  <a
-                    href={current ? undefined : a.url}
-                    target={current ? undefined : '_blank'}
-                    rel="noreferrer"
-                    onClick={() => setOpen(false)}
-                    className={`flex items-center gap-3 rounded-input px-3 py-2.5 transition ${
-                      current ? 'bg-base' : 'hover:bg-teal-light'
-                    }`}
+                  {/* L'application déjà ouverte n'est pas un lien : un <a> sans
+                      href a l'air cliquable et ne fait rien — on croit que
+                      l'application est cassée. */}
+                  <RowTag
+                    current={current}
+                    url={a.url}
+                    onDone={() => setOpen(false)}
                   >
                     <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-input text-xl ${ACCENT[a.accent]}`}>
                       {a.emoji}
@@ -89,7 +115,7 @@ export default function AppSwitcher({ align = 'start' }: { align?: 'start' | 'en
                       </span>
                       <span className="line-clamp-1 text-caption text-muted">{a.tagline}</span>
                     </span>
-                  </a>
+                  </RowTag>
                 </li>
               );
             })}

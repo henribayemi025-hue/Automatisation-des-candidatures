@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { RealtimeChannel, User } from '@supabase/supabase-js';
-import { supabase } from './supabase';
+import { authErrorInUrl, cleanAuthParams, supabase } from './supabase';
 import { hasContent, loadCache, useStoreActions } from './store';
 import { emptyDB, normalizeDB, replay } from './reducer';
 import type { DB, Member, MemberRole, Presence, WorkspaceEvent } from './types';
@@ -33,6 +33,8 @@ interface CollabValue {
   signOut: () => Promise<void>;
   /** Vrai si une session enregistrée a expiré : on le dit au lieu de basculer en mode local. */
   sessionExpired: boolean;
+  /** Erreur renvoyée par Google dans l'adresse de retour, s'il y en a une. */
+  authError: string | null;
   lastEmail: string;
   continueAsGuest: () => void;
 
@@ -139,6 +141,7 @@ export function CollabProvider({ children }: { children: ReactNode }) {
   const [pending, setPending] = useState(0);
   const [localConflict, setLocalConflict] = useState<LocalConflict | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [lastEmail, setLastEmail] = useState(() => localStorage.getItem(EMAIL_KEY) ?? '');
 
   const lastSeq = useRef(0);
@@ -154,8 +157,14 @@ export function CollabProvider({ children }: { children: ReactNode }) {
   // ---------- Session ----------
   useEffect(() => {
     void (async () => {
+      // Le retour de Google est traité par supabase-js (PKCE, `?code=…`).
+      // On le laisse finir, puis on nettoie l'adresse : sinon un rechargement
+      // rejouerait un code déjà consommé et paraîtrait « ne rien faire ».
+      const providerError = authErrorInUrl();
+      if (providerError) setAuthError(providerError);
       const { data } = await supabase.auth.getSession();
       let session = data.session;
+      if (session || providerError) cleanAuthParams();
       // Jeton enregistré mais session absente (expirée, appareil resté fermé, réseau coupé) :
       // on tente de la reprendre avant de considérer la personne comme déconnectée.
       if (!session && localStorage.getItem(AUTH_KEY)) {
@@ -492,6 +501,7 @@ export function CollabProvider({ children }: { children: ReactNode }) {
       loading,
       guest,
       sessionExpired,
+      authError,
       lastEmail,
       displayName: nameOf(user),
       avatarUrl: avatarOf(user),
@@ -617,7 +627,7 @@ export function CollabProvider({ children }: { children: ReactNode }) {
         }
       },
     }),
-    [user, loading, guest, sessionExpired, lastEmail, workspace, workspaces, members, invitations, presence, sync, pending, localConflict, rebuild, loadWorkspace],
+    [user, loading, guest, sessionExpired, authError, lastEmail, workspace, workspaces, members, invitations, presence, sync, pending, localConflict, rebuild, loadWorkspace],
   );
 
   return <CollabContext.Provider value={value}>{children}</CollabContext.Provider>;

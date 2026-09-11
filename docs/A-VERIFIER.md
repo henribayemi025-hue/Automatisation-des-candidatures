@@ -7,6 +7,16 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 
 - [ ] La page de connexion s'affiche quand on arrive (plus d'onboarding surprise).
 - [ ] Google et e-mail fonctionnent avec le compte Finjaro habituel.
+- [ ] **« Continuer avec Google »** ramène dans l'application, connecté — plus
+      sur la page de connexion. (Cause corrigée : le jeton arrivait dans
+      l'ancre `#…`, que la navigation par ancres écrasait.) Si Google refuse,
+      la raison s'affiche en rouge au lieu d'un retour muet.
+- [ ] Si ça retombe encore sur la connexion : vérifier dans Supabase →
+      Authentication → URL Configuration que
+      `https://automatisation-des-candidatures.finjaro.workers.dev/` figure
+      dans les « Redirect URLs ». Ce réglage n'est pas dans le code.
+- [ ] Six points : l'application déjà ouverte est marquée « Ouverte » et n'est
+      pas un lien ; « Finjaro » ouvre finjaro.net dans un nouvel onglet.
 - [ ] **Numéro de téléphone** : nom + numéro + mot de passe suffisent pour créer
       un compte. Le numéro doit porter son indicatif (+237…), sinon c'est refusé.
       Il n'est PAS vérifié par SMS — c'est le mot de passe qui protège.
