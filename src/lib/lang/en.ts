@@ -1095,4 +1095,10 @@ export const EN: Record<string, string> = {
 
   'Proposée pour ce pays': 'Suggested for this country',
   'Toutes les devises': 'All currencies',
+  'Voir avec des données d’exemple': 'View with sample data',
+  'Comptable ou curieux ? « Voir avec des données d’exemple » remplit l’espace avec trois mois d’activité complète, dans la devise choisie.':
+    'Accountant or just curious? “View with sample data” fills the workspace with three months of complete activity, in the chosen currency.',
+  'Vous êtes comptable ?': 'Are you an accountant?',
+  'Ouvrir une démonstration': 'Open a demonstration',
+  '— trois questions, puis trois mois d’activité déjà saisie.': '— three questions, then three months of activity already entered.',
 };

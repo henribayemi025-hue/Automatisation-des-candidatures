@@ -1,5 +1,5 @@
 import { accountCode } from './chart';
-import { factor } from './money';
+import { currency, factor } from './money';
 import { applyEvent, saleTotals } from './reducer';
 import { accountCode as codeOf } from './chart';
 import type {
@@ -95,7 +95,11 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
   const company: Company = start.company;
   const events: WorkspaceEvent[] = [];
   const unit = factor(company.currency);
-  const money = (v: number): Minor => Math.round(v * unit);
+  // Les montants sont écrits dans un ordre de grandeur « franc CFA ». Pour une
+  // devise à centimes (euro, dollar, dinar…), on les ramène à une échelle
+  // crédible : un sac de riz vaut 18 000 en francs, 18 en euros.
+  const scale = currency(company.currency).decimals === 0 ? 1 : 1 / 1000;
+  const money = (v: number): Minor => Math.round(v * scale * unit);
   const chart = company.chart;
   const rnd = seeded(20260911);
   const base = new Date(`${todayISO}T12:00:00.000Z`);

@@ -173,10 +173,17 @@ export default function Auth() {
             )}
           </p>
 
-          <div className="mt-6 border-t border-hairline pt-4 text-center">
+          <div className="mt-6 space-y-3 border-t border-hairline pt-4 text-center">
             <button type="button" onClick={continueAsGuest} className="text-caption font-medium text-muted underline-offset-4 hover:text-ink hover:underline">
               {t('Essayer sans compte (données sur cet appareil seulement)')}
             </button>
+            <p className="text-caption text-muted">
+              {t('Vous êtes comptable ?')}{' '}
+              <button type="button" onClick={continueAsGuest} className="font-semibold text-teal underline-offset-4 hover:underline">
+                {t('Ouvrir une démonstration')}
+              </button>{' '}
+              {t('— trois questions, puis trois mois d’activité déjà saisie.')}
+            </p>
           </div>
         </section>
       </div>

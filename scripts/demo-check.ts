@@ -7,10 +7,10 @@ import { countryProfile } from '../src/lib/countries';
 
 const today = process.argv[2] ?? new Date().toISOString().slice(0, 10);
 let db = emptyDB();
-const profile = countryProfile('Cameroun')!;
+const profile = countryProfile(process.argv[3] ?? 'Cameroun')!;
 db = applyEvent(db, {
   id: 'c', at: today + 'T08:00:00.000Z', actorId: null, actorName: 'Test', type: 'company.update',
-  payload: { patch: { ...profileToCompany(profile), name: 'Boutique démo', currency: 'XAF', country: 'Cameroun', onboarded: true, mode: 'EXPERT' } },
+  payload: { patch: { ...profileToCompany(profile), name: 'Boutique démo', country: profile.name, currency: profile.currency, onboarded: true, mode: 'EXPERT' } },
 });
 const events = buildDemoEvents(db, { id: null, name: 'Henri' }, 'demo', today);
 let failed = 0;

@@ -10,7 +10,7 @@ import { IconCheck, IconChevronRight } from '../components/Icons';
 import AppSwitcher from '../components/AppSwitcher';
 
 export default function Onboarding() {
-  const { db, setCompany } = useStore();
+  const { db, setCompany, loadDemo } = useStore();
   const { user, signOut } = useCollab();
   const [step, setStep] = useState(0);
   const [sector, setSector] = useState(db.company.sector);
@@ -27,8 +27,8 @@ export default function Onboarding() {
     setGoals((g) => (g.includes(id) ? g.filter((x) => x !== id) : [...g, id]));
   }
 
-  function finish() {
-    const expert = goals.includes('accounting');
+  function finish(withDemo = false) {
+    const expert = goals.includes('accounting') || withDemo;
     setCompany({
       ...(profile ? profileToCompany(profile) : {}),
       sector,
@@ -40,6 +40,8 @@ export default function Onboarding() {
       mode: expert ? 'EXPERT' : 'SIMPLE',
       onboarded: true,
     });
+    // Découverte : trois mois d'activité déjà saisis, dans la devise choisie.
+    if (withDemo) loadDemo();
   }
 
   const canNext = step === 0 ? !!sector : step === 1 ? name.trim().length > 0 && !!currency : goals.length > 0;
@@ -170,6 +172,9 @@ export default function Onboarding() {
             <>
               <h1 className="font-display text-[28px] font-bold text-ink">{t('Que voulez-vous faire ?')}</h1>
               <p className="mt-1 text-body text-muted">{t('Choisissez tout ce qui vous parle. L’écran s’adapte.')}</p>
+              <p className="mt-3 text-caption text-muted">
+                {t('Comptable ou curieux ? « Voir avec des données d’exemple » remplit l’espace avec trois mois d’activité complète, dans la devise choisie.')}
+              </p>
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {GOALS.map((g) => {
                   const on = goals.includes(g.id);
@@ -205,10 +210,15 @@ export default function Onboarding() {
                 <IconChevronRight className="h-4 w-4" />
               </button>
             ) : (
-              <button type="button" onClick={finish} disabled={!canNext} className="btn-primary">
-                {t('C’est parti')}
-                <IconChevronRight className="h-4 w-4" />
-              </button>
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                <button type="button" onClick={() => finish(true)} disabled={!canNext} className="btn-ghost">
+                  {t('Voir avec des données d’exemple')}
+                </button>
+                <button type="button" onClick={() => finish(false)} disabled={!canNext} className="btn-primary">
+                  {t('C’est parti')}
+                  <IconChevronRight className="h-4 w-4" />
+                </button>
+              </div>
             )}
           </div>
         </div>
