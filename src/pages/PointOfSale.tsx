@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from '../lib/store';
 import { formatMoney, toMinor } from '../lib/money';
 import type { PaymentMethod, SaleLine } from '../lib/types';
 import { Badge, Empty, Field, Money, PageHeader } from '../components/UI';
 import { IconBox, IconCart, IconCheck, IconDoc, IconSearch, IconX } from '../components/Icons';
+import { scanFeedback, useBarcodeScanner } from '../lib/scanner';
 import { t } from '../lib/i18n';
 import ProjectSelect from '../components/ProjectSelect';
 
@@ -15,6 +16,24 @@ const METHODS: { value: PaymentMethod; label: string }[] = [
   { value: 'CREDIT', label: 'Crédit (à terme)' },
 ];
 
+interface HeldTicket {
+  id: string;
+  at: string;
+  lines: SaleLine[];
+  customerId: string;
+  note: string;
+}
+
+const HELD_KEY = 'finia.pos.held';
+
+function loadHeld(): HeldTicket[] {
+  try {
+    return JSON.parse(localStorage.getItem(HELD_KEY) ?? '[]') as HeldTicket[];
+  } catch {
+    return [];
+  }
+}
+
 export default function PointOfSale() {
   const { db, recordSale } = useStore();
   const [query, setQuery] = useState('');
@@ -25,6 +44,10 @@ export default function PointOfSale() {
   const [method, setMethod] = useState<PaymentMethod>('CASH');
   const [paidRaw, setPaidRaw] = useState('');
   const [flash, setFlash] = useState('');
+  const [scanNote, setScanNote] = useState<{ ok: boolean; text: string } | null>(null);
+  const [held, setHeld] = useState<HeldTicket[]>(() => loadHeld());
+  const [customerPanel, setCustomerPanel] = useState(false);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const currency = db.company.currency;
   const discount = toMinor(discountRaw || 0, currency);
@@ -76,6 +99,54 @@ export default function PointOfSale() {
     });
   }
 
+  /** Un code scanné ou tapé puis Entrée : correspondance exacte sur le code-barres ou la référence. */
+  function scan(code: string) {
+    const clean = code.trim().toLowerCase();
+    const product = db.products.find((p) => !p.archived && (p.barcode.toLowerCase() === clean || p.sku.toLowerCase() === clean));
+    if (!product) {
+      scanFeedback(false);
+      setScanNote({ ok: false, text: t('Code « {code} » inconnu : ajoutez ce code-barres à la fiche du produit.', { code }) });
+      return;
+    }
+    if (product.stock <= 0) {
+      scanFeedback(false);
+      setScanNote({ ok: false, text: t('{name} est en rupture.', { name: product.name }) });
+      return;
+    }
+    addToCart(product.id);
+    scanFeedback(true);
+    setScanNote({ ok: true, text: t('{name} ajouté', { name: product.name }) });
+    setQuery('');
+  }
+  useBarcodeScanner(scan);
+  useEffect(() => {
+    if (!scanNote) return;
+    const id = setTimeout(() => setScanNote(null), 2500);
+    return () => clearTimeout(id);
+  }, [scanNote]);
+
+  /** Mettre le panier de côté (client qui va chercher son argent) et servir le suivant. */
+  function hold() {
+    if (!cart.length) return;
+    const ticket: HeldTicket = { id: Date.now().toString(36), at: new Date().toISOString(), lines: cart, customerId, note: '' };
+    const next = [ticket, ...held].slice(0, 20);
+    setHeld(next);
+    localStorage.setItem(HELD_KEY, JSON.stringify(next));
+    reset();
+    setFlash(t('Ticket mis en attente. Reprenez-le quand le client revient.'));
+    setTimeout(() => setFlash(''), 4000);
+  }
+
+  function resume(id: string) {
+    const ticket = held.find((h) => h.id === id);
+    if (!ticket) return;
+    const next = held.filter((h) => h.id !== id);
+    setHeld(next);
+    localStorage.setItem(HELD_KEY, JSON.stringify(next));
+    setCart(ticket.lines);
+    setCustomerId(ticket.customerId);
+  }
+
   function setQty(productId: string, qty: number) {
     setCart((prev) =>
       qty <= 0
@@ -116,7 +187,17 @@ export default function PointOfSale() {
 
   return (
     <>
-      <PageHeader title={t('Point de vente')} subtitle={t('Encaissement rapide, écritures générées automatiquement')} />
+      <PageHeader
+        title={t('Point de vente')}
+        subtitle={t('Scannez ou cherchez, validez : la vente, le stock et les écritures sont enregistrés d’un coup')}
+        actions={
+          held.length > 0 ? (
+            <span className="rounded-pill border border-brass/50 bg-[#FBF1DF] px-3 py-1.5 text-caption font-semibold text-[#8C6A3D]">
+              {t('{n} ticket(s) en attente', { n: held.length })}
+            </span>
+          ) : undefined
+        }
+      />
 
       {flash && (
         <div className="mb-4 flex items-center gap-2 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm font-medium text-brand-800 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-200">
@@ -127,16 +208,43 @@ export default function PointOfSale() {
 
       <div className="grid gap-4 lg:grid-cols-[1fr_380px]">
         <div className="card">
-          <div className="relative mb-4">
+          <form
+            className="relative mb-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (query.trim()) scan(query);
+            }}
+          >
             <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-400" />
             <input
+              ref={searchRef}
+              id="pos-search"
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={t('Rechercher un produit, une référence ou un code-barres…')}
+              placeholder={t('Scannez un code-barres, ou tapez un nom, une référence…')}
               className="field pl-11"
+              autoComplete="off"
             />
-          </div>
+          </form>
+          <p className="mb-4 text-[11px] text-muted">
+            {scanNote ? (
+              <span className={scanNote.ok ? 'font-semibold text-[#1F6F65]' : 'font-semibold text-[#A63030]'}>{scanNote.text}</span>
+            ) : (
+              t('Un lecteur de codes-barres USB ou Bluetooth fonctionne sans réglage : scannez, l’article s’ajoute au panier.')
+            )}
+          </p>
+
+          {held.length > 0 && (
+            <div className="mb-4 flex flex-wrap items-center gap-2 rounded-input bg-[#FBF1DF] px-3 py-2 text-caption">
+              <span className="font-semibold text-[#8C6A3D]">{t('En attente :')}</span>
+              {held.map((h) => (
+                <button key={h.id} type="button" onClick={() => resume(h.id)} className="rounded-pill border border-brass/50 bg-white px-2.5 py-1 font-medium hover:border-teal">
+                  {new Date(h.at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })} · {h.lines.reduce((n, l) => n + l.qty, 0)} {t('art.')} · {formatMoney(h.lines.reduce((n, l) => n + l.unitPrice * l.qty, 0), currency)}
+                </button>
+              ))}
+            </div>
+          )}
 
           {results.length ? (
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -148,7 +256,7 @@ export default function PointOfSale() {
                   className="group rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-400 hover:shadow-md disabled:opacity-40 dark:border-white/10"
                 >
                   <div className="mb-2 flex items-start justify-between gap-2">
-                    <span className="line-clamp-2 text-sm font-semibold">{p.name}</span>
+                    <span className="line-clamp-3 text-sm font-semibold leading-snug">{p.name}</span>
                     {p.stock <= 0 ? (
                       <Badge tone="danger">{t('Rupture')}</Badge>
                     ) : p.stock <= p.reorderPoint ? (
@@ -225,16 +333,28 @@ export default function PointOfSale() {
           )}
 
           <div className="space-y-3 border-t border-slate-100 pt-4 dark:border-white/10">
-            <Field label={t('Client')}>
-              <select value={customerId} onChange={(e) => setCustomerId(e.target.value)} className="field">
-                <option value="">{t('Client passager')}</option>
-                {db.customers.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </Field>
+            {customerPanel || customerId || isCredit ? (
+              <Field label={t('Client')} hint={t('Nécessaire seulement pour une vente à crédit ou un suivi par client.')}>
+                <select value={customerId} onChange={(e) => setCustomerId(e.target.value)} className="field">
+                  <option value="">{t('Client passager (comptoir)')}</option>
+                  {db.customers.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            ) : (
+              <div className="flex items-center justify-between rounded-input bg-base px-3 py-2 text-caption">
+                <span>
+                  <span className="font-semibold text-ink">{t('Client passager')}</span>
+                  <span className="text-muted"> — {t('aucune fiche à créer')}</span>
+                </span>
+                <button type="button" onClick={() => setCustomerPanel(true)} className="font-semibold text-teal">
+                  {t('Identifier')}
+                </button>
+              </div>
+            )}
 
             <ProjectSelect value={projectId} onChange={setProjectId} />
 
@@ -304,12 +424,15 @@ export default function PointOfSale() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <button onClick={() => submit(true)} disabled={!cart.length} className="btn-ghost">
+          <div className="grid grid-cols-3 gap-2">
+            <button onClick={() => submit(true)} disabled={!cart.length} className="btn-ghost px-2">
               <IconDoc className="h-4 w-4" />
               {t('Devis')}
             </button>
-            <button onClick={() => submit(false)} disabled={!cart.length} className="btn-primary">
+            <button onClick={hold} disabled={!cart.length} className="btn-ghost px-2" title={t('Mettre ce panier de côté et servir le client suivant')}>
+              {t('Attente')}
+            </button>
+            <button onClick={() => submit(false)} disabled={!cart.length} className="btn-primary px-2">
               <IconCheck className="h-4 w-4" />
               {t('Valider')}
             </button>

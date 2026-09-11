@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useStore } from '../lib/store';
 import { accountCode } from '../lib/chart';
 import { toMinor } from '../lib/money';
@@ -39,7 +40,15 @@ export default function CashRegister() {
 
   return (
     <>
-      <PageHeader title={t('Caisse')} subtitle={t('Ouverture, contrôle et clôture de la session de caisse')} />
+      <PageHeader
+        title={t('Caisse')}
+        subtitle={t('Ouverture, contrôle et clôture de la session de caisse')}
+        actions={
+          <Link to="/ventes" className="btn-ghost">
+            {t('Retrouver un ticket')}
+          </Link>
+        }
+      />
 
       {error && (
         <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300">

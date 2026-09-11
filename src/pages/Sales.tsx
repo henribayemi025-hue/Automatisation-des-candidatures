@@ -20,18 +20,25 @@ export default function Sales() {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [detail, setDetail] = useState<Sale | null>(null);
+  const [q, setQ] = useState('');
 
-  const sales = useMemo(
-    () =>
-      db.sales.filter((s) => {
-        if (s.status === 'QUOTE') return false;
-        if (status && s.status !== status) return false;
-        if (from && s.date < from) return false;
-        if (to && s.date > to) return false;
-        return true;
-      }),
-    [db.sales, status, from, to],
-  );
+  const sales = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    const digits = needle.replace(/[^\d]/g, '');
+    return db.sales.filter((s) => {
+      if (s.status === 'QUOTE') return false;
+      if (status && s.status !== status) return false;
+      if (from && s.date < from) return false;
+      if (to && s.date > to) return false;
+      if (!needle) return true;
+      // Un ticket se retrouve par son numéro, le client, le caissier, un article, ou un montant exact.
+      if (s.number.toLowerCase().includes(needle)) return true;
+      if (s.customerName.toLowerCase().includes(needle) || s.cashier.toLowerCase().includes(needle)) return true;
+      if (s.lines.some((l) => l.name.toLowerCase().includes(needle))) return true;
+      if (digits && (String(s.total).includes(digits) || String(s.paid).includes(digits))) return true;
+      return false;
+    });
+  }, [db.sales, status, from, to, q]);
 
   const revenue = sales.reduce((s, x) => s + saleRevenue(x), 0);
   const collected = sales.reduce((s, x) => s + x.paid, 0);
@@ -47,6 +54,13 @@ export default function Sales() {
       </div>
 
       <div className="card mt-6 mb-4 flex flex-wrap items-end gap-3">
+        <input
+          id="sales-search"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder={t('Numéro, client, article, montant…')}
+          className="field min-w-[220px] flex-1"
+        />
         <select value={status} onChange={(e) => setStatus(e.target.value)} className="field w-auto">
           <option value="">{t('Tous les statuts')}</option>
           <option value="CONFIRMED">{t('Confirmées')}</option>
