@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { accountCode } from './chart';
 import type { AccountKey } from './chart';
 import { applyEvent, emptyDB, normalizeDB, saleTotals } from './reducer';
+import { buildDemoEvents } from './demo';
 import type {
   Company,
   Customer,
@@ -120,6 +121,8 @@ export interface StoreActions {
   reverseEntry: (entryId: string) => void;
   openSession: (opening: Minor) => void;
   closeSession: (counted: Minor) => void;
+  /** Charge un jeu d'essai complet (trois mois d'activité) et renvoie le nombre d'événements. */
+  loadDemo: () => number;
   resetAll: () => void;
 }
 
@@ -381,6 +384,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         const session = dbRef.current.sessions.find((s) => !s.closedAt);
         if (!session) throw new Error('Aucune session ouverte');
         dispatch('session.close', { sessionId: session.id, counted, entryId: newId() });
+      },
+
+      loadDemo() {
+        const events = buildDemoEvents(dbRef.current, actor.current, newId().slice(0, 8), today());
+        let next = dbRef.current;
+        const kept: WorkspaceEvent[] = [];
+        for (const ev of events) {
+          try {
+            next = applyEvent(next, ev);
+            kept.push(ev);
+          } catch {
+            // Un événement refusé par les règles n'interrompt pas le chargement.
+          }
+        }
+        commit(next);
+        kept.forEach((ev) => listeners.current.forEach((l) => l(ev)));
+        return kept.length;
       },
 
       resetAll() {

@@ -18,10 +18,12 @@ const CHARTS: { value: Company['chart']; label: string; hint: string }[] = [
 ];
 
 export default function Settings() {
-  const { db, setCompany, resetAll } = useStore();
+  const { db, setCompany, resetAll, loadDemo } = useStore();
   const { workspace, user } = useCollab();
   const [confirmReset, setConfirmReset] = useState(false);
   const [applied, setApplied] = useState('');
+  const [confirmDemo, setConfirmDemo] = useState(false);
+  const [demoDone, setDemoDone] = useState('');
   const c = db.company;
   const canEdit = !workspace || workspace.role === 'owner' || workspace.role === 'manager';
 
@@ -193,6 +195,40 @@ export default function Settings() {
           <Link to="/equipe" className="btn-ghost">
             {t('Gérer l’équipe')}
           </Link>
+        </div>
+
+        <div className="card lg:col-span-2">
+          <h2 className="text-section">{t('Jeu d’essai pour votre comptable')}</h2>
+          <p className="mt-1 text-caption text-muted">
+            {t('Remplit cet espace avec trois mois d’activité complète : achats, ventes au comptant et à crédit, devis, dépenses, caisse, inventaire, écritures et une extourne. De quoi examiner chaque écran sans rien saisir.')}
+          </p>
+          <p className="mt-2 text-caption text-muted">
+            {t('Les montants sont dans votre devise et votre référentiel. Ce sont des données d’exemple : « Réinitialiser toutes les données » les efface.')}
+          </p>
+          {confirmDemo ? (
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                className="btn-brass"
+                onClick={() => {
+                  const n = loadDemo();
+                  setConfirmDemo(false);
+                  setDemoDone(t('{n} opérations d’exemple ajoutées. Ouvrez l’accueil, les rapports ou le journal.', { n }));
+                }}
+              >
+                {t('Oui, ajouter les données d’exemple')}
+              </button>
+              <button type="button" className="btn-ghost" onClick={() => setConfirmDemo(false)}>
+                {t('Annuler')}
+              </button>
+              {hasContent(db) && <span className="text-caption text-[#A63030]">{t('Cet espace contient déjà des données : l’exemple s’ajoute par-dessus.')}</span>}
+            </div>
+          ) : (
+            <button type="button" disabled={!canEdit} onClick={() => setConfirmDemo(true)} className="btn-brass mt-4">
+              {t('Charger trois mois d’activité d’exemple')}
+            </button>
+          )}
+          {demoDone && <p className="mt-3 text-caption text-[#1F6F65]">{demoDone}</p>}
         </div>
 
         {(!workspace || workspace.role === 'owner') && (

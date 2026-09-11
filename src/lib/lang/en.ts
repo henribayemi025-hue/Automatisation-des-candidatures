@@ -975,4 +975,14 @@ export const EN: Record<string, string> = {
   'Votre session s’est terminée sur cet appareil. Reconnectez-vous : votre travail est en sécurité dans votre compte.':
     'Your session ended on this device. Sign in again: your work is safe in your account.',
   'Dernier compte utilisé ici : {email}': 'Last account used here: {email}',
+
+  'Jeu d’essai pour votre comptable': 'Test data for your accountant',
+  'Remplit cet espace avec trois mois d’activité complète : achats, ventes au comptant et à crédit, devis, dépenses, caisse, inventaire, écritures et une extourne. De quoi examiner chaque écran sans rien saisir.':
+    'Fills this workspace with three months of complete activity: purchases, cash and credit sales, quotes, expenses, till, inventory, entries and one reversal. Enough to review every screen without typing anything.',
+  'Les montants sont dans votre devise et votre référentiel. Ce sont des données d’exemple : « Réinitialiser toutes les données » les efface.':
+    'Amounts use your currency and your chart of accounts. This is sample data: “Reset all data” removes it.',
+  'Charger trois mois d’activité d’exemple': 'Load three months of sample activity',
+  'Oui, ajouter les données d’exemple': 'Yes, add the sample data',
+  'Cet espace contient déjà des données : l’exemple s’ajoute par-dessus.': 'This workspace already has data: the sample is added on top.',
+  '{n} opérations d’exemple ajoutées. Ouvrez l’accueil, les rapports ou le journal.': '{n} sample operations added. Open the home page, the reports or the journal.',
 };
