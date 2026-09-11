@@ -55,6 +55,12 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 - [ ] « Attente » met un panier de côté ; reprise en un clic.
 - [ ] Ventes : recherche par numéro, client, article ou montant ;
       Caisse : « Retrouver un ticket ».
+- [ ] Panier vide : la carte explique qu'on scanne ou qu'on clique un article,
+      et que la quantité s'ajuste avec − et + ; bouton « Tout vider ».
+- [ ] Prix affichés taxe comprise (réglages → « Mes prix affichés incluent déjà
+      la taxe ») : le client paie l'étiquette, la ligne « dont TVA » montre la
+      part de taxe, et le chiffre d'affaires est hors taxe.
+- [ ] Ouvrir deux fois le même lien de démonstration ne double plus les articles.
 
 ## 4. Rattrapage (pour qui ne saisit pas tous les jours)
 
@@ -76,6 +82,17 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 - [ ] Garage : « Pièces et interventions », conseil sur le devis.
 - [ ] Boutique, pharmacie, salon, électronique : mêmes écrans, mots du métier.
 - [ ] Les postes de dépense du métier apparaissent en tête des listes.
+
+## 4 ter. Fiches clients et fournisseurs
+
+- [ ] « Modifier » rouvre la fiche (nom, téléphone, e-mail, adresse).
+- [ ] « Supprimer » une fiche jamais utilisée : effacée définitivement.
+- [ ] « Supprimer » une fiche qui a des ventes, des achats ou une dette :
+      la fenêtre dit combien d'opérations, propose « Archiver », et prévient
+      s'il reste un solde en cours.
+- [ ] Une fiche archivée disparaît des listes, de la caisse, des achats et de
+      la recherche ; les factures déjà émises gardent le nom.
+- [ ] « Voir les archivés » → « Réactiver » la remet dans la liste.
 
 ## 5. Projets (suivi à part : ouverture, chantier, événement, matériel)
 

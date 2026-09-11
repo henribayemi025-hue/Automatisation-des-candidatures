@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useStore } from '../lib/store';
+import { hasContent, useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
 import { COUNTRIES, countryProfile, profileToCompany } from '../lib/countries';
 import { currencyLabel } from '../lib/money';
@@ -38,7 +38,7 @@ export function slug(name: string): string {
  * de trois mois d'activité. Aucun compte, aucune installation.
  */
 export default function Demo() {
-  const { setCompany, loadDemo } = useStore();
+  const { db, setCompany, loadDemo } = useStore();
   const { continueAsGuest } = useCollab();
   const { country: fromUrl } = useParams();
   const [country, setCountry] = useState('');
@@ -49,6 +49,12 @@ export default function Demo() {
     const profile = countryProfile(name);
     if (!profile || busy) return;
     setBusy(true);
+    // Revenir sur le lien de démonstration ne doit pas empiler un second jeu
+    // de données : on rouvre simplement l'espace déjà rempli.
+    if (localStorage.getItem(DEMO_KEY) === '1' && hasContent(db)) {
+      window.location.hash = '#/';
+      return;
+    }
     continueAsGuest();
     setCompany({
       ...profileToCompany(profile),

@@ -171,9 +171,28 @@ export default function Settings() {
               <span className="text-body">{t('Appliquer la taxe sur les ventes et achats')} ({c.taxLabel || 'TVA'})</span>
             </label>
             {c.vatEnabled && (
+              <>
+              <label className="flex items-start gap-3 rounded-input border border-hairline p-3.5">
+                <input
+                  type="checkbox"
+                  checked={c.pricesIncludeTax !== false}
+                  disabled={!canEdit}
+                  onChange={(e) => setCompany({ pricesIncludeTax: e.target.checked })}
+                  className="mt-0.5 h-4 w-4 accent-[#C25E38]"
+                  id="set-prices-ttc"
+                />
+                <span>
+                  <span className="block text-body">{t('Mes prix affichés incluent déjà la taxe')}</span>
+                  <span className="block text-caption text-muted">
+                    {t('Coché : l’étiquette est ce que le client paie, la taxe est extraite du montant (cas d’une boutique). Décoché : la taxe s’ajoute au prix sur la facture.')}
+                  </span>
+                </span>
+              </label>
+
               <Field label={t('Nom de la taxe')}>
                 <input id="set-taxlabel" value={c.taxLabel} disabled={!canEdit} onChange={(e) => setCompany({ taxLabel: e.target.value })} placeholder="TVA, VAT, GST…" className="field" />
               </Field>
+              </>
             )}
             {c.vatEnabled && (
               <Field label={t('Taux de la taxe (%)')}>

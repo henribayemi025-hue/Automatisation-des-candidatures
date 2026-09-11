@@ -31,6 +31,7 @@ export const DEFAULT_COMPANY: Company = {
   chart: 'SYSCOHADA',
   vatEnabled: false,
   vatRateBp: 0,
+  pricesIncludeTax: true,
   taxLabel: 'TVA',
   fiscalYearStart: '01-01',
   mode: 'SIMPLE',
@@ -116,6 +117,22 @@ function audit(db: DB, ev: WorkspaceEvent, entity: string, entityId: string, act
   ].slice(0, 3000);
 }
 
+/**
+ * Ce qu'une fiche client ou fournisseur laisse derrière elle. Tant que ce
+ * n'est pas vide, on archive : effacer viderait le nom d'une facture déjà
+ * émise et ferait mentir l'historique.
+ */
+export function partyUsage(db: DB, partyId: string) {
+  const sales = db.sales.filter((s) => s.customerId === partyId).length;
+  const purchases = db.purchases.filter((x) => x.supplierId === partyId).length;
+  const debts = db.debts.filter((d) => d.partyId === partyId);
+  const open = debts.reduce(
+    (sum, d) => sum + Math.max(0, d.amount - d.payments.reduce((s2, x) => s2 + x.amount, 0)),
+    0,
+  );
+  return { sales, purchases, debts: debts.length, open, total: sales + purchases + debts.length };
+}
+
 /** Deux appareils hors ligne peuvent produire le même numéro : on suffixe le second. */
 function uniqueNumber(existing: string[], wanted: string): string {
   let n = wanted;
@@ -125,10 +142,18 @@ function uniqueNumber(existing: string[], wanted: string): string {
   return n;
 }
 
+/**
+ * Totaux d'une vente. Si les prix incluent la taxe (étiquette = ce que le
+ * client paie), la taxe est extraite du montant ; sinon elle s'ajoute.
+ * `net` est toujours le chiffre d'affaires hors taxe, `total` ce qui est encaissé.
+ */
 export function saleTotals(company: Company, lines: Sale['lines'], discount: Minor) {
   const gross = lines.reduce((s, l) => s + l.unitPrice * l.qty, 0);
-  const net = Math.max(0, gross - discount);
-  const vat = company.vatEnabled ? Math.round((net * company.vatRateBp) / 10000) : 0;
+  const afterDiscount = Math.max(0, gross - discount);
+  const rate = company.vatEnabled ? company.vatRateBp : 0;
+  const included = company.pricesIncludeTax !== false;
+  const vat = rate === 0 ? 0 : included ? afterDiscount - Math.round((afterDiscount * 10000) / (10000 + rate)) : Math.round((afterDiscount * rate) / 10000);
+  const net = included ? afterDiscount - vat : afterDiscount;
   const cost = lines.reduce((s, l) => s + l.unitCost * l.qty, 0);
   return { gross, net, vat, total: net + vat, cost };
 }
@@ -303,6 +328,52 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       break;
     }
 
+    case 'customer.archive': {
+      const c = db.customers.find((x) => x.id === p.customerId);
+      if (c) {
+        c.archived = p.archived !== false;
+        audit(db, ev, 'customer', c.id, c.archived ? 'ARCHIVE' : 'RESTORE', `Client ${c.archived ? 'archivé' : 'réactivé'} : ${c.name}`);
+      }
+      break;
+    }
+
+    case 'customer.remove': {
+      const c = db.customers.find((x) => x.id === p.customerId);
+      if (!c) break;
+      // Effacer n'est possible que si la fiche n'a servi à rien : sinon une vente
+      // se retrouverait sans client et la piste d'audit serait cassée.
+      if (partyUsage(db, c.id).total > 0) {
+        c.archived = true;
+        audit(db, ev, 'customer', c.id, 'ARCHIVE', `Client archivé (opérations existantes) : ${c.name}`);
+        break;
+      }
+      db.customers = db.customers.filter((x) => x.id !== c.id);
+      audit(db, ev, 'customer', c.id, 'DELETE', `Client supprimé : ${c.name}`);
+      break;
+    }
+
+    case 'supplier.archive': {
+      const f = db.suppliers.find((x) => x.id === p.supplierId);
+      if (f) {
+        f.archived = p.archived !== false;
+        audit(db, ev, 'supplier', f.id, f.archived ? 'ARCHIVE' : 'RESTORE', `Fournisseur ${f.archived ? 'archivé' : 'réactivé'} : ${f.name}`);
+      }
+      break;
+    }
+
+    case 'supplier.remove': {
+      const f = db.suppliers.find((x) => x.id === p.supplierId);
+      if (!f) break;
+      if (partyUsage(db, f.id).total > 0) {
+        f.archived = true;
+        audit(db, ev, 'supplier', f.id, 'ARCHIVE', `Fournisseur archivé (opérations existantes) : ${f.name}`);
+        break;
+      }
+      db.suppliers = db.suppliers.filter((x) => x.id !== f.id);
+      audit(db, ev, 'supplier', f.id, 'DELETE', `Fournisseur supprimé : ${f.name}`);
+      break;
+    }
+
     case 'sale.record': {
       const sale = structuredClone(p.sale as Sale);
       sale.number = uniqueNumber(db.sales.map((s) => s.number), sale.number);
@@ -344,17 +415,24 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       const ids = p.ids as { movements: string[]; entry: string; payment: string; debt: string };
       const date = p.date as string;
 
+      // Le coût saisi peut inclure la taxe ; le stock, lui, se valorise hors taxe,
+      // sinon la marge et le compte de stock ne diraient pas la même chose.
+      const rate = db.company.vatEnabled ? db.company.vatRateBp : 0;
+      const included = db.company.pricesIncludeTax !== false;
+      const netOf = (amount: Minor) => (rate === 0 || !included ? amount : Math.round((amount * 10000) / (10000 + rate)));
+
       purchase.lines.forEach((line, i) => {
         const product = db.products.find((x) => x.id === line.productId);
         if (!product) return;
+        const unitNet = netOf(line.unitCost);
         const before = product.stock;
         const beforeValue = Math.max(0, before) * product.cost;
         product.stock = before + line.qty;
         // Prix moyen pondéré : le coût unitaire suit les réceptions successives.
         product.cost =
           product.stock > 0
-            ? Math.round((beforeValue + line.qty * line.unitCost) / product.stock)
-            : line.unitCost;
+            ? Math.round((beforeValue + line.qty * unitNet) / product.stock)
+            : unitNet;
         db.movements.unshift({
           id: ids.movements[i] ?? `${purchase.id}-m${i}`,
           date,
@@ -369,8 +447,10 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
         });
       });
 
-      const vat = db.company.vatEnabled ? Math.round((purchase.total * db.company.vatRateBp) / 10000) : 0;
-      const ttc = purchase.total + vat;
+      // Même règle pour le total : la taxe est extraite ou ajoutée.
+      const goods = purchase.lines.reduce((sum, l) => sum + netOf(l.unitCost) * l.qty, 0);
+      const vat = rate === 0 ? 0 : included ? purchase.total - goods : Math.round((purchase.total * rate) / 10000);
+      const ttc = goods + vat;
 
       post(db, ev, {
         id: ids.entry,
@@ -381,7 +461,7 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
         sourceType: 'purchase',
         sourceId: purchase.id,
         lines: [
-          { account: accountCode(chart, 'INVENTORY'), label: 'Entrée en stock', debit: purchase.total, credit: 0 },
+          { account: accountCode(chart, 'INVENTORY'), label: 'Entrée en stock', debit: goods, credit: 0 },
           { account: accountCode(chart, 'VAT_DEDUCTIBLE'), label: 'TVA déductible', debit: vat, credit: 0 },
           { account: accountCode(chart, 'SUPPLIERS'), label: purchase.supplierName, debit: 0, credit: ttc },
         ],

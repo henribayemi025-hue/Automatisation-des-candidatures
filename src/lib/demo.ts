@@ -53,14 +53,14 @@ function stamp(date: string, hour: number, minute = 0): string {
 }
 
 const PRODUCTS: { name: string; sku: string; barcode: string; category: string; price: number; cost: number; stock: number; reorder: number; unit: string }[] = [
-  { name: 'Sac de riz 25 kg', sku: 'RIZ25', barcode: '6111245670013', category: 'Épicerie', price: 18000, cost: 14500, stock: 40, reorder: 10, unit: 'sac' },
-  { name: 'Huile végétale 5 L', sku: 'HUI5', barcode: '6111245670020', category: 'Épicerie', price: 6500, cost: 5000, stock: 60, reorder: 15, unit: 'bidon' },
-  { name: 'Savon de ménage (carton)', sku: 'SAV12', barcode: '6111245670037', category: 'Entretien', price: 4800, cost: 3600, stock: 50, reorder: 12, unit: 'carton' },
-  { name: 'Sucre 1 kg', sku: 'SUC1', barcode: '6111245670044', category: 'Épicerie', price: 900, cost: 650, stock: 200, reorder: 40, unit: 'paquet' },
-  { name: 'Lait en poudre 400 g', sku: 'LAI400', barcode: '6111245670051', category: 'Épicerie', price: 2500, cost: 1900, stock: 80, reorder: 20, unit: 'boîte' },
-  { name: 'Cahier 100 pages (lot de 10)', sku: 'CAH100', barcode: '6111245670068', category: 'Papeterie', price: 3500, cost: 2400, stock: 30, reorder: 10, unit: 'lot' },
-  { name: 'Ampoule LED 9 W', sku: 'LED9', barcode: '6111245670075', category: 'Électricité', price: 1500, cost: 900, stock: 25, reorder: 10, unit: 'pièce' },
-  { name: 'Bidon d’eau 10 L', sku: 'EAU10', barcode: '6111245670082', category: 'Boissons', price: 1200, cost: 800, stock: 18, reorder: 12, unit: 'bidon' },
+  { name: 'Sac de riz 25 kg', sku: 'RIZ25', barcode: '6111245670013', category: 'Épicerie', price: 22500, cost: 14500, stock: 40, reorder: 10, unit: 'sac' },
+  { name: 'Huile végétale 5 L', sku: 'HUI5', barcode: '6111245670020', category: 'Épicerie', price: 8100, cost: 5000, stock: 60, reorder: 15, unit: 'bidon' },
+  { name: 'Savon de ménage (carton)', sku: 'SAV12', barcode: '6111245670037', category: 'Entretien', price: 6000, cost: 3600, stock: 50, reorder: 12, unit: 'carton' },
+  { name: 'Sucre 1 kg', sku: 'SUC1', barcode: '6111245670044', category: 'Épicerie', price: 1100, cost: 650, stock: 200, reorder: 40, unit: 'paquet' },
+  { name: 'Lait en poudre 400 g', sku: 'LAI400', barcode: '6111245670051', category: 'Épicerie', price: 3100, cost: 1900, stock: 80, reorder: 20, unit: 'boîte' },
+  { name: 'Cahier 100 pages (lot de 10)', sku: 'CAH100', barcode: '6111245670068', category: 'Papeterie', price: 4400, cost: 2400, stock: 30, reorder: 10, unit: 'lot' },
+  { name: 'Ampoule LED 9 W', sku: 'LED9', barcode: '6111245670075', category: 'Électricité', price: 1900, cost: 900, stock: 25, reorder: 10, unit: 'pièce' },
+  { name: 'Bidon d’eau 10 L', sku: 'EAU10', barcode: '6111245670082', category: 'Boissons', price: 1500, cost: 800, stock: 18, reorder: 12, unit: 'bidon' },
 ];
 
 const CUSTOMERS = [

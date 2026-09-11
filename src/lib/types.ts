@@ -28,6 +28,12 @@ export interface Company {
   vatEnabled: boolean;
   /** Taux de TVA en points de base (1950 = 19,5 %). */
   vatRateBp: number;
+  /**
+   * Vrai si les prix saisis incluent déjà la taxe — le cas courant d'une
+   * boutique : l'étiquette est ce que le client paie. Faux pour une entreprise
+   * qui facture hors taxe et ajoute la TVA sur la facture.
+   */
+  pricesIncludeTax: boolean;
   /** Nom local de la taxe sur la consommation : TVA, VAT, GST, IVA… */
   taxLabel: string;
   fiscalYearStart: string; // MM-DD
@@ -100,6 +106,8 @@ export interface Customer {
   phone: string;
   email: string;
   address: string;
+  /** Fiche retirée des listes. On archive au lieu d'effacer dès qu'il y a eu une opération. */
+  archived?: boolean;
   createdAt: ISODate;
 }
 
@@ -109,6 +117,7 @@ export interface Supplier {
   phone: string;
   email: string;
   address: string;
+  archived?: boolean;
   createdAt: ISODate;
 }
 

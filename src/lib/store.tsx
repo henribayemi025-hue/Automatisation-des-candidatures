@@ -120,6 +120,10 @@ export interface StoreActions {
   archiveProduct: (productId: string) => void;
   saveCustomer: (customer: Omit<Customer, 'id' | 'createdAt'> & { id?: string }) => Customer;
   saveSupplier: (supplier: Omit<Supplier, 'id' | 'createdAt'> & { id?: string }) => Supplier;
+  removeCustomer: (customerId: string) => void;
+  archiveCustomer: (customerId: string, archived: boolean) => void;
+  removeSupplier: (supplierId: string) => void;
+  archiveSupplier: (supplierId: string, archived: boolean) => void;
   recordSale: (input: SaleInput) => Sale;
   confirmQuote: (saleId: string, method: PaymentMethod, paid: Minor) => void;
   recordPurchase: (input: PurchaseInput) => Purchase;
@@ -243,6 +247,22 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         const supplier: Supplier = { ...input, id: input.id ?? newId(), createdAt: new Date().toISOString() };
         dispatch('supplier.save', { supplier });
         return supplier;
+      },
+
+      removeCustomer(customerId) {
+        dispatch('customer.remove', { customerId });
+      },
+
+      archiveCustomer(customerId, archived) {
+        dispatch('customer.archive', { customerId, archived });
+      },
+
+      removeSupplier(supplierId) {
+        dispatch('supplier.remove', { supplierId });
+      },
+
+      archiveSupplier(supplierId, archived) {
+        dispatch('supplier.archive', { supplierId, archived });
       },
 
       recordSale(input) {

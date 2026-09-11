@@ -286,10 +286,20 @@ export default function PointOfSale() {
             <IconCart className="h-[18px] w-[18px] text-brand-600" />
             {t('Panier')}
             {cart.length > 0 && <Badge tone="success">{cart.length}</Badge>}
+            {cart.length > 0 && (
+              <button type="button" onClick={reset} className="ml-auto text-caption font-semibold text-muted hover:text-[#A63030]">
+                {t('Tout vider')}
+              </button>
+            )}
           </h2>
 
           {cart.length === 0 ? (
-            <p className="py-8 text-center text-sm text-slate-400">{t('Panier vide')}</p>
+            <div className="rounded-input border border-dashed border-hairline px-4 py-6 text-center">
+              <p className="text-caption font-semibold text-ink">{t('Panier vide')}</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-muted">
+                {t('Scannez un code-barres, ou cliquez un article à gauche. Il apparaît ici avec les boutons − et + pour la quantité.')}
+              </p>
+            </div>
           ) : (
             <ul className="space-y-2">
               {cart.map((l) => (
@@ -337,7 +347,7 @@ export default function PointOfSale() {
               <Field label={t('Client')} hint={t('Nécessaire seulement pour une vente à crédit ou un suivi par client.')}>
                 <select value={customerId} onChange={(e) => setCustomerId(e.target.value)} className="field">
                   <option value="">{t('Client passager (comptoir)')}</option>
-                  {db.customers.map((c) => (
+                  {db.customers.filter((c) => !c.archived).map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
                     </option>
@@ -397,7 +407,7 @@ export default function PointOfSale() {
 
           <div className="space-y-1.5 border-t border-slate-100 pt-4 text-sm dark:border-white/10">
             <div className="flex justify-between text-slate-500">
-              <span>{t('Sous-total')}</span>
+              <span>{db.company.pricesIncludeTax !== false ? t('Total des articles') : t('Sous-total')}</span>
               <Money value={totals.gross} />
             </div>
             {discount > 0 && (
@@ -408,7 +418,9 @@ export default function PointOfSale() {
             )}
             {db.company.vatEnabled && (
               <div className="flex justify-between text-slate-500">
-                <span>{db.company.taxLabel || t('TVA')} ({(db.company.vatRateBp / 100).toFixed(2)} %)</span>
+                <span>
+                  {db.company.pricesIncludeTax !== false ? t('dont {tax}', { tax: db.company.taxLabel || t('TVA') }) : db.company.taxLabel || t('TVA')} ({(db.company.vatRateBp / 100).toFixed(2)} %)
+                </span>
                 <Money value={totals.vat} />
               </div>
             )}

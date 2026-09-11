@@ -169,7 +169,7 @@ export default function Purchases() {
               className="field"
             >
               <option value="">{t('— Saisie libre —')}</option>
-              {db.suppliers.map((s) => (
+              {db.suppliers.filter((s) => !s.archived).map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
                 </option>
