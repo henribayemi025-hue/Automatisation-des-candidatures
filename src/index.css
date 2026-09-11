@@ -211,3 +211,9 @@
 .dark .text-\[\#8C6A0B\] { color: rgb(226 184 96); }
 .dark .border-brass\/40,
 .dark .border-brass\/50 { border-color: rgb(120 92 42); }
+
+/* Bande d'indicateurs : une colonne sur téléphone, la grille calculée ensuite. */
+@media (max-width: 639px) {
+  .grid[style*='--strip-cols'],
+  .grid[style*='repeat('] { grid-template-columns: minmax(0, 1fr) !important; }
+}

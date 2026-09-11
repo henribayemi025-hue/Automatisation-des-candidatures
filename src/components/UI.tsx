@@ -64,8 +64,13 @@ export function StatCard({
 }
 
 export function FigureStrip({ items }: { items: { label: string; value: ReactNode; hint?: string; share?: number; tone?: 'positive' | 'negative' | 'neutral' }[] }) {
+  // Autant de colonnes que d'indicateurs : pas de case vide en bout de ligne.
+  const cols = `repeat(${Math.min(items.length, 4)}, minmax(0, 1fr))`;
   return (
-    <div className="grid gap-px overflow-hidden rounded-card border border-hairline bg-hairline sm:grid-cols-2 lg:grid-cols-4">
+    <div
+      className="grid gap-px overflow-hidden rounded-card border border-hairline bg-hairline sm:grid-cols-2"
+      style={{ gridTemplateColumns: `var(--strip-cols, ${cols})` }}
+    >
       {items.map((it) => (
         <div key={it.label} className="min-w-0 bg-surface px-4 py-3">
           <div className="truncate text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">{it.label}</div>
