@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useStore } from '../lib/store';
+import { today, useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
 import { answer, insights } from '../lib/assistant';
 import type { Answer } from '../lib/assistant';
 import { AIError, aiErrorMessage, askAI, buildContext, fileToImage } from '../lib/ai';
-import type { AIMessage, AIProduct } from '../lib/ai';
+import type { AIExpense, AIMessage, AIProduct } from '../lib/ai';
 import { MODULE_HELP } from '../lib/guide';
+import { EXPENSE_KEYS } from '../lib/chart';
+import type { AccountKey } from '../lib/chart';
+import type { PaymentMethod } from '../lib/types';
+import { EXPENSE_LABEL } from '../lib/expenses';
 import { IconAlert, IconCheck, IconChevronRight, IconSend, IconSparkle } from './Icons';
 import { t } from '../lib/i18n';
 
@@ -16,6 +20,7 @@ interface Message {
   text: string;
   facts?: Answer['facts'];
   products?: AIProduct[];
+  expense?: AIExpense | null;
   goto?: string | null;
   imageName?: string;
   local?: boolean;
@@ -34,7 +39,7 @@ const GENERIC = [
  * IA Gemini quand la personne est connectée, moteur local sinon ou en secours.
  */
 export default function AssistantChat({ compact = false }: { compact?: boolean }) {
-  const { db, saveProduct } = useStore();
+  const { db, saveProduct, addExpense } = useStore();
   const { user } = useCollab();
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -74,7 +79,7 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
         const result = await askAI(payload, buildContext(db, pathname));
         setMessages((m) => [
           ...m,
-          { id: ++counter.current, role: 'assistant', text: result.text, products: result.products, goto: result.goto },
+          { id: ++counter.current, role: 'assistant', text: result.text, products: result.products, expense: result.expense, goto: result.goto },
         ]);
         setBusy(false);
         return;
@@ -123,6 +128,23 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
     }
     setMessages((m) => m.map((x) => (x.id === msgId ? { ...x, products: [] } : x)));
     setMessages((m) => [...m, { id: ++counter.current, role: 'assistant', text: t('{n} produit(s) importé(s) dans votre catalogue.', { n: products.length }), local: true }]);
+  }
+
+  /** La dépense lue sur la photo n'est enregistrée qu'après confirmation. */
+  function saveExpense(e: AIExpense, msgId: number) {
+    const key = (EXPENSE_KEYS as string[]).includes(e.category) ? (e.category as AccountKey) : 'MISC_EXPENSE';
+    const methods: PaymentMethod[] = ['CASH', 'MOBILE', 'CARD', 'BANK'];
+    const method = methods.includes(e.method as PaymentMethod) ? (e.method as PaymentMethod) : 'CASH';
+    addExpense({
+      date: /^\d{4}-\d{2}-\d{2}$/.test(e.date) ? e.date : today(),
+      category: t(EXPENSE_LABEL[key]),
+      accountKey: key,
+      description: [e.supplier, e.description].filter(Boolean).join(' — '),
+      amount: Math.round(e.amount * factorOf(db.company.currency)),
+      method,
+    });
+    setMessages((m) => m.map((x) => (x.id === msgId ? { ...x, expense: null } : x)));
+    setMessages((m) => [...m, { id: ++counter.current, role: 'assistant', text: t('Dépense enregistrée. Vous pouvez la retrouver dans « Dépenses ».'), local: true, goto: '/depenses' }]);
   }
 
   return (
@@ -194,6 +216,23 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
                   </ul>
                   <button onClick={() => importProducts(m.products!, m.id)} className="btn-primary mt-2 w-full py-2 text-caption">
                     {t('Ajouter au catalogue')}
+                  </button>
+                </div>
+              )}
+              {m.expense && m.expense.amount > 0 && (
+                <div className="mt-3 rounded-input border border-hairline bg-white p-3">
+                  <div className="text-caption font-semibold text-ink">{t('Dépense lue sur le document')}</div>
+                  <ul className="mt-1 space-y-0.5 text-[12px] text-muted">
+                    <li>{t('Montant')} : <span className="font-semibold text-ink num">{m.expense.amount}</span> {db.company.currency}</li>
+                    {m.expense.date && <li>{t('Date')} : {m.expense.date}</li>}
+                    {m.expense.supplier && <li>{t('Fournisseur')} : {m.expense.supplier}</li>}
+                    {m.expense.description && <li>{m.expense.description}</li>}
+                  </ul>
+                  <button onClick={() => saveExpense(m.expense!, m.id)} className="btn-primary mt-2 w-full py-2 text-caption">
+                    {t('Enregistrer cette dépense')}
+                  </button>
+                  <button onClick={() => navigate('/rattrapage')} className="btn-ghost mt-1.5 w-full py-2 text-caption">
+                    {t('Corriger avant d’enregistrer')}
                   </button>
                 </div>
               )}

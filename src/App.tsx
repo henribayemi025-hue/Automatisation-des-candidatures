@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import Assistant from './pages/Assistant';
 import PointOfSale from './pages/PointOfSale';
 import CashRegister from './pages/CashRegister';
+import CatchUp from './pages/CatchUp';
 import Products from './pages/Products';
 import Purchases from './pages/Purchases';
 import Stock from './pages/Stock';
@@ -105,6 +106,7 @@ export default function App() {
           <Route path="/assistant" element={<Assistant />} />
           <Route path="/pos" element={<PointOfSale />} />
           <Route path="/caisse" element={<CashRegister />} />
+          <Route path="/rattrapage" element={<CatchUp />} />
           <Route path="/produits" element={<Products />} />
           <Route path="/achats" element={<Purchases />} />
           <Route path="/stock" element={<Stock />} />

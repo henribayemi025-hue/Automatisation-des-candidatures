@@ -7,33 +7,8 @@ import type { PaymentMethod } from '../lib/types';
 import { Empty, Field, Modal, Money, PageHeader, StatCard, Table } from '../components/UI';
 import { IconPlus, IconWallet } from '../components/Icons';
 import { t } from '../lib/i18n';
+import { EXPENSE_LABEL as CATEGORY_LABEL } from '../lib/expenses';
 
-const CATEGORY_LABEL: Record<AccountKey, string> = {
-  PURCHASES: 'Achats de marchandises',
-  UTILITIES: 'Eau, électricité, énergie',
-  TRANSPORT: 'Transport et carburant',
-  RENT: 'Loyer',
-  SERVICES: 'Services extérieurs',
-  PAYROLL: 'Salaires et charges',
-  TAXES: 'Impôts et taxes',
-  FINANCIAL: 'Frais bancaires et financiers',
-  MISC_EXPENSE: 'Charges diverses',
-  CAPITAL: '',
-  RESULT: '',
-  EQUIPMENT: '',
-  INVENTORY: '',
-  SUPPLIERS: '',
-  CUSTOMERS: '',
-  VAT_COLLECTED: '',
-  VAT_DEDUCTIBLE: '',
-  BANK: '',
-  CASH: '',
-  MOBILE_MONEY: '',
-  INVENTORY_CHANGE: '',
-  SALES: '',
-  SERVICE_REVENUE: '',
-  MISC_REVENUE: '',
-};
 
 export default function Expenses() {
   const { db, addExpense } = useStore();

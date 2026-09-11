@@ -283,6 +283,19 @@ export const IconHelp = (p: Props) => (
   </Svg>
 );
 
+export const IconTrash = (p: Props) => (
+  <Svg {...p}>
+    <path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13" />
+  </Svg>
+);
+
+export const IconCamera = (p: Props) => (
+  <Svg {...p}>
+    <path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 011 1v9a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z" />
+    <circle cx="12" cy="13" r="3.5" />
+  </Svg>
+);
+
 export const IconGoogle = (p: Props) => (
   <svg viewBox="0 0 24 24" className={p.className ?? 'h-[18px] w-[18px]'} aria-hidden="true">
     <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 01-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-8.9z" />

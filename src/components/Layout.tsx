@@ -31,6 +31,7 @@ import {
   IconUsers,
   IconWallet,
   IconX,
+  IconCamera,
 } from './Icons';
 import { t } from '../lib/i18n';
 
@@ -55,6 +56,7 @@ const NAV: NavGroup[] = [
       { to: '/', label: 'Accueil', icon: <IconHome />, area: 'sell' },
       { to: '/pos', label: 'Vendre', icon: <IconMonitor />, area: 'sell' },
       { to: '/caisse', label: 'Caisse', icon: <IconWallet />, area: 'sell' },
+      { to: '/rattrapage', label: 'Rattrapage', icon: <IconCamera />, area: 'sell' },
     ],
   },
   {

@@ -60,6 +60,8 @@ interface Actor {
 
 interface SaleInput {
   lines: SaleLine[];
+  /** Date de l'opération : permet de rattraper des journées passées. */
+  date?: string;
   discount: Minor;
   method: PaymentMethod;
   customerId: string | null;
@@ -70,6 +72,7 @@ interface SaleInput {
 
 interface PurchaseInput {
   lines: PurchaseLine[];
+  date?: string;
   supplierId: string | null;
   supplierName: string;
   paid: Minor;
@@ -113,7 +116,7 @@ export interface StoreActions {
   recordSale: (input: SaleInput) => Sale;
   confirmQuote: (saleId: string, method: PaymentMethod, paid: Minor) => void;
   recordPurchase: (input: PurchaseInput) => Purchase;
-  receivePurchase: (purchaseId: string) => void;
+  receivePurchase: (purchaseId: string, date?: string) => void;
   addExpense: (input: ExpenseInput) => void;
   adjustStock: (productId: string, qty: number, reason: string) => void;
   payDebt: (debtId: string, amount: Minor, method: PaymentMethod) => void;
@@ -241,7 +244,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             isQuote ? 'DV' : 'FA',
             dbRef.current.sales.filter((s) => (isQuote ? s.status === 'QUOTE' : s.status !== 'QUOTE')).length,
           ),
-          date: today(),
+          date: input.date || today(),
           customerId: input.customerId,
           customerName: input.customerName || 'Client passager',
           lines: input.lines,
@@ -289,7 +292,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         const purchase: Purchase = {
           id: newId(),
           number: nextNumber('BC', dbRef.current.purchases.length),
-          date: today(),
+          date: input.date || today(),
           supplierId: input.supplierId,
           supplierName: input.supplierName || 'Fournisseur',
           lines: input.lines,
@@ -302,13 +305,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         return purchase;
       },
 
-      receivePurchase(purchaseId) {
+      receivePurchase(purchaseId, date) {
         const purchase = dbRef.current.purchases.find((p) => p.id === purchaseId);
         if (!purchase) throw new Error('Achat introuvable');
         if (purchase.status === 'RECEIVED') throw new Error('Achat déjà réceptionné');
         dispatch('purchase.receive', {
           purchaseId,
-          date: today(),
+          date: date || purchase.date || today(),
           ids: { movements: purchase.lines.map(() => newId()), entry: newId(), payment: newId(), debt: newId() },
         });
       },

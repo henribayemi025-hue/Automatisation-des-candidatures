@@ -20,10 +20,21 @@ export interface AIProduct {
   category?: string;
 }
 
+/** Dépense lue sur une facture ou un reçu, à confirmer par la personne. */
+export interface AIExpense {
+  date: string;
+  supplier: string;
+  category: string;
+  description: string;
+  amount: number;
+  method: string;
+}
+
 export interface AIResult {
   text: string;
   goto: string | null;
   products: AIProduct[];
+  expense: AIExpense | null;
 }
 
 /** Résumé compact et exact de l'activité : la seule source de chiffres de l'IA. */
@@ -77,6 +88,7 @@ export function buildContext(db: DB, pathname: string) {
 export function parseAI(text: string): AIResult {
   let goto: string | null = null;
   const products: AIProduct[] = [];
+  let expense: AIExpense | null = null;
   let clean = text;
 
   const action = clean.match(/ACTION:\s*goto:(\S+)/);
@@ -106,7 +118,26 @@ export function parseAI(text: string): AIResult {
     }
     clean = clean.replace(block[0], '').trim();
   }
-  return { text: clean, goto, products };
+  const expenseBlock = clean.match(/```expense\s*([\s\S]*?)```/);
+  if (expenseBlock) {
+    try {
+      const p = JSON.parse(expenseBlock[1]) as Record<string, unknown>;
+      const amount = Number(p.amount) || 0;
+      expense = {
+        date: typeof p.date === 'string' ? p.date : '',
+        supplier: typeof p.supplier === 'string' ? p.supplier : '',
+        category: typeof p.category === 'string' ? p.category : '',
+        description: typeof p.description === 'string' ? p.description : '',
+        amount,
+        method: typeof p.method === 'string' ? p.method : 'CASH',
+      };
+    } catch {
+      // Bloc mal formé : on garde le texte, sans formulaire prérempli.
+    }
+    clean = clean.replace(expenseBlock[0], '').trim();
+  }
+
+  return { text: clean, goto, products, expense };
 }
 
 export class AIError extends Error {

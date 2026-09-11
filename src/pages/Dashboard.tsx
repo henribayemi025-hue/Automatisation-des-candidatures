@@ -9,12 +9,12 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { useDB } from '../lib/store';
+import { today, useDB } from '../lib/store';
 import { dailySeries, productPerformance, snapshot } from '../lib/metrics';
 import { factor, formatMoney, formatNumber } from '../lib/money';
 import { Empty, Money, PageHeader, StatCard } from '../components/UI';
 import StartGuide from '../components/StartGuide';
-import { IconAlert, IconBox, IconCard, IconChart, IconTrend, IconWallet } from '../components/Icons';
+import { IconAlert, IconBox, IconCamera, IconCard, IconChart, IconChevronRight, IconTrend, IconWallet } from '../components/Icons';
 import { t } from '../lib/i18n';
 
 export default function Dashboard() {
@@ -25,12 +25,38 @@ export default function Dashboard() {
   const top = useMemo(() => productPerformance(db).slice(0, 5), [db]);
   const hasData = series.some((p) => p.revenue > 0 || p.expenses > 0);
 
+  // Dernière saisie : au-delà de deux jours, on propose le rattrapage plutôt
+  // que de laisser croire que l'activité s'est arrêtée.
+  const daysSinceEntry = useMemo(() => {
+    const dates = [...db.sales.map((x) => x.date), ...db.expenses.map((x) => x.date), ...db.purchases.map((x) => x.date)];
+    if (dates.length === 0) return 0;
+    const last = dates.reduce((a, b) => (a > b ? a : b));
+    const diff = (Date.parse(`${today()}T00:00:00Z`) - Date.parse(`${last}T00:00:00Z`)) / 86400000;
+    return Math.max(0, Math.round(diff));
+  }, [db.sales, db.expenses, db.purchases]);
+
   return (
     <>
       <PageHeader
         title={t('Bonjour, {name}', { name: db.company.name })}
         subtitle={t('Où en est votre activité aujourd\'hui')}
       />
+
+      {daysSinceEntry >= 3 && (
+        <div className="mb-4 flex flex-wrap items-center gap-3 rounded-card border border-brass/40 bg-[#FBF1DF] px-4 py-3">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-input bg-white text-[#8C6A3D]">
+            <IconCamera className="h-5 w-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="text-body font-semibold text-ink">{t('{n} jours sans rien enregistrer', { n: daysSinceEntry })}</div>
+            <p className="text-caption text-muted">{t('Rattrapez la semaine d’un coup : à la main, depuis votre relevé mobile money, ou en photographiant vos factures.')}</p>
+          </div>
+          <Link to="/rattrapage" className="btn-brass">
+            {t('Rattraper maintenant')}
+            <IconChevronRight className="h-4 w-4" />
+          </Link>
+        </div>
+      )}
 
       <StartGuide />
 

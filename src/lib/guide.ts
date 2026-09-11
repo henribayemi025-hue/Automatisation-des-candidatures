@@ -205,6 +205,13 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
     example: 'Un caissier peut vendre et gérer le stock, mais ne voit ni la comptabilité ni les paramètres.',
     questions: [],
   },
+  '/rattrapage': {
+    title: 'Rattrapage',
+    what: 'Saisir d’un coup plusieurs journées passées : à la main, depuis un relevé mobile money ou bancaire, ou en photographiant une facture.',
+    when: 'Quand vous n’avez pas ouvert l’application depuis quelques jours, ou en fin de semaine.',
+    example: 'Vous collez vos messages Mobile Money de la semaine : chaque ligne devient une recette ou une dépense, à sa date.',
+    questions: ['Comment rattraper une semaine ?', 'Comment lire une facture en photo ?', 'Comment importer mon relevé ?'],
+  },
   '/parametres': {
     title: 'Paramètres',
     what: 'Le nom de l’entreprise, la devise, le mode d’affichage (simple ou expert) et le référentiel comptable.',
