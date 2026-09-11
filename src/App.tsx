@@ -81,7 +81,14 @@ export default function App() {
   if (loading) return <Splash />;
   // Lien de démonstration : un seul clic, sans compte. Une personne déjà
   // connectée garde ses données — elle passe par les paramètres si elle veut l'exemple.
-  if (pathname === '/demo') return user ? <Navigate to="/" replace /> : <Demo />;
+  if (pathname === '/demo' || pathname.startsWith('/demo/')) {
+    return user ? <Navigate to="/" replace /> : (
+      <Routes>
+        <Route path="/demo" element={<Demo />} />
+        <Route path="/demo/:country" element={<Demo />} />
+      </Routes>
+    );
+  }
   // Une session expirée reprend la main sur le mode local : on propose la connexion plutôt que de basculer sans rien dire.
   if (!user && (!guest || sessionExpired)) return <Auth />;
   if (user && !workspace && sync !== 'error') return <Splash />;

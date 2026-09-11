@@ -97,8 +97,9 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
   const unit = factor(company.currency);
   // Les montants sont écrits dans un ordre de grandeur « franc CFA ». Pour une
   // devise à centimes (euro, dollar, dinar…), on les ramène à une échelle
-  // crédible : un sac de riz vaut 18 000 en francs, 18 en euros.
-  const scale = currency(company.currency).decimals === 0 ? 1 : 1 / 1000;
+  // crédible, proche d'une conversion réelle : le sac de riz à 18 000 francs
+  // devient 30 euros, le loyer 125, le salaire 150.
+  const scale = currency(company.currency).decimals === 0 ? 1 : 1 / 600;
   const money = (v: number): Minor => Math.round(v * scale * unit);
   const chart = company.chart;
   const rnd = seeded(20260911);

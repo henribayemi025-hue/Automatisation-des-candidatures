@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
 import { COUNTRIES, countryProfile, profileToCompany } from '../lib/countries';
@@ -22,6 +23,16 @@ const CONTENT = [
   'Dotation aux amortissements, et une écriture fausse puis extournée',
 ];
 
+/** « Côte d’Ivoire » → « cote-d-ivoire » : pour écrire le pays dans le lien. */
+export function slug(name: string): string {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
 /**
  * Page de démonstration : une seule question (le pays), puis l'espace se remplit
  * de trois mois d'activité. Aucun compte, aucune installation.
@@ -29,8 +40,10 @@ const CONTENT = [
 export default function Demo() {
   const { setCompany, loadDemo } = useStore();
   const { continueAsGuest } = useCollab();
+  const { country: fromUrl } = useParams();
   const [country, setCountry] = useState('');
   const [busy, setBusy] = useState(false);
+  const started = useRef(false);
 
   function open(name: string) {
     const profile = countryProfile(name);
@@ -52,6 +65,16 @@ export default function Demo() {
     localStorage.setItem(DEMO_KEY, '1');
     window.location.hash = '#/';
   }
+
+  // Lien direct « #/demo/cameroun » : la démonstration s'ouvre sans aucun clic.
+  useEffect(() => {
+    if (started.current || !fromUrl) return;
+    const match = COUNTRIES.find((c) => slug(c.name) === slug(fromUrl));
+    if (!match) return;
+    started.current = true;
+    open(match.name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromUrl]);
 
   return (
     <div className="min-h-screen bg-base px-4 py-8 sm:px-8">
