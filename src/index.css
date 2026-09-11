@@ -95,3 +95,26 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Texte long qui défile au lieu d'être coupé : au survol sur ordinateur, en continu quand il déborde sur téléphone. */
+.ticker {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: bottom;
+  max-width: 100%;
+}
+.ticker-inner {
+  display: inline-block;
+  will-change: transform;
+}
+@keyframes ticker-scroll {
+  0%, 15% { transform: translateX(0); }
+  85%, 100% { transform: translateX(var(--ticker-shift, 0px)); }
+}
+.ticker[data-overflow='1'] .ticker-inner {
+  animation: ticker-scroll 7s ease-in-out infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker .ticker-inner { animation: none !important; }
+}

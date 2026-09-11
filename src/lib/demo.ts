@@ -365,7 +365,7 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
   });
 
   // ---- Dépenses courantes, chaque mois ----
-  for (const month of [-3, -2, -1]) {
+  for (const month of [-3, -2, -1, 0]) {
     for (const item of MONTHLY_EXPENSES) {
       const d = new Date(base);
       d.setMonth(d.getMonth() + month, item.day);
