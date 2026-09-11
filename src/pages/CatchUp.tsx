@@ -5,6 +5,9 @@ import type { AccountKey } from '../lib/chart';
 import { EXPENSE_LABEL } from '../lib/expenses';
 import { toMinor } from '../lib/money';
 import { guessCategory, parseStatement } from '../lib/statement';
+import { OPENING_FIELDS, balanceToLines, buildOpeningEntry, parseBalanceFile } from '../lib/opening';
+import type { BalanceRow } from '../lib/opening';
+import { formatMoney } from '../lib/money';
 import type { Direction, StatementRow } from '../lib/statement';
 import type { PaymentMethod, SaleLine } from '../lib/types';
 import { Empty, Money, PageHeader, Table } from '../components/UI';
@@ -13,7 +16,7 @@ import ProjectSelect from '../components/ProjectSelect';
 import { IconCamera, IconPlus, IconSparkle, IconTrash } from '../components/Icons';
 import { t } from '../lib/i18n';
 
-type Tab = 'days' | 'statement' | 'photo';
+type Tab = 'days' | 'statement' | 'photo' | 'opening';
 
 const METHODS: { value: PaymentMethod; label: string }[] = [
   { value: 'CASH', label: 'Espèces' },
@@ -57,7 +60,7 @@ function recentDays(count: number): string[] {
  * pour qui n'a pas ouvert l'application depuis une semaine.
  */
 export default function CatchUp() {
-  const { db, recordSale, addExpense } = useStore();
+  const { db, recordSale, addExpense, addManualEntry } = useStore();
   const [tab, setTab] = useState<Tab>('days');
   const products = useMemo(() => db.products.filter((p) => !p.archived), [db.products]);
   const hasProjects = db.projects.some((p) => p.status === 'ACTIVE');
@@ -180,6 +183,45 @@ export default function CatchUp() {
 
   const kept = parsed.filter((r) => r.keep && r.direction !== 'UNKNOWN').length;
 
+  // ---- Onglet « reprise d'un bilan » ----
+  const [openingDate, setOpeningDate] = useState(() => {
+    const [mm, dd] = (db.company.fiscalYearStart || '01-01').split('-');
+    const y = today().slice(0, 4);
+    const candidate = `${y}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
+    return candidate <= today() ? candidate : `${Number(y) - 1}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
+  });
+  const [openingRaw, setOpeningRaw] = useState<Record<string, string>>({});
+  const [capitalRaw, setCapitalRaw] = useState('');
+  const [balanceRows, setBalanceRows] = useState<BalanceRow[]>([]);
+  const [openingDone, setOpeningDone] = useState('');
+  const balanceRef = useRef<HTMLInputElement>(null);
+  const alreadyOpened = db.entries.some((e) => e.ref === 'AN');
+
+  const openingAmounts = Object.fromEntries(OPENING_FIELDS.map((f) => [f.key, toMinor(openingRaw[f.key] || 0, db.company.currency)]));
+  const openingPreview = buildOpeningEntry(db.company, openingAmounts, capitalRaw.trim() ? toMinor(capitalRaw, db.company.currency) : undefined);
+
+  function saveOpening() {
+    if (openingPreview.lines.length === 0) return;
+    addManualEntry({ date: openingDate, journal: 'OD', ref: 'AN', label: t('À-nouveaux — reprise du bilan au {date}', { date: openingDate }), lines: openingPreview.lines });
+    setOpeningRaw({});
+    setCapitalRaw('');
+    setOpeningDone(t('Bilan d’ouverture enregistré au {date}. Le bilan et la balance repartent de ces soldes.', { date: openingDate }));
+  }
+
+  async function onBalanceFile(file: File | undefined) {
+    if (!file) return;
+    setBalanceRows(await parseBalanceFile(file, db.company.currency, db.company.chart));
+    setOpeningDone('');
+  }
+
+  function saveBalance() {
+    const { lines } = balanceToLines(db.company, balanceRows);
+    if (lines.length === 0) return;
+    addManualEntry({ date: openingDate, journal: 'OD', ref: 'AN', label: t('À-nouveaux — balance importée au {date}', { date: openingDate }), lines });
+    setBalanceRows([]);
+    setOpeningDone(t('Balance reprise : {n} compte(s) repris au {date}.', { n: lines.length, date: openingDate }));
+  }
+
   return (
     <>
       <PageHeader
@@ -192,6 +234,7 @@ export default function CatchUp() {
           ['days', 'Jour par jour'],
           ['statement', 'Relevé mobile money ou banque'],
           ['photo', 'Photo d’une facture'],
+          ['opening', 'Reprise d’un bilan existant'],
         ] as [Tab, string][]).map(([value, label]) => (
           <button
             key={value}
@@ -425,6 +468,140 @@ export default function CatchUp() {
               />
             </div>
           )}
+        </div>
+      )}
+
+      {tab === 'opening' && (
+        <div className="space-y-4">
+          <div className="card">
+            <h2 className="text-section">{t('Votre entreprise existait déjà : partez de son dernier bilan')}</h2>
+            <p className="mt-1 text-caption text-muted">
+              {t('Pas besoin de ressaisir les années passées. Indiquez les soldes à la date d’ouverture — ce que vous possédez, ce que vous devez — et l’application écrit l’à-nouveau. Votre comptable peut ensuite tout vérifier dans le journal.')}
+            </p>
+            {alreadyOpened && (
+              <p className="mt-3 rounded-input bg-[#FBF1DF] px-3 py-2 text-caption text-ink">
+                {t('Un à-nouveau existe déjà dans cet espace. En ajouter un second cumule les soldes : extournez d’abord l’ancien dans le journal si c’est une correction.')}
+              </p>
+            )}
+            <div className="mt-4 grid gap-4 sm:grid-cols-[220px_1fr]">
+              <label className="block">
+                <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-muted">{t('Date d’ouverture')}</span>
+                <input type="date" value={openingDate} onChange={(e) => setOpeningDate(e.target.value)} className="field" id="opening-date" />
+                <span className="mt-1 block text-[11px] text-muted">{t('En général le premier jour de l’exercice en cours.')}</span>
+              </label>
+            </div>
+            <div className="mt-4 grid gap-4 lg:grid-cols-2">
+              <div>
+                <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted">{t('Ce que vous possédez (actif)')}</div>
+                <div className="space-y-2">
+                  {OPENING_FIELDS.filter((f) => f.side === 'ASSET').map((f) => (
+                    <label key={f.key} className="flex items-center gap-3">
+                      <span className="min-w-0 flex-1 text-caption">
+                        <span className="block font-medium text-ink">{t(f.label)}</span>
+                        {f.hint && <span className="block text-[11px] text-muted">{t(f.hint)}</span>}
+                      </span>
+                      <input
+                        inputMode="decimal"
+                        value={openingRaw[f.key] ?? ''}
+                        onChange={(e) => setOpeningRaw({ ...openingRaw, [f.key]: e.target.value })}
+                        placeholder="0"
+                        className="field num w-36 py-1.5 text-caption"
+                        id={`opening-${f.key}`}
+                      />
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted">{t('Ce que vous devez (passif)')}</div>
+                <div className="space-y-2">
+                  {OPENING_FIELDS.filter((f) => f.side === 'LIABILITY').map((f) => (
+                    <label key={f.key} className="flex items-center gap-3">
+                      <span className="min-w-0 flex-1 text-caption">
+                        <span className="block font-medium text-ink">{t(f.label)}</span>
+                        {f.hint && <span className="block text-[11px] text-muted">{t(f.hint)}</span>}
+                      </span>
+                      <input
+                        inputMode="decimal"
+                        value={openingRaw[f.key] ?? ''}
+                        onChange={(e) => setOpeningRaw({ ...openingRaw, [f.key]: e.target.value })}
+                        placeholder="0"
+                        className="field num w-36 py-1.5 text-caption"
+                        id={`opening-${f.key}`}
+                      />
+                    </label>
+                  ))}
+                  <label className="flex items-center gap-3 border-t border-hairline pt-2">
+                    <span className="min-w-0 flex-1 text-caption">
+                      <span className="block font-medium text-ink">{t('Capital (facultatif)')}</span>
+                      <span className="block text-[11px] text-muted">{t('Laissez vide : l’écart actif − dettes devient vos capitaux propres.')}</span>
+                    </span>
+                    <input inputMode="decimal" value={capitalRaw} onChange={(e) => setCapitalRaw(e.target.value)} placeholder="auto" className="field num w-36 py-1.5 text-caption" id="opening-capital" />
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-input bg-base px-4 py-3 text-caption">
+              <span>
+                {t('Actif')} <strong className="tabular-nums">{formatMoney(openingPreview.totalAssets, db.company.currency)}</strong> · {t('Dettes')}{' '}
+                <strong className="tabular-nums">{formatMoney(openingPreview.totalLiabilities, db.company.currency)}</strong> · {t('Capitaux propres')}{' '}
+                <strong className={`tabular-nums ${openingPreview.equity < 0 ? 'text-[#A63030]' : ''}`}>{formatMoney(openingPreview.equity, db.company.currency)}</strong>
+              </span>
+              <button type="button" onClick={saveOpening} disabled={openingPreview.lines.length === 0} className="btn-primary">
+                {t('Enregistrer le bilan d’ouverture')}
+              </button>
+            </div>
+            {openingDone && <p className="mt-3 text-caption text-[#1F6F65]">{openingDone}</p>}
+          </div>
+
+          <div className="card">
+            <h2 className="text-section">{t('Ou importez la balance de votre ancien logiciel')}</h2>
+            <p className="mt-1 text-caption text-muted">
+              {t('Un fichier Excel ou CSV avec le numéro de compte, le libellé et les colonnes débit / crédit (ou un solde signé). Les comptes sont rattachés automatiquement au plan ; vous corrigez avant d’enregistrer.')}
+            </p>
+            <input ref={balanceRef} type="file" accept=".xlsx,.xls,.csv,.txt" className="hidden" onChange={(e) => void onBalanceFile(e.target.files?.[0])} />
+            <button type="button" onClick={() => balanceRef.current?.click()} className="btn-ghost mt-3">
+              {t('Choisir le fichier de balance')}
+            </button>
+            {balanceRows.length > 0 && (
+              <div className="mt-4">
+                <div className="overflow-x-auto">
+                  <Table head={['Compte', 'Libellé', 'Débit', 'Crédit', 'Rattaché à']}>
+                    {balanceRows.map((r, i) => (
+                      <tr key={i} className={`row ${r.key ? '' : 'opacity-60'}`}>
+                        <td className="td font-mono text-caption">{r.code}</td>
+                        <td className="td text-caption">{r.label}</td>
+                        <td className="td num text-caption">{r.debit ? formatMoney(r.debit, db.company.currency) : ''}</td>
+                        <td className="td num text-caption">{r.credit ? formatMoney(r.credit, db.company.currency) : ''}</td>
+                        <td className="td">
+                          <select
+                            value={r.key}
+                            onChange={(e) => setBalanceRows(balanceRows.map((x, j) => (j === i ? { ...x, key: e.target.value as BalanceRow['key'] } : x)))}
+                            className="field py-1 text-caption"
+                          >
+                            <option value="">{t('— Ignorer —')}</option>
+                            {(['CAPITAL', 'RESULT', 'EQUIPMENT', 'INVENTORY', 'CUSTOMERS', 'SUPPLIERS', 'VAT_COLLECTED', 'VAT_DEDUCTIBLE', 'BANK', 'MOBILE_MONEY', 'CASH', 'MISC_EXPENSE', 'MISC_REVENUE'] as const).map((k) => (
+                              <option key={k} value={k}>
+                                {k}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </Table>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                  <span className="text-caption text-muted">
+                    {t('{n} ligne(s), {skipped} ignorée(s)', { n: balanceRows.length, skipped: balanceRows.filter((r) => !r.key).length })}
+                  </span>
+                  <button type="button" onClick={saveBalance} className="btn-primary">
+                    {t('Reprendre cette balance')}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

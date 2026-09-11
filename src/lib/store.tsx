@@ -97,6 +97,8 @@ interface ManualEntryInput {
   journal: JournalCode;
   label: string;
   lines: JournalLine[];
+  /** Référence imposée (ex. « AN » pour les à-nouveaux) ; sinon OD-0001, OD-0002… */
+  ref?: string;
 }
 
 type Listener = (ev: WorkspaceEvent) => void;
@@ -365,7 +367,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           entryId: newId(),
           date: input.date,
           journal: input.journal,
-          ref: `OD-${String(dbRef.current.entries.length + 1).padStart(4, '0')}`,
+          ref: input.ref ?? `OD-${String(dbRef.current.entries.length + 1).padStart(4, '0')}`,
           label: input.label,
           lines: input.lines,
         });
