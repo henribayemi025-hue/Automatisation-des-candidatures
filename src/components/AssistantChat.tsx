@@ -4,7 +4,7 @@ import { today, useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
 import { answer, insights } from '../lib/assistant';
 import type { Answer } from '../lib/assistant';
-import { AIError, aiErrorMessage, askAI, buildContext, fileToImage } from '../lib/ai';
+import { AIError, aiErrorMessage, askAI, buildContext, fileToBase64, fileToImage } from '../lib/ai';
 import type { AIExpense, AIMessage, AIProduct } from '../lib/ai';
 import { MODULE_HELP } from '../lib/guide';
 import { EXPENSE_KEYS } from '../lib/chart';
@@ -104,10 +104,11 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
   async function onFile(file: File | undefined) {
     if (!file) return;
     try {
-      const img = await fileToImage(file);
-      setPendingImage({ ...img, name: file.name });
+      // Un PDF part tel quel ; une photo est réduite avant l'envoi.
+      const part = file.type === 'application/pdf' ? await fileToBase64(file) : await fileToImage(file);
+      setPendingImage({ mime: part.mime, data: part.data, name: file.name });
     } catch {
-      setNotice(t('Impossible de lire cette image.'));
+      setNotice(t('Impossible de lire ce fichier.'));
     }
   }
 
@@ -286,8 +287,8 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
           }}
           className="flex gap-2"
         >
-          <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => void onFile(e.target.files?.[0])} />
-          <button type="button" onClick={() => fileRef.current?.click()} title={t('Photographier une liste de produits, une facture, un cahier')} className="btn-ghost px-3" aria-label={t('Ajouter une photo')}>
+          <input ref={fileRef} type="file" accept="image/*,application/pdf" className="hidden" onChange={(e) => void onFile(e.target.files?.[0])} />
+          <button type="button" onClick={() => fileRef.current?.click()} title={t('Photo ou PDF : liste de produits, facture, bilan, cahier')} className="btn-ghost px-3" aria-label={t('Ajouter une photo')}>
             📷
           </button>
           <input

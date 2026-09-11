@@ -6,6 +6,8 @@ import { EXPENSE_LABEL } from '../lib/expenses';
 import { toMinor } from '../lib/money';
 import { guessCategory, parseStatement } from '../lib/statement';
 import { OPENING_FIELDS, balanceToLines, buildOpeningEntry, parseBalanceFile } from '../lib/opening';
+import { AIError, aiErrorMessage, askAI, buildContext, fileToBase64 } from '../lib/ai';
+import { useCollab } from '../lib/collab';
 import type { BalanceRow } from '../lib/opening';
 import { formatMoney } from '../lib/money';
 import type { Direction, StatementRow } from '../lib/statement';
@@ -61,6 +63,7 @@ function recentDays(count: number): string[] {
  */
 export default function CatchUp() {
   const { db, recordSale, addExpense, addManualEntry } = useStore();
+  const { user } = useCollab();
   const [tab, setTab] = useState<Tab>('days');
   const products = useMemo(() => db.products.filter((p) => !p.archived), [db.products]);
   const hasProjects = db.projects.some((p) => p.status === 'ACTIVE');
@@ -195,6 +198,9 @@ export default function CatchUp() {
   const [balanceRows, setBalanceRows] = useState<BalanceRow[]>([]);
   const [openingDone, setOpeningDone] = useState('');
   const balanceRef = useRef<HTMLInputElement>(null);
+  const pdfRef = useRef<HTMLInputElement>(null);
+  const [reading, setReading] = useState(false);
+  const [readNote, setReadNote] = useState('');
   const alreadyOpened = db.entries.some((e) => e.ref === 'AN');
 
   const openingAmounts = Object.fromEntries(OPENING_FIELDS.map((f) => [f.key, toMinor(openingRaw[f.key] || 0, db.company.currency)]));
@@ -206,6 +212,48 @@ export default function CatchUp() {
     setOpeningRaw({});
     setCapitalRaw('');
     setOpeningDone(t('Bilan d’ouverture enregistré au {date}. Le bilan et la balance repartent de ces soldes.', { date: openingDate }));
+  }
+
+  /**
+   * Bilan, balance ou compte de résultat en PDF (ou photo) : l'assistant lit le
+   * document et pré-remplit les soldes. Rien n'est enregistré sans validation.
+   */
+  async function onDocuments(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    if (!user) {
+      setReadNote(t('La lecture de documents demande un compte connecté.'));
+      return;
+    }
+    setReading(true);
+    setReadNote('');
+    try {
+      const parts = await Promise.all([...files].slice(0, 6).map((f) => fileToBase64(f)));
+      const result = await askAI(
+        [
+          {
+            role: 'user',
+            text: t('Voici le bilan (ou la balance) de mon entreprise. Donne-moi les soldes d’ouverture, et dis si actif = passif.'),
+            files: parts,
+          },
+        ],
+        buildContext(db, '/rattrapage'),
+      );
+      if (result.opening) {
+        const next: Record<string, string> = {};
+        for (const [key, value] of Object.entries(result.opening.amounts)) {
+          if (key === 'CAPITAL') setCapitalRaw(String(value));
+          else next[key] = String(value);
+        }
+        setOpeningRaw(next);
+        if (/^\d{4}-\d{2}-\d{2}$/.test(result.opening.date)) setOpeningDate(result.opening.date);
+        setReadNote(`${result.text} ${result.opening.note}`.trim());
+      } else {
+        setReadNote(result.text || t('Aucun solde n’a pu être lu dans ce document.'));
+      }
+    } catch (e) {
+      setReadNote(t(aiErrorMessage(e instanceof AIError ? e.code : 'unknown')));
+    }
+    setReading(false);
   }
 
   async function onBalanceFile(file: File | undefined) {
@@ -483,6 +531,23 @@ export default function CatchUp() {
                 {t('Un à-nouveau existe déjà dans cet espace. En ajouter un second cumule les soldes : extournez d’abord l’ancien dans le journal si c’est une correction.')}
               </p>
             )}
+            <div className="mt-4 rounded-input border border-dashed border-hairline bg-base px-4 py-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-caption font-semibold text-ink">{t('Vous avez le bilan en PDF ou en photo ?')}</div>
+                  <p className="text-[11px] text-muted">
+                    {t('Déposez le bilan, la balance ou le compte de résultat : l’assistant lit les postes, vérifie que l’actif égale le passif, et remplit les cases ci-dessous. Vous validez ensuite.')}
+                  </p>
+                </div>
+                <input ref={pdfRef} type="file" accept="application/pdf,image/*" multiple className="hidden" onChange={(e) => void onDocuments(e.target.files)} />
+                <button type="button" disabled={reading} onClick={() => pdfRef.current?.click()} className="btn-brass shrink-0">
+                  <IconSparkle className="h-4 w-4" />
+                  {reading ? t('Lecture en cours…') : t('Lire un PDF ou une photo')}
+                </button>
+              </div>
+              {readNote && <p className="mt-2 whitespace-pre-wrap text-caption text-ink">{readNote}</p>}
+            </div>
+
             <div className="mt-4 grid gap-4 sm:grid-cols-[220px_1fr]">
               <label className="block">
                 <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-muted">{t('Date d’ouverture')}</span>

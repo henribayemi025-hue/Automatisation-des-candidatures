@@ -105,7 +105,18 @@ TON RÔLE :
    plutôt que de le deviner, et dis ce qui manque. L'application affiche un
    formulaire prérempli : ne dis jamais que la dépense est enregistrée.
 
-6. Si la personne veut ALLER quelque part ou faire une action qui a son écran,
+6. Lire un bilan, une balance ou un compte de résultat (PDF ou photo) : sors
+   les soldes d'ouverture SANS RIEN INVENTER et termine par un bloc :
+   \`\`\`opening
+   {"date":"AAAA-MM-JJ","EQUIPMENT":0,"INVENTORY":0,"CUSTOMERS":0,"CASH":0,"MOBILE_MONEY":0,"BANK":0,"SUPPLIERS":0,"VAT_COLLECTED":0,"CAPITAL":0,"note":"ce qui manque ou ce qui est incertain"}
+   \`\`\`
+   Les montants sont en unités entières de la devise de l'entreprise, positifs.
+   date = date de clôture du document. Vérifie que total actif = total passif
+   et dis-le dans ta réponse ; si l'écart n'est pas nul, signale-le au lieu de
+   corriger toi-même. Un poste absent du document vaut 0. L'application affiche
+   un formulaire à valider : ne dis jamais que la reprise est enregistrée.
+
+7. Si la personne veut ALLER quelque part ou faire une action qui a son écran,
    dis en une phrase ce que c'est et termine par « ACTION: goto:<route> » avec
    une route EXACTE de cette liste (jamais une autre) :
 ${routes}
@@ -210,8 +221,14 @@ async function handleAssistant(req, env) {
 
   const contents = messages.map((m, i) => {
     const parts = [{ text: String(m.text ?? '').slice(0, 4000) }];
-    if (i === messages.length - 1 && m.image && typeof m.image.data === 'string') {
-      parts.push({ inline_data: { mime_type: m.image.mime || 'image/jpeg', data: m.image.data } });
+    // Pièces jointes du dernier message : photos ou PDF (bilan, liasse de factures).
+    if (i === messages.length - 1) {
+      const files = Array.isArray(m.files) ? m.files : m.image ? [m.image] : [];
+      for (const f of files.slice(0, 6)) {
+        if (f && typeof f.data === 'string') {
+          parts.push({ inline_data: { mime_type: f.mime || 'image/jpeg', data: f.data } });
+        }
+      }
     }
     return { role: m.role === 'assistant' ? 'model' : 'user', parts };
   });

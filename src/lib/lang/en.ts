@@ -1407,4 +1407,13 @@ export const EN: Record<string, string> = {
   'Chercher un ticket, un libellé, un montant…': 'Search a ticket, a label, an amount…',
   'Aucun mouvement ne correspond à « {q} ».': 'No movement matches “{q}”.',
   'Aucun mouvement depuis l’ouverture.': 'No movement since opening.',
+  'Vous avez le bilan en PDF ou en photo ?': 'Do you have the balance sheet as a PDF or a photo?',
+  'Déposez le bilan, la balance ou le compte de résultat : l’assistant lit les postes, vérifie que l’actif égale le passif, et remplit les cases ci-dessous. Vous validez ensuite.': 'Drop the balance sheet, the trial balance or the income statement: the assistant reads the lines, checks that assets equal liabilities, and fills the boxes below. You confirm afterwards.',
+  'Lire un PDF ou une photo': 'Read a PDF or a photo',
+  'Lecture en cours…': 'Reading…',
+  'La lecture de documents demande un compte connecté.': 'Reading documents requires a signed-in account.',
+  'Voici le bilan (ou la balance) de mon entreprise. Donne-moi les soldes d’ouverture, et dis si actif = passif.': 'Here is my company’s balance sheet (or trial balance). Give me the opening balances, and say whether assets = liabilities.',
+  'Aucun solde n’a pu être lu dans ce document.': 'No balance could be read from this document.',
+  'Impossible de lire ce fichier.': 'This file could not be read.',
+  'Photo ou PDF : liste de produits, facture, bilan, cahier': 'Photo or PDF: product list, invoice, balance sheet, notebook',
 };

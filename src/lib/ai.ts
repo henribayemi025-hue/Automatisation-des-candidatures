@@ -6,10 +6,18 @@ import { MODULE_HELP } from './guide';
 import type { DB } from './types';
 import { getLang } from './i18n';
 
+export interface AIFile {
+  mime: string;
+  data: string;
+  name?: string;
+}
+
 export interface AIMessage {
   role: 'user' | 'assistant';
   text: string;
-  image?: { mime: string; data: string };
+  image?: AIFile;
+  /** Plusieurs pièces jointes : photos et PDF (bilan, liasse de factures). */
+  files?: AIFile[];
 }
 
 export interface AIProduct {
@@ -30,11 +38,19 @@ export interface AIExpense {
   method: string;
 }
 
+/** Soldes d'ouverture lus sur un bilan ou une balance, à confirmer. */
+export interface AIOpening {
+  date: string;
+  note: string;
+  amounts: Record<string, number>;
+}
+
 export interface AIResult {
   text: string;
   goto: string | null;
   products: AIProduct[];
   expense: AIExpense | null;
+  opening: AIOpening | null;
 }
 
 /** Résumé compact et exact de l'activité : la seule source de chiffres de l'IA. */
@@ -93,6 +109,7 @@ export function parseAI(text: string): AIResult {
   let goto: string | null = null;
   const products: AIProduct[] = [];
   let expense: AIExpense | null = null;
+  let opening: AIOpening | null = null;
   let clean = text;
 
   const action = clean.match(/ACTION:\s*goto:(\S+)/);
@@ -141,7 +158,27 @@ export function parseAI(text: string): AIResult {
     clean = clean.replace(expenseBlock[0], '').trim();
   }
 
-  return { text: clean, goto, products, expense };
+  const openingBlock = clean.match(/```opening\s*([\s\S]*?)```/);
+  if (openingBlock) {
+    try {
+      const raw = JSON.parse(openingBlock[1]) as Record<string, unknown>;
+      const amounts: Record<string, number> = {};
+      for (const key of ['EQUIPMENT', 'INVENTORY', 'CUSTOMERS', 'CASH', 'MOBILE_MONEY', 'BANK', 'SUPPLIERS', 'VAT_COLLECTED', 'CAPITAL']) {
+        const v = Number(raw[key]);
+        if (isFinite(v) && v > 0) amounts[key] = v;
+      }
+      opening = {
+        date: typeof raw.date === 'string' ? raw.date : '',
+        note: typeof raw.note === 'string' ? raw.note : '',
+        amounts,
+      };
+    } catch {
+      // Bloc mal formé : on garde le texte, sans formulaire prérempli.
+    }
+    clean = clean.replace(openingBlock[0], '').trim();
+  }
+
+  return { text: clean, goto, products, expense, opening };
 }
 
 export class AIError extends Error {
@@ -175,6 +212,19 @@ export function aiErrorMessage(code: string): string {
     default:
       return 'L’IA ne répond pas pour le moment. Je réponds avec le moteur local.';
   }
+}
+
+/** Encode un fichier tel quel (PDF, image déjà petite) en base64 pour l'envoi. */
+export function fileToBase64(file: File): Promise<AIFile> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result);
+      resolve({ mime: file.type || 'application/pdf', data: result.slice(result.indexOf(',') + 1), name: file.name });
+    };
+    reader.onerror = () => reject(new Error('lecture'));
+    reader.readAsDataURL(file);
+  });
 }
 
 /** Convertit une photo en base64 (sans le préfixe data:) et la réduit pour l'envoi. */
