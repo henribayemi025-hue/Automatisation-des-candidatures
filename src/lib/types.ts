@@ -62,7 +62,8 @@ export interface JournalLine {
   credit: Minor;
 }
 
-export type JournalCode = 'VT' | 'AC' | 'CA' | 'BQ' | 'OD';
+/** 'CL' = journal de clôture : ces écritures soldent les comptes de gestion. */
+export type JournalCode = 'VT' | 'AC' | 'CA' | 'BQ' | 'OD' | 'CL';
 
 export interface JournalEntry {
   id: string;
@@ -260,6 +261,67 @@ export interface Message {
   createdAt: ISODate;
 }
 
+/**
+ * Une immobilisation : un bien qui sert plusieurs années (véhicule, four,
+ * ordinateur). On ne le passe pas en charge d'un coup, on étale son coût sur sa
+ * durée d'utilisation — c'est l'amortissement.
+ */
+export interface FixedAsset {
+  id: string;
+  name: string;
+  category: string;
+  acquiredOn: ISODate;
+  /** Valeur d'acquisition hors taxe. */
+  cost: Minor;
+  /** Ce qu'il vaudra encore au bout du plan, souvent zéro. */
+  salvage: Minor;
+  /** Durée d'utilisation, en mois. */
+  months: number;
+  /** Linéaire seulement : le dégressif dépend de règles fiscales par pays. */
+  method: 'LINEAR';
+  status: 'ACTIVE' | 'DISPOSED';
+  disposedOn?: ISODate;
+  notes: string;
+  createdAt: ISODate;
+}
+
+/** Dotation déjà comptabilisée, pour ne jamais amortir deux fois la même période. */
+export interface Depreciation {
+  id: string;
+  assetId: string;
+  /** Période comptabilisée, au format AAAA-MM. */
+  period: string;
+  amount: Minor;
+  entryId: string;
+  createdAt: ISODate;
+}
+
+/** Ligne de trésorerie pointée contre le relevé de la banque. */
+export interface Reconciliation {
+  id: string;
+  account: string;
+  entryId: string;
+  /** Date du relevé sur lequel la ligne apparaît. */
+  statementDate: ISODate;
+  createdAt: ISODate;
+}
+
+/**
+ * Exercice clos : les comptes de charges et de produits sont ramenés à zéro,
+ * le résultat part au compte « Résultat », puis en « Report à nouveau ».
+ */
+export interface FiscalClosing {
+  id: string;
+  from: ISODate;
+  to: ISODate;
+  revenue: Minor;
+  expenses: Minor;
+  result: Minor;
+  closingEntryId: string;
+  carryEntryId: string;
+  createdAt: ISODate;
+}
+
 export interface CashSession {
   id: string;
   openedAt: ISODate;
@@ -296,6 +358,10 @@ export interface DB {
   sessions: CashSession[];
   projects: Project[];
   messages: Message[];
+  assets: FixedAsset[];
+  depreciations: Depreciation[];
+  reconciliations: Reconciliation[];
+  closings: FiscalClosing[];
   audit: AuditLog[];
 }
 

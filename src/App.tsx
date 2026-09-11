@@ -29,6 +29,9 @@ import GeneralLedger from './pages/GeneralLedger';
 import TrialBalance from './pages/TrialBalance';
 import Statements from './pages/Statements';
 import ChartOfAccounts from './pages/ChartOfAccounts';
+import Assets from './pages/Assets';
+import Closing from './pages/Closing';
+import Reconcile from './pages/Reconcile';
 import Audit from './pages/Audit';
 import AuditTrail from './pages/AuditTrail';
 import Team from './pages/Team';
@@ -130,6 +133,9 @@ export default function App() {
           <Route path="/balance" element={<TrialBalance />} />
           <Route path="/etats" element={<Statements />} />
           <Route path="/plan-comptable" element={<ChartOfAccounts />} />
+          <Route path="/immobilisations" element={<Assets />} />
+          <Route path="/rapprochement" element={<Reconcile />} />
+          <Route path="/cloture" element={<Closing />} />
           <Route path="/audit" element={<Audit />} />
           <Route path="/historique" element={<AuditTrail />} />
           <Route path="/equipe" element={<Team />} />

@@ -125,6 +125,13 @@ export const IconShield = (p: Props) => (
   </Svg>
 );
 
+export const IconLock = (p: Props) => (
+  <Svg {...p}>
+    <rect x="4.5" y="10.5" width="15" height="10" rx="2" />
+    <path d="M8 10.5V7.5a4 4 0 018 0v3" />
+  </Svg>
+);
+
 export const IconHistory = (p: Props) => (
   <Svg {...p}>
     <path d="M3.5 12a8.5 8.5 0 106-8.1" />

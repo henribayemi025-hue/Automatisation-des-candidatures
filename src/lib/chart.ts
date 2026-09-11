@@ -8,7 +8,9 @@ import type { Account, AccountClass, AccountKind, Company } from './types';
 export type AccountKey =
   | 'CAPITAL'
   | 'RESULT'
+  | 'RETAINED'
   | 'EQUIPMENT'
+  | 'DEPRECIATION'
   | 'INVENTORY'
   | 'SUPPLIERS'
   | 'CUSTOMERS'
@@ -26,6 +28,7 @@ export type AccountKey =
   | 'TAXES'
   | 'PAYROLL'
   | 'FINANCIAL'
+  | 'DEPRECIATION_EXPENSE'
   | 'MISC_EXPENSE'
   | 'SALES'
   | 'SERVICE_REVENUE'
@@ -45,7 +48,11 @@ interface ChartRow {
 const ROWS: ChartRow[] = [
   { key: 'CAPITAL', label: 'Capital social', class: 1, kind: 'EQUITY', normal: 'CREDIT', SYSCOHADA: '101', PCG: '101', GENERIC: '3000' },
   { key: 'RESULT', label: "Résultat de l'exercice", class: 1, kind: 'EQUITY', normal: 'CREDIT', SYSCOHADA: '120', PCG: '120', GENERIC: '3900' },
+  { key: 'RETAINED', label: 'Report à nouveau', class: 1, kind: 'EQUITY', normal: 'CREDIT', SYSCOHADA: '121', PCG: '110', GENERIC: '3800' },
   { key: 'EQUIPMENT', label: 'Matériel et mobilier', class: 2, kind: 'ASSET', normal: 'DEBIT', SYSCOHADA: '244', PCG: '218', GENERIC: '1500' },
+  // Amortissements cumulés : compte d'actif soustractif. Il vient en moins du
+  // matériel au bilan, donc son solde est créditeur.
+  { key: 'DEPRECIATION', label: 'Amortissements du matériel', class: 2, kind: 'ASSET', normal: 'CREDIT', SYSCOHADA: '2844', PCG: '2818', GENERIC: '1590' },
   { key: 'INVENTORY', label: 'Stock de marchandises', class: 3, kind: 'ASSET', normal: 'DEBIT', SYSCOHADA: '311', PCG: '370', GENERIC: '1300' },
   { key: 'SUPPLIERS', label: 'Fournisseurs', class: 4, kind: 'LIABILITY', normal: 'CREDIT', SYSCOHADA: '401', PCG: '401', GENERIC: '2000' },
   { key: 'CUSTOMERS', label: 'Clients', class: 4, kind: 'ASSET', normal: 'DEBIT', SYSCOHADA: '411', PCG: '411', GENERIC: '1200' },
@@ -63,6 +70,7 @@ const ROWS: ChartRow[] = [
   { key: 'TAXES', label: 'Impôts et taxes', class: 6, kind: 'EXPENSE', normal: 'DEBIT', SYSCOHADA: '641', PCG: '635', GENERIC: '6500' },
   { key: 'PAYROLL', label: 'Charges de personnel', class: 6, kind: 'EXPENSE', normal: 'DEBIT', SYSCOHADA: '661', PCG: '641', GENERIC: '6600' },
   { key: 'FINANCIAL', label: 'Frais financiers', class: 6, kind: 'EXPENSE', normal: 'DEBIT', SYSCOHADA: '671', PCG: '661', GENERIC: '6700' },
+  { key: 'DEPRECIATION_EXPENSE', label: 'Dotations aux amortissements', class: 6, kind: 'EXPENSE', normal: 'DEBIT', SYSCOHADA: '681', PCG: '6811', GENERIC: '6800' },
   { key: 'MISC_EXPENSE', label: 'Charges diverses', class: 6, kind: 'EXPENSE', normal: 'DEBIT', SYSCOHADA: '658', PCG: '658', GENERIC: '6900' },
   { key: 'SALES', label: 'Ventes de marchandises', class: 7, kind: 'REVENUE', normal: 'CREDIT', SYSCOHADA: '701', PCG: '707', GENERIC: '4000' },
   { key: 'SERVICE_REVENUE', label: 'Prestations de services', class: 7, kind: 'REVENUE', normal: 'CREDIT', SYSCOHADA: '706', PCG: '706', GENERIC: '4100' },

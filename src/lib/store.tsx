@@ -21,7 +21,10 @@ import type {
   WorkspaceEvent,
   Project,
   Message,
+  FixedAsset,
 } from './types';
+import { depreciationPlan } from './assets';
+import { carryForwardLines, closingPlan, dayAfter } from './closing';
 
 export function newId(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
@@ -133,6 +136,12 @@ export interface StoreActions {
   payDebt: (debtId: string, amount: Minor, method: PaymentMethod) => void;
   addManualEntry: (input: ManualEntryInput) => void;
   reverseEntry: (entryId: string) => void;
+  saveAsset: (asset: Omit<FixedAsset, 'id' | 'createdAt'> & { id?: string }, paidWith?: PaymentMethod) => FixedAsset;
+  disposeAsset: (assetId: string, date: string, proceeds: Minor, method: PaymentMethod) => void;
+  runDepreciation: (period: string, date: string) => number;
+  reconcileEntry: (entryId: string, account: string, on: boolean, statementDate: string) => void;
+  closeFiscalYear: (range: { from: string; to: string }) => { result: Minor } | null;
+  reopenFiscalYear: (closingId: string) => void;
   openSession: (opening: Minor) => void;
   closeSession: (counted: Minor) => void;
   /** Charge un jeu d'essai complet (trois mois d'activité) et renvoie le nombre d'événements. */
@@ -398,6 +407,70 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (!original) throw new Error('Écriture introuvable');
         if (original.reversedBy) throw new Error('Écriture déjà extournée');
         dispatch('entry.reverse', { entryId, reversalId: newId(), date: today() });
+      },
+
+      saveAsset(input, paidWith) {
+        const asset: FixedAsset = {
+          ...input,
+          id: input.id ?? newId(),
+          createdAt: dbRef.current.assets.find((a) => a.id === input.id)?.createdAt ?? new Date().toISOString(),
+        };
+        dispatch('asset.save', { asset, paidWith: paidWith ?? null, entryId: newId() });
+        return asset;
+      },
+
+      disposeAsset(assetId, date, proceeds, method) {
+        dispatch('asset.dispose', { assetId, date, proceeds, method, entryId: newId() });
+      },
+
+      runDepreciation(period, date) {
+        const state = dbRef.current;
+        const plan = depreciationPlan(
+          state.assets.filter((a) => a.status === 'ACTIVE'),
+          state.depreciations,
+          period,
+        );
+        if (!plan.length) return 0;
+        dispatch('depreciation.run', {
+          period,
+          date,
+          entryId: newId(),
+          items: plan.map((l) => ({ id: newId(), assetId: l.asset.id, amount: l.amount })),
+        });
+        return plan.length;
+      },
+
+      reconcileEntry(entryId, account, on, statementDate) {
+        dispatch('entry.reconcile', { entryId, account, on, statementDate, reconciliationId: newId() });
+      },
+
+      closeFiscalYear(range) {
+        const state = dbRef.current;
+        const plan = closingPlan(state.accounts, state, { ...range, label: range.to.slice(0, 4) });
+        if (plan.empty) return null;
+        dispatch('year.close', {
+          closingId: newId(),
+          from: range.from,
+          to: range.to,
+          lines: plan.lines,
+          revenue: plan.revenue,
+          expenses: plan.expenses,
+          result: plan.result,
+          closingEntryId: newId(),
+          carryEntryId: newId(),
+          carryDate: dayAfter(range.to),
+          carryLines: carryForwardLines(state.company.chart, plan.result),
+        });
+        return { result: plan.result };
+      },
+
+      reopenFiscalYear(closingId) {
+        dispatch('year.reopen', {
+          closingId,
+          date: today(),
+          closingReversalId: newId(),
+          carryReversalId: newId(),
+        });
       },
 
       openSession(opening) {

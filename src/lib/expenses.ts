@@ -11,9 +11,13 @@ export const EXPENSE_LABEL: Record<AccountKey, string> = {
   TAXES: 'Impôts et taxes',
   FINANCIAL: 'Frais bancaires et financiers',
   MISC_EXPENSE: 'Charges diverses',
+  // Dotations : jamais saisies à la main, elles viennent de l'écran Immobilisations.
+  DEPRECIATION_EXPENSE: '',
   CAPITAL: '',
   RESULT: '',
+  RETAINED: '',
   EQUIPMENT: '',
+  DEPRECIATION: '',
   INVENTORY: '',
   SUPPLIERS: '',
   CUSTOMERS: '',

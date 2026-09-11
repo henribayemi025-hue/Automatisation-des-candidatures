@@ -111,17 +111,22 @@ export interface IncomeStatement {
   netIncome: Minor;
 }
 
+/**
+ * Compte de résultat de la période. Les écritures de clôture sont écartées :
+ * elles ramènent les comptes 6 et 7 à zéro, et sans cela le compte de résultat
+ * d'un exercice clos afficherait des colonnes vides.
+ */
 export function incomeStatement(
   accounts: Account[],
   entries: JournalEntry[],
   from?: string,
   to?: string,
 ): IncomeStatement {
-  const balances = trialBalance(accounts, entries, from, to);
+  const balances = trialBalance(accounts, entries.filter((e) => e.journal !== 'CL'), from, to);
   const revenue = balances.filter((b) => b.account.kind === 'REVENUE');
   const expenses = balances.filter((b) => b.account.kind === 'EXPENSE');
-  const totalRevenue = revenue.reduce((s, b) => s + b.balance, 0);
-  const totalExpenses = expenses.reduce((s, b) => s + b.balance, 0);
+  const totalRevenue = revenue.reduce((s, b) => s + sheetValue(b), 0);
+  const totalExpenses = expenses.reduce((s, b) => s + sheetValue(b), 0);
   return {
     revenue,
     expenses,
@@ -143,6 +148,16 @@ export interface BalanceSheet {
   difference: Minor;
 }
 
+/**
+ * Contribution d'un compte à son côté du bilan. Presque toujours son solde
+ * naturel — sauf pour un compte soustractif comme les amortissements cumulés,
+ * qui est un compte d'actif au solde créditeur : il vient EN MOINS de l'actif.
+ */
+export function sheetValue(b: AccountBalance): Minor {
+  const expected = b.account.kind === 'ASSET' || b.account.kind === 'EXPENSE' ? 'DEBIT' : 'CREDIT';
+  return b.account.normal === expected ? b.balance : -b.balance;
+}
+
 export function balanceSheet(
   accounts: Account[],
   entries: JournalEntry[],
@@ -152,10 +167,17 @@ export function balanceSheet(
   const assets = balances.filter((b) => b.account.kind === 'ASSET');
   const liabilities = balances.filter((b) => b.account.kind === 'LIABILITY');
   const equity = balances.filter((b) => b.account.kind === 'EQUITY');
-  const { netIncome } = incomeStatement(accounts, entries, undefined, to);
-  const totalAssets = assets.reduce((s, b) => s + b.balance, 0);
-  const totalLiabilities = liabilities.reduce((s, b) => s + b.balance, 0);
-  const totalEquity = equity.reduce((s, b) => s + b.balance, 0);
+  // Ici on GARDE les écritures de clôture. Une fois l'exercice soldé, le
+  // résultat n'est plus dans les comptes 6 et 7 mais au compte « Résultat »,
+  // qui est déjà compté dans les capitaux propres : le bilan reste équilibré
+  // avant comme après la clôture.
+  const netIncome = balances
+    .filter((b) => b.account.kind === 'REVENUE')
+    .reduce((s, b) => s + sheetValue(b), 0)
+    - balances.filter((b) => b.account.kind === 'EXPENSE').reduce((s, b) => s + sheetValue(b), 0);
+  const totalAssets = assets.reduce((s, b) => s + sheetValue(b), 0);
+  const totalLiabilities = liabilities.reduce((s, b) => s + sheetValue(b), 0);
+  const totalEquity = equity.reduce((s, b) => s + sheetValue(b), 0);
   return {
     assets,
     liabilities,

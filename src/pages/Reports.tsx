@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useDB } from '../lib/store';
 import { balanceSheet, incomeStatement, trialBalance } from '../lib/ledger';
 import { monthStart, outstanding, productPerformance, saleRevenue } from '../lib/metrics';
-import { formatMoney } from '../lib/money';
+import { formatMoney, currency as currencyOf } from '../lib/money';
+import { buildFec, fecFileName } from '../lib/fec';
 import type { Minor } from '../lib/types';
 import { Field, PageHeader } from '../components/UI';
 import { IconBook, IconBox, IconCard, IconDoc, IconReceipt, IconScale, IconTrend } from '../components/Icons';
@@ -171,6 +172,17 @@ export default function Reports() {
     w.document.close();
   }
 
+  function exportFec() {
+    const text = buildFec(db.accounts, db.entries, { from, to, decimals: currencyOf(db.company.currency).decimals });
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fecFileName(db.company, to);
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <>
       <PageHeader
@@ -188,6 +200,21 @@ export default function Reports() {
         <p className="text-xs text-slate-400">
           {t('La période s\'applique aux rapports datés. L\'inventaire et les encours sont toujours arrêtés au jour même.')}
         </p>
+      </div>
+
+      {/* Le FEC est le seul export que l'administration fiscale française sait
+          lire telle quelle : journal complet, une ligne par ligne d'écriture. */}
+      <div className="card mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="font-bold">{t('Fichier des écritures comptables (FEC)')}</h2>
+          <p className="text-caption text-muted">
+            {t('Le journal complet de la période, au format exigé en cas de contrôle fiscal. À transmettre tel quel au comptable.')}
+          </p>
+        </div>
+        <button onClick={exportFec} className="btn-dark shrink-0">
+          <IconDoc className="h-4 w-4" />
+          {t('Exporter le FEC')}
+        </button>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

@@ -123,6 +123,29 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 - [ ] Historique : chaque action tracée, avec son auteur.
 - [ ] Exports Excel et PDF sur les écrans de rapports.
 
+## 7 bis. Ce qu'un comptable réclamait (nouveau)
+
+- [ ] **Immobilisations** (menu « Mon argent ») : la démo contient un
+      congélateur à 720 000 amorti sur 5 ans, déjà amorti de trois mois.
+- [ ] « Nouveau bien » : nom, valeur, durée ; cocher « déjà enregistré dans
+      l'application » si l'achat a été saisi ailleurs, sinon l'écriture
+      d'acquisition est passée toute seule.
+- [ ] « Passer la dotation du mois » : le montant proposé est le cumul dû ;
+      un mois oublié se rattrape tout seul ; jamais deux fois la même période.
+- [ ] « Sortir » un bien : prix de vente, gain ou perte calculé, écriture passée.
+- [ ] **Rapprochement bancaire** : choisir le compte et la période, saisir le
+      solde du relevé ; l'écart doit tomber à zéro une fois tout pointé.
+- [ ] Coller un relevé (ou des SMS mobile money) puis « Pointer ce qui
+      correspond » : seules les correspondances certaines sont cochées.
+- [ ] **Clôture de l'exercice** : la période proposée est modifiable ; une
+      année encore en cours ne se clôture pas.
+- [ ] Après clôture : comptes 6 et 7 à zéro, résultat passé en « Report à
+      nouveau », bilan toujours vérifié, et compte de résultat de l'année
+      toujours lisible dans les rapports.
+- [ ] « Rouvrir » extourne les écritures de clôture — rien n'est effacé.
+- [ ] **Export FEC**, depuis la clôture et depuis Documents : fichier texte de
+      18 colonnes, total débit = total crédit.
+
 ## 8. Équipe
 
 - [ ] Inviter une adresse e-mail en « Comptable » depuis Équipe.
@@ -134,7 +157,9 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 - Constructeur de requêtes (question en langage courant → tableau).
 - Appels audio/vidéo dans la discussion ; réception des messages WhatsApp dans l'app.
 - Plusieurs espaces de travail pour un même propriétaire.
-- Immobilisations et amortissements automatiques, paie, déclarations fiscales.
+- Paie (bulletins, cotisations) et déclarations fiscales pré-remplies :
+  un autre métier, à faire pays par pays.
+- Lettrage automatique facture ↔ règlement, avoirs et retours de marchandise.
 - Les 8 photos de métiers pour l'écran d'accueil (attendues de Beau).
 
 ## Documents

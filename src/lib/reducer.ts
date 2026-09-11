@@ -19,6 +19,8 @@ import type {
   WorkspaceEvent,
   Project,
   Message,
+  FixedAsset,
+  FiscalClosing,
 } from './types';
 
 export const DEFAULT_COMPANY: Company = {
@@ -55,6 +57,10 @@ export function emptyDB(): DB {
     sessions: [],
     projects: [],
     messages: [],
+    assets: [],
+    depreciations: [],
+    reconciliations: [],
+    closings: [],
     audit: [],
   };
 }
@@ -71,6 +77,10 @@ export function normalizeDB(raw: Partial<DB> | null | undefined): DB {
     // Ajouté après coup : un instantané ancien n'a pas de projets.
     projects: raw.projects ?? [],
     messages: raw.messages ?? [],
+    assets: raw.assets ?? [],
+    depreciations: raw.depreciations ?? [],
+    reconciliations: raw.reconciliations ?? [],
+    closings: raw.closings ?? [],
   };
 }
 
@@ -605,6 +615,202 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
         lines: p.lines as JournalLine[],
       });
       audit(db, ev, 'entry', entry.id, 'CREATE', `Écriture manuelle ${entry.ref} : ${entry.label}`);
+      break;
+    }
+
+    case 'asset.save': {
+      const asset = p.asset as FixedAsset;
+      const idx = db.assets.findIndex((a) => a.id === asset.id);
+      const isNew = idx < 0;
+      if (isNew) db.assets.push(asset);
+      else db.assets[idx] = { ...db.assets[idx], ...asset };
+
+      // Un bien acheté depuis l'application est déjà au bilan par l'écriture
+      // d'achat. Ce n'est que quand on le déclare à part qu'il faut l'y mettre.
+      if (isNew && p.entryId && p.paidWith) {
+        post(db, ev, {
+          id: p.entryId as string,
+          date: asset.acquiredOn,
+          journal: 'OD',
+          ref: `IMMO-${db.assets.length}`,
+          label: `Acquisition — ${asset.name}`,
+          sourceType: 'asset',
+          sourceId: asset.id,
+          lines: [
+            { account: accountCode(chart, 'EQUIPMENT'), label: asset.name, debit: asset.cost, credit: 0 },
+            { account: methodAccount(chart, p.paidWith as PaymentMethod), label: 'Règlement', debit: 0, credit: asset.cost },
+          ],
+        });
+      }
+      audit(db, ev, 'asset', asset.id, isNew ? 'CREATE' : 'UPDATE', `Immobilisation : ${asset.name}`);
+      break;
+    }
+
+    case 'asset.dispose': {
+      const asset = db.assets.find((a) => a.id === p.assetId);
+      if (!asset || asset.status === 'DISPOSED') break;
+      const date = p.date as string;
+      const proceeds = (p.proceeds as Minor) ?? 0;
+      const posted = db.depreciations.filter((d) => d.assetId === asset.id).reduce((s, d) => s + d.amount, 0);
+      const book = asset.cost - posted; // valeur nette comptable restante
+      asset.status = 'DISPOSED';
+      asset.disposedOn = date;
+
+      // Sortie du bien : on efface sa valeur d'origine et ses amortissements,
+      // on encaisse le prix de vente, et l'écart passe en perte ou en gain.
+      const lines: JournalLine[] = [];
+      if (posted > 0) lines.push({ account: accountCode(chart, 'DEPRECIATION'), label: 'Amortissements repris', debit: posted, credit: 0 });
+      if (proceeds > 0) lines.push({ account: methodAccount(chart, (p.method as PaymentMethod) ?? 'CASH'), label: 'Prix de cession', debit: proceeds, credit: 0 });
+      const loss = book - proceeds;
+      if (loss > 0) lines.push({ account: accountCode(chart, 'MISC_EXPENSE'), label: 'Valeur nette du bien cédé', debit: loss, credit: 0 });
+      if (loss < 0) lines.push({ account: accountCode(chart, 'MISC_REVENUE'), label: 'Produit de cession', debit: 0, credit: -loss });
+      lines.push({ account: accountCode(chart, 'EQUIPMENT'), label: asset.name, debit: 0, credit: asset.cost });
+
+      post(db, ev, {
+        id: p.entryId as string,
+        date,
+        journal: 'OD',
+        ref: `CESS-${asset.id.slice(0, 6)}`,
+        label: `Sortie — ${asset.name}`,
+        sourceType: 'asset',
+        sourceId: asset.id,
+        lines,
+      });
+      audit(db, ev, 'asset', asset.id, 'DISPOSE', `Immobilisation sortie : ${asset.name}`);
+      break;
+    }
+
+    case 'depreciation.run': {
+      const period = p.period as string;
+      const items = p.items as { id: string; assetId: string; amount: Minor }[];
+      const kept = items.filter(
+        (i) => i.amount > 0 && !db.depreciations.some((d) => d.assetId === i.assetId && d.period === period),
+      );
+      if (!kept.length) break;
+      const total = kept.reduce((s, i) => s + i.amount, 0);
+      const lines: JournalLine[] = kept.map((i) => ({
+        account: accountCode(chart, 'DEPRECIATION_EXPENSE'),
+        label: db.assets.find((a) => a.id === i.assetId)?.name ?? 'Immobilisation',
+        debit: i.amount,
+        credit: 0,
+      }));
+      lines.push({ account: accountCode(chart, 'DEPRECIATION'), label: `Dotation ${period}`, debit: 0, credit: total });
+      const entry = post(db, ev, {
+        id: p.entryId as string,
+        date: p.date as string,
+        journal: 'OD',
+        ref: `DOT-${period}`,
+        label: `Dotation aux amortissements — ${period}`,
+        sourceType: 'depreciation',
+        sourceId: period,
+        lines,
+      });
+      for (const i of kept) {
+        db.depreciations.push({
+          id: i.id,
+          assetId: i.assetId,
+          period,
+          amount: i.amount,
+          entryId: entry.id,
+          createdAt: ev.at,
+        });
+      }
+      audit(db, ev, 'depreciation', period, 'CREATE', `Dotation ${period} sur ${kept.length} bien(s)`);
+      break;
+    }
+
+    case 'entry.reconcile': {
+      const entryId = p.entryId as string;
+      const account = p.account as string;
+      const on = p.on !== false;
+      const existing = db.reconciliations.findIndex((r) => r.entryId === entryId && r.account === account);
+      if (on && existing < 0) {
+        db.reconciliations.push({
+          id: p.reconciliationId as string,
+          entryId,
+          account,
+          statementDate: (p.statementDate as string) || (ev.at.slice(0, 10) as string),
+          createdAt: ev.at,
+        });
+      }
+      if (!on && existing >= 0) db.reconciliations.splice(existing, 1);
+      break;
+    }
+
+    case 'year.close': {
+      const from = p.from as string;
+      const to = p.to as string;
+      if (db.closings.some((c) => c.to === to)) break;
+      const lines = p.lines as JournalLine[];
+      if (!lines?.length) break;
+      const result = p.result as Minor;
+
+      const closing = post(db, ev, {
+        id: p.closingEntryId as string,
+        date: to,
+        journal: 'CL',
+        ref: `CLO-${to.slice(0, 4)}`,
+        label: `Clôture de l'exercice ${from} → ${to}`,
+        sourceType: 'closing',
+        sourceId: to,
+        lines,
+      });
+
+      const carry = p.carryLines as JournalLine[];
+      const carryEntry = carry?.length
+        ? post(db, ev, {
+            id: p.carryEntryId as string,
+            date: p.carryDate as string,
+            journal: 'CL',
+            ref: `AN-${(p.carryDate as string).slice(0, 4)}`,
+            label: 'Affectation du résultat — report à nouveau',
+            sourceType: 'closing',
+            sourceId: to,
+            lines: carry,
+          })
+        : null;
+
+      const record: FiscalClosing = {
+        id: p.closingId as string,
+        from,
+        to,
+        revenue: p.revenue as Minor,
+        expenses: p.expenses as Minor,
+        result,
+        closingEntryId: closing.id,
+        carryEntryId: carryEntry?.id ?? '',
+        createdAt: ev.at,
+      };
+      db.closings.push(record);
+      audit(db, ev, 'closing', record.id, 'CLOSE', `Exercice ${from} → ${to} clôturé, résultat ${result}`);
+      break;
+    }
+
+    case 'year.reopen': {
+      const closing = db.closings.find((c) => c.id === p.closingId);
+      if (!closing) break;
+      // On n'efface jamais une écriture : on l'extourne, comme le reste.
+      for (const [entryId, reversalId] of [
+        [closing.carryEntryId, p.carryReversalId as string],
+        [closing.closingEntryId, p.closingReversalId as string],
+      ] as const) {
+        const original = db.entries.find((e) => e.id === entryId);
+        if (!original || original.reversedBy) continue;
+        const reversal = post(db, ev, {
+          id: reversalId,
+          date: p.date as string,
+          journal: 'CL',
+          ref: `EXT-${original.ref}`,
+          label: `Réouverture — extourne de ${original.ref}`,
+          sourceType: original.sourceType,
+          sourceId: original.sourceId,
+          reverses: original.id,
+          lines: original.lines.map((l) => ({ account: l.account, label: l.label, debit: l.credit, credit: l.debit })),
+        });
+        original.reversedBy = reversal.id;
+      }
+      db.closings = db.closings.filter((c) => c.id !== closing.id);
+      audit(db, ev, 'closing', closing.id, 'REOPEN', `Exercice ${closing.from} → ${closing.to} rouvert`);
       break;
     }
 

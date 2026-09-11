@@ -54,11 +54,11 @@ certification ou une infrastructure).
 | Comptabilité analytique de premier niveau : projets | fait |
 | Rôle comptable en lecture, invitation par e-mail | fait |
 | Import de relevés (texte, CSV) avec poste de dépense proposé | fait |
-| Clôture d'exercice et à-nouveaux automatiques | prochain |
-| Immobilisations et plan d'amortissement | prochain |
+| Clôture d'exercice et à-nouveaux automatiques | fait |
+| Immobilisations et plan d'amortissement | fait |
 | Taux de TVA par article ; ventilation 17,5 % / centimes au Cameroun | prochain |
-| Export FEC (France) | prochain |
-| Rapprochement bancaire assisté | prochain |
+| Export FEC (France) | fait |
+| Rapprochement bancaire assisté | fait |
 | Paiements mixtes ventilés par compte de trésorerie | prochain |
 | SMT / Système normal, TAFIRE, DSF ; liasse fiscale ; Factur-X ; retenue à la source ; provisions ; FIFO / CUMP au choix ; brouillons d'écritures | plus tard |
 

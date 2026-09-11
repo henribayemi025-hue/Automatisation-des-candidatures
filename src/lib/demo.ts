@@ -136,6 +136,34 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
     emit(stamp(dayISO(base, -91), 9, i), 'product.save', { product, movementId: id(), entryId: id() }),
   );
 
+  // ---- Immobilisations : un congélateur acheté avant l'ouverture ----
+  // Il sert d'exemple à l'écran Immobilisations, avec trois dotations passées.
+  const freezerDay = dayISO(base, -90);
+  const freezer = {
+    id: `${runId}-imm-1`,
+    name: 'Congélateur vitrine',
+    category: 'Matériel et outillage',
+    acquiredOn: freezerDay,
+    cost: money(720_000),
+    salvage: 0,
+    months: 60,
+    method: 'LINEAR' as const,
+    status: 'ACTIVE' as const,
+    notes: 'Acheté à l’ouverture du rayon frais',
+    createdAt: stamp(freezerDay, 9, 30),
+  };
+  emit(stamp(freezerDay, 9, 30), 'asset.save', { asset: freezer, paidWith: 'BANK', entryId: id() });
+  for (let back = 2; back >= 0; back -= 1) {
+    const day = dayISO(base, -back * 30 - 5);
+    const period = day.slice(0, 7);
+    emit(stamp(day, 20, 0), 'depreciation.run', {
+      period,
+      date: day,
+      entryId: id(),
+      items: [{ id: id(), assetId: freezer.id, amount: money(12_000) }],
+    });
+  }
+
   // ---- Suivi local du stock, pour ne jamais vendre ce qu'on n'a pas ----
   const stock = new Map(products.map((p) => [p.id, p.stock]));
   const cost = new Map(products.map((p) => [p.id, p.cost]));
