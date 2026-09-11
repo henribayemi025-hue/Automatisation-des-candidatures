@@ -14,6 +14,8 @@ export type AccountKey =
   | 'INVENTORY'
   | 'SUPPLIERS'
   | 'CUSTOMERS'
+  | 'STAFF_ADVANCE'
+  | 'STAFF_PAYABLE'
   | 'VAT_COLLECTED'
   | 'VAT_DEDUCTIBLE'
   | 'BANK'
@@ -56,6 +58,10 @@ const ROWS: ChartRow[] = [
   { key: 'INVENTORY', label: 'Stock de marchandises', class: 3, kind: 'ASSET', normal: 'DEBIT', SYSCOHADA: '311', PCG: '370', GENERIC: '1300' },
   { key: 'SUPPLIERS', label: 'Fournisseurs', class: 4, kind: 'LIABILITY', normal: 'CREDIT', SYSCOHADA: '401', PCG: '401', GENERIC: '2000' },
   { key: 'CUSTOMERS', label: 'Clients', class: 4, kind: 'ASSET', normal: 'DEBIT', SYSCOHADA: '411', PCG: '411', GENERIC: '1200' },
+  // Une avance sur salaire est de l'argent que le salarié doit encore à
+  // l'entreprise : c'est une créance, pas une charge.
+  { key: 'STAFF_ADVANCE', label: 'Personnel — avances et acomptes', class: 4, kind: 'ASSET', normal: 'DEBIT', SYSCOHADA: '421', PCG: '425', GENERIC: '1260' },
+  { key: 'STAFF_PAYABLE', label: 'Personnel — rémunérations dues', class: 4, kind: 'LIABILITY', normal: 'CREDIT', SYSCOHADA: '422', PCG: '421', GENERIC: '2100' },
   { key: 'VAT_COLLECTED', label: 'TVA collectée', class: 4, kind: 'LIABILITY', normal: 'CREDIT', SYSCOHADA: '4431', PCG: '44571', GENERIC: '2200' },
   { key: 'VAT_DEDUCTIBLE', label: 'TVA déductible', class: 4, kind: 'ASSET', normal: 'DEBIT', SYSCOHADA: '4451', PCG: '44566', GENERIC: '1250' },
   { key: 'BANK', label: 'Banque', class: 5, kind: 'ASSET', normal: 'DEBIT', SYSCOHADA: '521', PCG: '512', GENERIC: '1010' },

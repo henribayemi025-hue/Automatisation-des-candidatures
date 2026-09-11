@@ -136,6 +136,48 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
     emit(stamp(dayISO(base, -91), 9, i), 'product.save', { product, movementId: id(), entryId: id() }),
   );
 
+  // ---- Personnel : deux personnes, l'une au mois, l'autre à la journée ----
+  const hireDay = dayISO(base, -88);
+  const staff = [
+    { id: `${runId}-emp-1`, name: 'Awa Nguema', role: 'Vendeuse', phone: '+237 6 99 12 34 56', payKind: 'MONTHLY' as const, rate: money(85_000) },
+    { id: `${runId}-emp-2`, name: 'Paul Mbarga', role: 'Livreur', phone: '', payKind: 'DAILY' as const, rate: money(3_500) },
+  ];
+  staff.forEach((s, i) =>
+    emit(stamp(hireDay, 9, 40 + i), 'employee.save', {
+      employee: { ...s, startedOn: hireDay, notes: '', createdAt: stamp(hireDay, 9, 40 + i) },
+    }),
+  );
+
+  // Paul est pointé sur les six dernières semaines, sauf les dimanches.
+  for (let back = 41; back >= 0; back -= 1) {
+    const day = dayISO(base, -back);
+    const weekday = new Date(`${day}T12:00:00.000Z`).getUTCDay();
+    if (weekday === 0) continue;
+    const status = back % 13 === 0 ? 'ABSENT' : back % 7 === 3 ? 'HALF' : 'PRESENT';
+    emit(stamp(day, 8, 0), 'attendance.mark', {
+      employeeId: staff[1].id,
+      date: day,
+      status,
+      hours: status === 'PRESENT' ? 8 : status === 'HALF' ? 4 : 0,
+      attendanceId: id(),
+    });
+  }
+
+  // Une avance à Awa, qui sera retenue sur sa prochaine paie.
+  const advanceDay = dayISO(base, -12);
+  emit(stamp(advanceDay, 11, 0), 'staff.advance', {
+    advance: {
+      id: id(),
+      employeeId: staff[0].id,
+      date: advanceDay,
+      amount: money(20_000),
+      method: 'CASH',
+      note: 'Frais de scolarité',
+      entryId: id(),
+      createdAt: stamp(advanceDay, 11, 0),
+    },
+  });
+
   // ---- Immobilisations : un congélateur acheté avant l'ouverture ----
   // Il sert d'exemple à l'écran Immobilisations, avec trois dotations passées.
   const freezerDay = dayISO(base, -90);

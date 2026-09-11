@@ -22,6 +22,10 @@ import type {
   Project,
   Message,
   FixedAsset,
+  Employee,
+  Attendance,
+  Payslip,
+  PayrollRun,
 } from './types';
 import { depreciationPlan } from './assets';
 import { carryForwardLines, closingPlan, dayAfter } from './closing';
@@ -136,6 +140,12 @@ export interface StoreActions {
   payDebt: (debtId: string, amount: Minor, method: PaymentMethod) => void;
   addManualEntry: (input: ManualEntryInput) => void;
   reverseEntry: (entryId: string) => void;
+  saveEmployee: (employee: Omit<Employee, 'id' | 'createdAt'> & { id?: string }) => Employee;
+  archiveEmployee: (employeeId: string, archived: boolean) => void;
+  markAttendance: (employeeId: string, date: string, status: Attendance['status'], hours?: number) => void;
+  payAdvance: (employeeId: string, amount: Minor, method: PaymentMethod, date: string, note?: string) => void;
+  runPayroll: (period: string, date: string, slips: Payslip[], method: PaymentMethod, paid: boolean) => PayrollRun | null;
+  settlePayroll: (runId: string, method: PaymentMethod, date: string) => void;
   saveAsset: (asset: Omit<FixedAsset, 'id' | 'createdAt'> & { id?: string }, paidWith?: PaymentMethod) => FixedAsset;
   disposeAsset: (assetId: string, date: string, proceeds: Minor, method: PaymentMethod) => void;
   runDepreciation: (period: string, date: string) => number;
@@ -407,6 +417,64 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (!original) throw new Error('Écriture introuvable');
         if (original.reversedBy) throw new Error('Écriture déjà extournée');
         dispatch('entry.reverse', { entryId, reversalId: newId(), date: today() });
+      },
+
+      saveEmployee(input) {
+        const employee: Employee = {
+          ...input,
+          id: input.id ?? newId(),
+          createdAt: dbRef.current.employees.find((e) => e.id === input.id)?.createdAt ?? new Date().toISOString(),
+        };
+        dispatch('employee.save', { employee });
+        return employee;
+      },
+
+      archiveEmployee(employeeId, archived) {
+        dispatch('employee.archive', { employeeId, archived });
+      },
+
+      markAttendance(employeeId, date, status, hours = 0) {
+        dispatch('attendance.mark', { employeeId, date, status, hours, attendanceId: newId() });
+      },
+
+      payAdvance(employeeId, amount, method, date, note = '') {
+        if (amount <= 0) return;
+        dispatch('staff.advance', {
+          advance: {
+            id: newId(),
+            employeeId,
+            date,
+            amount,
+            method,
+            note,
+            entryId: newId(),
+            createdAt: new Date().toISOString(),
+          },
+        });
+      },
+
+      runPayroll(period, date, slips, method, paid) {
+        const kept = slips.filter((s) => s.gross > 0);
+        if (!kept.length) return null;
+        const run: PayrollRun = {
+          id: newId(),
+          period,
+          date,
+          slips: kept,
+          gross: kept.reduce((s, x) => s + x.gross, 0),
+          advances: kept.reduce((s, x) => s + x.advances, 0),
+          net: kept.reduce((s, x) => s + x.net, 0),
+          paid,
+          method,
+          entryId: newId(),
+          createdAt: new Date().toISOString(),
+        };
+        dispatch('payroll.run', { run });
+        return run;
+      },
+
+      settlePayroll(runId, method, date) {
+        dispatch('payroll.settle', { runId, method, date, entryId: newId() });
       },
 
       saveAsset(input, paidWith) {

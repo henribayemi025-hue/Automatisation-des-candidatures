@@ -262,6 +262,85 @@ export interface Message {
 }
 
 /**
+ * Comment la personne est payée. Le salaire mensuel est le cas des contrats
+ * fixes ; le journalier et l'horaire sont la réalité de beaucoup de petites
+ * structures, où l'on paie ce qui a été travaillé.
+ */
+export type PayKind = 'MONTHLY' | 'DAILY' | 'HOURLY';
+
+export interface Employee {
+  id: string;
+  name: string;
+  /** Poste occupé, en mots courants : vendeuse, cuisinier, apprenti… */
+  role: string;
+  phone: string;
+  payKind: PayKind;
+  /** Montant du salaire mensuel, ou du taux journalier / horaire. */
+  rate: Minor;
+  startedOn: ISODate;
+  archived?: boolean;
+  notes: string;
+  createdAt: ISODate;
+}
+
+export type AttendanceStatus = 'PRESENT' | 'HALF' | 'ABSENT' | 'LEAVE';
+
+/** Une journée pointée pour une personne. Une seule par personne et par jour. */
+export interface Attendance {
+  id: string;
+  employeeId: string;
+  date: ISODate;
+  status: AttendanceStatus;
+  /** Heures travaillées, pour les payes à l'heure. */
+  hours: number;
+  note: string;
+  createdAt: ISODate;
+}
+
+/** Argent avancé à quelqu'un avant la paie : une créance, pas une charge. */
+export interface StaffAdvance {
+  id: string;
+  employeeId: string;
+  date: ISODate;
+  amount: Minor;
+  method: PaymentMethod;
+  note: string;
+  entryId: string;
+  createdAt: ISODate;
+}
+
+/** Ligne de paie d'une personne pour une période. */
+export interface Payslip {
+  employeeId: string;
+  employeeName: string;
+  /** Ce qui est dû pour la période, avant déduction des avances. */
+  gross: Minor;
+  /** Avances déjà versées, retenues sur cette paie. */
+  advances: Minor;
+  /** Ce qui reste à verser. */
+  net: Minor;
+  /** Base du calcul, affichée sur le bulletin : « 22 jours », « salaire du mois ». */
+  basis: string;
+}
+
+/** Une paie passée : la charge est enregistrée, les avances sont soldées. */
+export interface PayrollRun {
+  id: string;
+  /** Période payée, au format AAAA-MM. */
+  period: string;
+  date: ISODate;
+  slips: Payslip[];
+  gross: Minor;
+  advances: Minor;
+  net: Minor;
+  /** Vrai si le net a été versé tout de suite ; sinon il reste dû. */
+  paid: boolean;
+  method: PaymentMethod;
+  entryId: string;
+  createdAt: ISODate;
+}
+
+/**
  * Une immobilisation : un bien qui sert plusieurs années (véhicule, four,
  * ordinateur). On ne le passe pas en charge d'un coup, on étale son coût sur sa
  * durée d'utilisation — c'est l'amortissement.
@@ -358,6 +437,10 @@ export interface DB {
   sessions: CashSession[];
   projects: Project[];
   messages: Message[];
+  employees: Employee[];
+  attendance: Attendance[];
+  advances: StaffAdvance[];
+  payrolls: PayrollRun[];
   assets: FixedAsset[];
   depreciations: Depreciation[];
   reconciliations: Reconciliation[];

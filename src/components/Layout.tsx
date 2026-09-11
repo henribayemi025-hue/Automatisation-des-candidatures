@@ -86,6 +86,7 @@ const NAV: NavGroup[] = [
       { to: '/analyse', label: 'Résultats', icon: <IconChart />, area: 'finance' },
       { to: '/rapports', label: 'Documents', icon: <IconDoc />, area: 'finance' },
       { to: '/livre-caisse', label: 'Livre de caisse', icon: <IconBook />, area: 'finance' },
+      { to: '/personnel', label: 'Personnel', icon: <IconUsers />, area: 'finance' },
       { to: '/immobilisations', label: 'Immobilisations', icon: <IconBox />, area: 'finance' },
     ],
   },

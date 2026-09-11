@@ -77,6 +77,24 @@ certification ou une infrastructure).
 | API ouverte, connecteurs Odoo / SAP, consolidation multi-sociétés | plus tard |
 | Imprimantes de tickets (WebUSB / Bluetooth) | prochain |
 
+## Gestion opérationnelle
+
+L'application est née autour du stock : « j'achète, je revends ». C'est le bon
+socle pour une boutique, c'est étroit pour un salon, un artisan ou une agence,
+qui vendent du temps. Cette partie élargit sans alourdir la boutique.
+
+| Point | État |
+| --- | --- |
+| Personnel : fiches, présences pointées, avances sur salaire, paie versée ou due | fait |
+| Charge au brut, avance en créance, net en sortie d'argent — écritures automatiques | fait |
+| Bulletins réglementaires, cotisations sociales, déclarations sociales | plus tard |
+| Agenda et rendez-vous (salon, garage, chantier) | prochain |
+| Tâches à cocher, rattachées ou non à un projet | prochain |
+| Factures et charges récurrentes (loyer, abonnements, forfaits mensuels) | prochain |
+| Mode « sans stock » : les écrans stock s'effacent pour un métier de service | prochain |
+| Fiches recettes : un plat vendu décrémente ses ingrédients | prochain |
+| Suivi commercial : prospects, devis relancés, taux de transformation | plus tard |
+
 ## Intelligence artificielle
 
 | Point | État |

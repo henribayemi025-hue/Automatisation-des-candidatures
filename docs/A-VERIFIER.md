@@ -123,6 +123,25 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 - [ ] Historique : chaque action tracée, avec son auteur.
 - [ ] Exports Excel et PDF sur les écrans de rapports.
 
+## 6 bis. Personnel (nouveau)
+
+- [ ] Menu « Personnel » : la démo contient Awa (au mois, 85 000) et Paul
+      (à la journée, 3 500), avec six semaines de pointage et une avance
+      de 20 000 en cours.
+- [ ] « Nouvelle personne » : nom, poste, au mois / à la journée / à l'heure.
+- [ ] Onglet « Présences » : un clic par personne et par jour ; repointer
+      corrige au lieu d'ajouter une deuxième ligne.
+- [ ] « Avance » : l'argent versé apparaît en « Avance en cours », pas en
+      dépense — c'est une créance sur la personne.
+- [ ] Onglet « Paie » : le brut est calculé (salaire du mois, ou jours
+      pointés × taux), les avances sont retenues, le net s'affiche.
+- [ ] « Le net est versé aujourd'hui » décoché : la paie reste « Reste due »,
+      et le bouton « Verser » la solde plus tard.
+- [ ] Journal : écriture `PAIE-AAAA-MM` — la charge est au BRUT, jamais au net.
+- [ ] Après une paie : audit sans anomalie, bilan toujours vérifié.
+- [ ] Ce qui n'y est PAS : cotisations sociales, bulletin de paie
+      réglementaire, déclarations. C'est assumé, pas oublié.
+
 ## 7 bis. Ce qu'un comptable réclamait (nouveau)
 
 - [ ] **Immobilisations** (menu « Mon argent ») : la démo contient un
@@ -157,8 +176,11 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 - Constructeur de requêtes (question en langage courant → tableau).
 - Appels audio/vidéo dans la discussion ; réception des messages WhatsApp dans l'app.
 - Plusieurs espaces de travail pour un même propriétaire.
-- Paie (bulletins, cotisations) et déclarations fiscales pré-remplies :
-  un autre métier, à faire pays par pays.
+- Bulletins de paie réglementaires, cotisations sociales et déclarations
+  fiscales pré-remplies : un autre métier, à faire pays par pays.
+  (Le suivi du personnel, des avances et de la paie versée, lui, est fait.)
+- Agenda et rendez-vous ; tâches à cocher ; factures qui reviennent chaque
+  mois ; mode « sans stock » pour les métiers de service.
 - Lettrage automatique facture ↔ règlement, avoirs et retours de marchandise.
 - Les 8 photos de métiers pour l'écran d'accueil (attendues de Beau).
 

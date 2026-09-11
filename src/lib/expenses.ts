@@ -16,6 +16,8 @@ export const EXPENSE_LABEL: Record<AccountKey, string> = {
   CAPITAL: '',
   RESULT: '',
   RETAINED: '',
+  STAFF_ADVANCE: '',
+  STAFF_PAYABLE: '',
   EQUIPMENT: '',
   DEPRECIATION: '',
   INVENTORY: '',

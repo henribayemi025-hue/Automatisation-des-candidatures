@@ -21,6 +21,10 @@ import type {
   Message,
   FixedAsset,
   FiscalClosing,
+  Employee,
+  Attendance,
+  StaffAdvance,
+  PayrollRun,
 } from './types';
 
 export const DEFAULT_COMPANY: Company = {
@@ -57,6 +61,10 @@ export function emptyDB(): DB {
     sessions: [],
     projects: [],
     messages: [],
+    employees: [],
+    attendance: [],
+    advances: [],
+    payrolls: [],
     assets: [],
     depreciations: [],
     reconciliations: [],
@@ -77,6 +85,10 @@ export function normalizeDB(raw: Partial<DB> | null | undefined): DB {
     // Ajouté après coup : un instantané ancien n'a pas de projets.
     projects: raw.projects ?? [],
     messages: raw.messages ?? [],
+    employees: raw.employees ?? [],
+    attendance: raw.attendance ?? [],
+    advances: raw.advances ?? [],
+    payrolls: raw.payrolls ?? [],
     assets: raw.assets ?? [],
     depreciations: raw.depreciations ?? [],
     reconciliations: raw.reconciliations ?? [],
@@ -615,6 +627,129 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
         lines: p.lines as JournalLine[],
       });
       audit(db, ev, 'entry', entry.id, 'CREATE', `Écriture manuelle ${entry.ref} : ${entry.label}`);
+      break;
+    }
+
+    case 'employee.save': {
+      const employee = p.employee as Employee;
+      const idx = db.employees.findIndex((e) => e.id === employee.id);
+      if (idx >= 0) db.employees[idx] = { ...db.employees[idx], ...employee };
+      else db.employees.push(employee);
+      audit(db, ev, 'employee', employee.id, idx >= 0 ? 'UPDATE' : 'CREATE', `Personnel : ${employee.name}`);
+      break;
+    }
+
+    case 'employee.archive': {
+      const employee = db.employees.find((e) => e.id === p.employeeId);
+      if (!employee) break;
+      employee.archived = p.archived !== false;
+      audit(
+        db,
+        ev,
+        'employee',
+        employee.id,
+        employee.archived ? 'ARCHIVE' : 'RESTORE',
+        `${employee.name} ${employee.archived ? 'retiré du personnel' : 'réintégré'}`,
+      );
+      break;
+    }
+
+    case 'attendance.mark': {
+      const employeeId = p.employeeId as string;
+      const date = p.date as string;
+      // Une seule ligne par personne et par jour : repointer corrige.
+      const idx = db.attendance.findIndex((a) => a.employeeId === employeeId && a.date === date);
+      const row = {
+        id: (p.attendanceId as string) ?? `${employeeId}-${date}`,
+        employeeId,
+        date,
+        status: p.status as Attendance['status'],
+        hours: (p.hours as number) ?? 0,
+        note: (p.note as string) ?? '',
+        createdAt: ev.at,
+      };
+      if (idx >= 0) db.attendance[idx] = { ...db.attendance[idx], ...row, id: db.attendance[idx].id };
+      else db.attendance.push(row);
+      break;
+    }
+
+    case 'staff.advance': {
+      const advance = p.advance as StaffAdvance;
+      if (db.advances.some((a) => a.id === advance.id)) break;
+      const employee = db.employees.find((e) => e.id === advance.employeeId);
+      db.advances.push(advance);
+      post(db, ev, {
+        id: advance.entryId,
+        date: advance.date,
+        journal: 'OD',
+        ref: `AV-${db.advances.length}`,
+        label: `Avance sur salaire — ${employee?.name ?? 'Personnel'}`,
+        sourceType: 'advance',
+        sourceId: advance.id,
+        lines: [
+          { account: accountCode(chart, 'STAFF_ADVANCE'), label: employee?.name ?? 'Personnel', debit: advance.amount, credit: 0 },
+          { account: methodAccount(chart, advance.method), label: 'Décaissement', debit: 0, credit: advance.amount },
+        ],
+      });
+      audit(db, ev, 'employee', advance.employeeId, 'ADVANCE', `Avance versée à ${employee?.name ?? 'un salarié'}`);
+      break;
+    }
+
+    case 'payroll.run': {
+      const run = p.run as PayrollRun;
+      if (db.payrolls.some((r) => r.id === run.id)) break;
+      if (!run.slips.length || run.gross <= 0) break;
+
+      // La charge est le brut : c'est ce que le travail a coûté. Les avances
+      // ne sont pas une charge de plus, elles soldent une créance déjà là.
+      const lines: JournalLine[] = [
+        { account: accountCode(chart, 'PAYROLL'), label: `Salaires ${run.period}`, debit: run.gross, credit: 0 },
+      ];
+      if (run.advances > 0) {
+        lines.push({ account: accountCode(chart, 'STAFF_ADVANCE'), label: 'Avances retenues', debit: 0, credit: run.advances });
+      }
+      if (run.net > 0) {
+        lines.push(
+          run.paid
+            ? { account: methodAccount(chart, run.method), label: 'Net versé', debit: 0, credit: run.net }
+            : { account: accountCode(chart, 'STAFF_PAYABLE'), label: 'Net restant dû', debit: 0, credit: run.net },
+        );
+      }
+      post(db, ev, {
+        id: run.entryId,
+        date: run.date,
+        journal: 'OD',
+        ref: `PAIE-${run.period}`,
+        label: `Paie ${run.period}`,
+        sourceType: 'payroll',
+        sourceId: run.id,
+        lines,
+      });
+      db.payrolls.unshift(run);
+      audit(db, ev, 'payroll', run.id, 'CREATE', `Paie ${run.period} — ${run.slips.length} personne(s), brut ${run.gross}`);
+      break;
+    }
+
+    case 'payroll.settle': {
+      const run = db.payrolls.find((r) => r.id === p.runId);
+      if (!run || run.paid || run.net <= 0) break;
+      const method = (p.method as PaymentMethod) ?? run.method;
+      run.paid = true;
+      run.method = method;
+      post(db, ev, {
+        id: p.entryId as string,
+        date: p.date as string,
+        journal: 'OD',
+        ref: `PAIE-${run.period}-R`,
+        label: `Versement des salaires ${run.period}`,
+        sourceType: 'payroll',
+        sourceId: run.id,
+        lines: [
+          { account: accountCode(chart, 'STAFF_PAYABLE'), label: 'Salaires dus', debit: run.net, credit: 0 },
+          { account: methodAccount(chart, method), label: 'Net versé', debit: 0, credit: run.net },
+        ],
+      });
+      audit(db, ev, 'payroll', run.id, 'PAYMENT', `Salaires ${run.period} versés`);
       break;
     }
 
