@@ -1101,4 +1101,30 @@ export const EN: Record<string, string> = {
   'Vous êtes comptable ?': 'Are you an accountant?',
   'Ouvrir une démonstration': 'Open a demonstration',
   '— trois questions, puis trois mois d’activité déjà saisie.': '— three questions, then three months of activity already entered.',
+  'Une boutique, trois mois d’activité, déjà saisie.': 'One shop, three months of activity, already entered.',
+  'Choisissez votre pays : les chiffres s’affichent dans votre monnaie et votre plan comptable. Rien à créer, rien à installer.':
+    'Choose your country: figures appear in your currency and your chart of accounts. Nothing to create, nothing to install.',
+  'Ouvrir la démonstration pour': 'Open the demonstration for',
+  'Ou choisissez un autre pays': 'Or choose another country',
+  'Ouvrir la démonstration': 'Open the demonstration',
+  'Ce que contient la démonstration': 'What the demonstration contains',
+  'Achats reçus, payés, à crédit ou encore en attente': 'Purchases received, paid, on credit or still pending',
+  'Ventes au comptant, mobile money, carte et à crédit, avec encaissements partiels':
+    'Cash, mobile money, card and credit sales, with partial payments',
+  'Devis converti en facture, créances clients et dettes fournisseurs': 'Quote turned into an invoice, customer receivables and supplier payables',
+  'Loyer, salaires, électricité, transport sur trois mois': 'Rent, wages, electricity and transport over three months',
+  'Trois journées de caisse, dont une avec un manquant': 'Three till days, one of them short',
+  'Casse, écart d’inventaire, article en rupture et sous le seuil': 'Breakage, stocktake difference, an item out of stock and one below its reorder level',
+  'Dotation aux amortissements, et une écriture fausse puis extournée': 'Depreciation charge, and one wrong entry then reversed',
+  'Rien n’est partagé': 'Nothing is shared',
+  'Ces chiffres d’exemple restent sur votre appareil. Vous ne voyez les données de personne, personne ne voit les vôtres.':
+    'These sample figures stay on your device. You see nobody’s data, nobody sees yours.',
+  'Tout est modifiable': 'Everything can be changed',
+  'Saisissez une vente, extournez une écriture, exportez en Excel : c’est l’application complète, pas une image.':
+    'Record a sale, reverse an entry, export to Excel: this is the full application, not a picture.',
+  'Vous préférez partir d’un espace vide ?': 'Prefer to start from an empty workspace?',
+  'Aller à la connexion': 'Go to sign-in',
+  'Boutique de démonstration': 'Demonstration shop',
+  'Démonstration': 'Demonstration',
+  'chiffres d’exemple, gardés sur cet appareil. Tout est modifiable.': 'sample figures, kept on this device. Everything can be changed.',
 };

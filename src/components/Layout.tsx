@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import type { ReactNode } from 'react';
-import { useDB } from '../lib/store';
+import { useDB, useStoreActions } from '../lib/store';
 import { canAccess, useCollab } from '../lib/collab';
+import { DEMO_KEY } from '../pages/Demo';
 import { LanguageSwitch } from '../lib/i18n';
 import AppSwitcher from './AppSwitcher';
 import AssistantDrawer from './AssistantDrawer';
@@ -111,8 +112,18 @@ export default function Layout({ children }: { children: ReactNode }) {
   const { company } = useDB();
   const { user, sync, pending, signOut, workspace, workspaces, switchWorkspace, invitations, acceptInvitation, displayName, avatarUrl, setPage } =
     useCollab();
+  const { resetAll } = useStoreActions();
+  const [demo, setDemo] = useState(() => localStorage.getItem(DEMO_KEY) === '1');
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
+
+  /** Quitter la démonstration : on efface l'exemple et on propose la connexion. */
+  function leaveDemo() {
+    resetAll();
+    localStorage.removeItem(DEMO_KEY);
+    setDemo(false);
+    void signOut();
+  }
   const location = useLocation();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -267,6 +278,17 @@ export default function Layout({ children }: { children: ReactNode }) {
             )}
           </div>
         </header>
+
+        {demo && (
+          <div className="flex flex-wrap items-center gap-3 border-b border-brass/40 bg-[#FBF1DF] px-4 py-2.5 text-caption text-ink sm:px-6">
+            <span>
+              <strong>{t('Démonstration')}</strong> — {t('chiffres d’exemple, gardés sur cet appareil. Tout est modifiable.')}
+            </span>
+            <button onClick={leaveDemo} className="btn-primary px-3 py-1.5 text-caption">
+              {t('Créer mon compte')}
+            </button>
+          </div>
+        )}
 
         {invitations.length > 0 && (
           <div className="border-b border-brass/40 bg-[#FBF1DF] px-4 py-3 text-caption text-ink sm:px-6">

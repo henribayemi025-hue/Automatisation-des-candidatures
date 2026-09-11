@@ -1,9 +1,10 @@
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import { useCollab } from './lib/collab';
 import { useDB } from './lib/store';
 import Auth from './pages/Auth';
 import Onboarding from './pages/Onboarding';
+import Demo from './pages/Demo';
 import Dashboard from './pages/Dashboard';
 import Assistant from './pages/Assistant';
 import PointOfSale from './pages/PointOfSale';
@@ -75,8 +76,12 @@ function LocalConflict() {
 export default function App() {
   const { user, guest, loading, workspace, sync, sessionExpired } = useCollab();
   const db = useDB();
+  const { pathname } = useLocation();
 
   if (loading) return <Splash />;
+  // Lien de démonstration : un seul clic, sans compte. Une personne déjà
+  // connectée garde ses données — elle passe par les paramètres si elle veut l'exemple.
+  if (pathname === '/demo') return user ? <Navigate to="/" replace /> : <Demo />;
   // Une session expirée reprend la main sur le mode local : on propose la connexion plutôt que de basculer sans rien dire.
   if (!user && (!guest || sessionExpired)) return <Auth />;
   if (user && !workspace && sync !== 'error') return <Splash />;
