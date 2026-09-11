@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { hasContent, useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
-import { CURRENCIES } from '../lib/money';
+import { CURRENCIES, currencyLabel } from '../lib/money';
 import { SECTORS } from '../lib/guide';
 import type { Company } from '../lib/types';
 import { Field, PageHeader } from '../components/UI';
@@ -127,11 +127,18 @@ export default function Settings() {
             <Field label={t('Devise de travail')} hint={t('Les montants déjà saisis gardent leur valeur : changez de devise avant de commencer.')}>
               <select id="set-currency" value={c.currency} disabled={!canEdit} onChange={(e) => setCompany({ currency: e.target.value })} className="field">
                 <option value="">{t('— Choisir —')}</option>
-                {CURRENCIES.map((x) => (
-                  <option key={x.code} value={x.code}>
-                    {x.code} — {x.symbol}
-                  </option>
-                ))}
+                {countryProfile(c.country)?.currency && (
+                  <optgroup label={t('Proposée pour ce pays')}>
+                    <option value={countryProfile(c.country)!.currency}>{currencyLabel(countryProfile(c.country)!.currency)}</option>
+                  </optgroup>
+                )}
+                <optgroup label={t('Toutes les devises')}>
+                  {CURRENCIES.map((x) => (
+                    <option key={x.code} value={x.code}>
+                      {currencyLabel(x.code)}
+                    </option>
+                  ))}
+                </optgroup>
               </select>
             </Field>
             <Field label={t('Début d’exercice (MM-JJ)')}>

@@ -7,6 +7,8 @@ export type ISODate = string;
 export interface Currency {
   code: string;
   symbol: string;
+  /** Nom courant de la devise, affiché dans les listes de choix. */
+  name?: string;
   /** Nombre de décimales de l'unité mineure. XAF/XOF = 0, EUR/USD = 2. */
   decimals: number;
 }

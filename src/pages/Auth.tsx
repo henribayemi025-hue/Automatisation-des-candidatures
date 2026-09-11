@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useCollab } from '../lib/collab';
 import { Field } from '../components/UI';
 import { LanguageSwitch } from '../lib/i18n';
+import AppSwitcher from '../components/AppSwitcher';
 import { IconBook, IconEye, IconEyeOff, IconGoogle, IconMonitor, IconShield, IconSparkle, IconUsers } from '../components/Icons';
 import { t } from '../lib/i18n';
 
@@ -47,7 +48,10 @@ export default function Auth() {
             <span className="block font-display text-[26px] font-bold text-teal">{t('Finjaro')}</span>
             <span className="block text-[11px] font-bold uppercase tracking-[0.22em] text-[#8C6A3D]">{t('Accounting')}</span>
           </div>
-          <LanguageSwitch />
+          <div className="flex items-center gap-2">
+            <AppSwitcher align="end" />
+            <LanguageSwitch />
+          </div>
           </div>
 
           <h1 className="mt-8 font-display text-[38px] font-bold leading-[1.08] text-ink sm:text-[52px]">

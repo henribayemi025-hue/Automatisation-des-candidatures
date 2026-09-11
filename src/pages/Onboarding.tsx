@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
-import { CURRENCIES } from '../lib/money';
+import { CURRENCIES, currencyLabel } from '../lib/money';
 import { GOALS, SECTORS } from '../lib/guide';
 import { COUNTRIES, countryProfile, profileToCompany } from '../lib/countries';
 import { LanguageSwitch, t } from '../lib/i18n';
 import { Field } from '../components/UI';
 import { IconCheck, IconChevronRight } from '../components/Icons';
+import AppSwitcher from '../components/AppSwitcher';
 
 export default function Onboarding() {
   const { db, setCompany } = useStore();
@@ -52,6 +53,7 @@ export default function Onboarding() {
             <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C6A3D]">Accounting</span>
           </div>
           <div className="flex items-center gap-2">
+            <AppSwitcher align="end" />
             <LanguageSwitch />
             {!user && (
               <button type="button" onClick={() => void signOut()} className="btn-ghost py-1.5 text-caption">
@@ -137,11 +139,18 @@ export default function Onboarding() {
                 <Field label={t('Devise de travail')} hint={t('Celle dans laquelle vous fixez vos prix. À confirmer même si elle est proposée.')}>
                   <select id="ob-currency" value={currency} onChange={(e) => setCurrency(e.target.value)} className="field">
                     <option value="">{t('— Choisir —')}</option>
-                    {CURRENCIES.map((c) => (
-                      <option key={c.code} value={c.code}>
-                        {c.code} — {c.symbol}
-                      </option>
-                    ))}
+                    {profile?.currency && (
+                      <optgroup label={t('Proposée pour ce pays')}>
+                        <option value={profile.currency}>{currencyLabel(profile.currency)}</option>
+                      </optgroup>
+                    )}
+                    <optgroup label={t('Toutes les devises')}>
+                      {CURRENCIES.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {currencyLabel(c.code)}
+                        </option>
+                      ))}
+                    </optgroup>
                   </select>
                 </Field>
                 {profile && profile.name !== 'Autre' && (

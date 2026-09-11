@@ -12,7 +12,7 @@ const ACCENT: Record<FinjaroApp['accent'], string> = {
 };
 
 /** Sélecteur en grille « comme Google » : lit finjaro_apps, marque l'application ouverte. */
-export default function AppSwitcher() {
+export default function AppSwitcher({ align = 'start' }: { align?: 'start' | 'end' }) {
   const { user } = useCollab();
   const [open, setOpen] = useState(false);
   const [apps, setApps] = useState<FinjaroApp[]>(FALLBACK_APPS);
@@ -50,7 +50,13 @@ export default function AppSwitcher() {
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-50 mt-2 w-[320px] rounded-card border border-hairline bg-white p-2 shadow-[0_18px_40px_rgba(23,27,38,0.16)]">
+        <div
+          // Sur téléphone, le menu occupe la largeur de l'écran avec ses marges ;
+          // à partir de « sm », il s'accroche au bouton.
+          className={`fixed inset-x-4 top-[4.5rem] z-50 rounded-card border border-hairline bg-white p-2 shadow-[0_18px_40px_rgba(23,27,38,0.16)] sm:absolute sm:inset-x-auto sm:top-full sm:mt-2 sm:w-[320px] ${
+            align === 'end' ? 'sm:right-0' : 'sm:left-0'
+          }`}
+        >
           <div className="px-3 pb-2 pt-2 text-[11px] font-bold uppercase tracking-wider text-muted">
             {t('Applications Finjaro')}
           </div>
