@@ -28,6 +28,23 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 - [ ] 106 monnaies dans la liste, avec le bon nombre de décimales
       (yen sans centimes, dinar tunisien à 3 chiffres).
 
+## 3 bis. Accueil professionnel
+
+- [ ] Six indicateurs comparés (CA, marge brute, résultat, trésorerie, créances,
+      dettes) ; bouton MTD / YTD / 30 j ; « vs M-1 » ou « vs N-1 » sur chaque carte.
+- [ ] Cliquer une carte ouvre l'écran de détail ; courbe miniature dans CA et trésorerie.
+- [ ] Meilleures ventes : nom complet qui défile, part de marge, barre.
+- [ ] Graphique recettes / dépenses / trésorerie lisible sur téléphone.
+
+## 3 ter. Point de vente
+
+- [ ] Scanner un code-barres (ou taper une référence + Entrée) ajoute l'article,
+      avec un bip ; code inconnu signalé sans bloquer.
+- [ ] « Client passager » par défaut, « Identifier » seulement si besoin.
+- [ ] « Attente » met un panier de côté ; reprise en un clic.
+- [ ] Ventes : recherche par numéro, client, article ou montant ;
+      Caisse : « Retrouver un ticket ».
+
 ## 4. Rattrapage (pour qui ne saisit pas tous les jours)
 
 - [ ] « Jour par jour » : plusieurs lignes, chacune à sa date, ventes et dépenses.
@@ -36,6 +53,8 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 - [ ] « Photo d'une facture » : l'assistant lit le document et propose la dépense
       (demande d'être connecté).
 - [ ] Bandeau d'accueil après trois jours sans saisie.
+- [ ] « Reprise d'un bilan existant » : soldes d'ouverture saisis, ou balance
+      Excel / CSV importée ; écriture « AN » dans le journal ; bilan vérifié.
 
 ## 5. Projets (suivi à part : ouverture, chantier, événement, matériel)
 
@@ -49,7 +68,8 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 
 ## 6. Discussion (fil d'équipe)
 
-- [ ] Menu « Discussion » : canal Général + un canal par projet en cours.
+- [ ] Menu « Discussion » : sur ordinateur, canaux à gauche, fil au centre,
+      chiffres du projet (ou membres) à droite ; sur téléphone, pilules.
 - [ ] Envoyer un message ; il reste après rechargement ; partagé entre membres.
 - [ ] « @assistant … » : réponse dans le fil (IA connecté, moteur local sinon).
 - [ ] Connecté : joindre la photo d'une facture → l'assistant propose la dépense,
@@ -79,8 +99,15 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 - Immobilisations et amortissements automatiques, paie, déclarations fiscales.
 - Les 8 photos de métiers pour l'écran d'accueil (attendues de Beau).
 
-## Dernier balayage automatique (11/09/2026)
+## Documents
 
+- docs/SECTEURS.md : comment chaque métier se gère, ce qui est fait, ce qui reste.
+- docs/FEUILLE-DE-ROUTE.md : les 100 points classés fait / prochain / plus tard.
+
+## Dernier balayage automatique (11/09/2026, soir)
+
+- Accueil, point de vente (scanner simulé, attente, recherche), reprise de bilan
+  (saisie et import CSV), discussion trois colonnes rejoués : OK.
 - 27 écrans ouverts en démo à 390 px et 1 280 px : aucune erreur, aucun débordement.
 - Parcours rejoués : connexion, session expirée, démo (lien direct par pays),
   FR/EN, profils pays, devises, rattrapage (journées, relevé, photo), rappel,

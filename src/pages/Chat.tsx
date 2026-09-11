@@ -11,6 +11,9 @@ import type { AccountKey } from '../lib/chart';
 import { EXPENSE_LABEL } from '../lib/expenses';
 import { factor } from '../lib/money';
 import { locale, t } from '../lib/i18n';
+import { projectSummary } from '../lib/metrics';
+import { kindLabel } from './Projects';
+import { formatMoney } from '../lib/money';
 import type { Message, PaymentMethod } from '../lib/types';
 import { Avatar } from '../components/PresenceAvatars';
 import { Empty, PageHeader } from '../components/UI';
@@ -50,7 +53,7 @@ function timeOf(iso: string): string {
 export default function Chat() {
   const { projectId: fromUrl } = useParams();
   const { db, postMessage, addExpense } = useStore();
-  const { user, workspace, displayName, avatarUrl, presence } = useCollab();
+  const { user, workspace, displayName, avatarUrl, presence, members } = useCollab();
   const [channel, setChannel] = useState<string>(fromUrl ?? '');
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
@@ -65,6 +68,14 @@ export default function Chat() {
 
   const projects = db.projects.filter((p) => p.status === 'ACTIVE');
   const messages = useMemo(() => db.messages.filter((m) => (m.projectId ?? '') === channel), [db.messages, channel]);
+  const lastOf = (id: string) => db.messages.filter((m) => (m.projectId ?? '') === id).slice(-1)[0];
+  const countOf = (id: string) => db.messages.filter((m) => (m.projectId ?? '') === id).length;
+  const project = channel ? db.projects.find((p) => p.id === channel) : undefined;
+  const summary = useMemo(() => (project ? projectSummary(db, project.id) : null), [db, project]);
+  const channelTitle = project ? project.name : t('Général');
+  const channelHint = project
+    ? t('Fil du projet : factures, avancement, décisions — tout reste rattaché aux chiffres du projet.')
+    : t('Annonces et vie de l’entreprise : caisse, stock, horaires, questions à l’assistant.');
   const canAttach = !!user && !!workspace;
 
   useEffect(() => {
@@ -162,32 +173,46 @@ export default function Chat() {
         }
       />
 
-      <div className="no-scrollbar mb-4 flex gap-2 overflow-x-auto">
-        <button
-          type="button"
-          onClick={() => setChannel('')}
-          className={`shrink-0 rounded-pill border px-4 py-2 text-caption font-semibold ${channel === '' ? 'border-teal bg-teal text-white' : 'border-hairline bg-white text-ink hover:border-teal'}`}
-        >
-          {t('Général')}
-        </button>
-        {projects.map((p) => (
+      {/* Téléphone : les canaux en pilules. Ordinateur : colonne de gauche, façon Slack. */}
+      <div className="no-scrollbar mb-3 flex gap-2 overflow-x-auto lg:hidden">
+        {[{ id: '', name: t('Général') }, ...projects].map((c) => (
           <button
-            key={p.id}
+            key={c.id || 'general'}
             type="button"
-            onClick={() => setChannel(p.id)}
-            className={`shrink-0 rounded-pill border px-4 py-2 text-caption font-semibold ${channel === p.id ? 'border-teal bg-teal text-white' : 'border-hairline bg-white text-ink hover:border-teal'}`}
+            onClick={() => setChannel(c.id)}
+            className={`shrink-0 rounded-pill border px-4 py-2 text-caption font-semibold ${channel === c.id ? 'border-teal bg-teal text-white' : 'border-hairline bg-white text-ink hover:border-teal'}`}
           >
-            {p.name}
+            {c.id ? '# ' : ''}{c.name}
           </button>
         ))}
-        {projects.length === 0 && (
-          <Link to="/projets" className="shrink-0 rounded-pill border border-dashed border-hairline px-4 py-2 text-caption text-muted hover:border-teal hover:text-teal">
-            {t('+ Un fil par projet')}
-          </Link>
-        )}
       </div>
 
-      <div className="card flex h-[calc(100vh-360px)] min-h-[420px] flex-col p-0 lg:h-[calc(100vh-280px)]">
+      <div className="grid gap-4 lg:grid-cols-[240px_1fr_280px]">
+        <aside className="hidden lg:block">
+          <div className="card p-2">
+            <div className="px-2 pb-1 pt-1 text-[11px] font-bold uppercase tracking-wider text-muted">{t('Canaux')}</div>
+            <ChannelRow active={channel === ''} onClick={() => setChannel('')} name={t('Général')} hint={t('Toute l’équipe')} count={countOf('')} last={lastOf('')?.createdAt} />
+            <div className="mt-2 flex items-center justify-between px-2 pb-1 pt-2 text-[11px] font-bold uppercase tracking-wider text-muted">
+              <span>{t('Projets')}</span>
+              <Link to="/projets" className="font-semibold normal-case tracking-normal text-teal">
+                {t('Gérer')}
+              </Link>
+            </div>
+            {projects.map((p) => (
+              <ChannelRow key={p.id} active={channel === p.id} onClick={() => setChannel(p.id)} name={`# ${p.name}`} hint={t(kindLabel(p.kind))} count={countOf(p.id)} last={lastOf(p.id)?.createdAt} />
+            ))}
+            {projects.length === 0 && <p className="px-2 py-2 text-[11px] text-muted">{t('Créez un projet pour lui ouvrir un fil.')}</p>}
+          </div>
+        </aside>
+
+      <div className="card flex h-[calc(100vh-360px)] min-h-[420px] min-w-0 flex-col p-0 lg:h-[calc(100vh-280px)]">
+        <div className="flex items-center justify-between gap-3 border-b border-hairline px-4 py-2.5 sm:px-5">
+          <div className="min-w-0">
+            <div className="truncate text-body font-semibold text-ink">{project ? `# ${channelTitle}` : channelTitle}</div>
+            <div className="truncate text-[11px] text-muted">{channelHint}</div>
+          </div>
+          <span className="shrink-0 text-[11px] text-muted">{t('{n} message(s)', { n: messages.length })}</span>
+        </div>
         <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4 scrollbar-thin sm:px-5">
           {messages.length === 0 && (
             <Empty
@@ -309,6 +334,74 @@ export default function Chat() {
           </p>
         </div>
       </div>
+
+        <aside className="hidden lg:block">
+          {project && summary ? (
+            <div className="card">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-muted">{t('Le projet en chiffres')}</div>
+              <div className="mt-2 text-body font-semibold text-ink">{project.name}</div>
+              <dl className="mt-3 space-y-2 text-caption">
+                <div className="flex justify-between"><dt className="text-muted">{t('Budget')}</dt><dd className="tabular-nums font-semibold">{formatMoney(project.budget, db.company.currency)}</dd></div>
+                <div className="flex justify-between"><dt className="text-muted">{t('Dépensé')}</dt><dd className="tabular-nums font-semibold">{formatMoney(summary.spent, db.company.currency)}</dd></div>
+                <div className="flex justify-between"><dt className="text-muted">{t('Recettes')}</dt><dd className="tabular-nums font-semibold">{formatMoney(summary.revenue, db.company.currency)}</dd></div>
+                <div className="flex justify-between border-t border-hairline pt-2"><dt className="text-muted">{t('Marge')}</dt><dd className={`tabular-nums font-semibold ${summary.margin < 0 ? 'text-[#A63030]' : 'text-[#1F6F65]'}`}>{formatMoney(summary.margin, db.company.currency)}</dd></div>
+              </dl>
+              {project.budget > 0 && (
+                <div className="mt-3 h-1.5 rounded-full bg-base">
+                  <div className={`h-1.5 rounded-full ${summary.spent > project.budget ? 'bg-[#A63030]' : 'bg-teal'}`} style={{ width: `${Math.min(100, (summary.spent / project.budget) * 100)}%` }} />
+                </div>
+              )}
+              <Link to={`/projets/${project.id}`} className="btn-ghost mt-3 w-full">
+                {t('Ouvrir la fiche projet')}
+              </Link>
+            </div>
+          ) : (
+            <div className="card">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-muted">{t('Membres')}</div>
+              <ul className="mt-2 space-y-2 text-caption">
+                <li className="flex items-center gap-2">
+                  <Avatar name={displayName} src={avatarUrl} size={26} />
+                  <span className="min-w-0 flex-1 truncate">{displayName} <span className="text-muted">— {t('vous')}</span></span>
+                </li>
+                {members.filter((m) => m.status !== 'removed').map((m, i) => (
+                  <li key={m.email} className="flex items-center gap-2">
+                    <Avatar name={m.displayName ?? m.email} size={26} index={i + 1} />
+                    <span className="min-w-0 flex-1 truncate">{m.displayName ?? m.email}</span>
+                    <span className="text-[10px] uppercase tracking-wider text-muted">{t(m.role)}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-3 text-[11px] text-muted">
+                {presence.length > 0 ? t('{n} en ligne maintenant', { n: presence.length }) : user ? t('Personne d’autre en ligne') : t('Sans compte, la discussion reste sur cet appareil.')}
+              </div>
+              {user && (
+                <Link to="/equipe" className="btn-ghost mt-3 w-full">
+                  {t('Inviter quelqu’un')}
+                </Link>
+              )}
+            </div>
+          )}
+        </aside>
+      </div>
     </>
+  );
+}
+
+function ChannelRow({ active, onClick, name, hint, count, last }: { active: boolean; onClick: () => void; name: string; hint: string; count: number; last?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex w-full items-center gap-2 rounded-input px-2 py-1.5 text-left transition ${active ? 'bg-teal-light text-teal' : 'hover:bg-base'}`}
+    >
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-caption font-semibold">{name}</span>
+        <span className={`block truncate text-[11px] ${active ? 'text-teal/80' : 'text-muted'}`}>{hint}</span>
+      </span>
+      <span className="shrink-0 text-right text-[10px] tabular-nums text-muted">
+        {count > 0 && <span className="block">{count}</span>}
+        {last && <span className="block">{timeOf(last).split(' ')[0]}</span>}
+      </span>
+    </button>
   );
 }
