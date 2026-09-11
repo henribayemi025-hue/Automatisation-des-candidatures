@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import { insights } from './assistant';
-import { outstanding, productPerformance, snapshot } from './metrics';
+import { outstanding, productPerformance, projectSummary, snapshot } from './metrics';
 import { formatMoney } from './money';
 import { MODULE_HELP } from './guide';
 import type { DB } from './types';
@@ -80,6 +80,10 @@ export function buildContext(db: DB, pathname: string) {
       .slice(0, 5)
       .map((x) => ({ numero: x.number, date: x.date, client: x.customerName, total: money(x.total), paye: money(x.paid) })),
     dernieres_depenses: db.expenses.slice(0, 5).map((e) => ({ date: e.date, poste: e.category, montant: money(e.amount) })),
+    projets: db.projects.slice(0, 10).map((p) => {
+      const ps = projectSummary(db, p.id);
+      return { nom: p.name, type: p.kind, etat: p.status, budget: money(p.budget), depense: money(ps.spent), reste: money(ps.remaining), recettes: money(ps.revenue), marge: money(ps.margin) };
+    }),
     caisse_ouverte: db.sessions.some((x) => !x.closedAt),
     alertes: insights(db).map((t) => t.text),
   };

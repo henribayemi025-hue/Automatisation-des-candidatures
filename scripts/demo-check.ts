@@ -2,7 +2,7 @@ import { buildDemoEvents } from '../src/lib/demo';
 import { applyEvent, emptyDB } from '../src/lib/reducer';
 import { profileToCompany } from '../src/lib/countries';
 import { balanceSheet, incomeStatement, runAuditChecks, trialBalance } from '../src/lib/ledger';
-import { outstanding, snapshot } from '../src/lib/metrics';
+import { outstanding, projectSummary, snapshot } from '../src/lib/metrics';
 import { countryProfile } from '../src/lib/countries';
 
 const today = process.argv[2] ?? new Date().toISOString().slice(0, 10);
@@ -39,3 +39,6 @@ console.log('--- soldes par compte ---');
 for (const b of tb) if (b.debit || b.credit) console.log(`${b.account.code} ${b.account.label}: D ${b.debit} C ${b.credit} = ${b.balance}`);
 console.log('--- caisse ---');
 for (const s of db.sessions) console.log(s.openedAt.slice(0,10), 'ouverture', s.opening, 'attendu', s.expected, 'compté', s.counted, 'écart', s.variance);
+
+console.log('--- projets ---');
+for (const p of db.projects) { const ps = projectSummary(db, p.id); console.log(p.name, '| budget', p.budget, 'dépensé', ps.spent, 'recettes', ps.revenue, 'marge', ps.margin, 'ops', ps.operations.length); }

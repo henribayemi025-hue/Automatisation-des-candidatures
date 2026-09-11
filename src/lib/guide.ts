@@ -212,6 +212,13 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
     example: 'Vous collez vos messages Mobile Money de la semaine : chaque ligne devient une recette ou une dépense, à sa date.',
     questions: ['Comment rattraper une semaine ?', 'Comment lire une facture en photo ?', 'Comment importer mon relevé ?'],
   },
+  '/projets': {
+    title: 'Projets',
+    what: 'Suivre à part ce qui sort du quotidien — ouverture d’un point de vente, chantier, événement, achat de matériel — avec un budget, les dépenses et les recettes rattachées, et la marge.',
+    when: 'Dès qu’une opération ne concerne pas la boutique de tous les jours, mais un projet précis dont vous voulez connaître le coût.',
+    example: 'Projet « Ouverture du rayon papeterie », budget 150 000 : achats du stock de départ, étagères, affiche — et les ventes de cahiers en face. Vous voyez si le rayon est rentable.',
+    questions: ['Où en est mon projet ?', 'Combien m’a coûté ce projet ?', 'Quel projet est le plus rentable ?'],
+  },
   '/parametres': {
     title: 'Paramètres',
     what: 'Le nom de l’entreprise, la devise, le mode d’affichage (simple ou expert) et le référentiel comptable.',

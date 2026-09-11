@@ -9,6 +9,7 @@ import type { Direction, StatementRow } from '../lib/statement';
 import type { PaymentMethod, SaleLine } from '../lib/types';
 import { Empty, Money, PageHeader, Table } from '../components/UI';
 import AssistantChat from '../components/AssistantChat';
+import ProjectSelect from '../components/ProjectSelect';
 import { IconCamera, IconPlus, IconSparkle, IconTrash } from '../components/Icons';
 import { t } from '../lib/i18n';
 
@@ -31,11 +32,12 @@ interface Row {
   amountRaw: string;
   method: PaymentMethod;
   category: AccountKey;
+  projectId: string;
 }
 
 let rowSeq = 0;
 function blankRow(date: string): Row {
-  return { id: ++rowSeq, date, kind: 'SALE', productId: '', label: '', qty: '1', amountRaw: '', method: 'CASH', category: 'PURCHASES' };
+  return { id: ++rowSeq, date, kind: 'SALE', productId: '', label: '', qty: '1', amountRaw: '', method: 'CASH', category: 'PURCHASES', projectId: '' };
 }
 
 /** Les jours ouvrés récents, du plus proche au plus lointain. */
@@ -58,6 +60,7 @@ export default function CatchUp() {
   const { db, recordSale, addExpense } = useStore();
   const [tab, setTab] = useState<Tab>('days');
   const products = useMemo(() => db.products.filter((p) => !p.archived), [db.products]);
+  const hasProjects = db.projects.some((p) => p.status === 'ACTIVE');
 
   // ---- Onglet « jour par jour » ----
   const [rows, setRows] = useState<Row[]>(() => [blankRow(today()), blankRow(today()), blankRow(today())]);
@@ -95,6 +98,7 @@ export default function CatchUp() {
           customerId: null,
           customerName: '',
           paid: product ? product.price * qty : amount,
+          projectId: row.projectId || null,
         });
       } else {
         addExpense({
@@ -104,6 +108,7 @@ export default function CatchUp() {
           description: row.label.trim(),
           amount,
           method: row.method,
+          projectId: row.projectId || null,
         });
       }
       n += 1;
@@ -223,7 +228,7 @@ export default function CatchUp() {
           </div>
 
           <div className="overflow-x-auto">
-            <Table head={['Date', 'Type', 'Produit ou libellé', 'Qté', 'Montant', 'Paiement', '']}>
+            <Table head={['Date', 'Type', 'Produit ou libellé', 'Qté', 'Montant', 'Paiement', hasProjects ? 'Projet' : '', '']}>
               {rows.map((row) => {
                 const product = products.find((p) => p.id === row.productId);
                 return (
@@ -294,6 +299,11 @@ export default function CatchUp() {
                         ))}
                       </select>
                     </td>
+                    {hasProjects && (
+                      <td className="td">
+                        <ProjectSelect compact value={row.projectId} onChange={(v) => patch(row.id, { projectId: v })} />
+                      </td>
+                    )}
                     <td className="td">
                       <button type="button" onClick={() => setRows((l) => l.filter((r) => r.id !== row.id))} aria-label={t('Supprimer la ligne')} className="text-muted hover:text-[#D14343]">
                         <IconTrash className="h-4 w-4" />

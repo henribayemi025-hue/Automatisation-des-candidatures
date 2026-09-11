@@ -5,6 +5,7 @@ import type { PaymentMethod, SaleLine } from '../lib/types';
 import { Badge, Empty, Field, Money, PageHeader } from '../components/UI';
 import { IconBox, IconCart, IconCheck, IconDoc, IconSearch, IconX } from '../components/Icons';
 import { t } from '../lib/i18n';
+import ProjectSelect from '../components/ProjectSelect';
 
 const METHODS: { value: PaymentMethod; label: string }[] = [
   { value: 'CASH', label: 'Espèces' },
@@ -19,6 +20,7 @@ export default function PointOfSale() {
   const [query, setQuery] = useState('');
   const [cart, setCart] = useState<SaleLine[]>([]);
   const [customerId, setCustomerId] = useState('');
+  const [projectId, setProjectId] = useState('');
   const [discountRaw, setDiscountRaw] = useState('');
   const [method, setMethod] = useState<PaymentMethod>('CASH');
   const [paidRaw, setPaidRaw] = useState('');
@@ -105,6 +107,7 @@ export default function PointOfSale() {
       customerName: customer?.name ?? 'Client passager',
       paid: effectivePaid,
       asQuote,
+      projectId: projectId || null,
     });
     setFlash(asQuote ? t('Devis {n} enregistré.', { n: sale.number }) : t('Vente {n} enregistrée.', { n: sale.number }));
     reset();
@@ -232,6 +235,8 @@ export default function PointOfSale() {
                 ))}
               </select>
             </Field>
+
+            <ProjectSelect value={projectId} onChange={setProjectId} />
 
             <Field label={t('Remise')}>
               <input

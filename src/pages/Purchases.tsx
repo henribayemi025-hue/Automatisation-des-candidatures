@@ -6,6 +6,7 @@ import type { PurchaseLine } from '../lib/types';
 import { Badge, Empty, Field, Money, PageHeader, StatCard, Table, Modal } from '../components/UI';
 import { IconCart, IconPlus, IconX } from '../components/Icons';
 import { t } from '../lib/i18n';
+import ProjectSelect from '../components/ProjectSelect';
 
 type Filter = 'ALL' | 'PENDING' | 'RECEIVED';
 
@@ -16,6 +17,7 @@ export default function Purchases() {
   const [open, setOpen] = useState(false);
   const [supplierId, setSupplierId] = useState('');
   const [supplierName, setSupplierName] = useState('');
+  const [projectId, setProjectId] = useState('');
   const [lines, setLines] = useState<PurchaseLine[]>([]);
   const [paidRaw, setPaidRaw] = useState('');
   const [error, setError] = useState('');
@@ -55,8 +57,10 @@ export default function Purchases() {
       supplierId: supplierId || null,
       supplierName: supplierName || db.suppliers.find((s) => s.id === supplierId)?.name || 'Fournisseur',
       paid: toMinor(paidRaw || 0, currency),
+      projectId: projectId || null,
     });
     setLines([]);
+    setProjectId('');
     setSupplierId('');
     setSupplierName('');
     setPaidRaw('');
@@ -177,6 +181,7 @@ export default function Purchases() {
               <input value={supplierName} onChange={(e) => setSupplierName(e.target.value)} className="field" />
             </Field>
           )}
+          <ProjectSelect value={projectId} onChange={setProjectId} />
         </div>
 
         <div className="mt-4">

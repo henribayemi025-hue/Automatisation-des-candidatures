@@ -10,6 +10,8 @@ import Assistant from './pages/Assistant';
 import PointOfSale from './pages/PointOfSale';
 import CashRegister from './pages/CashRegister';
 import CatchUp from './pages/CatchUp';
+import Projects from './pages/Projects';
+import ProjectDetail from './pages/ProjectDetail';
 import Products from './pages/Products';
 import Purchases from './pages/Purchases';
 import Stock from './pages/Stock';
@@ -114,6 +116,8 @@ export default function App() {
           <Route path="/devis" element={<Quotes />} />
           <Route path="/tiers" element={<Parties />} />
           <Route path="/dettes" element={<Debts />} />
+          <Route path="/projets" element={<Projects />} />
+          <Route path="/projets/:id" element={<ProjectDetail />} />
           <Route path="/depenses" element={<Expenses />} />
           <Route path="/analyse" element={<Analytics />} />
           <Route path="/rapports" element={<Reports />} />

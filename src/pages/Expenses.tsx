@@ -8,6 +8,7 @@ import { Empty, Field, Modal, Money, PageHeader, StatCard, Table } from '../comp
 import { IconPlus, IconWallet } from '../components/Icons';
 import { t } from '../lib/i18n';
 import { EXPENSE_LABEL as CATEGORY_LABEL } from '../lib/expenses';
+import ProjectSelect from '../components/ProjectSelect';
 
 
 export default function Expenses() {
@@ -20,6 +21,7 @@ export default function Expenses() {
   const [description, setDescription] = useState('');
   const [amountRaw, setAmountRaw] = useState('');
   const [method, setMethod] = useState<PaymentMethod>('CASH');
+  const [projectId, setProjectId] = useState('');
 
   const filtered = useMemo(
     () =>
@@ -49,8 +51,10 @@ export default function Expenses() {
       description,
       amount,
       method,
+      projectId: projectId || null,
     });
     setAmountRaw('');
+    setProjectId('');
     setDescription('');
     setOpen(false);
   }
@@ -172,6 +176,7 @@ export default function Expenses() {
               <option value="CARD">{t('Carte')}</option>
             </select>
           </Field>
+          <ProjectSelect value={projectId} onChange={setProjectId} />
         </div>
         <div className="mt-6 flex justify-end gap-2">
           <button onClick={() => setOpen(false)} className="btn-ghost">

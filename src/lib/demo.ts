@@ -217,6 +217,7 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
   purchase(-90, 0, [{ productIndex: 0, qty: 60, unitCost: 14500 }, { productIndex: 1, qty: 120, unitCost: 5000 }, { productIndex: 7, qty: 80, unitCost: 800 }], 1, true);
   purchase(-62, 0, [{ productIndex: 3, qty: 400, unitCost: 640 }, { productIndex: 4, qty: 180, unitCost: 1900 }, { productIndex: 0, qty: 40, unitCost: 14800 }], 0.5, true);
   purchase(-30, 1, [{ productIndex: 2, qty: 120, unitCost: 3550 }, { productIndex: 6, qty: 60, unitCost: 880 }, { productIndex: 1, qty: 60, unitCost: 5100 }], 0, true);
+  purchase(-50, 2, [{ productIndex: 5, qty: 30, unitCost: 2400 }], 1, true);
   purchase(-4, 2, [{ productIndex: 5, qty: 25, unitCost: 2400 }], 0, false);
 
   // ---- Ventes réparties sur trois mois ----
@@ -262,6 +263,11 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
     return record;
   }
 
+  // Ventes de cahiers à l'école, réservées avant le tout-venant : elles
+  // alimentent le projet « rayon papeterie ».
+  const schoolSale = sale(-45, 15, [{ productIndex: 5, qty: 10 }], 'CREDIT', 1, 0);
+  const schoolSale2 = sale(-22, 10, [{ productIndex: 5, qty: 12 }], 'MOBILE', 1, 1);
+
   const methods: PaymentMethod[] = ['CASH', 'CASH', 'MOBILE', 'CASH', 'CARD', 'MOBILE'];
   for (let day = -89; day <= -1; day += 1) {
     const weekday = new Date(`${dayISO(base, day)}T12:00:00.000Z`).getUTCDay();
@@ -278,7 +284,6 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
 
   // Ventes à crédit à des clients identifiés : de quoi tester les créances.
   sale(-70, 16, [{ productIndex: 0, qty: 6 }, { productIndex: 1, qty: 4 }], 'CREDIT', 0, 0.3);
-  sale(-45, 15, [{ productIndex: 5, qty: 10 }], 'CREDIT', 1, 0);
   sale(-20, 11, [{ productIndex: 2, qty: 8 }, { productIndex: 3, qty: 20 }], 'CREDIT', 3, 0.5);
   sale(-8, 17, [{ productIndex: 4, qty: 5 }], 'CREDIT', 2, 0);
 
@@ -299,6 +304,33 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
 
   // ---- Réassort de fin de mois : de quoi montrer les alertes de seuil ----
   purchase(-2, 1, [{ productIndex: 0, qty: 8, unitCost: 14800 }, { productIndex: 7, qty: 10, unitCost: 820 }], 0, true);
+
+  // ---- Un projet : le nouveau rayon papeterie, avec son budget et ses opérations ----
+  const projectId = `${runId}-prj-1`;
+  emit(stamp(dayISO(base, -52), 9), 'project.save', {
+    project: {
+      id: projectId,
+      name: 'Ouverture du rayon papeterie',
+      kind: 'opening',
+      budget: money(150000),
+      startDate: dayISO(base, -52),
+      endDate: dayISO(base, 30),
+      status: 'ACTIVE',
+      notes: 'Étagères par le menuisier du quartier, stock de départ chez Papeterie du Sud.',
+      createdAt: stamp(dayISO(base, -52), 9),
+    },
+  });
+  for (const [day, description, amount] of [[-51, 'Menuisier — étagères du rayon', 45000], [-40, 'Affiche et flyers du rayon', 8000]] as [number, string, number][]) {
+    const date = dayISO(base, day);
+    emit(stamp(date, 16), 'expense.add', {
+      expense: { id: id(), date, projectId, category: 'Services extérieurs', account: accountCode(chart, 'SERVICES'), description, amount: money(amount), method: 'CASH', createdAt: stamp(date, 16) },
+      entryId: id(),
+    });
+  }
+  // Rattachements après coup : l'achat de départ et les ventes à l'école.
+  emit(stamp(dayISO(base, -50), 11), 'project.assign', { kind: 'purchase', id: `${runId}-pur-3`, projectId });
+  if (schoolSale) emit(stamp(dayISO(base, -45), 16), 'project.assign', { kind: 'sale', id: schoolSale.id, projectId });
+  if (schoolSale2) emit(stamp(dayISO(base, -22), 11), 'project.assign', { kind: 'sale', id: schoolSale2.id, projectId });
 
   // ---- Encaissements partiels sur les créances ----
   customerDebts.slice(0, 3).forEach((debt, i) => {

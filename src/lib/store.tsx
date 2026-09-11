@@ -19,6 +19,7 @@ import type {
   SaleLine,
   Supplier,
   WorkspaceEvent,
+  Project,
 } from './types';
 
 export function newId(): string {
@@ -62,6 +63,7 @@ interface SaleInput {
   lines: SaleLine[];
   /** Date de l'opération : permet de rattraper des journées passées. */
   date?: string;
+  projectId?: string | null;
   discount: Minor;
   method: PaymentMethod;
   customerId: string | null;
@@ -73,6 +75,7 @@ interface SaleInput {
 interface PurchaseInput {
   lines: PurchaseLine[];
   date?: string;
+  projectId?: string | null;
   supplierId: string | null;
   supplierName: string;
   paid: Minor;
@@ -80,6 +83,7 @@ interface PurchaseInput {
 
 interface ExpenseInput {
   date: string;
+  projectId?: string | null;
   category: string;
   accountKey: AccountKey;
   description: string;
@@ -126,6 +130,8 @@ export interface StoreActions {
   closeSession: (counted: Minor) => void;
   /** Charge un jeu d'essai complet (trois mois d'activité) et renvoie le nombre d'événements. */
   loadDemo: () => number;
+  saveProject: (project: Omit<Project, 'id' | 'createdAt'> & { id?: string }) => Project;
+  assignToProject: (kind: 'sale' | 'purchase' | 'expense', id: string, projectId: string | null) => void;
   resetAll: () => void;
 }
 
@@ -245,6 +251,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             dbRef.current.sales.filter((s) => (isQuote ? s.status === 'QUOTE' : s.status !== 'QUOTE')).length,
           ),
           date: input.date || today(),
+          projectId: input.projectId ?? null,
           customerId: input.customerId,
           customerName: input.customerName || 'Client passager',
           lines: input.lines,
@@ -293,6 +300,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           id: newId(),
           number: nextNumber('BC', dbRef.current.purchases.length),
           date: input.date || today(),
+          projectId: input.projectId ?? null,
           supplierId: input.supplierId,
           supplierName: input.supplierName || 'Fournisseur',
           lines: input.lines,
@@ -321,6 +329,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           expense: {
             id: newId(),
             date: input.date,
+            projectId: input.projectId ?? null,
             category: input.category,
             account: accountCode(chart(), input.accountKey),
             description: input.description,
@@ -404,6 +413,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         commit(next);
         kept.forEach((ev) => listeners.current.forEach((l) => l(ev)));
         return kept.length;
+      },
+
+      saveProject(input) {
+        const existing = input.id ? dbRef.current.projects.find((x) => x.id === input.id) : undefined;
+        const project: Project = {
+          ...input,
+          id: existing?.id ?? input.id ?? newId(),
+          createdAt: existing?.createdAt ?? new Date().toISOString(),
+        };
+        dispatch('project.save', { project });
+        return project;
+      },
+
+      assignToProject(kind, id, projectId) {
+        dispatch('project.assign', { kind, id, projectId });
       },
 
       resetAll() {

@@ -17,6 +17,7 @@ import type {
   Sale,
   Supplier,
   WorkspaceEvent,
+  Project,
 } from './types';
 
 export const DEFAULT_COMPANY: Company = {
@@ -50,6 +51,7 @@ export function emptyDB(): DB {
     movements: [],
     debts: [],
     sessions: [],
+    projects: [],
     audit: [],
   };
 }
@@ -63,6 +65,8 @@ export function normalizeDB(raw: Partial<DB> | null | undefined): DB {
     ...raw,
     company: { ...base.company, ...(raw.company ?? {}) },
     accounts: raw.accounts?.length ? raw.accounts : base.accounts,
+    // Ajouté après coup : un instantané ancien n'a pas de projets.
+    projects: raw.projects ?? [],
   };
 }
 
@@ -586,6 +590,29 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
         });
       }
       audit(db, ev, 'session', session.id, 'CLOSE', `Clôture de caisse — écart ${session.variance}`);
+      break;
+    }
+
+    case 'project.save': {
+      const project = p.project as Project;
+      const idx = db.projects.findIndex((x) => x.id === project.id);
+      if (idx >= 0) db.projects[idx] = project;
+      else db.projects.unshift(project);
+      audit(db, ev, 'project', project.id, idx >= 0 ? 'UPDATE' : 'CREATE', `Projet : ${project.name}`);
+      break;
+    }
+
+    case 'project.assign': {
+      // Rattache (ou détache, projectId null) une opération existante à un projet.
+      const kind = p.kind as 'sale' | 'purchase' | 'expense';
+      const targetId = p.id as string;
+      const projectId = (p.projectId as string | null) ?? null;
+      const list = kind === 'sale' ? db.sales : kind === 'purchase' ? db.purchases : db.expenses;
+      const item = (list as { id: string; projectId?: string | null }[]).find((x) => x.id === targetId);
+      if (!item) break;
+      item.projectId = projectId;
+      const project = db.projects.find((x) => x.id === projectId);
+      audit(db, ev, 'project', projectId ?? targetId, 'ASSIGN', project ? `Opération rattachée au projet ${project.name}` : 'Opération détachée de son projet');
       break;
     }
 

@@ -32,6 +32,7 @@ import {
   IconWallet,
   IconX,
   IconCamera,
+  IconFolder,
 } from './Icons';
 import { t } from '../lib/i18n';
 
@@ -74,6 +75,7 @@ const NAV: NavGroup[] = [
       { to: '/ventes', label: 'Ventes', icon: <IconReceipt />, area: 'sell' },
       { to: '/devis', label: 'Devis', icon: <IconDoc />, area: 'sell' },
       { to: '/dettes', label: 'Dettes & crédits', icon: <IconCard />, area: 'finance' },
+      { to: '/projets', label: 'Projets', icon: <IconFolder />, area: 'finance' },
       { to: '/depenses', label: 'Dépenses', icon: <IconWallet />, area: 'finance' },
       { to: '/analyse', label: 'Résultats', icon: <IconChart />, area: 'finance' },
       { to: '/rapports', label: 'Documents', icon: <IconDoc />, area: 'finance' },

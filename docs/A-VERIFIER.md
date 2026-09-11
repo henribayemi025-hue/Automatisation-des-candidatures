@@ -37,7 +37,17 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
       (demande d'être connecté).
 - [ ] Bandeau d'accueil après trois jours sans saisie.
 
-## 5. Comptabilité (à faire regarder par le comptable)
+## 5. Projets (suivi à part : ouverture, chantier, événement, matériel)
+
+- [ ] Menu « Projets » : la démo contient « Ouverture du rayon papeterie »
+      (budget 150 000, 83 % utilisé, 5 opérations, marge encore négative).
+- [ ] « Nouveau projet » : nom, type, budget, dates, notes.
+- [ ] Champ « Projet » dans Vendre, Achats, Dépenses et Rattrapage
+      (il n'apparaît que s'il existe au moins un projet en cours).
+- [ ] Fiche projet : « Rattacher une opération » déjà saisie, « Détacher ».
+- [ ] L'assistant répond à « où en est le projet … ? ».
+
+## 6. Comptabilité (à faire regarder par le comptable)
 
 - [ ] Balance : total débit = total crédit.
 - [ ] Bilan : « Équilibre du bilan — Vérifié ».
@@ -45,7 +55,7 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 - [ ] Historique : chaque action tracée, avec son auteur.
 - [ ] Exports Excel et PDF sur les écrans de rapports.
 
-## 6. Équipe
+## 7. Équipe
 
 - [ ] Inviter une adresse e-mail en « Comptable » depuis Équipe.
 - [ ] La personne se connecte avec cette adresse et voit l'espace.
@@ -54,7 +64,7 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 ## Ce qui n'est pas encore fait
 
 - Constructeur de requêtes (question en langage courant → tableau).
-- Comptabilité analytique par projet ou par centre de coût.
+- Chat d'équipe avec photos et assistant dans le fil (prochaine étape).
 - Plusieurs espaces de travail pour un même propriétaire.
 - Immobilisations et amortissements automatiques, paie, déclarations fiscales.
 - Les 8 photos de métiers pour l'écran d'accueil (attendues de Beau).

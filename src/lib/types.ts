@@ -129,6 +129,8 @@ export interface Sale {
   id: string;
   number: string;
   date: ISODate;
+  /** Projet auquel l'opération est rattachée (suivi analytique), facultatif. */
+  projectId?: string | null;
   customerId: string | null;
   customerName: string;
   lines: SaleLine[];
@@ -155,6 +157,7 @@ export interface Purchase {
   id: string;
   number: string;
   date: ISODate;
+  projectId?: string | null;
   supplierId: string | null;
   supplierName: string;
   lines: PurchaseLine[];
@@ -167,6 +170,7 @@ export interface Purchase {
 export interface Expense {
   id: string;
   date: ISODate;
+  projectId?: string | null;
   category: string;
   account: string;
   description: string;
@@ -212,6 +216,25 @@ export interface Debt {
   createdAt: ISODate;
 }
 
+export type ProjectStatus = 'ACTIVE' | 'DONE' | 'CANCELLED';
+
+/**
+ * Un projet regroupe des opérations qui sortent du quotidien — ouverture d'un
+ * point de vente, chantier, événement, achat de matériel — pour répondre à
+ * « ça m'a coûté combien, ça m'a rapporté combien ».
+ */
+export interface Project {
+  id: string;
+  name: string;
+  kind: string;
+  budget: Minor;
+  startDate: ISODate;
+  endDate: ISODate | '';
+  status: ProjectStatus;
+  notes: string;
+  createdAt: ISODate;
+}
+
 export interface CashSession {
   id: string;
   openedAt: ISODate;
@@ -246,6 +269,7 @@ export interface DB {
   movements: StockMovement[];
   debts: Debt[];
   sessions: CashSession[];
+  projects: Project[];
   audit: AuditLog[];
 }
 

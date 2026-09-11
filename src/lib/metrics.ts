@@ -143,3 +143,62 @@ export function productPerformance(db: DB, from?: string, to?: string): ProductP
 export function outstanding(debt: { amount: Minor; payments: { amount: Minor }[] }): Minor {
   return Math.max(0, debt.amount - debt.payments.reduce((s, p) => s + p.amount, 0));
 }
+
+
+export interface ProjectOperation {
+  kind: 'sale' | 'purchase' | 'expense';
+  id: string;
+  date: string;
+  label: string;
+  /** Positif pour une recette, négatif pour une sortie. */
+  amount: Minor;
+}
+
+export interface ProjectSummary {
+  revenue: Minor;
+  purchases: Minor;
+  expenses: Minor;
+  /** Achats reçus + dépenses : ce qui compte face au budget. */
+  spent: Minor;
+  remaining: Minor;
+  margin: Minor;
+  operations: ProjectOperation[];
+}
+
+/**
+ * Chiffres d'un projet, calculés depuis les opérations rattachées. Les achats
+ * comptent à la réception ; les ventes annulées et les devis sont ignorés.
+ */
+export function projectSummary(db: DB, projectId: string): ProjectSummary {
+  const operations: ProjectOperation[] = [];
+  let revenue = 0;
+  let purchases = 0;
+  let expenses = 0;
+  for (const sale of db.sales) {
+    if (sale.projectId !== projectId || sale.status !== 'CONFIRMED') continue;
+    revenue += sale.total;
+    operations.push({ kind: 'sale', id: sale.id, date: sale.date, label: `${sale.number} — ${sale.customerName}`, amount: sale.total });
+  }
+  for (const purchase of db.purchases) {
+    if (purchase.projectId !== projectId || purchase.status !== 'RECEIVED') continue;
+    purchases += purchase.total;
+    operations.push({ kind: 'purchase', id: purchase.id, date: purchase.date, label: `${purchase.number} — ${purchase.supplierName}`, amount: -purchase.total });
+  }
+  for (const expense of db.expenses) {
+    if (expense.projectId !== projectId) continue;
+    expenses += expense.amount;
+    operations.push({ kind: 'expense', id: expense.id, date: expense.date, label: expense.description || expense.category, amount: -expense.amount });
+  }
+  operations.sort((a, b) => (a.date === b.date ? 0 : a.date < b.date ? 1 : -1));
+  const project = db.projects.find((x) => x.id === projectId);
+  const spent = purchases + expenses;
+  return {
+    revenue,
+    purchases,
+    expenses,
+    spent,
+    remaining: (project?.budget ?? 0) - spent,
+    margin: revenue - spent,
+    operations,
+  };
+}
