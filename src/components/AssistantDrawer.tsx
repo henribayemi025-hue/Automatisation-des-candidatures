@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import AssistantChat from './AssistantChat';
 import { IconSparkle, IconX } from './Icons';
 import { t } from '../lib/i18n';
@@ -6,6 +7,9 @@ import { t } from '../lib/i18n';
 /** L'assistant partout : bouton flottant, tiroir avec l'aide de l'écran courant. */
 export default function AssistantDrawer() {
   const [open, setOpen] = useState(false);
+  const { pathname } = useLocation();
+  // Sur les écrans qui sont déjà une conversation, le bouton flottant ferait doublon.
+  if (pathname === '/assistant' || pathname.startsWith('/discussion')) return null;
 
   return (
     <>

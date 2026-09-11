@@ -235,6 +235,22 @@ export interface Project {
   createdAt: ISODate;
 }
 
+/** Message du fil de discussion : général (projectId vide) ou rattaché à un projet. */
+export interface Message {
+  id: string;
+  projectId: string | null;
+  authorId: string | null;
+  authorName: string;
+  /** 'assistant' pour une réponse de l'IA, 'system' pour une note automatique. */
+  kind: 'user' | 'assistant' | 'system';
+  text: string;
+  /** Photo jointe, hébergée en ligne (jamais dans l'état lui-même). */
+  imageUrl?: string;
+  /** Dépense lue par l'assistant sur une photo, proposée à l'enregistrement. */
+  expense?: { date: string; supplier: string; category: string; description: string; amount: number; method: string } | null;
+  createdAt: ISODate;
+}
+
 export interface CashSession {
   id: string;
   openedAt: ISODate;
@@ -270,6 +286,7 @@ export interface DB {
   debts: Debt[];
   sessions: CashSession[];
   projects: Project[];
+  messages: Message[];
   audit: AuditLog[];
 }
 

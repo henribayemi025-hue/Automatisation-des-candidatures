@@ -6,6 +6,8 @@ import type { PaymentMethod } from '../lib/types';
 import { Badge, Empty, Field, Modal, Money, PageHeader, StatCard, Table } from '../components/UI';
 import { IconCard, IconCheck } from '../components/Icons';
 import { t } from '../lib/i18n';
+import { whatsappLink } from '../lib/chat';
+import { formatMoney } from '../lib/money';
 
 type Tab = 'CUSTOMER' | 'SUPPLIER';
 
@@ -14,6 +16,7 @@ export default function Debts() {
   const [tab, setTab] = useState<Tab>('CUSTOMER');
   const [payId, setPayId] = useState<string | null>(null);
   const [amountRaw, setAmountRaw] = useState('');
+  const phoneOf = (partyId: string | null) => db.customers.find((c) => c.id === partyId)?.phone ?? '';
   const [method, setMethod] = useState<PaymentMethod>('CASH');
 
   const all = db.debts.filter((d) => d.party === tab);
@@ -103,15 +106,35 @@ export default function Debts() {
                     <Money value={rest} />
                   </td>
                   <td className="td text-right">
-                    <button
-                      onClick={() => {
-                        setPayId(d.id);
-                        setAmountRaw('');
-                      }}
-                      className="text-sm font-semibold text-brand-600"
-                    >
-                      {t('Enregistrer un règlement')}
-                    </button>
+                    <div className="flex flex-wrap items-center justify-end gap-3">
+                      {isCustomer && phoneOf(d.partyId) && (
+                        <a
+                          href={whatsappLink(
+                            phoneOf(d.partyId),
+                            t('Bonjour {name}, petit rappel de {shop} : il reste {amount} à régler pour {origin}. Merci !', {
+                              name: d.partyName,
+                              shop: db.company.name,
+                              amount: formatMoney(rest, db.company.currency),
+                              origin: d.origin,
+                            }),
+                          )}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-sm font-semibold text-[#1F6F65]"
+                        >
+                          {t('Relancer sur WhatsApp')}
+                        </a>
+                      )}
+                      <button
+                        onClick={() => {
+                          setPayId(d.id);
+                          setAmountRaw('');
+                        }}
+                        className="text-sm font-semibold text-brand-600"
+                      >
+                        {t('Enregistrer un règlement')}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );

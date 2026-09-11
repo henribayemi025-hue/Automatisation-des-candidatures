@@ -18,6 +18,7 @@ import type {
   Supplier,
   WorkspaceEvent,
   Project,
+  Message,
 } from './types';
 
 export const DEFAULT_COMPANY: Company = {
@@ -52,6 +53,7 @@ export function emptyDB(): DB {
     debts: [],
     sessions: [],
     projects: [],
+    messages: [],
     audit: [],
   };
 }
@@ -67,6 +69,7 @@ export function normalizeDB(raw: Partial<DB> | null | undefined): DB {
     accounts: raw.accounts?.length ? raw.accounts : base.accounts,
     // Ajouté après coup : un instantané ancien n'a pas de projets.
     projects: raw.projects ?? [],
+    messages: raw.messages ?? [],
   };
 }
 
@@ -613,6 +616,15 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       item.projectId = projectId;
       const project = db.projects.find((x) => x.id === projectId);
       audit(db, ev, 'project', projectId ?? targetId, 'ASSIGN', project ? `Opération rattachée au projet ${project.name}` : 'Opération détachée de son projet');
+      break;
+    }
+
+    case 'message.post': {
+      const message = p.message as Message;
+      if (db.messages.some((m) => m.id === message.id)) break;
+      db.messages.push(message);
+      // Le fil n'est pas un journal comptable : on garde les 2 000 derniers messages.
+      if (db.messages.length > 2000) db.messages.splice(0, db.messages.length - 2000);
       break;
     }
 

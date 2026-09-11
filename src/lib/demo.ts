@@ -332,6 +332,28 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
   if (schoolSale) emit(stamp(dayISO(base, -45), 16), 'project.assign', { kind: 'sale', id: schoolSale.id, projectId });
   if (schoolSale2) emit(stamp(dayISO(base, -22), 11), 'project.assign', { kind: 'sale', id: schoolSale2.id, projectId });
 
+  // ---- Le fil de discussion : quelques échanges vrais autour du projet ----
+  const chat = (day: number, hour: number, projectRef: string | null, authorName: string, text: string, extra: Record<string, unknown> = {}) =>
+    emit(stamp(dayISO(base, day), hour), 'message.post', {
+      message: { id: id(), projectId: projectRef, authorId: null, authorName, kind: 'user', text, createdAt: stamp(dayISO(base, day), hour), ...extra },
+    });
+  chat(-51, 17, projectId, 'Awa', 'Le menuisier a livré les étagères, j’ai payé 45 000 en espèces. Je mets le reçu demain.');
+  chat(-51, 17, projectId, actor.name, 'Parfait, je l’ai rattaché au projet. Reste 105 000 sur le budget.');
+  chat(-45, 16, projectId, 'Awa', 'L’école a pris 10 lots de cahiers à crédit, ils paient en deux fois.');
+  chat(-3, 9, null, 'Awa', '@assistant combien nous doit encore l’école ?');
+  emit(stamp(dayISO(base, -3), 9, 1), 'message.post', {
+    message: {
+      id: id(),
+      projectId: null,
+      authorId: null,
+      authorName: 'Assistant',
+      kind: 'assistant',
+      text: 'D’après vos chiffres, l’École Les Étoiles a encore un reste à payer sur la vente FA-00001 (cahiers, à crédit). Vous pouvez la relancer depuis « Dettes & crédits », bouton WhatsApp.',
+      createdAt: stamp(dayISO(base, -3), 9, 1),
+    },
+  });
+  chat(-1, 18, null, actor.name, 'Pensez à fermer la caisse ce soir, on a eu un manquant la semaine dernière.');
+
   // ---- Encaissements partiels sur les créances ----
   customerDebts.slice(0, 3).forEach((debt, i) => {
     const date = dayISO(base, -60 + i * 20);

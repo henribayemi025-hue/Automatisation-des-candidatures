@@ -20,6 +20,7 @@ import type {
   Supplier,
   WorkspaceEvent,
   Project,
+  Message,
 } from './types';
 
 export function newId(): string {
@@ -131,6 +132,7 @@ export interface StoreActions {
   /** Charge un jeu d'essai complet (trois mois d'activité) et renvoie le nombre d'événements. */
   loadDemo: () => number;
   saveProject: (project: Omit<Project, 'id' | 'createdAt'> & { id?: string }) => Project;
+  postMessage: (input: Omit<Message, 'id' | 'createdAt' | 'authorId' | 'authorName'> & { authorName?: string; authorId?: string | null }) => Message;
   assignToProject: (kind: 'sale' | 'purchase' | 'expense', id: string, projectId: string | null) => void;
   resetAll: () => void;
 }
@@ -424,6 +426,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         };
         dispatch('project.save', { project });
         return project;
+      },
+
+      postMessage(input) {
+        const message: Message = {
+          ...input,
+          id: newId(),
+          authorId: input.authorId === undefined ? actor.current.id : input.authorId,
+          authorName: input.authorName ?? actor.current.name,
+          createdAt: new Date().toISOString(),
+        };
+        dispatch('message.post', { message });
+        return message;
       },
 
       assignToProject(kind, id, projectId) {

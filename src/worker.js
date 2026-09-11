@@ -46,6 +46,9 @@ const ROUTES = [
   ['/balance', 'Balance générale (mode expert)'],
   ['/etats', 'Bilan & compte de résultat (mode expert)'],
   ['/audit', 'Audit : contrôles de cohérence'],
+  ['/rattrapage', 'Rattrapage : saisir plusieurs jours d’un coup, relevé mobile money, photo de facture'],
+  ['/projets', 'Projets : budget, dépenses et recettes rattachées, marge d’un chantier, d’une ouverture, d’un événement'],
+  ['/discussion', 'Discussion : fil d’équipe, photos, questions à l’assistant'],
   ['/equipe', 'Équipe : inviter, rôles'],
   ['/parametres', 'Paramètres : entreprise, devise, mode simple/expert'],
 ];

@@ -302,6 +302,12 @@ export const IconFolder = (p: Props) => (
   </Svg>
 );
 
+export const IconChat = (p: Props) => (
+  <Svg {...p}>
+    <path d="M4 6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H9l-4 4v-4H6a2 2 0 01-2-2V6z" />
+  </Svg>
+);
+
 export const IconGoogle = (p: Props) => (
   <svg viewBox="0 0 24 24" className={p.className ?? 'h-[18px] w-[18px]'} aria-hidden="true">
     <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 01-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-8.9z" />

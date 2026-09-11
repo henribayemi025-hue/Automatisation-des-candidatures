@@ -219,6 +219,13 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
     example: 'Projet « Ouverture du rayon papeterie », budget 150 000 : achats du stock de départ, étagères, affiche — et les ventes de cahiers en face. Vous voyez si le rayon est rentable.',
     questions: ['Où en est mon projet ?', 'Combien m’a coûté ce projet ?', 'Quel projet est le plus rentable ?'],
   },
+  '/discussion': {
+    title: 'Discussion',
+    what: 'Le fil de votre équipe : un canal général et un par projet. On y envoie des messages, des photos de factures que l’assistant lit, et on lui pose des questions avec @assistant.',
+    when: 'Pour se coordonner sans quitter les chiffres : « j’ai payé le menuisier, voici le reçu », « où en est le chantier ? ».',
+    example: 'Le caissier envoie la photo du reçu d’électricité ; l’assistant propose la dépense ; le gérant clique « Enregistrer ». Tout le monde voit la même chose.',
+    questions: ['Qui est en ligne ?', 'Résume le fil de la semaine', 'Où en est le projet en cours ?'],
+  },
   '/parametres': {
     title: 'Paramètres',
     what: 'Le nom de l’entreprise, la devise, le mode d’affichage (simple ou expert) et le référentiel comptable.',

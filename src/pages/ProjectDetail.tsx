@@ -61,6 +61,7 @@ export default function ProjectDetail() {
         actions={
           <div className="flex flex-wrap gap-2">
             <Link to="/projets" className="btn-ghost">{t('Tous les projets')}</Link>
+            <Link to={`/discussion/${project.id}`} className="btn-ghost">{t('Discussion')}</Link>
             <button type="button" onClick={() => setAttach(true)} className="btn-ghost">{t('Rattacher une opération')}</button>
             <button type="button" onClick={() => setEdit(true)} className="btn-primary">{t('Modifier')}</button>
           </div>

@@ -11,6 +11,7 @@ import PointOfSale from './pages/PointOfSale';
 import CashRegister from './pages/CashRegister';
 import CatchUp from './pages/CatchUp';
 import Projects from './pages/Projects';
+import Chat from './pages/Chat';
 import ProjectDetail from './pages/ProjectDetail';
 import Products from './pages/Products';
 import Purchases from './pages/Purchases';
@@ -109,6 +110,8 @@ export default function App() {
           <Route path="/pos" element={<PointOfSale />} />
           <Route path="/caisse" element={<CashRegister />} />
           <Route path="/rattrapage" element={<CatchUp />} />
+          <Route path="/discussion" element={<Chat />} />
+          <Route path="/discussion/:projectId" element={<Chat />} />
           <Route path="/produits" element={<Products />} />
           <Route path="/achats" element={<Purchases />} />
           <Route path="/stock" element={<Stock />} />
