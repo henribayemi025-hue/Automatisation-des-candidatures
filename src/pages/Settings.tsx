@@ -4,13 +4,15 @@ import { hasContent, useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
 import { CURRENCIES, currencyLabel } from '../lib/money';
 import { SECTORS } from '../lib/guide';
+import { tracksStock } from '../lib/sector';
+import { displayIdentity } from '../lib/identity';
 import type { Company } from '../lib/types';
 import { Field, PageHeader } from '../components/UI';
 import { LanguageSwitch } from '../lib/i18n';
 import { useTheme } from '../lib/theme';
 import type { ThemeChoice } from '../lib/theme';
 import { COUNTRIES, countryProfile, profileToCompany } from '../lib/countries';
-import { IconUsers } from '../components/Icons';
+import { IconLogout, IconUsers } from '../components/Icons';
 import { t } from '../lib/i18n';
 
 const CHARTS: { value: Company['chart']; label: string; hint: string }[] = [
@@ -21,7 +23,7 @@ const CHARTS: { value: Company['chart']; label: string; hint: string }[] = [
 
 export default function Settings() {
   const { db, setCompany, resetAll, loadDemo } = useStore();
-  const { workspace, user } = useCollab();
+  const { workspace, user, signOut } = useCollab();
   const [confirmReset, setConfirmReset] = useState(false);
   const [applied, setApplied] = useState('');
   const { choice, setChoice } = useTheme();
@@ -102,6 +104,24 @@ export default function Settings() {
                 ))}
               </select>
             </Field>
+            {/* Le métier propose, la personne décide : un salon qui revend des
+                crèmes coche la case, une boutique de services la décoche. */}
+            <label className="flex items-start gap-2 text-caption text-ink">
+              <input
+                id="set-tracks-stock"
+                type="checkbox"
+                checked={tracksStock(c)}
+                disabled={!canEdit}
+                onChange={(e) => setCompany({ tracksStock: e.target.checked })}
+                className="mt-0.5"
+              />
+              <span>
+                {t('Je suis des quantités en stock')}
+                <span className="block text-muted">
+                  {t('Décoché, les écrans Stock et Achats sortent du menu et les fiches ne demandent plus de quantité — pour un métier qui vend surtout du temps.')}
+                </span>
+              </span>
+            </label>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label={t('Pays')}>
                 <select id="set-country" value={c.country} disabled={!canEdit} onChange={(e) => setCompany({ country: e.target.value })} className="field">
@@ -277,6 +297,22 @@ export default function Settings() {
             </button>
           )}
           {demoDone && <p className="mt-3 text-caption text-[#1F6F65]">{demoDone}</p>}
+        </div>
+
+        {/* La déconnexion n'existait que derrière l'avatar, sans étiquette.
+            On la remet là où les gens la cherchent : dans les réglages. */}
+        <div className="card">
+          <h2 className="text-section">{t('Mon compte')}</h2>
+          <p className="mt-1 text-caption text-muted">
+            {displayIdentity(user?.email) || t('Sans compte — les données restent sur cet appareil.')}
+          </p>
+          <p className="mt-3 text-caption text-muted">
+            {t('Pour voir l’application avec le vocabulaire d’un autre métier, pas besoin de se déconnecter : changez « Activité » plus haut.')}
+          </p>
+          <button onClick={() => void signOut()} className="btn-ghost mt-4 text-[#A63030]">
+            <IconLogout className="h-4 w-4" />
+            {user ? t('Se déconnecter') : t('Quitter le mode local')}
+          </button>
         </div>
 
         {(!workspace || workspace.role === 'owner') && (

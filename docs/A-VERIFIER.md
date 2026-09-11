@@ -7,6 +7,17 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 
 - [ ] La page de connexion s'affiche quand on arrive (plus d'onboarding surprise).
 - [ ] Google et e-mail fonctionnent avec le compte Finjaro habituel.
+- [ ] **Numéro de téléphone** : nom + numéro + mot de passe suffisent pour créer
+      un compte. Le numéro doit porter son indicatif (+237…), sinon c'est refusé.
+      Il n'est PAS vérifié par SMS — c'est le mot de passe qui protège.
+- [ ] Le même numéro écrit de trois façons ouvre le même compte ; deux pays
+      différents restent deux comptes.
+- [ ] Toute la phrase « Pas encore de compte ? Créer un compte » est cliquable.
+- [ ] « Ouvrir une démonstration » ouvre vraiment la démonstration (avant, il
+      entrait en mode local sur un écran vide), et n'est plus présenté comme
+      réservé aux comptables.
+- [ ] **Se déconnecter** : dans le menu du compte (en haut à droite, avec le nom
+      et une flèche) ET dans Paramètres → Mon compte.
 - [ ] Session expirée : message « votre session s'est terminée », e-mail prérempli.
 - [ ] Le carré de 6 points (en haut) ouvre le menu et ramène à finjaro.net,
       depuis la connexion, l'accueil de démarrage et l'application.
@@ -76,6 +87,16 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
       balance ; l'assistant remplit les cases et dit si actif = passif.
 
 ## 4 bis. Adaptation au métier
+
+- [ ] Paramètres → **Activité** change le métier sans se déconnecter.
+- [ ] Salon de coiffure : le menu dit « Encaisser », « Prestations »,
+      « Clientes & fournisseurs », « Prestations réalisées » ; **Stock et Achats
+      disparaissent** du menu, et la fiche d'une prestation ne demande plus de
+      quantité.
+- [ ] Restaurant : « Carte » et « Additions ». Garage : « Interventions ».
+- [ ] Paramètres → case **« Je suis des quantités en stock »** : cochée, les
+      écrans Stock et Achats reviennent, même pour un salon qui revend des
+      produits.
 
 - [ ] Restaurant : l'écran des articles s'appelle « Carte », exemples de plats,
       conseil sur le coût des ingrédients.

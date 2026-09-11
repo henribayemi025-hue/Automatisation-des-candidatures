@@ -1473,6 +1473,37 @@ export const EN: Record<string, string> = {
   'Supprimer définitivement': 'Delete for good',
   'Archiver': 'Archive',
 
+  // Connexion par email ou par téléphone
+  'Email ou numéro de téléphone': 'Email or phone number',
+  'Le numéro sert d’identifiant. Il n’est pas vérifié par SMS : c’est le mot de passe qui protège le compte.': 'The number is only an identifier. It is not verified by text message: the password is what protects the account.',
+  'vous@exemple.com ou +237 6 99 12 34 56': 'you@example.com or +237 6 99 12 34 56',
+  'Juste voir à quoi ça ressemble ?': 'Just want to see what it looks like?',
+  '— une boutique avec trois mois d’activité déjà saisie, sans rien créer.': '— a shop with three months of activity already entered, nothing to create.',
+  'Entrez votre email ou votre numéro de téléphone.': 'Enter your email or your phone number.',
+  'Entrez une adresse email valide, ou un numéro de téléphone.': 'Enter a valid email address, or a phone number.',
+  'Numéro trop court.': 'Number too short.',
+  'Numéro trop long.': 'Number too long.',
+  'Ajoutez l’indicatif du pays devant le numéro, par exemple +237 6 99 12 34 56.': 'Add the country code in front of the number, for example +237 6 99 12 34 56.',
+  'Numéro ou mot de passe incorrect.': 'Wrong number or password.',
+  'Ce numéro a déjà un compte. Connectez-vous avec votre mot de passe.': 'This number already has an account. Sign in with your password.',
+  'Ce numéro n’est pas accepté. Vérifiez l’indicatif du pays.': 'This number is not accepted. Check the country code.',
+  'Sans compte — les données restent sur cet appareil.': 'No account — data stays on this device.',
+  'Pour voir l’application avec le vocabulaire d’un autre métier, pas besoin de se déconnecter : changez « Activité » plus haut.': 'To see the app in another trade’s words, no need to sign out: change “Activity” above.',
+
+  // Métier : vocabulaire et suivi de stock
+  'Je suis des quantités en stock': 'I track stock quantities',
+  'Décoché, les écrans Stock et Achats sortent du menu et les fiches ne demandent plus de quantité — pour un métier qui vend surtout du temps.': 'Unticked, the Stock and Purchases screens leave the menu and item cards stop asking for quantities — for a trade that mostly sells time.',
+  'Mon activité': 'My business',
+  'Clientes': 'Clients',
+  'Patients': 'Patients',
+  'Tables et clients': 'Tables and guests',
+  'Encaisser': 'Take payment',
+  'Facturer': 'Invoice',
+  'Additions': 'Bills',
+  'Prestations réalisées': 'Services delivered',
+  'Interventions': 'Jobs',
+  'Chantiers facturés': 'Jobs invoiced',
+
   // Personnel, présences et paie
   'Personnel': 'Staff',
   'Qui travaille ici, qui était là, et ce qu’on leur doit': 'Who works here, who showed up, and what they are owed',

@@ -16,10 +16,21 @@ export interface SectorProfile {
   /** Titre et sous-titre de l'écran des articles. */
   itemsTitle: string;
   itemsSubtitle: string;
-  /** Mot pour la personne servie. */
+  /** Mot pour la personne servie, au singulier et au pluriel. */
   customer: string;
+  customers: string;
   /** Ce qu'on encaisse : une vente, une addition, une intervention… */
   sale: string;
+  sales: string;
+  /** Ce que dit le bouton d'encaissement dans le menu. */
+  sell: string;
+  /**
+   * Faux pour un métier qui vend surtout du temps : coiffure, conseil,
+   * services. Les écrans Stock et Achats sortent du menu, et la fiche d'un
+   * article ne demande plus de quantité. Le réglage reste modifiable : un
+   * salon qui revend des crèmes peut le remettre dans les paramètres.
+   */
+  tracksStock: boolean;
   /** Exemples d'articles proposés au démarrage. */
   examples: { name: string; category: string; unit: string }[];
   /** Postes de dépense les plus fréquents, mis en tête des listes. */
@@ -35,7 +46,11 @@ const RETAIL: SectorProfile = {
   itemsTitle: 'Produits',
   itemsSubtitle: 'Ce que vous vendez, avec le prix, le coût et le stock',
   customer: 'Client',
+  customers: 'Clients',
   sale: 'Vente',
+  sales: 'Ventes',
+  sell: 'Vendre',
+  tracksStock: true,
   examples: [
     { name: 'Sac de riz 25 kg', category: 'Épicerie', unit: 'sac' },
     { name: 'Huile végétale 5 L', category: 'Épicerie', unit: 'bidon' },
@@ -54,7 +69,11 @@ export const SECTOR_PROFILES: Record<string, SectorProfile> = {
     itemsTitle: 'Carte',
     itemsSubtitle: 'Vos plats et boissons, avec le prix de vente et le coût des ingrédients',
     customer: 'Table',
+    customers: 'Tables et clients',
     sale: 'Addition',
+    sales: 'Additions',
+    sell: 'Encaisser',
+    tracksStock: true,
     examples: [
       { name: 'Poulet DG', category: 'Plats', unit: 'assiette' },
       { name: 'Riz sauté', category: 'Plats', unit: 'assiette' },
@@ -70,7 +89,13 @@ export const SECTOR_PROFILES: Record<string, SectorProfile> = {
     itemsTitle: 'Prestations',
     itemsSubtitle: 'Vos services et les produits revendus, avec leur prix',
     customer: 'Cliente',
+    customers: 'Clientes',
     sale: 'Prestation',
+    sales: 'Prestations réalisées',
+    sell: 'Encaisser',
+    // Un salon vend d'abord du temps. Le stock de crèmes existe, mais il ne
+    // doit pas être la colonne vertébrale de l'écran.
+    tracksStock: false,
     examples: [
       { name: 'Coupe et brushing', category: 'Coiffure', unit: 'prestation' },
       { name: 'Pose d’ongles', category: 'Onglerie', unit: 'prestation' },
@@ -86,7 +111,11 @@ export const SECTOR_PROFILES: Record<string, SectorProfile> = {
     itemsTitle: 'Pièces et interventions',
     itemsSubtitle: 'Les pièces en stock et les interventions facturées à l’heure ou au forfait',
     customer: 'Client',
+    customers: 'Clients',
     sale: 'Intervention',
+    sales: 'Interventions',
+    sell: 'Facturer',
+    tracksStock: true,
     examples: [
       { name: 'Vidange complète', category: 'Interventions', unit: 'forfait' },
       { name: 'Plaquettes de frein', category: 'Pièces', unit: 'jeu' },
@@ -102,7 +131,11 @@ export const SECTOR_PROFILES: Record<string, SectorProfile> = {
     itemsTitle: 'Prestations et fournitures',
     itemsSubtitle: 'Ce que vous facturez : main-d’œuvre, forfaits, fournitures',
     customer: 'Client',
+    customers: 'Clients',
     sale: 'Chantier',
+    sales: 'Chantiers facturés',
+    sell: 'Facturer',
+    tracksStock: false,
     examples: [
       { name: 'Journée de main-d’œuvre', category: 'Main-d’œuvre', unit: 'jour' },
       { name: 'Déplacement', category: 'Forfaits', unit: 'forfait' },
@@ -118,7 +151,11 @@ export const SECTOR_PROFILES: Record<string, SectorProfile> = {
     itemsTitle: 'Références',
     itemsSubtitle: 'Vos références, avec le prix, le coût et le stock',
     customer: 'Patient',
+    customers: 'Patients',
     sale: 'Vente',
+    sales: 'Ventes',
+    sell: 'Vendre',
+    tracksStock: true,
     examples: [
       { name: 'Paracétamol 500 mg', category: 'Médicaments', unit: 'boîte' },
       { name: 'Compresses stériles', category: 'Matériel', unit: 'sachet' },
@@ -134,7 +171,11 @@ export const SECTOR_PROFILES: Record<string, SectorProfile> = {
     itemsTitle: 'Appareils et accessoires',
     itemsSubtitle: 'Ce que vous vendez et réparez, avec le prix et le stock',
     customer: 'Client',
+    customers: 'Clients',
     sale: 'Vente',
+    sales: 'Ventes',
+    sell: 'Vendre',
+    tracksStock: true,
     examples: [
       { name: 'Écran de remplacement', category: 'Pièces', unit: 'pièce' },
       { name: 'Chargeur rapide', category: 'Accessoires', unit: 'pièce' },
@@ -148,4 +189,14 @@ export const SECTOR_PROFILES: Record<string, SectorProfile> = {
 
 export function sectorProfile(sector: string): SectorProfile {
   return SECTOR_PROFILES[sector] ?? RETAIL;
+}
+
+/**
+ * Est-ce que cette entreprise suit un stock ? Le métier donne la réponse par
+ * défaut, mais le réglage de l'entreprise gagne toujours : un salon qui
+ * revend des produits coche la case, une boutique qui ne vend que des
+ * services la décoche.
+ */
+export function tracksStock(company: { sector: string; tracksStock?: boolean }): boolean {
+  return company.tracksStock ?? sectorProfile(company.sector).tracksStock;
 }

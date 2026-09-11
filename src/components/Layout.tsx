@@ -6,6 +6,8 @@ import { canAccess, useCollab } from '../lib/collab';
 import { DEMO_KEY } from '../pages/Demo';
 import { LanguageSwitch } from '../lib/i18n';
 import { useTheme } from '../lib/theme';
+import { sectorProfile, tracksStock } from '../lib/sector';
+import { displayIdentity } from '../lib/identity';
 import AppSwitcher from './AppSwitcher';
 import CommandPalette from './CommandPalette';
 import AssistantDrawer from './AssistantDrawer';
@@ -173,9 +175,24 @@ export default function Layout({ children }: { children: ReactNode }) {
     return () => document.removeEventListener('mousedown', close);
   }, [menu]);
 
+  // Le menu parle le métier de la personne : un salon voit « Prestations » et
+  // « Clientes », pas « Produits » et « Stock ». Et un métier qui ne suit pas
+  // de quantités ne garde pas dans son menu deux écrans qu'il n'ouvrira jamais.
+  const trade = sectorProfile(company.sector);
+  const withStock = tracksStock(company);
+  const RENAMED: Record<string, string> = {
+    '/pos': trade.sell,
+    '/produits': trade.itemsTitle,
+    '/ventes': trade.sales,
+    '/tiers': `${trade.customers} & fournisseurs`,
+  };
   const groups = NAV.map((g) => ({
     ...g,
-    items: g.items.filter((it) => (expert || !it.expert) && canAccess(role, it.area)),
+    title: g.title === 'Ma boutique' && !withStock ? 'Mon activité' : g.title,
+    items: g.items
+      .filter((it) => (expert || !it.expert) && canAccess(role, it.area))
+      .filter((it) => withStock || (it.to !== '/stock' && it.to !== '/achats'))
+      .map((it) => (RENAMED[it.to] ? { ...it, label: RENAMED[it.to] } : it)),
   })).filter((g) => g.items.length > 0);
 
   const status = user ? SYNC_LABEL[sync] : SYNC_LABEL.offline;
@@ -287,14 +304,23 @@ export default function Layout({ children }: { children: ReactNode }) {
           </span>
 
           <div ref={menuRef} className="relative">
-            <button onClick={() => setMenu((v) => !v)} aria-label={t('Mon compte')} className="rounded-full">
-              <Avatar name={displayName} src={avatarUrl} size={34} />
+            {/* L'avatar seul ne dit pas qu'il ouvre un menu : on ajoute le nom
+                et un chevron dès qu'il y a la place. Beau a cherché la
+                déconnexion sans la trouver. */}
+            <button
+              onClick={() => setMenu((v) => !v)}
+              aria-label={t('Mon compte')}
+              className="flex items-center gap-2 rounded-pill border border-hairline py-1 pl-1 pr-1 transition hover:border-teal sm:pr-2"
+            >
+              <Avatar name={displayName} src={avatarUrl} size={30} />
+              <span className="hidden max-w-[9rem] truncate text-caption font-semibold text-ink lg:block">{displayName}</span>
+              <IconChevronDown className="hidden h-4 w-4 shrink-0 text-muted sm:block" />
             </button>
             {menu && (
               <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-card border border-hairline bg-white p-2 shadow-[0_18px_40px_rgba(23,27,38,0.16)]">
                 <div className="px-3 py-2">
                   <div className="text-body font-semibold text-ink">{displayName}</div>
-                  <div className="truncate text-caption text-muted">{user?.email ?? t('Sans compte — données sur cet appareil')}</div>
+                  <div className="truncate text-caption text-muted">{displayIdentity(user?.email) || t('Sans compte — données sur cet appareil')}</div>
                 </div>
                 <div className="my-1 border-t border-hairline" />
                 <div className="flex items-center justify-between px-3 py-2">

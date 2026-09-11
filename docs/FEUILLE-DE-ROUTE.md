@@ -91,7 +91,7 @@ qui vendent du temps. Cette partie élargit sans alourdir la boutique.
 | Agenda et rendez-vous (salon, garage, chantier) | prochain |
 | Tâches à cocher, rattachées ou non à un projet | prochain |
 | Factures et charges récurrentes (loyer, abonnements, forfaits mensuels) | prochain |
-| Mode « sans stock » : les écrans stock s'effacent pour un métier de service | prochain |
+| Mode « sans stock » : les écrans stock sortent du menu pour un métier de service | fait |
 | Fiches recettes : un plat vendu décrémente ses ingrédients | prochain |
 | Suivi commercial : prospects, devis relancés, taux de transformation | plus tard |
 

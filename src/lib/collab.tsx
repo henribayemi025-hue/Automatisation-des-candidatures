@@ -6,6 +6,7 @@ import { hasContent, loadCache, useStoreActions } from './store';
 import { emptyDB, normalizeDB, replay } from './reducer';
 import type { DB, Member, MemberRole, Presence, WorkspaceEvent } from './types';
 import { t } from './i18n';
+import { displayIdentity, isPhoneAddress, phoneDigits, toLogin } from './identity';
 
 export type SyncStatus = 'offline' | 'syncing' | 'synced' | 'pending' | 'error';
 
@@ -61,13 +62,17 @@ const LAST_WS_KEY = 'finia.workspace';
 const OUTBOX_PREFIX = 'finia.outbox.';
 const COMPACT_AFTER = 300;
 
-function frenchError(message: string): string {
+function frenchError(message: string, byPhone = false): string {
   const m = message.toLowerCase();
-  if (m.includes('invalid login credentials')) return t('Email ou mot de passe incorrect.');
+  if (m.includes('invalid login credentials'))
+    return byPhone ? t('Numéro ou mot de passe incorrect.') : t('Email ou mot de passe incorrect.');
   if (m.includes('already registered') || m.includes('user already'))
-    return t('Cet email a déjà un compte. Connectez-vous avec votre mot de passe habituel — le même compte fonctionne sur toutes les applications Finjaro.');
+    return byPhone
+      ? t('Ce numéro a déjà un compte. Connectez-vous avec votre mot de passe.')
+      : t('Cet email a déjà un compte. Connectez-vous avec votre mot de passe habituel — le même compte fonctionne sur toutes les applications Finjaro.');
   if (m.includes('password should be at least')) return t('Mot de passe trop court (6 caractères minimum).');
-  if (m.includes('invalid email') || m.includes('validate email')) return t('Adresse email invalide.');
+  if (m.includes('invalid email') || m.includes('validate email'))
+    return byPhone ? t('Ce numéro n’est pas accepté. Vérifiez l’indicatif du pays.') : t('Adresse email invalide.');
   if (m.includes('rate limit')) return t('Trop de tentatives, réessayez dans quelques minutes.');
   if (m.includes('network') || m.includes('fetch')) return t('Connexion impossible : vérifiez votre réseau.');
   return message;
@@ -76,7 +81,10 @@ function frenchError(message: string): string {
 function nameOf(user: User | null): string {
   if (!user) return 'Utilisateur';
   const meta = user.user_metadata ?? {};
-  return (meta.name as string) || (meta.full_name as string) || user.email?.split('@')[0] || 'Utilisateur';
+  // Un compte créé par téléphone n'a pas de nom lisible dans l'adresse : on
+  // affiche le numéro plutôt que la suite de chiffres avant l'arobase.
+  const fallback = isPhoneAddress(user.email) ? displayIdentity(user.email) : user.email?.split('@')[0];
+  return (meta.name as string) || (meta.full_name as string) || fallback || 'Utilisateur';
 }
 
 function avatarOf(user: User | null): string | null {
@@ -488,17 +496,24 @@ export function CollabProvider({ children }: { children: ReactNode }) {
       displayName: nameOf(user),
       avatarUrl: avatarOf(user),
 
+      // `email` peut aussi être un numéro de téléphone : toLogin() le convertit
+      // en adresse interne, et tout le reste du mécanisme ne change pas.
       async signIn(email, password) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        return error ? frenchError(error.message) : null;
+        const id = toLogin(email);
+        if (!id.address) return id.error;
+        const { error } = await supabase.auth.signInWithPassword({ email: id.address, password });
+        return error ? frenchError(error.message, isPhoneAddress(id.address)) : null;
       },
       async signUp(email, password, name) {
+        const id = toLogin(email);
+        if (!id.address) return id.error;
+        const byPhone = isPhoneAddress(id.address);
         const { error } = await supabase.auth.signUp({
-          email,
+          email: id.address,
           password,
-          options: { data: { name, app: 'finia' } },
+          options: { data: { name, app: 'finia', ...(byPhone ? { phone_login: phoneDigits(email) } : {}) } },
         });
-        return error ? frenchError(error.message) : null;
+        return error ? frenchError(error.message, byPhone) : null;
       },
       async signInWithGoogle() {
         await supabase.auth.signInWithOAuth({

@@ -8,7 +8,7 @@ import ImportProducts from '../components/ImportProducts';
 import { exportXlsx } from '../lib/xlsx';
 import { Link } from 'react-router-dom';
 import { t } from '../lib/i18n';
-import { sectorProfile } from '../lib/sector';
+import { sectorProfile, tracksStock } from '../lib/sector';
 
 const BLANK = {
   name: '',
@@ -29,6 +29,9 @@ export default function Products() {
   // Le vocabulaire suit le métier : une carte pour un restaurant, des pièces
   // pour un garage, des références pour une pharmacie.
   const trade = sectorProfile(db.company.sector);
+  // Un salon ou un artisan ne compte pas des quantités : les colonnes et les
+  // champs de stock disparaissent au lieu de rester vides.
+  const withStock = tracksStock(db.company);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('');
   const [open, setOpen] = useState(false);
@@ -238,7 +241,13 @@ export default function Products() {
 
       <div className="card p-0">
         {filtered.length ? (
-          <Table head={['Produit', 'Catégorie', 'Prix de vente', 'Coût', 'Marge', 'Stock', '']}>
+          <Table
+            head={
+              withStock
+                ? [trade.item, 'Catégorie', 'Prix de vente', 'Coût', 'Marge', 'Stock', '']
+                : [trade.item, 'Catégorie', 'Prix', 'Coût', 'Marge', '']
+            }
+          >
             {filtered.map((p) => {
               const margin = p.price - p.cost;
               const rate = p.price > 0 ? (margin / p.price) * 100 : 0;
@@ -257,22 +266,24 @@ export default function Products() {
                     </span>
                     <span className="ml-1 text-xs text-slate-400">({rate.toFixed(0)} %)</span>
                   </td>
-                  <td className="td">
-                    <div className="flex items-center gap-2">
-                      {p.stock <= 0 ? (
-                        <Badge tone="danger">{t('Rupture')}</Badge>
-                      ) : p.stock <= p.reorderPoint ? (
-                        <Badge tone="warn">{p.stock} {t('— bas')}</Badge>
-                      ) : (
-                        <Badge tone="success">{p.stock}</Badge>
-                      )}
-                      {grid && (
-                        <span className="flex items-center gap-1 text-[11px] text-muted">
-                          seuil <Cell product={p} field="reorderPoint" />
-                        </span>
-                      )}
-                    </div>
-                  </td>
+                  {withStock && (
+                    <td className="td">
+                      <div className="flex items-center gap-2">
+                        {p.stock <= 0 ? (
+                          <Badge tone="danger">{t('Rupture')}</Badge>
+                        ) : p.stock <= p.reorderPoint ? (
+                          <Badge tone="warn">{p.stock} {t('— bas')}</Badge>
+                        ) : (
+                          <Badge tone="success">{p.stock}</Badge>
+                        )}
+                        {grid && (
+                          <span className="flex items-center gap-1 text-[11px] text-muted">
+                            seuil <Cell product={p} field="reorderPoint" />
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                  )}
                   <td className="td text-right">
                     <button onClick={() => openEdit(p)} className="text-sm font-semibold text-brand-600">
                       {t('Modifier')}
@@ -324,23 +335,26 @@ export default function Products() {
           <Field label={t("Coût d'achat ({c})", { c: currency })}>
             <input value={form.cost} onChange={(e) => setForm({ ...form, cost: e.target.value })} inputMode="decimal" className="field num" />
           </Field>
-          {editing ? (
-            <Field label={t('Stock actuel')} hint={t('Le stock se corrige depuis l’écran Stock pour garder la trace de chaque mouvement.')}>
-              <div className="flex items-center gap-3">
-                <span className="field w-auto bg-base num">{editing.stock}</span>
-                <Link to="/stock" onClick={() => setOpen(false)} className="text-caption font-semibold text-teal">
-                  {t('Ajuster le stock')}
-                </Link>
-              </div>
-            </Field>
-          ) : (
-            <Field label={t('Quantité en stock aujourd’hui')} hint={t('Ce que vous avez déjà en rayon. Vous pourrez l’ajuster ensuite.')}>
-              <input value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} inputMode="numeric" className="field num" />
+          {withStock &&
+            (editing ? (
+              <Field label={t('Stock actuel')} hint={t('Le stock se corrige depuis l’écran Stock pour garder la trace de chaque mouvement.')}>
+                <div className="flex items-center gap-3">
+                  <span className="field w-auto bg-base num">{editing.stock}</span>
+                  <Link to="/stock" onClick={() => setOpen(false)} className="text-caption font-semibold text-teal">
+                    {t('Ajuster le stock')}
+                  </Link>
+                </div>
+              </Field>
+            ) : (
+              <Field label={t('Quantité en stock aujourd’hui')} hint={t('Ce que vous avez déjà en rayon. Vous pourrez l’ajuster ensuite.')}>
+                <input value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} inputMode="numeric" className="field num" />
+              </Field>
+            ))}
+          {withStock && (
+            <Field label={t('M’alerter quand il en reste moins de')} hint={t('L’appli vous prévient qu’il faut recommander.')}>
+              <input value={form.reorderPoint} onChange={(e) => setForm({ ...form, reorderPoint: e.target.value })} inputMode="numeric" className="field num" />
             </Field>
           )}
-          <Field label={t('M’alerter quand il en reste moins de')} hint={t('L’appli vous prévient qu’il faut recommander.')}>
-            <input value={form.reorderPoint} onChange={(e) => setForm({ ...form, reorderPoint: e.target.value })} inputMode="numeric" className="field num" />
-          </Field>
         </div>
         <div className="mt-6 flex justify-end gap-2">
           <button onClick={() => setOpen(false)} className="btn-ghost">

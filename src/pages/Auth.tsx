@@ -5,6 +5,7 @@ import { LanguageSwitch } from '../lib/i18n';
 import AppSwitcher from '../components/AppSwitcher';
 import { IconBook, IconEye, IconEyeOff, IconGoogle, IconMonitor, IconShield, IconSparkle, IconUsers } from '../components/Icons';
 import { t } from '../lib/i18n';
+import { displayIdentity, looksLikePhone } from '../lib/identity';
 
 const PILLARS = [
   { icon: <IconMonitor />, title: 'Vendre en 3 clics', text: 'Un comptoir simple, le stock et la caisse suivent tout seuls.' },
@@ -17,12 +18,13 @@ export default function Auth() {
   const { signIn, signUp, signInWithGoogle, continueAsGuest, sessionExpired, lastEmail } = useCollab();
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [name, setName] = useState('');
-  const [email, setEmail] = useState(lastEmail);
+  const [email, setEmail] = useState(displayIdentity(lastEmail));
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
+  const byPhone = looksLikePhone(email);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -103,7 +105,7 @@ export default function Auth() {
             </div>
           )}
           {lastEmail && !sessionExpired && mode === 'login' && (
-            <p className="mb-4 text-caption text-muted">{t('Dernier compte utilisé ici : {email}', { email: lastEmail })}</p>
+            <p className="mb-4 text-caption text-muted">{t('Dernier compte utilisé ici : {email}', { email: displayIdentity(lastEmail) })}</p>
           )}
           {error && <div className="mb-4 rounded-input border border-[#D14343]/30 bg-[#FDEDED] px-4 py-3 text-caption text-[#A63030]">{error}</div>}
           {notice && <div className="mb-4 rounded-input border border-[#2A9D8F]/30 bg-[#EAF6EA] px-4 py-3 text-caption text-[#1F6F65]">{notice}</div>}
@@ -114,15 +116,21 @@ export default function Auth() {
                 <input id="auth-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder={t('Ex. Awa Ndiaye')} className="field" />
               </Field>
             )}
-            <Field label={t('Email')}>
+            {/* Un seul champ pour les deux : beaucoup de gens n'ouvrent jamais
+                leur boîte mail mais connaissent leur numéro par cœur. */}
+            <Field
+              label={t('Email ou numéro de téléphone')}
+              hint={byPhone ? t('Le numéro sert d’identifiant. Il n’est pas vérifié par SMS : c’est le mot de passe qui protège le compte.') : undefined}
+            >
               <input
                 id="auth-email"
-                type="email"
+                type="text"
+                inputMode={byPhone ? 'tel' : 'email'}
                 required
-                autoComplete="email"
+                autoComplete="username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder={t('vous@exemple.com')}
+                placeholder={t('vous@exemple.com ou +237 6 99 12 34 56')}
                 className="field"
               />
             </Field>
@@ -155,34 +163,42 @@ export default function Auth() {
             </button>
           </form>
 
-          <p className="mt-4 text-center text-caption text-muted">
-            {mode === 'login' ? (
-              <>
-                {t('Pas encore de compte ?')}{' '}
-                <button type="button" onClick={() => { setMode('signup'); setError(''); }} className="font-semibold text-teal">
-                  {t('Créer un compte')}
-                </button>
-              </>
-            ) : (
-              <>
-                {t('Déjà un compte Finjaro ?')}{' '}
-                <button type="button" onClick={() => { setMode('login'); setError(''); }} className="font-semibold text-teal">
-                  {t('Se connecter')}
-                </button>
-              </>
-            )}
-          </p>
+          {/* Toute la phrase bascule le formulaire : avant, seuls les deux
+              derniers mots étaient cliquables et on croyait que rien ne se
+              passait. */}
+          <button
+            type="button"
+            onClick={() => {
+              setMode(mode === 'login' ? 'signup' : 'login');
+              setError('');
+              setNotice('');
+            }}
+            className="mt-4 w-full rounded-input py-2 text-center text-caption text-muted transition hover:bg-base hover:text-ink"
+          >
+            {mode === 'login' ? t('Pas encore de compte ?') : t('Déjà un compte Finjaro ?')}{' '}
+            <span className="font-semibold text-teal underline-offset-4 group-hover:underline">
+              {mode === 'login' ? t('Créer un compte') : t('Se connecter')}
+            </span>
+          </button>
 
           <div className="mt-6 space-y-3 border-t border-hairline pt-4 text-center">
             <button type="button" onClick={continueAsGuest} className="text-caption font-medium text-muted underline-offset-4 hover:text-ink hover:underline">
               {t('Essayer sans compte (données sur cet appareil seulement)')}
             </button>
+            {/* La démonstration ouvre vraiment la démonstration : avant, ce
+                bouton entrait simplement en mode local, écran vide. */}
             <p className="text-caption text-muted">
-              {t('Vous êtes comptable ?')}{' '}
-              <button type="button" onClick={continueAsGuest} className="font-semibold text-teal underline-offset-4 hover:underline">
+              {t('Juste voir à quoi ça ressemble ?')}{' '}
+              <button
+                type="button"
+                onClick={() => {
+                  window.location.hash = '#/demo';
+                }}
+                className="font-semibold text-teal underline-offset-4 hover:underline"
+              >
                 {t('Ouvrir une démonstration')}
               </button>{' '}
-              {t('— trois questions, puis trois mois d’activité déjà saisie.')}
+              {t('— une boutique avec trois mois d’activité déjà saisie, sans rien créer.')}
             </p>
           </div>
         </section>

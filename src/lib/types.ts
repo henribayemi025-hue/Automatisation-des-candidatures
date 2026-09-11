@@ -36,6 +36,11 @@ export interface Company {
   pricesIncludeTax: boolean;
   /** Nom local de la taxe sur la consommation : TVA, VAT, GST, IVA… */
   taxLabel: string;
+  /**
+   * Suit-on des quantités en stock ? Non renseigné, le métier décide : une
+   * boutique oui, un salon de coiffure non. Le réglage explicite gagne.
+   */
+  tracksStock?: boolean;
   fiscalYearStart: string; // MM-DD
   mode: AppMode;
   onboarded: boolean;
