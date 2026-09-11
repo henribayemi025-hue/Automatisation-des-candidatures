@@ -1391,4 +1391,10 @@ export const EN: Record<string, string> = {
   'vs M-1': 'vs M-1',
   'vs N-1': 'vs Y-1',
   'vs 30 j précédents': 'vs previous 30 d',
+  'Apparence': 'Appearance',
+  'Clair pour la boutique, sombre pour les longues séances de comptabilité.': 'Light for the shop, dark for long accounting sessions.',
+  'Clair': 'Light',
+  'Sombre': 'Dark',
+  'Système': 'System',
+  'Changer l’apparence': 'Change appearance',
 };

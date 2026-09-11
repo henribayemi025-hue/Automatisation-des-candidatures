@@ -5,6 +5,7 @@ import { useDB, useStoreActions } from '../lib/store';
 import { canAccess, useCollab } from '../lib/collab';
 import { DEMO_KEY } from '../pages/Demo';
 import { LanguageSwitch } from '../lib/i18n';
+import { useTheme } from '../lib/theme';
 import AppSwitcher from './AppSwitcher';
 import AssistantDrawer from './AssistantDrawer';
 import ModuleIntro from './ModuleIntro';
@@ -119,6 +120,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   const { user, sync, pending, signOut, workspace, workspaces, switchWorkspace, invitations, acceptInvitation, displayName, avatarUrl, setPage } =
     useCollab();
   const { resetAll } = useStoreActions();
+  const { dark, setChoice } = useTheme();
   const [demo, setDemo] = useState(() => localStorage.getItem(DEMO_KEY) === '1');
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
@@ -264,7 +266,17 @@ export default function Layout({ children }: { children: ReactNode }) {
                   <div className="truncate text-caption text-muted">{user?.email ?? t('Sans compte — données sur cet appareil')}</div>
                 </div>
                 <div className="my-1 border-t border-hairline" />
-                <div className="px-3 py-2"><LanguageSwitch /></div>
+                <div className="flex items-center justify-between px-3 py-2">
+                  <LanguageSwitch />
+                  <button
+                    type="button"
+                    onClick={() => setChoice(dark ? 'light' : 'dark')}
+                    className="rounded-input border border-hairline px-2.5 py-1 text-caption font-semibold text-muted transition hover:text-ink"
+                    title={t('Changer l’apparence')}
+                  >
+                    {dark ? t('Clair') : t('Sombre')}
+                  </button>
+                </div>
                 <NavLink to="/parametres" className="flex items-center gap-3 rounded-input px-3 py-2 text-body hover:bg-base">
                   <IconSettings />
                   {t('Paramètres')}

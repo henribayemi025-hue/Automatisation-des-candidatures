@@ -137,6 +137,15 @@ export function toMajor(amount: Minor, code: string): number {
   return amount / factor(code);
 }
 
+/**
+ * Les séparateurs de milliers français sont des espaces fines insécables (U+202F)
+ * que les navigateurs collent aux chiffres : « 1 295 400 » devient illisible en
+ * grande taille. On les remplace par une espace insécable normale.
+ */
+function breathe(text: string): string {
+  return text.replace(/\u202f/g, '\u00a0');
+}
+
 export function formatMoney(amount: Minor, code: string): string {
   const c = currency(code);
   const value = toMajor(amount, code);
@@ -144,14 +153,16 @@ export function formatMoney(amount: Minor, code: string): string {
     minimumFractionDigits: c.decimals,
     maximumFractionDigits: c.decimals,
   }).format(value);
-  return `${formatted} ${c.symbol}`;
+  return `${breathe(formatted)}\u00a0${c.symbol}`;
 }
 
 export function formatNumber(value: number, digits = 0): string {
-  return new Intl.NumberFormat(locale(), {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
-  }).format(value);
+  return breathe(
+    new Intl.NumberFormat(locale(), {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }).format(value),
+  );
 }
 
 export function formatPercent(value: number): string {

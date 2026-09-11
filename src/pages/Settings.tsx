@@ -7,6 +7,8 @@ import { SECTORS } from '../lib/guide';
 import type { Company } from '../lib/types';
 import { Field, PageHeader } from '../components/UI';
 import { LanguageSwitch } from '../lib/i18n';
+import { useTheme } from '../lib/theme';
+import type { ThemeChoice } from '../lib/theme';
 import { COUNTRIES, countryProfile, profileToCompany } from '../lib/countries';
 import { IconUsers } from '../components/Icons';
 import { t } from '../lib/i18n';
@@ -22,6 +24,7 @@ export default function Settings() {
   const { workspace, user } = useCollab();
   const [confirmReset, setConfirmReset] = useState(false);
   const [applied, setApplied] = useState('');
+  const { choice, setChoice } = useTheme();
   const [confirmDemo, setConfirmDemo] = useState(false);
   const [demoDone, setDemoDone] = useState('');
   const c = db.company;
@@ -38,6 +41,25 @@ export default function Settings() {
             <p className="text-caption text-muted">Français · English</p>
           </div>
           <LanguageSwitch />
+        </div>
+
+        <div className="card flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="text-section">{t('Apparence')}</h2>
+            <p className="text-caption text-muted">{t('Clair pour la boutique, sombre pour les longues séances de comptabilité.')}</p>
+          </div>
+          <div className="inline-flex rounded-[8px] border border-hairline bg-surface p-0.5">
+            {(['light', 'dark', 'system'] as ThemeChoice[]).map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setChoice(c)}
+                className={`rounded-[6px] px-3 py-1.5 text-caption font-semibold transition ${choice === c ? 'bg-ink text-surface' : 'text-muted hover:text-ink'}`}
+              >
+                {t(c === 'light' ? 'Clair' : c === 'dark' ? 'Sombre' : 'Système')}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="card lg:col-span-2">

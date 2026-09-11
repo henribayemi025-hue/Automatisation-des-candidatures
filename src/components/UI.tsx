@@ -29,6 +29,10 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
   );
 }
 
+/**
+ * Indicateur compact : le chiffre reste lisible, la carte ne prend plus toute
+ * la hauteur de l'écran. Un liseré d'accent remplace l'ancien bloc coloré.
+ */
 export function StatCard({
   label,
   value,
@@ -42,20 +46,62 @@ export function StatCard({
   icon?: ReactNode;
   tone?: 'default' | 'positive' | 'negative' | 'dark';
 }) {
-  const toneClass =
-    tone === 'dark'
-      ? 'rounded-card border border-teal bg-gradient-to-br from-teal to-brand-700 p-5 text-white shadow-[0_12px_28px_rgba(194,94,56,0.28)]'
-      : 'card';
-  const valueClass = tone === 'positive' ? 'text-[#2A9D8F]' : tone === 'negative' ? 'text-[#D14343]' : '';
+  const valueClass = tone === 'positive' ? 'text-[#1F6F65]' : tone === 'negative' ? 'text-[#A63030]' : 'text-ink';
   return (
-    <div className={`${toneClass} flex flex-col gap-3`}>
-      <div className="flex items-start justify-between gap-3">
-        <span className={`text-[11px] font-semibold uppercase tracking-wide ${tone === 'dark' ? 'text-white/75' : 'text-muted'}`}>{label}</span>
-        {icon && <span className={`rounded-input p-2 ${tone === 'dark' ? 'bg-white/15 text-white' : 'bg-base'}`}>{icon}</span>}
+    <div
+      className={`min-w-0 rounded-card border bg-surface px-4 py-3 shadow-sm ${
+        tone === 'dark' ? 'border-teal/40 border-l-[3px] border-l-teal' : 'border-hairline'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <span className="min-w-0 truncate text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">{label}</span>
+        {icon && <span className="shrink-0 text-muted">{icon}</span>}
       </div>
-      <div className={`font-display text-[26px] font-bold tracking-tight num ${valueClass}`}>{value}</div>
-      {hint && <div className={`text-caption ${tone === 'dark' ? 'text-white/75' : 'text-muted'}`}>{hint}</div>}
+      <div className={`figure mt-1 text-[19px] leading-none ${valueClass}`}>{value}</div>
+      {hint && <div className="mt-1.5 truncate text-[11px] text-muted">{hint}</div>}
     </div>
+  );
+}
+
+export function FigureStrip({ items }: { items: { label: string; value: ReactNode; hint?: string; share?: number; tone?: 'positive' | 'negative' | 'neutral' }[] }) {
+  return (
+    <div className="grid gap-px overflow-hidden rounded-card border border-hairline bg-hairline sm:grid-cols-2 lg:grid-cols-4">
+      {items.map((it) => (
+        <div key={it.label} className="min-w-0 bg-surface px-4 py-3">
+          <div className="truncate text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">{it.label}</div>
+          <div
+            className={`figure mt-1 text-[19px] leading-none ${
+              it.tone === 'positive' ? 'text-[#1F6F65]' : it.tone === 'negative' ? 'text-[#A63030]' : 'text-ink'
+            }`}
+          >
+            {it.value}
+          </div>
+          {typeof it.share === 'number' && (
+            <div className="mt-2 h-1 rounded-full bg-base">
+              <div
+                className={`h-1 rounded-full ${it.tone === 'negative' ? 'bg-[#A63030]' : it.tone === 'positive' ? 'bg-[#1F6F65]' : 'bg-teal'}`}
+                style={{ width: `${Math.max(2, Math.min(100, it.share * 100))}%` }}
+              />
+            </div>
+          )}
+          {it.hint && <div className="mt-1.5 truncate text-[11px] text-muted">{it.hint}</div>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Barre de poids d'une ligne dans son total : on voit ce qui pèse. */
+export function ShareBar({ value, total, tone = 'accent' }: { value: number; total: number; tone?: 'accent' | 'danger' | 'ink' }) {
+  const share = total > 0 ? Math.min(1, Math.abs(value) / total) : 0;
+  const color = tone === 'danger' ? 'bg-[#A63030]' : tone === 'ink' ? 'bg-ink/50' : 'bg-teal';
+  return (
+    <span className="inline-flex w-full items-center gap-2">
+      <span className="h-1 flex-1 rounded-full bg-base">
+        <span className={`block h-1 rounded-full ${color}`} style={{ width: `${Math.max(1, share * 100)}%` }} />
+      </span>
+      <span className="w-10 shrink-0 text-right text-[11px] tabular-nums text-muted">{total > 0 ? `${Math.round(share * 100)} %` : '—'}</span>
+    </span>
   );
 }
 

@@ -3,7 +3,7 @@ import { useDB } from '../lib/store';
 import { balanceSheet, incomeStatement } from '../lib/ledger';
 import { monthStart } from '../lib/metrics';
 import { formatPercent } from '../lib/money';
-import { Badge, Field, Money, PageHeader, StatCard } from '../components/UI';
+import { Badge, Field, FigureStrip, Money, PageHeader, ShareBar } from '../components/UI';
 import { t } from '../lib/i18n';
 
 function Section({
@@ -11,31 +11,38 @@ function Section({
   rows,
   total,
   totalLabel,
+  tone = 'accent',
 }: {
   title: string;
   rows: { code: string; label: string; amount: number }[];
   total: number;
   totalLabel: string;
+  tone?: 'accent' | 'danger' | 'ink';
 }) {
   return (
     <div>
-      <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">{title}</h3>
-      <ul className="space-y-1.5">
+      <h3 className="mb-2 text-[11px] font-bold uppercase tracking-[0.08em] text-muted">{title}</h3>
+      <ul className="divide-y divide-hairline">
         {rows.length ? (
           rows.map((r) => (
-            <li key={r.code} className="flex items-baseline justify-between gap-3 text-sm">
-              <span className="min-w-0 truncate">
-                <span className="mr-2 text-xs text-slate-400 num">{r.code}</span>
-                {r.label}
-              </span>
-              <Money value={r.amount} className="shrink-0" />
+            <li key={r.code} className="py-1.5">
+              <div className="flex items-baseline justify-between gap-3 text-caption">
+                <span className="min-w-0 truncate">
+                  <span className="mr-2 font-mono text-[11px] text-muted">{r.code}</span>
+                  {r.label}
+                </span>
+                <Money value={r.amount} className="shrink-0 font-semibold" />
+              </div>
+              <div className="mt-1 pl-1">
+                <ShareBar value={r.amount} total={total} tone={tone} />
+              </div>
             </li>
           ))
         ) : (
-          <li className="text-sm text-slate-400">{t('Aucun mouvement')}</li>
+          <li className="py-2 text-caption text-muted">{t('Aucun mouvement')}</li>
         )}
       </ul>
-      <div className="mt-3 flex items-baseline justify-between border-t border-slate-200 pt-2 font-bold dark:border-white/10">
+      <div className="mt-2 flex items-baseline justify-between border-t border-hairline pt-2 text-body font-bold">
         <span>{totalLabel}</span>
         <Money value={total} />
       </div>
@@ -75,22 +82,37 @@ export default function Statements() {
         </Field>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label={t('Produits')} value={<Money value={income.totalRevenue} />} tone="positive" />
-        <StatCard label={t('Charges')} value={<Money value={income.totalExpenses} />} tone="negative" />
-        <StatCard
-          label={t('Résultat net')}
-          value={<Money value={income.netIncome} />}
-          tone="dark"
-          hint={`${t('Marge nette')} ${formatPercent(marginRate)}`}
-        />
-        <StatCard
-          label={t('Équilibre du bilan')}
-          value={sheet.difference === 0 ? t('Vérifié') : t('Écart')}
-          tone={sheet.difference === 0 ? 'positive' : 'negative'}
-          hint={t('Actif = Passif + Capitaux + Résultat')}
-        />
-      </div>
+      <FigureStrip
+        items={[
+          {
+            label: t('Produits'),
+            value: <Money value={income.totalRevenue} />,
+            tone: 'positive',
+            share: 1,
+            hint: t('Ce que l’activité a rapporté'),
+          },
+          {
+            label: t('Charges'),
+            value: <Money value={income.totalExpenses} />,
+            tone: 'negative',
+            share: income.totalRevenue > 0 ? income.totalExpenses / income.totalRevenue : 0,
+            hint: income.totalRevenue > 0 ? t('{p} des produits', { p: formatPercent((income.totalExpenses / income.totalRevenue) * 100) }) : t('Aucun produit sur la période'),
+          },
+          {
+            label: t('Résultat net'),
+            value: <Money value={income.netIncome} />,
+            tone: income.netIncome >= 0 ? 'positive' : 'negative',
+            share: income.totalRevenue > 0 ? Math.abs(income.netIncome) / income.totalRevenue : 0,
+            hint: `${t('Marge nette')} ${formatPercent(marginRate)}`,
+          },
+          {
+            label: t('Équilibre du bilan'),
+            value: sheet.difference === 0 ? t('Vérifié') : t('Écart'),
+            tone: sheet.difference === 0 ? 'positive' : 'negative',
+            hint: t('Actif = Passif + Capitaux + Résultat'),
+          },
+        ]}
+      />
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <div className="card space-y-6">
@@ -111,9 +133,10 @@ export default function Statements() {
             rows={toRows(income.expenses)}
             total={income.totalExpenses}
             totalLabel={t('Total des charges')}
+            tone="danger"
           />
           <div
-            className={`flex items-baseline justify-between rounded-xl px-4 py-3 text-lg font-extrabold ${
+            className={`flex items-baseline justify-between rounded-input px-4 py-3 text-body font-bold ${
               income.netIncome >= 0
                 ? 'bg-teal-50 text-teal-700 dark:bg-teal-500/10 dark:text-teal-300'
                 : 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300'
@@ -140,6 +163,7 @@ export default function Statements() {
             rows={toRows(sheet.liabilities)}
             total={sheet.totalLiabilities}
             totalLabel={t('Total dettes')}
+            tone="danger"
           />
           <Section
             title={t('Capitaux propres')}
@@ -149,8 +173,9 @@ export default function Statements() {
             ]}
             total={sheet.totalEquity + sheet.netIncome}
             totalLabel={t('Total capitaux propres')}
+            tone="ink"
           />
-          <div className="flex items-baseline justify-between rounded-xl bg-slate-100 px-4 py-3 font-extrabold dark:bg-white/10">
+          <div className="flex items-baseline justify-between rounded-input bg-base px-4 py-3 text-body font-bold">
             <span>{t('Total passif')}</span>
             <Money value={sheet.totalLiabilities + sheet.totalEquity + sheet.netIncome} />
           </div>

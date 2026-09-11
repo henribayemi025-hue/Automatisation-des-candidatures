@@ -67,7 +67,7 @@ function KpiCard({
         {label}
       </span>
       <div className="mt-1.5 flex flex-wrap items-end justify-between gap-x-2 gap-y-1">
-        <span className={`whitespace-nowrap font-display text-[22px] font-bold leading-none tracking-tight tabular-nums ${tone === 'positive' ? 'text-[#1F6F65]' : tone === 'negative' ? 'text-[#A63030]' : 'text-ink'}`}>
+        <span className={`figure whitespace-nowrap text-[23px] leading-none ${tone === 'positive' ? 'text-[#1F6F65]' : tone === 'negative' ? 'text-[#A63030]' : 'text-ink'}`}>
           {value}
         </span>
         {chip}
@@ -304,8 +304,8 @@ export default function Dashboard() {
                       <span className="h-1 flex-1 rounded-full bg-base">
                         <span className="block h-1 rounded-full bg-teal" style={{ width: `${Math.max(4, (p.revenue / topMax) * 100)}%` }} />
                       </span>
-                      <span className="w-28 shrink-0 text-right text-[11px] tabular-nums text-muted">
-                        {p.qty} {t('vendu(s)')} · {p.revenue > 0 ? `${Math.round((p.margin / p.revenue) * 100)} %` : '—'}
+                      <span className="shrink-0 whitespace-nowrap text-right text-[11px] tabular-nums text-muted">
+                        {p.qty} × · {p.revenue > 0 ? `${Math.round((p.margin / p.revenue) * 100)} %` : '—'}
                       </span>
                     </div>
                   </li>

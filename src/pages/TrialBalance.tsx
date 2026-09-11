@@ -5,7 +5,7 @@ import { CLASS_LABELS } from '../lib/chart';
 import { toMajor } from '../lib/money';
 import { exportXlsx } from '../lib/xlsx';
 import type { AccountClass } from '../lib/types';
-import { Badge, Empty, Field, Money, PageHeader, StatCard } from '../components/UI';
+import { Badge, Empty, Field, FigureStrip, Money, PageHeader } from '../components/UI';
 import { IconScale } from '../components/Icons';
 import { t } from '../lib/i18n';
 
@@ -71,16 +71,18 @@ export default function TrialBalance() {
         </Field>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label={t('Total débit')} value={<Money value={totalDebit} />} />
-        <StatCard label={t('Total crédit')} value={<Money value={totalCredit} />} />
-        <StatCard
-          label={t('Contrôle d\'équilibre')}
-          value={balanced ? t('Équilibrée') : t('Déséquilibrée')}
-          tone={balanced ? 'positive' : 'negative'}
-          hint={balanced ? t('Débit = crédit') : `${t('Écart')} ${totalDebit - totalCredit}`}
-        />
-      </div>
+      <FigureStrip
+        items={[
+          { label: t('Total débit'), value: <Money value={totalDebit} />, share: 1, hint: t('{n} compte(s) mouvementé(s)', { n: balances.length }) },
+          { label: t('Total crédit'), value: <Money value={totalCredit} />, share: totalDebit > 0 ? totalCredit / totalDebit : 0, hint: t('Doit égaler le débit') },
+          {
+            label: t('Contrôle d’équilibre'),
+            value: balanced ? t('Équilibrée') : t('Déséquilibrée'),
+            tone: balanced ? 'positive' : 'negative',
+            hint: balanced ? t('Débit = crédit, à l’unité près') : t('Écart : consultez l’audit'),
+          },
+        ]}
+      />
 
       <div className="card mt-6 p-0">
         {balances.length ? (

@@ -3,6 +3,40 @@
 @tailwind utilities;
 
 @layer base {
+  /* Mode clair : crème Finjaro, encre chaude. */
+  :root {
+    --c-base: 250 246 240;
+    --c-surface: 255 255 255;
+    --c-hairline: 232 223 209;
+    --c-brass: 224 159 62;
+    --c-muted: 107 107 107;
+    --c-accent: 194 94 56;
+    --c-accent-hover: 217 93 57;
+    --c-accent-soft: 244 239 230;
+    --c-ink: 23 27 38;
+    --c-ink-700: 42 50 71;
+    --c-ink-800: 35 43 62;
+    --c-ink-950: 16 19 28;
+    color-scheme: light;
+  }
+
+  /* Mode sombre : ardoise chaude, mêmes accents, contrastes tenus. */
+  .dark {
+    --c-base: 18 20 26;
+    --c-surface: 26 29 37;
+    --c-hairline: 48 53 65;
+    --c-brass: 224 167 79;
+    --c-muted: 154 158 168;
+    --c-accent: 216 112 71;
+    --c-accent-hover: 232 128 86;
+    --c-accent-soft: 45 36 32;
+    --c-ink: 236 238 243;
+    --c-ink-700: 205 210 220;
+    --c-ink-800: 218 222 230;
+    --c-ink-950: 246 247 250;
+    color-scheme: dark;
+  }
+
   html {
     -webkit-text-size-adjust: 100%;
   }
@@ -17,14 +51,26 @@
   textarea {
     @apply text-ink;
   }
+  /* Tous les chiffres : chasse fixe, alignés, jamais collés. */
+  .num,
+  .tabular-nums {
+    font-family: theme('fontFamily.figure');
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+    letter-spacing: 0.01em;
+  }
 }
 
 @layer components {
   .card {
-    @apply min-w-0 rounded-card border border-hairline bg-white p-5 shadow-sm;
+    @apply min-w-0 rounded-card border border-hairline bg-surface p-5 shadow-sm;
+  }
+  /* Un chiffre mis en avant : lisible de loin, sans empattements. */
+  .figure {
+    @apply font-figure tabular-nums font-semibold tracking-[0.01em];
   }
   .field {
-    @apply w-full rounded-input border border-hairline bg-white px-3.5 py-2.5 text-body outline-none transition
+    @apply w-full rounded-input border border-hairline bg-surface px-3.5 py-2.5 text-body outline-none transition
            placeholder:text-muted/60 focus:border-teal focus:ring-2 focus:ring-teal/20;
   }
   .label {
@@ -41,13 +87,13 @@
     @apply btn bg-ink text-white hover:bg-ink-800;
   }
   .btn-ghost {
-    @apply btn border border-hairline bg-white text-ink hover:bg-teal-light;
+    @apply btn border border-hairline bg-surface text-ink hover:bg-teal-light;
   }
   .btn-brass {
     @apply btn bg-brass text-ink hover:brightness-95;
   }
   .btn-danger {
-    @apply btn border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100;
+    @apply btn border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300;
   }
   .th {
     @apply px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-muted;
@@ -65,7 +111,7 @@
     @apply tabular-nums;
   }
   .tile {
-    @apply flex flex-col items-center justify-center gap-2 rounded-card border border-hairline bg-white p-4 text-center
+    @apply flex flex-col items-center justify-center gap-2 rounded-card border border-hairline bg-surface p-4 text-center
            transition hover:border-teal hover:shadow-md active:scale-[0.98];
   }
   .tile-active {
@@ -118,3 +164,50 @@
 @media (prefers-reduced-motion: reduce) {
   .ticker .ticker-inner { animation: none !important; }
 }
+
+/*
+ * Écrans écrits avant le mode sombre : on rattrape les surfaces et les gris
+ * figés pour qu'ils suivent le thème, sans réécrire chaque page.
+ */
+.dark .bg-white { background-color: rgb(var(--c-surface)); }
+.dark .bg-slate-50,
+.dark .bg-slate-100 { background-color: rgb(var(--c-base)); }
+.dark .text-slate-400,
+.dark .text-slate-500,
+.dark .text-slate-600 { color: rgb(var(--c-muted)); }
+.dark .text-slate-700,
+.dark .text-slate-800,
+.dark .text-slate-900 { color: rgb(var(--c-ink)); }
+.dark .border-slate-100,
+.dark .border-slate-200 { border-color: rgb(var(--c-hairline)); }
+.dark .bg-amber-50 { background-color: rgb(60 48 26); }
+.dark .text-amber-800,
+.dark .text-amber-900 { color: rgb(240 206 140); }
+.dark .border-amber-200 { border-color: rgb(96 76 40); }
+.dark .bg-rose-50 { background-color: rgb(60 28 32); }
+.dark .text-rose-700,
+.dark .text-rose-800 { color: rgb(246 168 168); }
+.dark .border-rose-200 { border-color: rgb(96 48 52); }
+.dark .bg-emerald-50 { background-color: rgb(24 52 44); }
+.dark .text-emerald-700 { color: rgb(150 220 198); }
+.dark .bg-brand-50 { background-color: rgb(var(--c-accent-soft)); }
+.dark .text-brand-600,
+.dark .text-brand-700,
+.dark .text-brand-800 { color: rgb(var(--c-accent-hover)); }
+.dark .border-brand-200 { border-color: rgb(96 62 48); }
+.dark img:not([src*='.svg']) { filter: brightness(0.92); }
+
+/* Bandeaux et pastilles écrits en couleurs fixes : équivalents sombres. */
+.dark .bg-\[\#FBF1DF\] { background-color: rgb(58 47 30); }
+.dark .bg-\[\#FDF6E3\] { background-color: rgb(56 48 28); }
+.dark .bg-\[\#FDEDED\] { background-color: rgb(62 32 34); }
+.dark .bg-\[\#EAF6EA\],
+.dark .bg-\[\#E4F3EE\] { background-color: rgb(26 52 45); }
+.dark .text-\[\#1F6F65\] { color: rgb(122 208 186); }
+.dark .text-\[\#A63030\] { color: rgb(244 155 155); }
+.dark .text-\[\#8C6A3D\] { color: rgb(214 176 118); }
+.dark .text-\[\#D14343\] { color: rgb(244 155 155); }
+.dark .text-\[\#B8860B\],
+.dark .text-\[\#8C6A0B\] { color: rgb(226 184 96); }
+.dark .border-brass\/40,
+.dark .border-brass\/50 { border-color: rgb(120 92 42); }
