@@ -8,6 +8,7 @@ import ImportProducts from '../components/ImportProducts';
 import { exportXlsx } from '../lib/xlsx';
 import { Link } from 'react-router-dom';
 import { t } from '../lib/i18n';
+import { sectorProfile } from '../lib/sector';
 
 const BLANK = {
   name: '',
@@ -25,6 +26,9 @@ const BLANK = {
 export default function Products() {
   const { db, saveProduct } = useStore();
   const currency = db.company.currency;
+  // Le vocabulaire suit le métier : une carte pour un restaurant, des pièces
+  // pour un garage, des références pour une pharmacie.
+  const trade = sectorProfile(db.company.sector);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('');
   const [open, setOpen] = useState(false);
@@ -175,8 +179,8 @@ export default function Products() {
   return (
     <>
       <PageHeader
-        title={t('Produits')}
-        subtitle={t('{n} référence(s) au catalogue', { n: db.products.filter((p) => !p.archived).length })}
+        title={t(trade.itemsTitle)}
+        subtitle={`${t(trade.itemsSubtitle)} · ${t('{n} référence(s)', { n: db.products.filter((p) => !p.archived).length })}`}
         actions={
           <>
             <button onClick={() => setGrid((g) => !g)} className={grid ? 'btn-dark' : 'btn-ghost'} title={t('Modifier les prix directement dans le tableau, comme dans un tableur')}>
@@ -194,7 +198,7 @@ export default function Products() {
             </button>
             <button onClick={openNew} className="btn-primary">
               <IconPlus className="h-4 w-4" />
-              {t('Nouveau produit')}
+              {t('Nouveau {item}', { item: t(trade.item).toLowerCase() })}
             </button>
           </>
         }
@@ -280,8 +284,14 @@ export default function Products() {
           </Table>
         ) : (
           <Empty
-            title={t('Aucun produit trouvé')}
-            hint={t('Créez votre première référence pour alimenter le point de vente et le stock.')}
+            title={db.products.length === 0 ? t('Rien dans « {items} » pour l’instant', { items: t(trade.itemsTitle) }) : t('Rien trouvé')}
+            hint={
+              db.products.length === 0
+                ? t('Par exemple : {examples}. Vous pouvez aussi importer un fichier Excel ou photographier une liste.', {
+                    examples: trade.examples.map((e) => e.name).join(', '),
+                  })
+                : t('Essayez un autre mot, ou retirez le filtre de catégorie.')
+            }
             icon={<IconBox className="h-10 w-10" />}
           />
         )}
@@ -289,7 +299,7 @@ export default function Products() {
 
       <ImportProducts open={importOpen} onClose={() => setImportOpen(false)} />
 
-      <Modal open={open} onClose={() => setOpen(false)} title={editing ? t('Modifier le produit') : t('Nouveau produit')} wide>
+      <Modal open={open} onClose={() => setOpen(false)} title={editing ? t('Modifier') : t('Nouveau {item}', { item: t(trade.item).toLowerCase() })} wide>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <Field label={t('Nom du produit')}>

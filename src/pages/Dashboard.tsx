@@ -9,8 +9,9 @@ import { factor, formatMoney, formatNumber } from '../lib/money';
 import { Money, PageHeader } from '../components/UI';
 import StartGuide from '../components/StartGuide';
 import Sparkline, { Ticker } from '../components/Sparkline';
-import { IconAlert, IconCamera, IconChevronRight } from '../components/Icons';
+import { IconAlert, IconCamera, IconChevronRight, IconSparkle } from '../components/Icons';
 import { locale, t } from '../lib/i18n';
+import { sectorProfile } from '../lib/sector';
 
 const PERIODS: { value: Period; label: string; hint: string }[] = [
   { value: 'MTD', label: 'MTD', hint: 'Depuis le 1er du mois' },
@@ -103,6 +104,7 @@ export default function Dashboard() {
   const topMax = top[0]?.revenue ?? 1;
   const hasData = k.series.revenue.some((v) => v > 0) || k.series.expenses.some((v) => v > 0);
   const expert = db.company.mode === 'EXPERT';
+  const trade = sectorProfile(db.company.sector);
 
   const chartData = k.series.dates.map((d, i) => ({
     date: d,
@@ -233,6 +235,11 @@ export default function Dashboard() {
       </div>
 
       <StartGuide />
+
+      <p className="mt-3 flex items-start gap-2 text-caption text-muted">
+        <IconSparkle className="mt-0.5 h-4 w-4 shrink-0 text-brass" />
+        <span>{t(trade.tip)}</span>
+      </p>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
         <div className="card lg:col-span-2">

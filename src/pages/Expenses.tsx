@@ -7,6 +7,7 @@ import type { PaymentMethod } from '../lib/types';
 import { Empty, Field, Modal, Money, PageHeader, StatCard, Table } from '../components/UI';
 import { IconPlus, IconWallet } from '../components/Icons';
 import { t } from '../lib/i18n';
+import { sectorProfile } from '../lib/sector';
 import { EXPENSE_LABEL as CATEGORY_LABEL } from '../lib/expenses';
 import ProjectSelect from '../components/ProjectSelect';
 
@@ -21,6 +22,11 @@ export default function Expenses() {
   const [description, setDescription] = useState('');
   const [amountRaw, setAmountRaw] = useState('');
   const [method, setMethod] = useState<PaymentMethod>('CASH');
+  // Les postes de dépense courants du métier passent devant.
+  const orderedExpenseKeys = (() => {
+    const preferred = sectorProfile(db.company.sector).expenses;
+    return [...preferred, ...EXPENSE_KEYS.filter((k) => !preferred.includes(k))];
+  })();
   const [projectId, setProjectId] = useState('');
 
   const filtered = useMemo(
@@ -155,7 +161,7 @@ export default function Expenses() {
               onChange={(e) => setAccountKey(e.target.value as AccountKey)}
               className="field"
             >
-              {EXPENSE_KEYS.map((k) => (
+              {orderedExpenseKeys.map((k) => (
                 <option key={k} value={k}>
                   {t(CATEGORY_LABEL[k])}
                 </option>

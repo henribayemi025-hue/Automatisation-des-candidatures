@@ -28,6 +28,17 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 - [ ] 106 monnaies dans la liste, avec le bon nombre de décimales
       (yen sans centimes, dinar tunisien à 3 chiffres).
 
+## 3 zéro. Design et recherche
+
+- [ ] Les montants respirent (espaces lisibles, chiffres alignés à chasse fixe).
+- [ ] Mode sombre : réglages → Apparence (Clair / Sombre / Système), ou le
+      bouton dans le menu du compte ; tous les écrans restent lisibles.
+- [ ] Cartes compactes partout ; en comptabilité, chaque ligne du bilan et du
+      compte de résultat montre son poids dans le total.
+- [ ] Ctrl+K (ou la loupe de l'en-tête) : écrans, produits, clients, factures,
+      montants. Entrée ouvre le résultat.
+- [ ] Caisse : recherche dans les mouvements de la session.
+
 ## 3 bis. Accueil professionnel
 
 - [ ] Six indicateurs comparés (CA, marge brute, résultat, trésorerie, créances,
@@ -55,6 +66,16 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 - [ ] Bandeau d'accueil après trois jours sans saisie.
 - [ ] « Reprise d'un bilan existant » : soldes d'ouverture saisis, ou balance
       Excel / CSV importée ; écriture « AN » dans le journal ; bilan vérifié.
+- [ ] « Lire un PDF ou une photo » (compte connecté) : déposer le bilan ou la
+      balance ; l'assistant remplit les cases et dit si actif = passif.
+
+## 4 bis. Adaptation au métier
+
+- [ ] Restaurant : l'écran des articles s'appelle « Carte », exemples de plats,
+      conseil sur le coût des ingrédients.
+- [ ] Garage : « Pièces et interventions », conseil sur le devis.
+- [ ] Boutique, pharmacie, salon, électronique : mêmes écrans, mots du métier.
+- [ ] Les postes de dépense du métier apparaissent en tête des listes.
 
 ## 5. Projets (suivi à part : ouverture, chantier, événement, matériel)
 

@@ -17,6 +17,7 @@ import AssistantChat from '../components/AssistantChat';
 import ProjectSelect from '../components/ProjectSelect';
 import { IconCamera, IconPlus, IconSparkle, IconTrash } from '../components/Icons';
 import { t } from '../lib/i18n';
+import { sectorProfile } from '../lib/sector';
 
 type Tab = 'days' | 'statement' | 'photo' | 'opening';
 
@@ -67,6 +68,11 @@ export default function CatchUp() {
   const [tab, setTab] = useState<Tab>('days');
   const products = useMemo(() => db.products.filter((p) => !p.archived), [db.products]);
   const hasProjects = db.projects.some((p) => p.status === 'ACTIVE');
+  // Les postes de dépense courants du métier passent devant.
+  const orderedExpenseKeys = (() => {
+    const preferred = sectorProfile(db.company.sector).expenses;
+    return [...preferred, ...EXPENSE_KEYS.filter((k) => !preferred.includes(k))];
+  })();
 
   // ---- Onglet « jour par jour » ----
   const [rows, setRows] = useState<Row[]>(() => [blankRow(today()), blankRow(today()), blankRow(today())]);
@@ -351,7 +357,7 @@ export default function CatchUp() {
                       ) : (
                         <div className="space-y-1">
                           <select value={row.category} onChange={(e) => patch(row.id, { category: e.target.value as AccountKey })} className="field py-1.5 text-caption">
-                            {EXPENSE_KEYS.map((k) => (
+                            {orderedExpenseKeys.map((k) => (
                               <option key={k} value={k}>
                                 {t(EXPENSE_LABEL[k])}
                               </option>
@@ -484,7 +490,7 @@ export default function CatchUp() {
                       <td className="td">
                         {row.direction === 'OUT' ? (
                           <select value={row.category} onChange={(e) => setLine(i, { category: e.target.value as AccountKey })} className="field py-1.5 text-caption">
-                            {EXPENSE_KEYS.map((k) => (
+                            {orderedExpenseKeys.map((k) => (
                               <option key={k} value={k}>
                                 {t(EXPENSE_LABEL[k])}
                               </option>
