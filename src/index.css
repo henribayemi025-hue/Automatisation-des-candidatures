@@ -21,7 +21,7 @@
 
 @layer components {
   .card {
-    @apply rounded-card border border-hairline bg-white p-5 shadow-sm;
+    @apply min-w-0 rounded-card border border-hairline bg-white p-5 shadow-sm;
   }
   .field {
     @apply w-full rounded-input border border-hairline bg-white px-3.5 py-2.5 text-body outline-none transition

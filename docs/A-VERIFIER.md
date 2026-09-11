@@ -47,7 +47,17 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 - [ ] Fiche projet : « Rattacher une opération » déjà saisie, « Détacher ».
 - [ ] L'assistant répond à « où en est le projet … ? ».
 
-## 6. Comptabilité (à faire regarder par le comptable)
+## 6. Discussion (fil d'équipe)
+
+- [ ] Menu « Discussion » : canal Général + un canal par projet en cours.
+- [ ] Envoyer un message ; il reste après rechargement ; partagé entre membres.
+- [ ] « @assistant … » : réponse dans le fil (IA connecté, moteur local sinon).
+- [ ] Connecté : joindre la photo d'une facture → l'assistant propose la dépense,
+      bouton « Enregistrer cette dépense » utilisable par n'importe quel membre.
+- [ ] Dettes & crédits : « Relancer sur WhatsApp » ouvre WhatsApp avec le
+      message déjà écrit (clients qui ont un numéro).
+
+## 7. Comptabilité (à faire regarder par le comptable)
 
 - [ ] Balance : total débit = total crédit.
 - [ ] Bilan : « Équilibre du bilan — Vérifié ».
@@ -55,7 +65,7 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 - [ ] Historique : chaque action tracée, avec son auteur.
 - [ ] Exports Excel et PDF sur les écrans de rapports.
 
-## 7. Équipe
+## 8. Équipe
 
 - [ ] Inviter une adresse e-mail en « Comptable » depuis Équipe.
 - [ ] La personne se connecte avec cette adresse et voit l'espace.
@@ -64,7 +74,20 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 ## Ce qui n'est pas encore fait
 
 - Constructeur de requêtes (question en langage courant → tableau).
-- Chat d'équipe avec photos et assistant dans le fil (prochaine étape).
+- Appels audio/vidéo dans la discussion ; réception des messages WhatsApp dans l'app.
 - Plusieurs espaces de travail pour un même propriétaire.
 - Immobilisations et amortissements automatiques, paie, déclarations fiscales.
 - Les 8 photos de métiers pour l'écran d'accueil (attendues de Beau).
+
+## Dernier balayage automatique (11/09/2026)
+
+- 27 écrans ouverts en démo à 390 px et 1 280 px : aucune erreur, aucun débordement.
+- Parcours rejoués : connexion, session expirée, démo (lien direct par pays),
+  FR/EN, profils pays, devises, rattrapage (journées, relevé, photo), rappel,
+  projets, discussion, WhatsApp.
+- Opérations enchaînées en démo : ouverture de caisse, vente, devis converti,
+  bon de commande réceptionné, règlement d'une créance, extourne, clôture de
+  caisse, exports Excel (journal, balance, produits), rapport imprimable.
+  Après tout cela : audit sans anomalie, bilan vérifié.
+- Jeu d'essai rejoué en XAF, EUR, JPY, GBP : balance équilibrée, écart bilan 0,
+  aucun stock négatif.
