@@ -50,6 +50,11 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 ## 2. Démonstration à envoyer aux comptables
 
 - [ ] `#/demo/cameroun` ouvre directement trois mois d'activité, sans compte.
+- [ ] **Un lien par métier**, pour vérifier chacun :
+      `#/demo/cameroun/boutique` · `/restaurant` · `/coiffure` · `/garage` ·
+      `/services` · `/pharmacie` · `/electronique` · `/import-export`.
+      Ouvrir un second lien change le métier sans recharger ni dupliquer les
+      données. La page `#/demo` propose les métiers avant les pays.
 - [ ] `#/demo/france`, `#/demo/cote-d-ivoire`, `#/demo` (liste des pays).
 - [ ] Bandeau « Démonstration » visible, bouton « Créer mon compte » qui efface
       l'exemple et ramène à la connexion.

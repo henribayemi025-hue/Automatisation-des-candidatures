@@ -4,6 +4,8 @@ import { hasContent, useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
 import { COUNTRIES, countryProfile, profileToCompany } from '../lib/countries';
 import { currencyLabel } from '../lib/money';
+import { SECTORS } from '../lib/guide';
+import { sectorProfile } from '../lib/sector';
 import { LanguageSwitch, t } from '../lib/i18n';
 import AppSwitcher from '../components/AppSwitcher';
 import { IconBook, IconChevronRight, IconShield, IconSparkle } from '../components/Icons';
@@ -37,21 +39,57 @@ export function slug(name: string): string {
  * Page de démonstration : une seule question (le pays), puis l'espace se remplit
  * de trois mois d'activité. Aucun compte, aucune installation.
  */
+/** Métiers proposés en démonstration, dans l'ordre où on les montre. */
+const TRADES = SECTORS.filter((s) => s.id !== 'other');
+
+/** Les mots qu'on écrit naturellement dans un lien, vers le métier qu'ils désignent. */
+const TRADE_ALIASES: Record<string, string> = {
+  boutique: 'retail', commerce: 'retail', epicerie: 'retail', quincaillerie: 'retail',
+  restaurant: 'food', restauration: 'food', resto: 'food', snack: 'food', boulangerie: 'food', traiteur: 'food',
+  coiffure: 'beauty', coiffeur: 'beauty', salon: 'beauty', beaute: 'beauty', barbier: 'beauty', onglerie: 'beauty',
+  garage: 'garage', mecanique: 'garage', mecanicien: 'garage',
+  services: 'services', service: 'services', artisan: 'services', plomberie: 'services', couture: 'services', conseil: 'services',
+  pharmacie: 'health', sante: 'health', cabinet: 'health',
+  electronique: 'tech', telephonie: 'tech', telephone: 'tech', informatique: 'tech',
+  import: 'trade', 'import-export': 'trade', export: 'trade', negoce: 'trade', grossiste: 'trade', conteneur: 'trade',
+};
+
+/** « coiffure », « import-export », « beauty » → le métier correspondant, ou null. */
+export function tradeFromSlug(value: string | undefined): string | null {
+  if (!value) return null;
+  const v = slug(value);
+  if (TRADE_ALIASES[v]) return TRADE_ALIASES[v];
+  const hit = TRADES.find((s) => s.id === v || slug(s.label) === v || slug(s.label).split('-').includes(v));
+  return hit?.id ?? null;
+}
+
+/** Le mot le plus simple pour écrire ce métier dans un lien. */
+export function tradeSlug(id: string): string {
+  const preferred: Record<string, string> = {
+    retail: 'boutique', food: 'restaurant', beauty: 'coiffure', garage: 'garage',
+    services: 'services', health: 'pharmacie', tech: 'electronique', trade: 'import-export',
+  };
+  return preferred[id] ?? id;
+}
+
 export default function Demo() {
   const { db, setCompany, loadDemo } = useStore();
   const { continueAsGuest } = useCollab();
-  const { country: fromUrl } = useParams();
+  const { country: fromUrl, trade: tradeUrl } = useParams();
   const [country, setCountry] = useState('');
+  const [trade, setTrade] = useState('retail');
   const [busy, setBusy] = useState(false);
   const started = useRef(false);
 
-  function open(name: string) {
+  function open(name: string, tradeId = trade) {
     const profile = countryProfile(name);
     if (!profile || busy) return;
     setBusy(true);
     // Revenir sur le lien de démonstration ne doit pas empiler un second jeu
-    // de données : on rouvre simplement l'espace déjà rempli.
+    // de données : on rouvre l'espace déjà rempli — en changeant seulement de
+    // métier si le lien en demande un autre, pour comparer sans tout recharger.
     if (localStorage.getItem(DEMO_KEY) === '1' && hasContent(db)) {
+      if (tradeId !== db.company.sector) setCompany({ sector: tradeId, tracksStock: undefined });
       window.location.hash = '#/';
       return;
     }
@@ -62,7 +100,7 @@ export default function Demo() {
       name: t('Boutique de démonstration'),
       country: name,
       city: '',
-      sector: 'retail',
+      sector: tradeId,
       goals: ['sell', 'stock', 'debts', 'accounting'],
       mode: 'EXPERT',
       onboarded: true,
@@ -72,15 +110,16 @@ export default function Demo() {
     window.location.hash = '#/';
   }
 
-  // Lien direct « #/demo/cameroun » : la démonstration s'ouvre sans aucun clic.
+  // Lien direct « #/demo/cameroun » ou « #/demo/cameroun/coiffure » : la
+  // démonstration s'ouvre sans aucun clic, dans les mots du métier demandé.
   useEffect(() => {
     if (started.current || !fromUrl) return;
     const match = COUNTRIES.find((c) => slug(c.name) === slug(fromUrl));
     if (!match) return;
     started.current = true;
-    open(match.name);
+    open(match.name, tradeFromSlug(tradeUrl) ?? 'retail');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fromUrl]);
+  }, [fromUrl, tradeUrl]);
 
   return (
     <div className="min-h-screen bg-base px-4 py-8 sm:px-8">
@@ -100,10 +139,41 @@ export default function Demo() {
           {t('Une boutique, trois mois d’activité, déjà saisie.')}
         </h1>
         <p className="mt-3 max-w-xl text-body leading-relaxed text-muted">
-          {t('Choisissez votre pays : les chiffres s’affichent dans votre monnaie et votre plan comptable. Rien à créer, rien à installer.')}
+          {t('Choisissez le métier et le pays : le menu parle ce métier, les chiffres s’affichent dans votre monnaie et votre plan comptable. Rien à créer, rien à installer.')}
         </p>
 
+        {/* Le métier d'abord : c'est lui qui change le menu, les mots et les
+            écrans. Le lien direct existe pour chacun, à copier pour vérifier. */}
         <div className="mt-6 rounded-card border border-hairline bg-white p-5 sm:p-6">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-muted">{t('Quel métier voulez-vous voir ?')}</div>
+          <div className="mt-3 grid gap-2 sm:grid-cols-4">
+            {TRADES.map((s) => {
+              const profile = sectorProfile(s.id);
+              const active = s.id === trade;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setTrade(s.id)}
+                  aria-pressed={active}
+                  className={`rounded-card border p-3 text-left transition ${active ? 'border-teal bg-teal-light' : 'border-hairline hover:border-teal/50'}`}
+                >
+                  <span className="block text-body font-semibold text-ink">{t(s.label)}</span>
+                  <span className="block text-caption text-muted">
+                    {t(profile.sell)} · {t(profile.itemsTitle)}
+                    {profile.tracksStock ? '' : ` · ${t('sans stock')}`}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-3 text-[12px] text-muted">
+            {t('Lien direct pour ce métier :')}{' '}
+            <code className="rounded bg-base px-1.5 py-0.5 text-ink">#/demo/cameroun/{tradeSlug(trade)}</code>
+          </p>
+        </div>
+
+        <div className="mt-4 rounded-card border border-hairline bg-white p-5 sm:p-6">
           <div className="text-[11px] font-bold uppercase tracking-wider text-muted">{t('Ouvrir la démonstration pour')}</div>
           <div className="mt-3 grid gap-2 sm:grid-cols-3">
             {QUICK.map((name) => {

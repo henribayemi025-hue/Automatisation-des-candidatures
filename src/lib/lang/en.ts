@@ -1527,6 +1527,12 @@ export const EN: Record<string, string> = {
   'Aucune taxe déductible sur la période.': 'No deductible tax in the period.',
   'Ceci prépare la déclaration ; le formulaire officiel et son dépôt restent au comptable. Base achats sur la période : {b}.': 'This prepares the return; the official form and its filing stay with the accountant. Purchase base for the period: {b}.',
 
+  // Démonstration par métier
+  'Choisissez le métier et le pays : le menu parle ce métier, les chiffres s’affichent dans votre monnaie et votre plan comptable. Rien à créer, rien à installer.': 'Choose the trade and the country: the menu speaks that trade, figures show in your currency and chart of accounts. Nothing to create, nothing to install.',
+  'Quel métier voulez-vous voir ?': 'Which trade do you want to see?',
+  'sans stock': 'no stock',
+  'Lien direct pour ce métier :': 'Direct link for this trade:',
+
   // Visite guidée
   'Visite guidée': 'Guided tour',
   'Précédent': 'Back',
