@@ -439,14 +439,24 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
 
       // Le coût saisi peut inclure la taxe ; le stock, lui, se valorise hors taxe,
       // sinon la marge et le compte de stock ne diraient pas la même chose.
-      const rate = db.company.vatEnabled ? db.company.vatRateBp : 0;
+      // Une facture étrangère ne porte pas de TVA locale : la taxe arrive à la
+      // douane, séparément (importVat). Sinon on déduirait une TVA jamais payée.
+      const rate = db.company.vatEnabled && !purchase.foreign ? db.company.vatRateBp : 0;
       const included = db.company.pricesIncludeTax !== false;
       const netOf = (amount: Minor) => (rate === 0 || !included ? amount : Math.round((amount * 10000) / (10000 + rate)));
+
+      // Frais d'approche (douane, fret, transit…) : ils font partie du coût de
+      // la marchandise, pas des charges du mois. On les répartit sur les lignes
+      // au prorata de leur valeur, pour que chaque article porte sa part.
+      const landed = (purchase.landed ?? []).reduce((s, c) => s + c.amount, 0);
+      const goodsNet = purchase.lines.reduce((s, l) => s + netOf(l.unitCost) * l.qty, 0);
+      const landedShare = (lineNet: Minor) => (landed === 0 || goodsNet === 0 ? 0 : Math.round((landed * lineNet) / goodsNet));
 
       purchase.lines.forEach((line, i) => {
         const product = db.products.find((x) => x.id === line.productId);
         if (!product) return;
-        const unitNet = netOf(line.unitCost);
+        const lineNet = netOf(line.unitCost) * line.qty;
+        const unitNet = line.qty > 0 ? Math.round((lineNet + landedShare(lineNet)) / line.qty) : netOf(line.unitCost);
         const before = product.stock;
         const beforeValue = Math.max(0, before) * product.cost;
         product.stock = before + line.qty;
@@ -473,20 +483,36 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       const goods = purchase.lines.reduce((sum, l) => sum + netOf(l.unitCost) * l.qty, 0);
       const vat = rate === 0 ? 0 : included ? purchase.total - goods : Math.round((purchase.total * rate) / 10000);
       const ttc = goods + vat;
+      const importVat = purchase.importVat ?? 0;
 
+      // Le stock entre au coût rendu magasin (marchandise + frais d'approche).
+      // Le fournisseur n'est dû que de sa facture ; la douane, le fret et la
+      // TVA d'importation ont été payés à part, à la réception — on ne libère
+      // pas un conteneur sans régler la douane.
+      const entryLines: JournalLine[] = [
+        { account: accountCode(chart, 'INVENTORY'), label: 'Entrée en stock', debit: goods + landed, credit: 0 },
+        { account: accountCode(chart, 'VAT_DEDUCTIBLE'), label: 'TVA déductible', debit: vat + importVat, credit: 0 },
+        { account: accountCode(chart, 'SUPPLIERS'), label: purchase.supplierName, debit: 0, credit: ttc },
+      ];
+      if (landed + importVat > 0) {
+        entryLines.push({
+          account: methodAccount(chart, purchase.landedPaidWith ?? 'BANK'),
+          label: 'Douane, fret, transit',
+          debit: 0,
+          credit: landed + importVat,
+        });
+      }
       post(db, ev, {
         id: ids.entry,
         date,
         journal: 'AC',
         ref: purchase.number,
-        label: `Achat ${purchase.supplierName}`,
+        label: purchase.foreign
+          ? `Achat ${purchase.supplierName} (${purchase.foreign.currency})`
+          : `Achat ${purchase.supplierName}`,
         sourceType: 'purchase',
         sourceId: purchase.id,
-        lines: [
-          { account: accountCode(chart, 'INVENTORY'), label: 'Entrée en stock', debit: goods, credit: 0 },
-          { account: accountCode(chart, 'VAT_DEDUCTIBLE'), label: 'TVA déductible', debit: vat, credit: 0 },
-          { account: accountCode(chart, 'SUPPLIERS'), label: purchase.supplierName, debit: 0, credit: ttc },
-        ],
+        lines: entryLines,
       });
 
       if (purchase.paid > 0) {

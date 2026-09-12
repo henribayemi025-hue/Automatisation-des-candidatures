@@ -168,6 +168,30 @@ export interface PurchaseLine {
 
 export type PurchaseStatus = 'PENDING' | 'RECEIVED' | 'CANCELLED';
 
+/**
+ * Frais d'approche d'une importation : ce qu'on paie en plus de la facture du
+ * fournisseur pour que la marchandise arrive au magasin. En comptabilité ils
+ * ne sont pas des charges du mois : ils entrent dans le coût du stock, sinon
+ * la marge affichée sur un conteneur serait fausse.
+ */
+export type LandedCostKind = 'CUSTOMS' | 'FREIGHT' | 'FORWARDING' | 'INSURANCE' | 'HANDLING' | 'OTHER';
+
+export interface LandedCost {
+  kind: LandedCostKind;
+  label: string;
+  /** Hors taxe, dans la devise de l'entreprise. */
+  amount: Minor;
+}
+
+/** Facture reçue dans une autre devise, convertie au taux du jour de la commande. */
+export interface ForeignAmount {
+  currency: string;
+  /** Total de la facture dans sa devise, en unités mineures de cette devise. */
+  total: Minor;
+  /** Combien vaut 1 unité de la devise étrangère dans la devise de l'entreprise. */
+  rate: number;
+}
+
 export interface Purchase {
   id: string;
   number: string;
@@ -175,10 +199,20 @@ export interface Purchase {
   projectId?: string | null;
   supplierId: string | null;
   supplierName: string;
+  /** Lignes toujours dans la devise de l'entreprise, déjà converties. */
   lines: PurchaseLine[];
+  /** Montant de la facture fournisseur, devise de l'entreprise. */
   total: Minor;
   paid: Minor;
   status: PurchaseStatus;
+  /** Renseigné quand la facture était dans une autre devise. */
+  foreign?: ForeignAmount | null;
+  /** Douane, fret, transit… payés à la réception, ajoutés au coût du stock. */
+  landed?: LandedCost[];
+  /** TVA payée en douane à l'importation : déductible, comme celle d'un achat local. */
+  importVat?: Minor;
+  /** Avec quoi les frais d'approche et la TVA de douane ont été payés. */
+  landedPaidWith?: PaymentMethod;
   createdAt: ISODate;
 }
 

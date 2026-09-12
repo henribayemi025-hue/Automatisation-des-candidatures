@@ -1,8 +1,18 @@
 import { useMemo, useState } from 'react';
 import { useStore } from '../lib/store';
-import { formatMoney, toMajor, toMinor } from '../lib/money';
+import { CURRENCIES, factor, formatMoney, toMajor, toMinor } from '../lib/money';
 import { outstanding } from '../lib/metrics';
-import type { PurchaseLine } from '../lib/types';
+import type { LandedCostKind, Minor, PaymentMethod, PurchaseLine } from '../lib/types';
+
+/** Les frais qui font qu'un conteneur coûte plus que la facture du fournisseur. */
+const LANDED_KINDS: { id: LandedCostKind; label: string }[] = [
+  { id: 'CUSTOMS', label: 'Droits de douane' },
+  { id: 'FREIGHT', label: 'Fret / transport' },
+  { id: 'FORWARDING', label: 'Transitaire' },
+  { id: 'INSURANCE', label: 'Assurance' },
+  { id: 'HANDLING', label: 'Manutention / port' },
+  { id: 'OTHER', label: 'Autres frais' },
+];
 import { Badge, Empty, Field, Money, PageHeader, StatCard, Table, Modal } from '../components/UI';
 import { IconCart, IconPlus, IconX } from '../components/Icons';
 import { t } from '../lib/i18n';
@@ -22,6 +32,24 @@ export default function Purchases() {
   const [paidRaw, setPaidRaw] = useState('');
   const [error, setError] = useState('');
 
+  // Achat à l'étranger : la facture est dans une autre devise, et la
+  // marchandise coûte plus que la facture — douane, fret, transit. Ces frais
+  // entrent dans le coût du stock, sinon la marge d'un conteneur ment.
+  const [abroad, setAbroad] = useState(false);
+  const [fxCurrency, setFxCurrency] = useState('USD');
+  const [fxRateRaw, setFxRateRaw] = useState('');
+  /** Coût unitaire saisi dans la devise étrangère, par produit (unités mineures de cette devise). */
+  const [foreignUnit, setForeignUnit] = useState<Record<string, Minor>>({});
+  const [landedRaw, setLandedRaw] = useState<Record<LandedCostKind, string>>({ CUSTOMS: '', FREIGHT: '', FORWARDING: '', INSURANCE: '', HANDLING: '', OTHER: '' });
+  const [importVatRaw, setImportVatRaw] = useState('');
+  const [landedPaidWith, setLandedPaidWith] = useState<PaymentMethod>('BANK');
+
+  const fxRate = Number(fxRateRaw.replace(',', '.')) || 0;
+  /** Convertit un montant en devise étrangère (mineures) vers la devise de l'entreprise (mineures). */
+  const toLocal = (foreignMinor: Minor) => Math.round((foreignMinor * fxRate * factor(currency)) / factor(fxCurrency));
+  const landedTotal = LANDED_KINDS.reduce((s, k) => s + toMinor(landedRaw[k.id] || 0, currency), 0);
+  const importVat = toMinor(importVatRaw || 0, currency);
+
   const stats = useMemo(() => {
     const received = db.purchases.filter((p) => p.status === 'RECEIVED');
     return {
@@ -38,7 +66,14 @@ export default function Purchases() {
     filter === 'ALL' ? true : filter === 'PENDING' ? p.status === 'PENDING' : p.status === 'RECEIVED',
   );
 
-  const total = lines.reduce((s, l) => s + l.unitCost * l.qty, 0);
+  // À l'étranger, les lignes gardent le coût converti ; la facture en devise
+  // est reconstituée à partir des coûts saisis, pour l'affichage et l'audit.
+  const effectiveLines: PurchaseLine[] = abroad
+    ? lines.map((l) => ({ ...l, unitCost: toLocal(foreignUnit[l.productId] ?? 0) }))
+    : lines;
+  const total = effectiveLines.reduce((s, l) => s + l.unitCost * l.qty, 0);
+  const foreignTotal = lines.reduce((s, l) => s + (foreignUnit[l.productId] ?? 0) * l.qty, 0);
+  const landedCost = total + landedTotal;
 
   function addLine(productId: string) {
     const product = db.products.find((p) => p.id === productId);
@@ -47,24 +82,41 @@ export default function Purchases() {
     setLines([...lines, { productId, name: product.name, qty: 1, unitCost: product.cost }]);
   }
 
-  function submit() {
-    if (!lines.length) {
-      setError(t('Ajoutez au moins un produit.'));
-      return;
-    }
-    recordPurchase({
-      lines,
-      supplierId: supplierId || null,
-      supplierName: supplierName || db.suppliers.find((s) => s.id === supplierId)?.name || 'Fournisseur',
-      paid: toMinor(paidRaw || 0, currency),
-      projectId: projectId || null,
-    });
+  function reset() {
     setLines([]);
     setProjectId('');
     setSupplierId('');
     setSupplierName('');
     setPaidRaw('');
     setError('');
+    setAbroad(false);
+    setFxRateRaw('');
+    setForeignUnit({});
+    setLandedRaw({ CUSTOMS: '', FREIGHT: '', FORWARDING: '', INSURANCE: '', HANDLING: '', OTHER: '' });
+    setImportVatRaw('');
+  }
+
+  function submit() {
+    if (!lines.length) {
+      setError(t('Ajoutez au moins un produit.'));
+      return;
+    }
+    if (abroad && fxRate <= 0) {
+      setError(t('Indiquez le taux de change : combien vaut 1 {c} dans votre devise.', { c: fxCurrency }));
+      return;
+    }
+    recordPurchase({
+      lines: effectiveLines,
+      supplierId: supplierId || null,
+      supplierName: supplierName || db.suppliers.find((s) => s.id === supplierId)?.name || 'Fournisseur',
+      paid: toMinor(paidRaw || 0, currency),
+      projectId: projectId || null,
+      foreign: abroad ? { currency: fxCurrency, total: foreignTotal, rate: fxRate } : null,
+      landed: LANDED_KINDS.map((k) => ({ kind: k.id, label: t(k.label), amount: toMinor(landedRaw[k.id] || 0, currency) })).filter((c) => c.amount > 0),
+      importVat,
+      landedPaidWith,
+    });
+    reset();
     setOpen(false);
   }
 
@@ -121,10 +173,22 @@ export default function Purchases() {
             {filtered.map((p) => (
               <tr key={p.id} className="row">
                 <td className="td font-semibold">{p.number}</td>
-                <td className="td">{p.supplierName}</td>
+                <td className="td">
+                  {p.supplierName}
+                  {p.foreign && (
+                    <span className="ml-2">
+                      <Badge tone="info">{p.foreign.currency}</Badge>
+                    </span>
+                  )}
+                </td>
                 <td className="td text-slate-500">{p.date}</td>
                 <td className="td num font-semibold">
                   <Money value={p.total} />
+                  {(p.landed?.length ?? 0) > 0 && (
+                    <span className="block text-[11px] font-normal text-muted">
+                      {t('+ frais')} <Money value={(p.landed ?? []).reduce((s, c) => s + c.amount, 0)} />
+                    </span>
+                  )}
                 </td>
                 <td className="td num text-slate-500">
                   <Money value={p.paid} />
@@ -218,20 +282,33 @@ export default function Purchases() {
                   inputMode="numeric"
                   className="field num w-20 py-1.5"
                 />
-                <input
-                  value={toMajor(l.unitCost, currency)}
-                  onChange={(e) =>
-                    setLines(
-                      lines.map((x) =>
-                        x.productId === l.productId
-                          ? { ...x, unitCost: toMinor(e.target.value, currency) }
-                          : x,
-                      ),
-                    )
-                  }
-                  inputMode="decimal"
-                  className="field num w-28 py-1.5"
-                />
+                {abroad ? (
+                  <span className="flex items-center gap-1">
+                    <input
+                      value={foreignUnit[l.productId] === undefined ? '' : toMajor(foreignUnit[l.productId], fxCurrency)}
+                      onChange={(e) => setForeignUnit({ ...foreignUnit, [l.productId]: toMinor(e.target.value || 0, fxCurrency) })}
+                      inputMode="decimal"
+                      placeholder={t('prix en {c}', { c: fxCurrency })}
+                      className="field num w-28 py-1.5"
+                    />
+                    <span className="num w-24 text-right text-[11px] text-muted">= {formatMoney(toLocal(foreignUnit[l.productId] ?? 0), currency)}</span>
+                  </span>
+                ) : (
+                  <input
+                    value={toMajor(l.unitCost, currency)}
+                    onChange={(e) =>
+                      setLines(
+                        lines.map((x) =>
+                          x.productId === l.productId
+                            ? { ...x, unitCost: toMinor(e.target.value, currency) }
+                            : x,
+                        ),
+                      )
+                    }
+                    inputMode="decimal"
+                    className="field num w-28 py-1.5"
+                  />
+                )}
                 <button
                   onClick={() => setLines(lines.filter((x) => x.productId !== l.productId))}
                   className="text-slate-400 hover:text-rose-600"
@@ -243,13 +320,93 @@ export default function Purchases() {
           </ul>
         )}
 
-        <div className="mt-4 flex items-baseline justify-between border-t border-slate-100 pt-4 text-lg font-extrabold dark:border-white/10">
-          <span>{t('Total commande')}</span>
-          <span className="num">{formatMoney(total, currency)}</span>
+        {/* Achat à l'étranger : devise et taux d'abord, les prix des lignes
+            se saisissent ensuite dans cette devise. */}
+        <div className="mt-4 rounded-input border border-hairline bg-base/60 p-3">
+          <label className="flex items-start gap-2 text-caption text-ink">
+            <input id="pur-abroad" type="checkbox" checked={abroad} onChange={(e) => setAbroad(e.target.checked)} className="mt-0.5" />
+            <span>
+              {t('Achat à l’étranger (facture dans une autre devise)')}
+              <span className="block text-muted">{t('Les prix se saisissent dans la devise de la facture ; la douane, le fret et le transit s’ajoutent au coût du stock.')}</span>
+            </span>
+          </label>
+          {abroad && (
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <Field label={t('Devise de la facture')}>
+                <select id="pur-fx" value={fxCurrency} onChange={(e) => setFxCurrency(e.target.value)} className="field">
+                  {CURRENCIES.filter((c) => c.code !== currency).map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.code} — {c.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label={t('Taux : 1 {c} =', { c: fxCurrency })} hint={t('en {c}, au jour de la facture', { c: currency })}>
+                <input id="pur-rate" value={fxRateRaw} onChange={(e) => setFxRateRaw(e.target.value)} inputMode="decimal" placeholder="600" className="field num" />
+              </Field>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-4 rounded-input border border-hairline p-3">
+          <p className="text-caption font-semibold text-ink">{t('Frais d’approche')}</p>
+          <p className="mb-3 text-[12px] text-muted">
+            {t('Ce que vous payez pour que la marchandise arrive : hors taxe, dans votre devise. Réglés à la réception, ajoutés au coût du stock.')}
+          </p>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {LANDED_KINDS.map((k) => (
+              <Field key={k.id} label={t(k.label)}>
+                <input
+                  id={`pur-landed-${k.id}`}
+                  value={landedRaw[k.id]}
+                  onChange={(e) => setLandedRaw({ ...landedRaw, [k.id]: e.target.value })}
+                  inputMode="decimal"
+                  className="field num"
+                />
+              </Field>
+            ))}
+          </div>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <Field label={t('{tax} payée en douane', { tax: db.company.taxLabel || 'TVA' })} hint={t('Déductible, comme sur un achat local.')}>
+              <input id="pur-import-vat" value={importVatRaw} onChange={(e) => setImportVatRaw(e.target.value)} inputMode="decimal" className="field num" />
+            </Field>
+            <Field label={t('Frais et taxe payés avec')}>
+              <select value={landedPaidWith} onChange={(e) => setLandedPaidWith(e.target.value as PaymentMethod)} className="field">
+                <option value="BANK">{t('Banque')}</option>
+                <option value="MOBILE">{t('Mobile money')}</option>
+                <option value="CASH">{t('Espèces')}</option>
+              </select>
+            </Field>
+          </div>
+        </div>
+
+        <div className="mt-4 space-y-1 border-t border-slate-100 pt-4 dark:border-white/10">
+          {abroad && (
+            <div className="flex items-baseline justify-between text-caption text-muted">
+              <span>{t('Facture fournisseur')}</span>
+              <span className="num">
+                {formatMoney(foreignTotal, fxCurrency)} → {formatMoney(total, currency)}
+              </span>
+            </div>
+          )}
+          <div className="flex items-baseline justify-between text-caption text-muted">
+            <span>{t('Marchandise')}</span>
+            <span className="num">{formatMoney(total, currency)}</span>
+          </div>
+          {landedTotal > 0 && (
+            <div className="flex items-baseline justify-between text-caption text-muted">
+              <span>{t('Frais d’approche')}</span>
+              <span className="num">{formatMoney(landedTotal, currency)}</span>
+            </div>
+          )}
+          <div className="flex items-baseline justify-between text-lg font-extrabold">
+            <span>{landedTotal > 0 ? t('Coût rendu magasin') : t('Total commande')}</span>
+            <span className="num">{formatMoney(landedCost, currency)}</span>
+          </div>
         </div>
 
         <div className="mt-4">
-          <Field label={t('Montant payé à la commande ({c})', { c: currency })} hint={t('Le solde devient une dette fournisseur')}>
+          <Field label={t('Montant payé au fournisseur à la commande ({c})', { c: currency })} hint={t('Le solde devient une dette fournisseur. Les frais d’approche, eux, sont réglés à la réception.')}>
             <input value={paidRaw} onChange={(e) => setPaidRaw(e.target.value)} inputMode="decimal" className="field num" />
           </Field>
         </div>

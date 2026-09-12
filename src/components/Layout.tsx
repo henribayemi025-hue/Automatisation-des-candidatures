@@ -100,6 +100,7 @@ const NAV: NavGroup[] = [
       { to: '/balance', label: 'Balance générale', icon: <IconScale />, area: 'accounting', expert: true },
       { to: '/etats', label: 'Bilan & résultat', icon: <IconChart />, area: 'accounting', expert: true },
       { to: '/plan-comptable', label: 'Plan comptable', icon: <IconLayers />, area: 'accounting', expert: true },
+      { to: '/tva', label: 'Déclaration de TVA', icon: <IconReceipt />, area: 'accounting', expert: true },
       { to: '/rapprochement', label: 'Rapprochement bancaire', icon: <IconScale />, area: 'accounting', expert: true },
       { to: '/cloture', label: 'Clôture de l’exercice', icon: <IconLock />, area: 'accounting', expert: true },
       { to: '/audit', label: 'Audit', icon: <IconShield />, area: 'accounting', expert: true },

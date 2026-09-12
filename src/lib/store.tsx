@@ -15,6 +15,8 @@ import type {
   Product,
   Purchase,
   PurchaseLine,
+  ForeignAmount,
+  LandedCost,
   Sale,
   SaleLine,
   Supplier,
@@ -81,12 +83,20 @@ interface SaleInput {
 }
 
 interface PurchaseInput {
+  /** Lignes dans la devise de l'entreprise (déjà converties si facture étrangère). */
   lines: PurchaseLine[];
   date?: string;
   projectId?: string | null;
   supplierId: string | null;
   supplierName: string;
   paid: Minor;
+  /** Facture reçue dans une autre devise : gardée pour l'affichage et l'audit. */
+  foreign?: ForeignAmount | null;
+  /** Douane, fret, transit… ajoutés au coût du stock à la réception. */
+  landed?: LandedCost[];
+  /** TVA payée en douane, déductible. */
+  importVat?: Minor;
+  landedPaidWith?: PaymentMethod;
 }
 
 interface ExpenseInput {
@@ -350,6 +360,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           total,
           paid: Math.min(input.paid, total),
           status: 'PENDING',
+          foreign: input.foreign ?? null,
+          landed: (input.landed ?? []).filter((c) => c.amount > 0),
+          importVat: input.importVat ?? 0,
+          landedPaidWith: input.landedPaidWith ?? 'BANK',
           createdAt: new Date().toISOString(),
         };
         dispatch('purchase.record', { purchase });

@@ -288,6 +288,68 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
   purchase(-62, 0, [{ productIndex: 3, qty: 400, unitCost: 640 }, { productIndex: 4, qty: 180, unitCost: 1900 }, { productIndex: 0, qty: 40, unitCost: 14800 }], 0.5, true);
   purchase(-30, 1, [{ productIndex: 2, qty: 120, unitCost: 3550 }, { productIndex: 6, qty: 60, unitCost: 880 }, { productIndex: 1, qty: 60, unitCost: 5100 }], 0, true);
   purchase(-50, 2, [{ productIndex: 5, qty: 30, unitCost: 2400 }], 1, true);
+
+  // ---- Une importation : facture en dollars, douane, fret, transit ----
+  // Pour qu'un fiscaliste ou un import-export voie tout de suite le coût rendu
+  // magasin et la TVA de douane. Les ampoules LED (index 6) et le sucre
+  // (index 3) arrivent d'un fournisseur étranger.
+  {
+    const date = dayISO(base, -44);
+    const fxRate = currency(company.currency).decimals === 0 ? 600 : 1; // 1 $ = 600 F ; en devise à centimes, on reste 1:1 pour garder des chiffres lisibles
+    const cents = (usd: number) => usd * 100;
+    const toLocal = (c: number) => Math.round((c * fxRate) / (currency(company.currency).decimals === 0 ? 100 : 1));
+    const importLines = [
+      { productIndex: 6, qty: 300, usd: 1.2 },
+      { productIndex: 3, qty: 200, usd: 0.9 },
+    ].map((l) => ({
+      productId: products[l.productIndex].id,
+      name: products[l.productIndex].name,
+      qty: l.qty,
+      unitCost: toLocal(cents(l.usd)),
+    }));
+    const foreignTotal = [300 * cents(1.2), 200 * cents(0.9)].reduce((s, x) => s + x, 0);
+    const total = importLines.reduce((s, l) => s + l.unitCost * l.qty, 0);
+    const landed = [
+      { kind: 'CUSTOMS' as const, label: 'Droits de douane', amount: money(96_000) },
+      { kind: 'FREIGHT' as const, label: 'Fret', amount: money(48_000) },
+      { kind: 'FORWARDING' as const, label: 'Transitaire', amount: money(24_000) },
+    ];
+    const landedTotal = landed.reduce((s, c) => s + c.amount, 0);
+    const importVat = company.vatEnabled ? Math.round(((total + landed[0].amount) * company.vatRateBp) / 10000) : 0;
+    const order: Purchase = {
+      id: `${runId}-pur-${purchaseNo}`,
+      number: `BC-${String(++purchaseNo).padStart(5, '0')}`,
+      date,
+      supplierId: null,
+      supplierName: 'Shenzhen Light Export',
+      lines: importLines,
+      total,
+      paid: 0,
+      status: 'PENDING',
+      foreign: { currency: 'USD', total: foreignTotal, rate: fxRate },
+      landed,
+      importVat,
+      landedPaidWith: 'BANK',
+      createdAt: stamp(date, 8),
+    };
+    emit(stamp(date, 8), 'purchase.record', { purchase: order });
+    emit(stamp(date, 11), 'purchase.receive', {
+      purchaseId: order.id,
+      date,
+      ids: { movements: importLines.map(() => id()), entry: id(), payment: id(), debt: id() },
+    });
+    // Suivi parallèle du coût moyen, frais d'approche compris (prorata valeur).
+    importLines.forEach((line) => {
+      const lineValue = line.unitCost * line.qty;
+      const share = total > 0 ? Math.round((landedTotal * lineValue) / total) : 0;
+      const unitLanded = Math.round((lineValue + share) / line.qty);
+      const before = stock.get(line.productId) ?? 0;
+      const beforeValue = Math.max(0, before) * (cost.get(line.productId) ?? 0);
+      const after = before + line.qty;
+      stock.set(line.productId, after);
+      cost.set(line.productId, after > 0 ? Math.round((beforeValue + line.qty * unitLanded) / after) : unitLanded);
+    });
+  }
   purchase(-4, 2, [{ productIndex: 5, qty: 25, unitCost: 2400 }], 0, false);
 
   // ---- Ventes réparties sur trois mois ----

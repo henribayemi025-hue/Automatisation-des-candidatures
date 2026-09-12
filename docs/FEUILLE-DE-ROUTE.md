@@ -56,6 +56,9 @@ certification ou une infrastructure).
 | Import de relevés (texte, CSV) avec poste de dépense proposé | fait |
 | Clôture d'exercice et à-nouveaux automatiques | fait |
 | Immobilisations et plan d'amortissement | fait |
+| Déclaration de TVA par période : collectée, déductible (achats + douane), net à reverser ou crédit | fait |
+| Achats à l’étranger : facture en devise, taux, frais d’approche dans le coût du stock, TVA de douane déductible | fait |
+| Écart de change au règlement d’une facture en devise | prochain |
 | Taux de TVA par article ; ventilation 17,5 % / centimes au Cameroun | prochain |
 | Export FEC (France) | fait |
 | Rapprochement bancaire assisté | fait |

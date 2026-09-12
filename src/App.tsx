@@ -30,6 +30,7 @@ import TrialBalance from './pages/TrialBalance';
 import Statements from './pages/Statements';
 import ChartOfAccounts from './pages/ChartOfAccounts';
 import Staff from './pages/Staff';
+import Vat from './pages/Vat';
 import Assets from './pages/Assets';
 import Closing from './pages/Closing';
 import Reconcile from './pages/Reconcile';
@@ -135,6 +136,7 @@ export default function App() {
           <Route path="/etats" element={<Statements />} />
           <Route path="/plan-comptable" element={<ChartOfAccounts />} />
           <Route path="/personnel" element={<Staff />} />
+          <Route path="/tva" element={<Vat />} />
           <Route path="/immobilisations" element={<Assets />} />
           <Route path="/rapprochement" element={<Reconcile />} />
           <Route path="/cloture" element={<Closing />} />

@@ -1,5 +1,5 @@
 import type { DB } from './types';
-import { IconBox, IconCard, IconLayers, IconMonitor, IconSettings, IconShield, IconSparkle, IconUsers } from '../components/Icons';
+import { IconBox, IconCard, IconCart, IconLayers, IconMonitor, IconSettings, IconShield, IconSparkle, IconUsers } from '../components/Icons';
 
 type IconComponent = (p: { className?: string }) => JSX.Element;
 
@@ -22,6 +22,7 @@ export const SECTORS: Sector[] = [
   { id: 'services', label: 'Services / artisan', hint: 'Plomberie, couture, photo, conseil…', gradient: 'from-[#2F6D62] to-[#1C4A42]', icon: IconUsers },
   { id: 'health', label: 'Pharmacie / santé', hint: 'Officine, cabinet, parapharmacie', gradient: 'from-[#8C6A3D] to-[#5C4426]', icon: IconShield },
   { id: 'tech', label: 'Électronique / téléphonie', hint: 'Téléphones, accessoires, réparation', gradient: 'from-[#2A3247] to-[#171B26]', icon: IconMonitor },
+  { id: 'trade', label: 'Import-export / négoce', hint: 'Conteneurs, grossiste, revente en gros', gradient: 'from-[#1F6F65] to-[#12443E]', icon: IconCart },
   { id: 'other', label: 'Autre activité', hint: 'On s’adapte à tout', gradient: 'from-[#D08363] to-[#AC4F2D]', icon: IconCard },
 ];
 

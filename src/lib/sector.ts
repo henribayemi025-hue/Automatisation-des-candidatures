@@ -184,6 +184,26 @@ export const SECTOR_PROFILES: Record<string, SectorProfile> = {
     expenses: ['PURCHASES', 'RENT', 'TRANSPORT', 'SERVICES', 'PAYROLL'],
     tip: 'Les réparations se créent comme des articles sans stock : on suit le chiffre d’affaires de l’atelier à part.',
   },
+  trade: {
+    id: 'trade',
+    item: 'Marchandise',
+    items: 'Marchandises',
+    itemsTitle: 'Marchandises',
+    itemsSubtitle: 'Ce que vous importez et revendez, avec le coût rendu magasin et le stock',
+    customer: 'Client',
+    customers: 'Clients',
+    sale: 'Vente',
+    sales: 'Ventes',
+    sell: 'Vendre',
+    tracksStock: true,
+    examples: [
+      { name: 'Carton de tuiles 30×30', category: 'Matériaux', unit: 'carton' },
+      { name: 'Groupe électrogène 5 kVA', category: 'Équipement', unit: 'pièce' },
+      { name: 'Sac de riz parfumé 50 kg', category: 'Alimentaire', unit: 'sac' },
+    ],
+    expenses: ['PURCHASES', 'TRANSPORT', 'TAXES', 'SERVICES', 'FINANCIAL'],
+    tip: 'Sur un achat à l’étranger, saisissez la douane, le fret et le transit dans « Frais d’approche » : ils entrent dans le coût du stock et la marge devient vraie.',
+  },
   other: { ...RETAIL, id: 'other' },
 };
 

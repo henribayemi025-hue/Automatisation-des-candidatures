@@ -173,6 +173,32 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 - [ ] Ce qui n'y est PAS : cotisations sociales, bulletin de paie
       réglementaire, déclarations. C'est assumé, pas oublié.
 
+## 7 pré. Pour le fiscaliste et pour un import-export (nouveau)
+
+À montrer en premier à Gautier (fiscaliste) et à Duviol (import-export).
+
+- [ ] **Déclaration de TVA** (menu Comptabilité, mode expert) : par mois,
+      collectée sur les ventes, déductible sur les achats et la douane, et
+      le net à reverser ou le crédit à reporter. Chaque ligne est une écriture.
+- [ ] Métier **« Import-export / négoce »** dans la liste des activités :
+      « Marchandises », conseil sur les frais d'approche.
+- [ ] Achats → « Nouveau bon de commande » → case **« Achat à l'étranger »** :
+      devise de la facture + taux ; les prix des lignes se saisissent dans
+      cette devise et la conversion s'affiche à côté.
+- [ ] **Frais d'approche** : douane, fret, transitaire, assurance, manutention,
+      autres ; « TVA payée en douane » ; « payés avec ».
+- [ ] Le total affiche Facture → converti, Marchandise, Frais, **Coût rendu
+      magasin**.
+- [ ] À la réception : le stock entre au coût rendu (réparti sur les articles
+      au prorata), la TVA de douane est déductible, **aucune TVA locale n'est
+      inventée sur une facture étrangère**, et le fournisseur n'est dû que de
+      sa facture. Journal : ligne « Douane, fret, transit » au crédit de la
+      banque.
+- [ ] La démo Cameroun contient une importation « Shenzhen Light Export » en
+      dollars avec douane, fret et transitaire ; bilan toujours vérifié.
+- [ ] Ce qui n'est PAS fait : écart de change au règlement (si le taux a bougé
+      entre la commande et le paiement) ; déclaration officielle DGI/DSF.
+
 ## 7 bis. Ce qu'un comptable réclamait (nouveau)
 
 - [ ] **Immobilisations** (menu « Mon argent ») : la démo contient un
