@@ -62,8 +62,11 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 
 ## 3. Langue et pays
 
-- [ ] Bouton FR / EN sur la connexion, l'accueil de démarrage et les réglages ;
-      le choix est gardé après rechargement.
+- [ ] Bouton FR / EN sur la connexion et l'accueil de démarrage ; dans les
+      réglages, deux boutons en toutes lettres **« Français » / « English »**,
+      la langue active surlignée, et une phrase qui dit laquelle est en cours
+      (avant, « Français · English » n'était qu'un texte : cliquer dessus ne
+      faisait rien). Le choix est gardé après rechargement.
 - [ ] Choisir un pays propose sa monnaie, sa taxe, son taux, son plan comptable
       et son début d'exercice ; « Appliquer le profil du pays » dans les réglages.
 - [ ] 106 monnaies dans la liste, avec le bon nombre de décimales

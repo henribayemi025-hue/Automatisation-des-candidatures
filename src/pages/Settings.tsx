@@ -9,7 +9,7 @@ import { startTour } from '../components/Tour';
 import { displayIdentity } from '../lib/identity';
 import type { Company } from '../lib/types';
 import { Field, PageHeader } from '../components/UI';
-import { LanguageSwitch } from '../lib/i18n';
+import { LanguageSwitch, getLang } from '../lib/i18n';
 import { useTheme } from '../lib/theme';
 import type { ThemeChoice } from '../lib/theme';
 import { COUNTRIES, countryProfile, profileToCompany } from '../lib/countries';
@@ -38,12 +38,18 @@ export default function Settings() {
       <PageHeader title={t('Paramètres')} subtitle={t('Votre entreprise, votre devise, votre façon de travailler')} />
 
       <div className="grid gap-4 lg:grid-cols-2">
+        {/* « Français · English » était un simple texte à côté d'un petit
+            FR / EN : on cliquait sur le mot, rien ne bougeait. Les deux langues
+            sont maintenant des boutons en toutes lettres, et la phrase dit
+            laquelle est active. */}
         <div className="card lg:col-span-2 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-section">{t('Langue')}</h2>
-            <p className="text-caption text-muted">Français · English</p>
+            <p className="text-caption text-muted">
+              {getLang() === 'en' ? 'The app is in English.' : 'L’application est en français.'}
+            </p>
           </div>
-          <LanguageSwitch />
+          <LanguageSwitch full />
         </div>
 
         <div className="card flex flex-wrap items-center justify-between gap-4">
