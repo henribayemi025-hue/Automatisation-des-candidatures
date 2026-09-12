@@ -32,6 +32,21 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
 - [ ] Le carré de 6 points (en haut) ouvre le menu et ramène à finjaro.net,
       depuis la connexion, l'accueil de démarrage et l'application.
 
+## 1 bis. Visite guidée (nouveau)
+
+- [ ] À la première ouverture (démo ou juste après l'inscription), une carte
+      « Visite guidée · 1/8 » apparaît en bas à droite. Suivant / Précédent
+      changent d'écran ; Terminer la ferme ; elle ne revient pas toute seule.
+- [ ] Relance : menu du compte (en haut à droite) → « Visite guidée », ou le
+      bouton du bandeau Démonstration, ou Paramètres → « Voir la visite guidée
+      avec ces mots ».
+- [ ] Les mots suivent le métier : import-export → « Marchandises » et l'étape
+      Achats avec les frais d'approche ; salon → « Prestations », 7 étapes,
+      sans Achats ; restaurant → « Carte ».
+- [ ] Paramètres → Activité : une note dit tout de suite ce que le menu
+      affiche maintenant (ex. « Vendre · Marchandises · Clients & fournisseurs
+      · Ventes »).
+
 ## 2. Démonstration à envoyer aux comptables
 
 - [ ] `#/demo/cameroun` ouvre directement trois mois d'activité, sans compte.

@@ -12,6 +12,7 @@ import AppSwitcher from './AppSwitcher';
 import CommandPalette from './CommandPalette';
 import AssistantDrawer from './AssistantDrawer';
 import ModuleIntro from './ModuleIntro';
+import Tour, { startTour } from './Tour';
 import PresenceAvatars, { Avatar } from './PresenceAvatars';
 import TabBar, { TAB_BAR_SPACE } from './TabBar';
 import {
@@ -335,6 +336,17 @@ export default function Layout({ children }: { children: ReactNode }) {
                     {dark ? t('Clair') : t('Sombre')}
                   </button>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenu(false);
+                    startTour();
+                  }}
+                  className="flex w-full items-center gap-3 rounded-input px-3 py-2 text-left text-body hover:bg-base"
+                >
+                  <IconSparkle />
+                  {t('Visite guidée')}
+                </button>
                 <NavLink to="/parametres" className="flex items-center gap-3 rounded-input px-3 py-2 text-body hover:bg-base">
                   <IconSettings />
                   {t('Paramètres')}
@@ -360,6 +372,9 @@ export default function Layout({ children }: { children: ReactNode }) {
             <span>
               <strong>{t('Démonstration')}</strong> — {t('chiffres d’exemple, gardés sur cet appareil. Tout est modifiable.')}
             </span>
+            <button onClick={startTour} className="btn-ghost px-3 py-1.5 text-caption">
+              {t('Visite guidée')}
+            </button>
             <button onClick={leaveDemo} className="btn-primary px-3 py-1.5 text-caption">
               {t('Créer mon compte')}
             </button>
@@ -390,6 +405,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       </div>
 
       <CommandPalette open={palette} onClose={() => setPalette(false)} />
+      <Tour />
       <TabBar onMenu={() => setOpen(true)} />
       <AssistantDrawer />
     </div>

@@ -1527,6 +1527,28 @@ export const EN: Record<string, string> = {
   'Aucune taxe déductible sur la période.': 'No deductible tax in the period.',
   'Ceci prépare la déclaration ; le formulaire officiel et son dépôt restent au comptable. Base achats sur la période : {b}.': 'This prepares the return; the official form and its filing stay with the accountant. Purchase base for the period: {b}.',
 
+  // Visite guidée
+  'Visite guidée': 'Guided tour',
+  'Précédent': 'Back',
+  'Passer': 'Skip',
+  'Terminer': 'Finish',
+  'Suivant': 'Next',
+  'L’accueil': 'Home',
+  'Six chiffres comparés au mois ou à l’année d’avant : chiffre d’affaires, marge, résultat, trésorerie, ce qu’on vous doit, ce que vous devez. Un clic sur une carte ouvre le détail.': 'Six figures compared with last month or last year: revenue, margin, result, cash, what you are owed, what you owe. Click a card to open the detail.',
+  'On clique un article ou on scanne un code-barres, il tombe dans le panier, − et + pour la quantité, Valider. Le stock, la caisse et la comptabilité suivent tout seuls.': 'Click an item or scan a barcode, it lands in the cart, − and + for quantity, Confirm. Stock, till and books follow on their own.',
+  'On clique une prestation, elle tombe dans le panier, Valider. La caisse et la comptabilité suivent tout seules — pas de stock à gérer.': 'Click a service, it lands in the cart, Confirm. Till and books follow on their own — no stock to manage.',
+  'Chaque article avec son prix, son coût d’achat, sa marge et son stock. Le coût suit les réceptions : prix moyen pondéré, comme dans un vrai logiciel.': 'Each item with its price, purchase cost, margin and stock. Cost follows receipts: weighted average, like real accounting software.',
+  'Chaque prestation avec son prix et son coût. Pas de quantité : un métier qui vend du temps ne compte pas des cartons.': 'Each service with its price and cost. No quantity: a trade that sells time does not count boxes.',
+  'Un bon de commande, puis la réception. Pour un achat à l’étranger : facture en devise, taux, et les frais d’approche — douane, fret, transit — qui entrent dans le coût du stock.': 'A purchase order, then the receipt. For a purchase abroad: invoice currency, rate, and landed costs — customs, freight, forwarding — that go into the stock cost.',
+  'Qui travaille ici, les présences pointées, les avances, la paie. L’avance est une créance, la charge est au brut, le net sort de la caisse : rien n’est compté deux fois.': 'Who works here, attendance, advances, payroll. The advance is a receivable, the expense is gross, the net leaves the till: nothing is counted twice.',
+  'Collectée sur les ventes, déductible sur les achats et la douane, net à reverser ou crédit. Chaque ligne est une écriture du journal.': 'Collected on sales, deductible on purchases and customs, net to remit or credit. Every line is a journal entry.',
+  'Bilan et compte de résultat': 'Balance sheet and income statement',
+  'Produits par un moteur en partie double : chaque opération de l’application a écrit ses lignes. L’équilibre du bilan est vérifié en permanence, et l’audit tourne sept contrôles.': 'Produced by a double-entry engine: every operation in the app wrote its lines. The balance sheet is checked at all times, and the audit runs seven controls.',
+  'Changez « Activité » pour voir l’application dans les mots d’un autre métier — import-export, restaurant, salon. Pays, devise, taxe et plan comptable se règlent ici aussi.': 'Change “Activity” to see the app in another trade’s words — import-export, restaurant, salon. Country, currency, tax and chart of accounts are set here too.',
+  'Avec ce métier, le menu dit :': 'With this trade, the menu says:',
+  'sans les écrans Stock et Achats': 'without the Stock and Purchases screens',
+  'Voir la visite guidée avec ces mots': 'See the guided tour with these words',
+
   // Connexion par email ou par téléphone
   'Email ou numéro de téléphone': 'Email or phone number',
   'Le numéro sert d’identifiant. Il n’est pas vérifié par SMS : c’est le mot de passe qui protège le compte.': 'The number is only an identifier. It is not verified by text message: the password is what protects the account.',

@@ -4,7 +4,8 @@ import { hasContent, useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
 import { CURRENCIES, currencyLabel } from '../lib/money';
 import { SECTORS } from '../lib/guide';
-import { tracksStock } from '../lib/sector';
+import { sectorProfile, tracksStock } from '../lib/sector';
+import { startTour } from '../components/Tour';
 import { displayIdentity } from '../lib/identity';
 import type { Company } from '../lib/types';
 import { Field, PageHeader } from '../components/UI';
@@ -104,6 +105,20 @@ export default function Settings() {
                 ))}
               </select>
             </Field>
+            {/* Changer d'activité change le menu tout de suite, mais rien ne le
+                disait : on nomme les nouveaux mots, et on propose la visite. */}
+            {c.sector && (
+              <div className="rounded-input bg-base px-3 py-2.5 text-caption text-ink">
+                <p>
+                  <span className="font-semibold">{t('Avec ce métier, le menu dit :')}</span>{' '}
+                  {t(sectorProfile(c.sector).sell)} · {t(sectorProfile(c.sector).itemsTitle)} · {t(sectorProfile(c.sector).customers)} · {t(sectorProfile(c.sector).sales)}
+                  {tracksStock(c) ? '' : ` — ${t('sans les écrans Stock et Achats')}`}
+                </p>
+                <button type="button" onClick={startTour} className="mt-1.5 font-semibold text-teal">
+                  {t('Voir la visite guidée avec ces mots')}
+                </button>
+              </div>
+            )}
             {/* Le métier propose, la personne décide : un salon qui revend des
                 crèmes coche la case, une boutique de services la décoche. */}
             <label className="flex items-start gap-2 text-caption text-ink">
