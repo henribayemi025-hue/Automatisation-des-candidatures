@@ -61,9 +61,9 @@ export default function Debts() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard
-          label={isCustomer ? 'Total des créances' : 'Total des dettes'}
+          label={isCustomer ? t('Total des créances') : t('Total des dettes')}
           value={<Money value={total} />}
-          hint={`${open.length} tiers concerné(s)`}
+          hint={`${open.length} ${t('tiers concerné(s)')}`}
           tone="dark"
         />
         <StatCard

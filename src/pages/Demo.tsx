@@ -89,7 +89,7 @@ export default function Demo() {
     // de données : on rouvre l'espace déjà rempli — en changeant seulement de
     // métier si le lien en demande un autre, pour comparer sans tout recharger.
     if (localStorage.getItem(DEMO_KEY) === '1' && hasContent(db)) {
-      if (tradeId !== db.company.sector) setCompany({ sector: tradeId, tracksStock: undefined });
+      if (tradeId !== db.company.sector) setCompany({ sector: tradeId, tracksStock: undefined, name: t('Démonstration — {trade}', { trade: t(SECTORS.find((s) => s.id === tradeId)?.label ?? 'Boutique / commerce') }) });
       window.location.hash = '#/';
       return;
     }
@@ -97,7 +97,7 @@ export default function Demo() {
     setCompany({
       ...profileToCompany(profile),
       currency: profile.currency,
-      name: t('Boutique de démonstration'),
+      name: t('Démonstration — {trade}', { trade: t(SECTORS.find((s) => s.id === tradeId)?.label ?? 'Boutique / commerce') }),
       country: name,
       city: '',
       sector: tradeId,

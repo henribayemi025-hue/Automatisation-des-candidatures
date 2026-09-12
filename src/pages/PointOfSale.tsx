@@ -6,7 +6,7 @@ import { Badge, Empty, Field, Money, PageHeader } from '../components/UI';
 import { IconBox, IconCart, IconCheck, IconDoc, IconSearch, IconX } from '../components/Icons';
 import { scanFeedback, useBarcodeScanner } from '../lib/scanner';
 import { t } from '../lib/i18n';
-import { tracksStock } from '../lib/sector';
+import { sectorProfile, tracksStock } from '../lib/sector';
 import ProjectSelect from '../components/ProjectSelect';
 
 const METHODS: { value: PaymentMethod; label: string }[] = [
@@ -191,8 +191,12 @@ export default function PointOfSale() {
   return (
     <>
       <PageHeader
-        title={t('Point de vente')}
-        subtitle={t('Scannez ou cherchez, validez : la vente, le stock et les écritures sont enregistrés d’un coup')}
+        title={withStock ? t('Point de vente') : t(sectorProfile(db.company.sector).sell)}
+        subtitle={
+          withStock
+            ? t('Scannez ou cherchez, validez : la vente, le stock et les écritures sont enregistrés d’un coup')
+            : t('Choisissez la prestation, encaissez : la vente et les écritures sont enregistrées d’un coup')
+        }
         actions={
           held.length > 0 ? (
             <span className="rounded-pill border border-brass/50 bg-[#FBF1DF] px-3 py-1.5 text-caption font-semibold text-[#8C6A3D]">
@@ -302,7 +306,9 @@ export default function PointOfSale() {
             <div className="rounded-input border border-dashed border-hairline px-4 py-6 text-center">
               <p className="text-caption font-semibold text-ink">{t('Panier vide')}</p>
               <p className="mt-1 text-[11px] leading-relaxed text-muted">
-                {t('Scannez un code-barres, ou cliquez un article à gauche. Il apparaît ici avec les boutons − et + pour la quantité.')}
+                {withStock
+                  ? t('Scannez un code-barres, ou cliquez un article à gauche. Il apparaît ici avec les boutons − et + pour la quantité.')
+                  : t('Cliquez une prestation à gauche. Elle apparaît ici avec les boutons − et + pour la quantité.')}
               </p>
             </div>
           ) : (

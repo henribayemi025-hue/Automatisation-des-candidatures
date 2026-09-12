@@ -68,7 +68,7 @@ export default function Stock() {
           ] as [Tab, string][]
         ).map(([key, label]) => (
           <button key={key} onClick={() => setTab(key)} className={tab === key ? 'btn-dark' : 'btn-ghost'}>
-            {label}
+            {t(label)}
           </button>
         ))}
         {tab === 'MOVEMENTS' && (

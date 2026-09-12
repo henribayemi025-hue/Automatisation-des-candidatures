@@ -270,7 +270,7 @@ export function runAuditChecks(
     label: t('Trésorerie négative'),
     severity: negativeCash.length ? 'WARN' : 'OK',
     detail: negativeCash.length
-      ? `Solde négatif sur : ${negativeCash.map((x) => `${x.a.code} ${x.a.label}`).join(', ')}`
+      ? t('Solde négatif sur : {list}', { list: negativeCash.map((x) => `${x.a.code} ${t(x.a.label)}`).join(', ') })
       : t('Aucun compte de trésorerie négatif.'),
   });
 

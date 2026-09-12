@@ -129,7 +129,7 @@ export default function Onboarding() {
                       <option value="">{t('— Choisir —')}</option>
                       {COUNTRIES.map((c) => (
                         <option key={c.name} value={c.name}>
-                          {c.name}
+                          {t(c.name)}
                         </option>
                       ))}
                     </select>

@@ -283,3 +283,36 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
   Après tout cela : audit sans anomalie, bilan vérifié.
 - Jeu d'essai rejoué en XAF, EUR, JPY, GBP : balance équilibrée, écart bilan 0,
   aucun stock négatif.
+
+## Audit complet (12/09/2026)
+
+Ce qui a été passé au crible : les 32 écrans, dans les 8 métiers de la
+démonstration, à 1 280 px et à 390 px, en clair et en sombre, en français et
+en anglais ; puis chaque bouton cliqué un par un (sauf les destructeurs).
+
+- Erreurs JavaScript, débordement horizontal, texte coupé, bloc blanc en mode
+  sombre, variable non remplacée : **aucun**.
+- Boutons morts : **aucun**. Les vingt « sans effet » relevés par la machine
+  étaient des onglets déjà actifs, des filtres déjà choisis, un envoi à vide,
+  ou un export qui ouvre un autre onglet.
+- Corrigé — **la démonstration vendait du riz chez le coiffeur.** Chaque
+  métier a maintenant son propre jeu d'articles (coupes et tresses au salon,
+  plats au restaurant, vidange et plaquettes au garage, médicaments en
+  pharmacie, tuiles et ciment en import-export…). Le nom de l'entreprise de
+  démonstration suit le métier.
+- Corrigé — la visite guidée s'ouvrait par-dessus la caisse en parlant de
+  l'accueil : elle commence sur l'accueil.
+- Corrigé — chez le coiffeur, la caisse s'appelle « Encaisser », l'aide et le
+  panier vide parlent de prestations, plus d'articles ni de stock.
+- Corrigé — sur téléphone, 73 boutons en texte étaient trop petits pour le
+  doigt (moins de 30 px). Tous font au moins 36 px maintenant : 0 sur 931.
+- Corrigé — en anglais : onglets du stock, « Total des créances », le badge
+  « au » des états, le message d'audit « Solde négatif », les noms de pays
+  dans les réglages, quatre intitulés de comptes (report à nouveau,
+  amortissements, avances au personnel, dotations).
+- Reste en français quoi qu'il arrive, et c'est voulu : le contenu de la
+  démonstration (noms d'articles, libellés d'écritures, fournisseurs).
+
+Vérifications comptables rejouées après ces changements : jeu d'essai 383
+événements, balance équilibrée, écart bilan 0, aucun stock négatif ; TVA,
+tiers, clôture, FEC, paie, import : tous OK.

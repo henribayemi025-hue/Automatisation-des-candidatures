@@ -48,6 +48,8 @@ export interface ModuleHelp {
   when: string;
   example: string;
   questions: string[];
+  /** Variante pour un métier sans stock (salon, artisan) : on ne parle ni d'articles ni de stock. */
+  noStock?: { what: string; example: string };
 }
 
 /** Explication en langage courant de chaque écran. Clé = chemin de la route. */
@@ -65,6 +67,10 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
     when: 'À chaque vente, même petite. C’est ce qui alimente tout le reste.',
     example: 'Un client prend 2 savons et paie en espèces : le stock passe de 20 à 18, la caisse augmente, la vente apparaît dans l’historique.',
     questions: ['Quel produit se vend le mieux ?', 'Combien de ventes aujourd’hui ?'],
+    noStock: {
+      what: 'Le comptoir : vous choisissez la prestation, le client paie, la vente est enregistrée et la caisse mise à jour automatiquement.',
+      example: 'Une cliente prend une coupe et un brushing et paie en espèces : la caisse augmente, la prestation apparaît dans l’historique.',
+    },
   },
   '/caisse': {
     title: 'Caisse',

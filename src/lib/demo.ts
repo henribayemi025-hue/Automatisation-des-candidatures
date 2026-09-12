@@ -1,6 +1,7 @@
 import { accountCode } from './chart';
 import { currency, factor } from './money';
 import { applyEvent, saleTotals } from './reducer';
+import { tracksStock } from './sector';
 import { accountCode as codeOf } from './chart';
 import type {
   Company,
@@ -63,6 +64,87 @@ const PRODUCTS: { name: string; sku: string; barcode: string; category: string; 
   { name: 'Bidon d’eau 10 L', sku: 'EAU10', barcode: '6111245670082', category: 'Boissons', price: 1500, cost: 800, stock: 18, reorder: 12, unit: 'bidon' },
 ];
 
+type ProductDef = (typeof PRODUCTS)[number];
+
+/**
+ * Un catalogue par métier, même structure et même nombre d'articles : les
+ * ventes, achats et projets du jeu d'essai raisonnent par index, et un
+ * coiffeur qui ouvre la démonstration doit voir des coupes, pas des sacs de
+ * riz. Les métiers sans stock (salon, artisan) ont des prestations à zéro.
+ */
+const CATALOGUES: Record<string, ProductDef[]> = {
+  food: [
+    { name: 'Poulet DG', sku: 'PDG', barcode: '', category: 'Plats', price: 4500, cost: 2100, stock: 40, reorder: 10, unit: 'assiette' },
+    { name: 'Riz sauté aux légumes', sku: 'RIZS', barcode: '', category: 'Plats', price: 2500, cost: 900, stock: 60, reorder: 15, unit: 'assiette' },
+    { name: 'Ndolé avec plantain', sku: 'NDOL', barcode: '', category: 'Plats', price: 3500, cost: 1500, stock: 50, reorder: 12, unit: 'assiette' },
+    { name: 'Jus de bissap 50 cl', sku: 'BIS50', barcode: '', category: 'Boissons', price: 700, cost: 250, stock: 200, reorder: 40, unit: 'bouteille' },
+    { name: 'Eau minérale 1,5 L', sku: 'EAU15', barcode: '', category: 'Boissons', price: 600, cost: 300, stock: 80, reorder: 20, unit: 'bouteille' },
+    { name: 'Menu du jour', sku: 'MENU', barcode: '', category: 'Plats', price: 3000, cost: 1300, stock: 30, reorder: 10, unit: 'menu' },
+    { name: 'Beignets (portion)', sku: 'BEIG', barcode: '', category: 'Snacks', price: 500, cost: 150, stock: 25, reorder: 10, unit: 'portion' },
+    { name: 'Café', sku: 'CAFE', barcode: '', category: 'Boissons', price: 500, cost: 120, stock: 18, reorder: 12, unit: 'tasse' },
+  ],
+  beauty: [
+    { name: 'Coupe et brushing', sku: 'COUPE', barcode: '', category: 'Coiffure', price: 6000, cost: 0, stock: 0, reorder: 0, unit: 'prestation' },
+    { name: 'Tresses (pose complète)', sku: 'TRES', barcode: '', category: 'Coiffure', price: 15000, cost: 0, stock: 0, reorder: 0, unit: 'prestation' },
+    { name: 'Défrisage', sku: 'DEFR', barcode: '', category: 'Coiffure', price: 8000, cost: 0, stock: 0, reorder: 0, unit: 'prestation' },
+    { name: 'Manucure', sku: 'MANU', barcode: '', category: 'Onglerie', price: 3000, cost: 0, stock: 0, reorder: 0, unit: 'prestation' },
+    { name: 'Pose d’ongles en gel', sku: 'GEL', barcode: '', category: 'Onglerie', price: 7000, cost: 0, stock: 0, reorder: 0, unit: 'prestation' },
+    { name: 'Soin du visage', sku: 'SOIN', barcode: '', category: 'Esthétique', price: 10000, cost: 0, stock: 0, reorder: 0, unit: 'prestation' },
+    { name: 'Coupe homme', sku: 'CHOM', barcode: '', category: 'Barbier', price: 2500, cost: 0, stock: 0, reorder: 0, unit: 'prestation' },
+    { name: 'Shampoing et soin', sku: 'SHAM', barcode: '', category: 'Coiffure', price: 3500, cost: 0, stock: 0, reorder: 0, unit: 'prestation' },
+  ],
+  garage: [
+    { name: 'Vidange complète', sku: 'VID', barcode: '', category: 'Interventions', price: 25000, cost: 12000, stock: 30, reorder: 5, unit: 'forfait' },
+    { name: 'Plaquettes de frein (jeu)', sku: 'PLAQ', barcode: '', category: 'Pièces', price: 18000, cost: 11000, stock: 20, reorder: 5, unit: 'jeu' },
+    { name: 'Batterie 12 V', sku: 'BAT12', barcode: '', category: 'Pièces', price: 65000, cost: 45000, stock: 8, reorder: 3, unit: 'pièce' },
+    { name: 'Filtre à huile', sku: 'FILT', barcode: '', category: 'Pièces', price: 4500, cost: 2500, stock: 40, reorder: 10, unit: 'pièce' },
+    { name: 'Heure de main-d’œuvre', sku: 'MO', barcode: '', category: 'Interventions', price: 5000, cost: 0, stock: 200, reorder: 0, unit: 'heure' },
+    { name: 'Pneu 185/65 R15', sku: 'PNEU', barcode: '', category: 'Pièces', price: 42000, cost: 30000, stock: 12, reorder: 4, unit: 'pièce' },
+    { name: 'Diagnostic électronique', sku: 'DIAG', barcode: '', category: 'Interventions', price: 10000, cost: 0, stock: 50, reorder: 0, unit: 'forfait' },
+    { name: 'Liquide de refroidissement 5 L', sku: 'LREF', barcode: '', category: 'Pièces', price: 6000, cost: 3500, stock: 15, reorder: 5, unit: 'bidon' },
+  ],
+  services: [
+    { name: 'Journée de main-d’œuvre', sku: 'JMO', barcode: '', category: 'Main-d’œuvre', price: 15000, cost: 0, stock: 0, reorder: 0, unit: 'jour' },
+    { name: 'Déplacement', sku: 'DEPL', barcode: '', category: 'Forfaits', price: 5000, cost: 0, stock: 0, reorder: 0, unit: 'forfait' },
+    { name: 'Installation sanitaire', sku: 'SANI', barcode: '', category: 'Forfaits', price: 45000, cost: 0, stock: 0, reorder: 0, unit: 'forfait' },
+    { name: 'Réparation de fuite', sku: 'FUITE', barcode: '', category: 'Forfaits', price: 12000, cost: 0, stock: 0, reorder: 0, unit: 'forfait' },
+    { name: 'Devis et étude', sku: 'ETUD', barcode: '', category: 'Conseil', price: 20000, cost: 0, stock: 0, reorder: 0, unit: 'forfait' },
+    { name: 'Retouche couture', sku: 'RETOU', barcode: '', category: 'Couture', price: 2500, cost: 0, stock: 0, reorder: 0, unit: 'pièce' },
+    { name: 'Séance photo', sku: 'PHOTO', barcode: '', category: 'Photo', price: 30000, cost: 0, stock: 0, reorder: 0, unit: 'séance' },
+    { name: 'Heure de conseil', sku: 'HCONS', barcode: '', category: 'Conseil', price: 10000, cost: 0, stock: 0, reorder: 0, unit: 'heure' },
+  ],
+  health: [
+    { name: 'Paracétamol 500 mg (boîte)', sku: 'PARA', barcode: '', category: 'Médicaments', price: 1200, cost: 700, stock: 120, reorder: 30, unit: 'boîte' },
+    { name: 'Amoxicilline 500 mg', sku: 'AMOX', barcode: '', category: 'Médicaments', price: 3500, cost: 2100, stock: 60, reorder: 15, unit: 'boîte' },
+    { name: 'Compresses stériles', sku: 'COMP', barcode: '', category: 'Matériel', price: 1500, cost: 800, stock: 80, reorder: 20, unit: 'sachet' },
+    { name: 'Sirop antitussif', sku: 'SIRO', barcode: '', category: 'Médicaments', price: 2800, cost: 1600, stock: 40, reorder: 10, unit: 'flacon' },
+    { name: 'Thermomètre digital', sku: 'THER', barcode: '', category: 'Matériel', price: 4500, cost: 2500, stock: 15, reorder: 5, unit: 'pièce' },
+    { name: 'Lait infantile 400 g', sku: 'LAITI', barcode: '', category: 'Parapharmacie', price: 6500, cost: 4200, stock: 25, reorder: 8, unit: 'boîte' },
+    { name: 'Crème solaire', sku: 'SOL', barcode: '', category: 'Parapharmacie', price: 5500, cost: 3200, stock: 12, reorder: 5, unit: 'tube' },
+    { name: 'Sérum physiologique', sku: 'SERU', barcode: '', category: 'Médicaments', price: 900, cost: 450, stock: 18, reorder: 12, unit: 'boîte' },
+  ],
+  tech: [
+    { name: 'Écran de remplacement', sku: 'ECR', barcode: '', category: 'Pièces', price: 25000, cost: 14000, stock: 20, reorder: 5, unit: 'pièce' },
+    { name: 'Chargeur rapide USB-C', sku: 'CHAR', barcode: '', category: 'Accessoires', price: 5000, cost: 2200, stock: 60, reorder: 15, unit: 'pièce' },
+    { name: 'Coque de protection', sku: 'COQ', barcode: '', category: 'Accessoires', price: 2500, cost: 900, stock: 80, reorder: 20, unit: 'pièce' },
+    { name: 'Écouteurs sans fil', sku: 'ECOU', barcode: '', category: 'Accessoires', price: 12000, cost: 6500, stock: 30, reorder: 8, unit: 'pièce' },
+    { name: 'Batterie de téléphone', sku: 'BATT', barcode: '', category: 'Pièces', price: 8000, cost: 4200, stock: 25, reorder: 8, unit: 'pièce' },
+    { name: 'Carte mémoire 64 Go', sku: 'SD64', barcode: '', category: 'Accessoires', price: 7000, cost: 3800, stock: 35, reorder: 10, unit: 'pièce' },
+    { name: 'Réparation écran (main-d’œuvre)', sku: 'REP', barcode: '', category: 'Réparations', price: 8000, cost: 0, stock: 40, reorder: 0, unit: 'forfait' },
+    { name: 'Câble HDMI 2 m', sku: 'HDMI', barcode: '', category: 'Accessoires', price: 3000, cost: 1200, stock: 18, reorder: 10, unit: 'pièce' },
+  ],
+  trade: [
+    { name: 'Carton de tuiles 30×30', sku: 'TUIL', barcode: '', category: 'Matériaux', price: 15000, cost: 9000, stock: 300, reorder: 50, unit: 'carton' },
+    { name: 'Sac de ciment 50 kg', sku: 'CIM50', barcode: '', category: 'Matériaux', price: 5500, cost: 4200, stock: 400, reorder: 100, unit: 'sac' },
+    { name: 'Groupe électrogène 5 kVA', sku: 'GEN5', barcode: '', category: 'Équipement', price: 450000, cost: 300000, stock: 6, reorder: 2, unit: 'pièce' },
+    { name: 'Sac de riz parfumé 50 kg', sku: 'RIZ50', barcode: '', category: 'Alimentaire', price: 42000, cost: 33000, stock: 200, reorder: 40, unit: 'sac' },
+    { name: 'Huile végétale (carton de 12)', sku: 'HUIL12', barcode: '', category: 'Alimentaire', price: 21000, cost: 16500, stock: 120, reorder: 30, unit: 'carton' },
+    { name: 'Tôle bac 3 m', sku: 'TOLE', barcode: '', category: 'Matériaux', price: 9000, cost: 6200, stock: 150, reorder: 30, unit: 'feuille' },
+    { name: 'Ampoule LED 9 W (lot de 100)', sku: 'LED100', barcode: '', category: 'Électricité', price: 60000, cost: 38000, stock: 25, reorder: 5, unit: 'lot' },
+    { name: 'Fer à béton 12 mm', sku: 'FER12', barcode: '', category: 'Matériaux', price: 7500, cost: 5400, stock: 18, reorder: 40, unit: 'barre' },
+  ],
+};
+
 const CUSTOMERS = [
   { name: 'Restaurant Le Palmier', phone: '+237 6 55 10 20 30', email: 'lepalmier@exemple.com', address: 'Quartier Centre' },
   { name: 'École Les Étoiles', phone: '+237 6 99 41 12 08', email: 'ecole.etoiles@exemple.com', address: 'Avenue des Écoles' },
@@ -117,8 +199,12 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
   customers.forEach((customer, i) => emit(stamp(dayISO(base, -92), 8, i), 'customer.save', { customer }));
   suppliers.forEach((supplier, i) => emit(stamp(dayISO(base, -92), 8, i + 10), 'supplier.save', { supplier }));
 
-  // ---- Catalogue et stock de départ ----
-  const products: Product[] = PRODUCTS.map((p, i) => ({
+  // ---- Catalogue et stock de départ, dans les mots du métier ----
+  const catalogue = CATALOGUES[company.sector] ?? PRODUCTS;
+  // Un métier sans stock ne reçoit pas de marchandise : pas de bons de
+  // commande, pas d'importation, et les ventes ne sont pas bornées par un stock.
+  const stocked = tracksStock(company);
+  const products: Product[] = catalogue.map((p, i) => ({
     id: `${runId}-prd-${i}`,
     name: p.name,
     sku: p.sku,
@@ -244,6 +330,7 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
 
   // ---- Achats : un reçu et payé, un reçu et payé à moitié, un encore en attente ----
   function purchase(dayOffset: number, supplierIndex: number, lines: { productIndex: number; qty: number; unitCost: number }[], paidRatio: number, receive: boolean) {
+    if (!stocked) return;
     const date = dayISO(base, dayOffset);
     const supplier = suppliers[supplierIndex];
     const purchaseLines = lines.map((l) => ({
@@ -293,7 +380,7 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
   // Pour qu'un fiscaliste ou un import-export voie tout de suite le coût rendu
   // magasin et la TVA de douane. Les ampoules LED (index 6) et le sucre
   // (index 3) arrivent d'un fournisseur étranger.
-  {
+  if (stocked) {
     const date = dayISO(base, -44);
     const fxRate = currency(company.currency).decimals === 0 ? 600 : 1; // 1 $ = 600 F ; en devise à centimes, on reste 1:1 pour garder des chiffres lisibles
     const cents = (usd: number) => usd * 100;
@@ -358,11 +445,11 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
     const lines: SaleLine[] = [];
     for (const pick of picks) {
       const product = products[pick.productIndex];
-      const available = stock.get(product.id) ?? 0;
+      const available = stocked ? (stock.get(product.id) ?? 0) : pick.qty;
       const qty = Math.min(pick.qty, Math.max(0, available));
       if (qty <= 0) continue;
       lines.push({ productId: product.id, name: product.name, qty, unitPrice: product.price, unitCost: cost.get(product.id) ?? product.cost });
-      if (!asQuote) stock.set(product.id, available - qty);
+      if (!asQuote && stocked) stock.set(product.id, available - qty);
     }
     if (lines.length === 0) return;
     const totals = saleTotals(company, lines, 0);
@@ -407,8 +494,8 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
     const count = 2 + Math.floor(rnd() * 4);
     for (let k = 0; k < count; k += 1) {
       const picks = [
-        { productIndex: Math.floor(rnd() * PRODUCTS.length), qty: 1 + Math.floor(rnd() * 4) },
-        { productIndex: Math.floor(rnd() * PRODUCTS.length), qty: 1 + Math.floor(rnd() * 3) },
+        { productIndex: Math.floor(rnd() * catalogue.length), qty: 1 + Math.floor(rnd() * 4) },
+        { productIndex: Math.floor(rnd() * catalogue.length), qty: 1 + Math.floor(rnd() * 3) },
       ];
       sale(day, 9 + k * 3, picks, methods[Math.floor(rnd() * methods.length)], null, 1);
     }

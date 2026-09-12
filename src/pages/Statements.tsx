@@ -150,7 +150,7 @@ export default function Statements() {
         <div className="card space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="font-bold">{t('Bilan')}</h2>
-            <Badge tone="info">au {to}</Badge>
+            <Badge tone="info">{t('au')} {to}</Badge>
           </div>
           <Section
             title={t('Actif')}

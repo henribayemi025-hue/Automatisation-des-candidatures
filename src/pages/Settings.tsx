@@ -149,7 +149,7 @@ export default function Settings() {
                   <option value="">{t('— Choisir —')}</option>
                   {COUNTRIES.map((x) => (
                     <option key={x.name} value={x.name}>
-                      {x.name}
+                      {t(x.name)}
                     </option>
                   ))}
                 </select>

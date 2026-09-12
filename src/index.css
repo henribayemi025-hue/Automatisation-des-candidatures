@@ -217,3 +217,8 @@
   .grid[style*='--strip-cols'],
   .grid[style*='repeat('] { grid-template-columns: minmax(0, 1fr) !important; }
 }
+
+/* Téléphone : chaque bouton du contenu reste attrapable au doigt. */
+@media (pointer: coarse), (max-width: 639px) {
+  main button:not([aria-hidden]) { min-height: 36px; }
+}

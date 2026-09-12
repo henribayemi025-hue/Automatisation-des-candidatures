@@ -134,11 +134,14 @@ export default function Tour() {
       const id = window.setTimeout(() => {
         setI(0);
         setOpen(true);
+        // La première étape parle de l'accueil : on y va, au lieu de décrire
+        // l'accueil par-dessus la caisse ou les réglages.
+        if (window.location.hash !== '#/' && window.location.hash !== '') navigate('/');
       }, 900);
       return () => window.clearTimeout(id);
     }
     return undefined;
-  }, [company.onboarded]);
+  }, [company.onboarded, navigate]);
 
   useEffect(() => {
     if (!open) return;

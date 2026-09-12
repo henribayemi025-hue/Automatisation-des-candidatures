@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { MODULE_HELP } from '../lib/guide';
+import { useDB } from '../lib/store';
+import { tracksStock } from '../lib/sector';
 import { IconHelp, IconX } from './Icons';
 import { t } from '../lib/i18n';
 
@@ -17,7 +19,9 @@ function hidden(): Set<string> {
 /** « À quoi ça sert ? » — une explication en langage courant, en tête de chaque écran. */
 export default function ModuleIntro() {
   const { pathname } = useLocation();
-  const help = MODULE_HELP[pathname];
+  const db = useDB();
+  const base = MODULE_HELP[pathname];
+  const help = base && base.noStock && !tracksStock(db.company) ? { ...base, ...base.noStock } : base;
   const [dismissed, setDismissed] = useState(() => hidden().has(pathname));
   const [expanded, setExpanded] = useState(false);
 
