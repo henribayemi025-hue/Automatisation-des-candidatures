@@ -1,4 +1,5 @@
 import { accountCode, buildChart } from './chart';
+import { tracksStock } from './sector';
 import type { AccountKey } from './chart';
 import type {
   Account,
@@ -188,10 +189,14 @@ function applySale(
 ) {
   const chart = db.company.chart;
   const t = saleTotals(db.company, sale.lines, sale.discount);
+  // Un métier qui vend du temps (salon, artisan) n'a rien à sortir d'un stock :
+  // ni mouvement, ni coût des marchandises vendues. Sinon chaque prestation
+  // creuserait un stock négatif et un compte de stock faux au bilan.
+  const stocked = tracksStock(db.company);
 
   sale.lines.forEach((line, i) => {
     const product = db.products.find((p) => p.id === line.productId);
-    if (!product) return;
+    if (!product || !stocked) return;
     product.stock -= line.qty;
     db.movements.unshift({
       id: ids.movements[i] ?? `${sale.id}-m${i}`,
@@ -224,7 +229,7 @@ function applySale(
     ],
   });
 
-  if (t.cost > 0) {
+  if (t.cost > 0 && stocked) {
     post(db, ev, {
       id: ids.cogsEntry,
       date: sale.date,

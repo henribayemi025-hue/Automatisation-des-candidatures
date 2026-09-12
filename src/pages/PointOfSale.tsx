@@ -6,6 +6,7 @@ import { Badge, Empty, Field, Money, PageHeader } from '../components/UI';
 import { IconBox, IconCart, IconCheck, IconDoc, IconSearch, IconX } from '../components/Icons';
 import { scanFeedback, useBarcodeScanner } from '../lib/scanner';
 import { t } from '../lib/i18n';
+import { tracksStock } from '../lib/sector';
 import ProjectSelect from '../components/ProjectSelect';
 
 const METHODS: { value: PaymentMethod; label: string }[] = [
@@ -50,6 +51,8 @@ export default function PointOfSale() {
   const searchRef = useRef<HTMLInputElement>(null);
 
   const currency = db.company.currency;
+  // Un métier sans stock (salon, artisan) encaisse des prestations : rien à épuiser.
+  const withStock = tracksStock(db.company);
   const discount = toMinor(discountRaw || 0, currency);
 
   const results = useMemo(() => {
@@ -252,12 +255,14 @@ export default function PointOfSale() {
                 <button
                   key={p.id}
                   onClick={() => addToCart(p.id)}
-                  disabled={p.stock <= 0}
+                  disabled={withStock && p.stock <= 0}
                   className="group rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-400 hover:shadow-md disabled:opacity-40 dark:border-white/10"
                 >
                   <div className="mb-2 flex items-start justify-between gap-2">
                     <span className="line-clamp-3 text-sm font-semibold leading-snug">{p.name}</span>
-                    {p.stock <= 0 ? (
+                    {/* Un salon ou un artisan ne compte pas de quantités : une
+                        prestation n'est jamais « en rupture ». */}
+                    {!withStock ? null : p.stock <= 0 ? (
                       <Badge tone="danger">{t('Rupture')}</Badge>
                     ) : p.stock <= p.reorderPoint ? (
                       <Badge tone="warn">{p.stock}</Badge>

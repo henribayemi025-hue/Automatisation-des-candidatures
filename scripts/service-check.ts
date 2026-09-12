@@ -1,0 +1,24 @@
+/** Salon : une prestation vendue ne sort rien d'un stock et ne passe aucun coût des marchandises. */
+import { accountCode } from '../src/lib/chart';
+import { applyEvent, emptyDB } from '../src/lib/reducer';
+import { balanceOf, balanceSheet } from '../src/lib/ledger';
+import type { DB, WorkspaceEvent } from '../src/lib/types';
+let seq = 0;
+const ev = (type: string, payload: Record<string, unknown>): WorkspaceEvent => ({ id: `e${++seq}`, at: '2026-09-12T10:00:00.000Z', actorId: 'u', actorName: 'Awa', type, payload });
+let db: DB = emptyDB();
+const feed = (t: string, p: Record<string, unknown>) => { db = applyEvent(db, ev(t, p)); };
+feed('company.update', { patch: { name: 'Salon Awa', currency: 'XAF', chart: 'SYSCOHADA', sector: 'beauty' } });
+feed('product.save', { product: { id: 'p1', name: 'Coupe et brushing', sku: '', barcode: '', category: 'Coiffure', brand: '', price: 5000, cost: 800, stock: 0, reorderPoint: 0, unit: 'prestation', createdAt: '2026-09-01' }, movementId: 'm0', entryId: 'j0' });
+feed('sale.record', { sale: { id: 's1', number: 'FA-0001', date: '2026-09-12', customerId: null, customerName: 'Cliente', lines: [{ productId: 'p1', name: 'Coupe et brushing', qty: 1, unitPrice: 5000, unitCost: 800 }], discount: 0, gross: 5000, net: 5000, vat: 0, total: 5000, cost: 800, method: 'CASH', status: 'CONFIRMED', paid: 5000, createdAt: '2026-09-12T10:00:00.000Z' }, ids: { movements: ['m1'], saleEntry: 'j1', cogsEntry: 'j2', debt: 'd1' } });
+const p = db.products[0];
+const inv = balanceOf(accountCode(db.company.chart, 'INVENTORY'), db.entries, 'DEBIT');
+const cogs = balanceOf(accountCode(db.company.chart, 'INVENTORY_CHANGE'), db.entries, 'DEBIT');
+const cash = balanceOf(accountCode(db.company.chart, 'CASH'), db.entries, 'DEBIT');
+const sheet = balanceSheet(db.accounts, db.entries);
+console.log('stock après la prestation :', p.stock, '(attendu 0, pas −1)');
+console.log('mouvements de stock       :', db.movements.filter((m) => m.type === 'OUT').length, '(attendu 0)');
+console.log('compte stock / CMV        :', inv, '/', cogs, '(attendus 0 / 0)');
+console.log('caisse                    :', cash, '· écart bilan', sheet.difference);
+const ok = p.stock === 0 && inv === 0 && cogs === 0 && cash === 5000 && sheet.difference === 0;
+console.log(ok ? 'OK — une prestation ne touche ni au stock ni au coût des marchandises.' : 'ÉCHEC');
+process.exit(ok ? 0 : 1);

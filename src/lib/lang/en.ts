@@ -1527,6 +1527,16 @@ export const EN: Record<string, string> = {
   'Aucune taxe déductible sur la période.': 'No deductible tax in the period.',
   'Ceci prépare la déclaration ; le formulaire officiel et son dépôt restent au comptable. Base achats sur la période : {b}.': 'This prepares the return; the official form and its filing stay with the accountant. Purchase base for the period: {b}.',
 
+  // États financiers et balance — oublis relevés par l'audit du 12/09
+  'Ce que l’activité a rapporté': 'What the business brought in',
+  '{p} des produits': '{p} of revenue',
+  'Aucun produit sur la période': 'No revenue in the period',
+  '{n} compte(s) mouvementé(s)': '{n} account(s) with movements',
+  'Doit égaler le débit': 'Must equal the debit',
+  'Contrôle d’équilibre': 'Balance check',
+  'Débit = crédit, à l’unité près': 'Debit = credit, to the unit',
+  'Écart : consultez l’audit': 'Gap: see the audit',
+
   // Démonstration par métier
   'Choisissez le métier et le pays : le menu parle ce métier, les chiffres s’affichent dans votre monnaie et votre plan comptable. Rien à créer, rien à installer.': 'Choose the trade and the country: the menu speaks that trade, figures show in your currency and chart of accounts. Nothing to create, nothing to install.',
   'Quel métier voulez-vous voir ?': 'Which trade do you want to see?',
