@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { ASSET_CATEGORIES } from '../lib/chart';
 import { today, useStore } from '../lib/store';
 import { toMajor, toMinor } from '../lib/money';
 import { USEFUL_LIVES, accumulatedAt, depreciationPlan, netValue, periodOf, postedFor } from '../lib/assets';
@@ -13,14 +14,7 @@ import { t } from '../lib/i18n';
  * L'écran fait les deux : tenir la liste des biens, et passer la dotation.
  */
 
-const CATEGORIES = [
-  'Matériel et outillage',
-  'Matériel informatique',
-  'Mobilier et agencement',
-  'Véhicule',
-  'Construction',
-  'Autre',
-];
+const CATEGORIES = ASSET_CATEGORIES.map((c) => c.label);
 
 const METHODS: { id: PaymentMethod; label: string }[] = [
   { id: 'CASH', label: 'Espèces' },

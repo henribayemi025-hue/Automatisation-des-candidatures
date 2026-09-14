@@ -127,13 +127,14 @@ export function carryForwardLines(chart: Company['chart'], result: Minor): Journ
   if (result === 0) return [];
   const resultAccount = accountCode(chart, 'RESULT');
   const retained = accountCode(chart, 'RETAINED');
+  const retainedLoss = accountCode(chart, 'RETAINED_LOSS');
   return result > 0
     ? [
         { account: resultAccount, label: 'Affectation du résultat', debit: result, credit: 0 },
         { account: retained, label: 'Report à nouveau', debit: 0, credit: result },
       ]
     : [
-        { account: retained, label: 'Report à nouveau déficitaire', debit: -result, credit: 0 },
+        { account: retainedLoss, label: 'Report à nouveau débiteur', debit: -result, credit: 0 },
         { account: resultAccount, label: 'Affectation du résultat', debit: 0, credit: -result },
       ];
 }

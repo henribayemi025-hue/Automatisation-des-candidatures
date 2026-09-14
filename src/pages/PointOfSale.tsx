@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from '../lib/store';
 import { formatMoney, toMinor } from '../lib/money';
-import type { PaymentMethod, SaleLine } from '../lib/types';
+import type { PaymentMethod, Sale, SaleLine } from '../lib/types';
+import Receipt from '../components/Receipt';
 import { Badge, Empty, Field, Money, PageHeader } from '../components/UI';
 import { IconBox, IconCart, IconCheck, IconDoc, IconSearch, IconX } from '../components/Icons';
 import { scanFeedback, useBarcodeScanner } from '../lib/scanner';
@@ -45,6 +46,8 @@ export default function PointOfSale() {
   const [method, setMethod] = useState<PaymentMethod>('CASH');
   const [paidRaw, setPaidRaw] = useState('');
   const [flash, setFlash] = useState('');
+  // Le ticket affiché après « Valider » : la preuve que la vente est passée.
+  const [receipt, setReceipt] = useState<Sale | null>(null);
   const [scanNote, setScanNote] = useState<{ ok: boolean; text: string } | null>(null);
   const [held, setHeld] = useState<HeldTicket[]>(() => loadHeld());
   const [customerPanel, setCustomerPanel] = useState(false);
@@ -183,13 +186,13 @@ export default function PointOfSale() {
       asQuote,
       projectId: projectId || null,
     });
-    setFlash(asQuote ? t('Devis {n} enregistré.', { n: sale.number }) : t('Vente {n} enregistrée.', { n: sale.number }));
     reset();
-    setTimeout(() => setFlash(''), 4000);
+    setReceipt(sale);
   }
 
   return (
     <>
+      <Receipt sale={receipt} company={db.company} onClose={() => { setReceipt(null); searchRef.current?.focus(); }} />
       <PageHeader
         title={withStock ? t('Point de vente') : t(sectorProfile(db.company.sector).sell)}
         subtitle={

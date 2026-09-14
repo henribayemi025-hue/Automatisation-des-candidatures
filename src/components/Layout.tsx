@@ -347,6 +347,10 @@ export default function Layout({ children }: { children: ReactNode }) {
                   <IconSparkle />
                   {t('Visite guidée')}
                 </button>
+                <NavLink to="/manuel" className="flex items-center gap-3 rounded-input px-3 py-2 text-body hover:bg-base">
+                  <IconBook />
+                  {t('Manuel d’utilisation')}
+                </NavLink>
                 <NavLink to="/parametres" className="flex items-center gap-3 rounded-input px-3 py-2 text-body hover:bg-base">
                   <IconSettings />
                   {t('Paramètres')}
@@ -375,6 +379,9 @@ export default function Layout({ children }: { children: ReactNode }) {
             <button onClick={startTour} className="btn-ghost px-3 py-1.5 text-caption">
               {t('Visite guidée')}
             </button>
+            <NavLink to="/manuel" className="btn-ghost px-3 py-1.5 text-caption">
+              {t('Manuel')}
+            </NavLink>
             <button onClick={leaveDemo} className="btn-primary px-3 py-1.5 text-caption">
               {t('Créer mon compte')}
             </button>

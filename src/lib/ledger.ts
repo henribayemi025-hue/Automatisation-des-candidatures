@@ -65,6 +65,58 @@ export function trialBalance(
     .filter((b) => b.debit !== 0 || b.credit !== 0);
 }
 
+/**
+ * Balance à six colonnes, celle que lit un comptable : solde d'ouverture
+ * (débit ou crédit), mouvements de la période, solde de clôture. Le solde
+ * d'ouverture est tout ce qui précède la date « Du » ; sans date, il est nul
+ * et tout est mouvement.
+ */
+export interface AccountBalance6 {
+  account: Account;
+  openDebit: Minor;
+  openCredit: Minor;
+  debit: Minor;
+  credit: Minor;
+  closeDebit: Minor;
+  closeCredit: Minor;
+}
+
+export function trialBalance6(accounts: Account[], entries: JournalEntry[], from?: string, to?: string): AccountBalance6[] {
+  const open = new Map<string, Minor>();
+  const move = new Map<string, { debit: Minor; credit: Minor }>();
+  for (const entry of entries) {
+    if (!entry.posted) continue;
+    if (to && entry.date > to) continue;
+    const before = !!from && entry.date < from;
+    for (const line of entry.lines) {
+      if (before) {
+        open.set(line.account, (open.get(line.account) ?? 0) + line.debit - line.credit);
+      } else {
+        const m = move.get(line.account) ?? { debit: 0, credit: 0 };
+        m.debit += line.debit;
+        m.credit += line.credit;
+        move.set(line.account, m);
+      }
+    }
+  }
+  return accounts
+    .map((account) => {
+      const o = open.get(account.code) ?? 0;
+      const m = move.get(account.code) ?? { debit: 0, credit: 0 };
+      const c = o + m.debit - m.credit;
+      return {
+        account,
+        openDebit: Math.max(o, 0),
+        openCredit: Math.max(-o, 0),
+        debit: m.debit,
+        credit: m.credit,
+        closeDebit: Math.max(c, 0),
+        closeCredit: Math.max(-c, 0),
+      };
+    })
+    .filter((b) => b.openDebit || b.openCredit || b.debit || b.credit);
+}
+
 export function accountLedger(
   code: string,
   entries: JournalEntry[],

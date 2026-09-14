@@ -303,27 +303,31 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
   const customerDebts: { id: string; name: string; customerId: string; date: string; amount: Minor }[] = [];
 
   // ---- Apport de départ : la caisse existe avant les premiers achats ----
-  emit(stamp(dayISO(base, -91), 7), 'entry.manual', {
+  emit(stamp(dayISO(base, -120), 7), 'entry.manual', {
     entryId: id(),
-    date: dayISO(base, -91),
+    date: dayISO(base, -120),
     journal: 'OD',
     ref: 'OD-0000',
-    label: 'Apport de la propriétaire en caisse',
+    label: 'Apport de la propriétaire',
     lines: [
       { account: accountCode(chart, 'CASH'), label: 'Apport en caisse', debit: money(2500000), credit: 0 },
-      { account: accountCode(chart, 'CAPITAL'), label: 'Capital', debit: 0, credit: money(2500000) },
+      { account: accountCode(chart, 'MOBILE_MONEY'), label: 'Apport sur le compte mobile', debit: money(400000), credit: 0 },
+      { account: accountCode(chart, 'BANK'), label: 'Apport en banque', debit: money(1500000), credit: 0 },
+      // Le capital est la somme des trois lignes converties : l'arrondi par
+      // devise ne doit pas déséquilibrer l'écriture.
+      { account: accountCode(chart, 'CAPITAL'), label: 'Capital', debit: 0, credit: money(2500000) + money(400000) + money(1500000) },
     ],
   });
 
   // ---- Matériel de la boutique : la dotation aux amortissements porte dessus ----
-  emit(stamp(dayISO(base, -91), 8), 'entry.manual', {
+  emit(stamp(dayISO(base, -120), 8), 'entry.manual', {
     entryId: id(),
-    date: dayISO(base, -91),
+    date: dayISO(base, -120),
     journal: 'OD',
     ref: 'OD-0001',
     label: 'Achat vitrine et comptoir',
     lines: [
-      { account: accountCode(chart, 'EQUIPMENT'), label: 'Vitrine et comptoir', debit: money(300000), credit: 0 },
+      { account: accountCode(chart, 'EQUIP_FURNITURE'), label: 'Vitrine et comptoir', debit: money(300000), credit: 0 },
       { account: accountCode(chart, 'CASH'), label: 'Paiement en caisse', debit: 0, credit: money(300000) },
     ],
   });
@@ -648,8 +652,8 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
 
   // ---- Écritures manuelles : une dotation, et une erreur volontairement extournée ----
   const amortisation: JournalLine[] = [
-    { account: accountCode(chart, 'MISC_EXPENSE'), label: 'Dotation aux amortissements (vitrine)', debit: money(25000), credit: 0 },
-    { account: accountCode(chart, 'EQUIPMENT'), label: 'Amortissement du matériel', debit: 0, credit: money(25000) },
+    { account: accountCode(chart, 'DEPRECIATION_EXPENSE'), label: 'Dotation aux amortissements (vitrine)', debit: money(25000), credit: 0 },
+    { account: accountCode(chart, 'DEP_FURNITURE'), label: 'Amortissement de la vitrine', debit: 0, credit: money(25000) },
   ];
   emit(stamp(dayISO(base, -31), 20), 'entry.manual', {
     entryId: id(),

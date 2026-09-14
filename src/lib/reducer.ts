@@ -1,4 +1,4 @@
-import { accountCode, buildChart } from './chart';
+import { accountCode, buildChart, assetAccounts } from './chart';
 import { tracksStock } from './sector';
 import type { AccountKey } from './chart';
 import type {
@@ -74,6 +74,14 @@ export function emptyDB(): DB {
   };
 }
 
+function mergeAccounts(saved: Account[] | undefined, chart: Company['chart']): Account[] {
+  const system = buildChart(chart);
+  if (!saved?.length) return system;
+  const codes = new Set(saved.map((a) => a.code));
+  const missing = system.filter((a) => !codes.has(a.code));
+  return missing.length ? [...saved, ...missing].sort((a, b) => a.code.localeCompare(b.code)) : saved;
+}
+
 /** Complète un état partiel (ancienne version, instantané cloud) avec les valeurs par défaut. */
 export function normalizeDB(raw: Partial<DB> | null | undefined): DB {
   const base = emptyDB();
@@ -82,7 +90,8 @@ export function normalizeDB(raw: Partial<DB> | null | undefined): DB {
     ...base,
     ...raw,
     company: { ...base.company, ...(raw.company ?? {}) },
-    accounts: raw.accounts?.length ? raw.accounts : base.accounts,
+    // Un instantané ancien ignore les comptes ajoutés depuis : on les complète.
+    accounts: mergeAccounts(raw.accounts, (raw.company?.chart ?? base.company.chart) as Company['chart']),
     // Ajouté après coup : un instantané ancien n'a pas de projets.
     projects: raw.projects ?? [],
     messages: raw.messages ?? [],
@@ -97,7 +106,7 @@ export function normalizeDB(raw: Partial<DB> | null | undefined): DB {
   };
 }
 
-function methodAccount(chart: Company['chart'], method: PaymentMethod): string {
+export function methodAccount(chart: Company['chart'], method: PaymentMethod): string {
   switch (method) {
     case 'CASH':
       return accountCode(chart, 'CASH');
@@ -803,7 +812,7 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
           sourceType: 'asset',
           sourceId: asset.id,
           lines: [
-            { account: accountCode(chart, 'EQUIPMENT'), label: asset.name, debit: asset.cost, credit: 0 },
+            { account: accountCode(chart, assetAccounts(asset.category).asset), label: asset.name, debit: asset.cost, credit: 0 },
             { account: methodAccount(chart, p.paidWith as PaymentMethod), label: 'Règlement', debit: 0, credit: asset.cost },
           ],
         });
@@ -825,12 +834,13 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       // Sortie du bien : on efface sa valeur d'origine et ses amortissements,
       // on encaisse le prix de vente, et l'écart passe en perte ou en gain.
       const lines: JournalLine[] = [];
-      if (posted > 0) lines.push({ account: accountCode(chart, 'DEPRECIATION'), label: 'Amortissements repris', debit: posted, credit: 0 });
+      const accts = assetAccounts(asset.category);
+      if (posted > 0) lines.push({ account: accountCode(chart, accts.depreciation), label: 'Amortissements repris', debit: posted, credit: 0 });
       if (proceeds > 0) lines.push({ account: methodAccount(chart, (p.method as PaymentMethod) ?? 'CASH'), label: 'Prix de cession', debit: proceeds, credit: 0 });
       const loss = book - proceeds;
       if (loss > 0) lines.push({ account: accountCode(chart, 'MISC_EXPENSE'), label: 'Valeur nette du bien cédé', debit: loss, credit: 0 });
       if (loss < 0) lines.push({ account: accountCode(chart, 'MISC_REVENUE'), label: 'Produit de cession', debit: 0, credit: -loss });
-      lines.push({ account: accountCode(chart, 'EQUIPMENT'), label: asset.name, debit: 0, credit: asset.cost });
+      lines.push({ account: accountCode(chart, accts.asset), label: asset.name, debit: 0, credit: asset.cost });
 
       post(db, ev, {
         id: p.entryId as string,
@@ -853,14 +863,19 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
         (i) => i.amount > 0 && !db.depreciations.some((d) => d.assetId === i.assetId && d.period === period),
       );
       if (!kept.length) break;
-      const total = kept.reduce((s, i) => s + i.amount, 0);
       const lines: JournalLine[] = kept.map((i) => ({
         account: accountCode(chart, 'DEPRECIATION_EXPENSE'),
         label: db.assets.find((a) => a.id === i.assetId)?.name ?? 'Immobilisation',
         debit: i.amount,
         credit: 0,
       }));
-      lines.push({ account: accountCode(chart, 'DEPRECIATION'), label: `Dotation ${period}`, debit: 0, credit: total });
+      // Une ligne de crédit par compte d'amortissement (outillage, informatique, transport…).
+      const byAccount = new Map<string, Minor>();
+      for (const i of kept) {
+        const code = accountCode(chart, assetAccounts(db.assets.find((a) => a.id === i.assetId)?.category ?? '').depreciation);
+        byAccount.set(code, (byAccount.get(code) ?? 0) + i.amount);
+      }
+      for (const [code, amount] of byAccount) lines.push({ account: code, label: `Dotation ${period}`, debit: 0, credit: amount });
       const entry = post(db, ev, {
         id: p.entryId as string,
         date: p.date as string,

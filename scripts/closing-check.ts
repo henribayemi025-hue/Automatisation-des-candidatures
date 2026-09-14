@@ -100,7 +100,7 @@ console.log('dotations 2025        :', money(posted), '(attendu 240 000 = 1 200 
 console.log('cumul théorique       :', money(accumulatedAt(four, '2025-12')));
 console.log('valeur nette du four  :', money(netValue(db.assets[0], db.depreciations)));
 console.log('compte 681 (dotations):', money(balanceOf(accountCode(chart(), 'DEPRECIATION_EXPENSE'), db.entries, 'DEBIT')));
-console.log('compte 2844 (cumul)   :', money(balanceOf(accountCode(chart(), 'DEPRECIATION'), db.entries, 'CREDIT')));
+console.log('compte 2841 (cumul)   :', money(balanceOf(accountCode(chart(), 'DEP_TOOLS'), db.entries, 'CREDIT')));
 
 const before = balanceSheet(db.accounts, db.entries, '2025-12-31');
 const incomeBefore = incomeStatement(db.accounts, db.entries, '2025-01-01', '2025-12-31');

@@ -38,6 +38,7 @@ import Audit from './pages/Audit';
 import AuditTrail from './pages/AuditTrail';
 import Team from './pages/Team';
 import Settings from './pages/Settings';
+import Manual from './pages/Manual';
 import { t } from './lib/i18n';
 
 function Splash() {
@@ -145,6 +146,7 @@ export default function App() {
           <Route path="/historique" element={<AuditTrail />} />
           <Route path="/equipe" element={<Team />} />
           <Route path="/parametres" element={<Settings />} />
+          <Route path="/manuel" element={<Manual />} />
           <Route path="*" element={<Dashboard />} />
         </Routes>
       </Layout>

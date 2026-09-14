@@ -49,7 +49,12 @@ export default function Settings() {
               {getLang() === 'en' ? 'The app is in English.' : 'L’application est en français.'}
             </p>
           </div>
-          <LanguageSwitch full />
+          <div className="flex items-center gap-2">
+            <Link to="/manuel" className="btn-ghost py-1.5 text-caption">
+              {t('Manuel d’utilisation')}
+            </Link>
+            <LanguageSwitch full />
+          </div>
         </div>
 
         <div className="card flex flex-wrap items-center justify-between gap-4">

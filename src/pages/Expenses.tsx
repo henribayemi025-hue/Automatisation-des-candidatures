@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react';
 import { useStore, today } from '../lib/store';
 import { EXPENSE_KEYS, accountCode } from '../lib/chart';
+import { methodAccount } from '../lib/reducer';
+import { balanceOf } from '../lib/ledger';
 import type { AccountKey } from '../lib/chart';
 import { toMinor } from '../lib/money';
 import type { PaymentMethod } from '../lib/types';
-import { Empty, Field, Modal, Money, PageHeader, StatCard, Table } from '../components/UI';
+import { Empty, Field, Modal, Money, PageHeader, StatCard, Table, useMoney } from '../components/UI';
 import { IconPlus, IconWallet } from '../components/Icons';
 import { t } from '../lib/i18n';
 import { sectorProfile } from '../lib/sector';
@@ -14,6 +16,7 @@ import ProjectSelect from '../components/ProjectSelect';
 
 export default function Expenses() {
   const { db, addExpense } = useStore();
+  const money = useMoney();
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [open, setOpen] = useState(false);
@@ -28,6 +31,8 @@ export default function Expenses() {
     return [...preferred, ...EXPENSE_KEYS.filter((k) => !preferred.includes(k))];
   })();
   const [projectId, setProjectId] = useState('');
+  // Une caisse n'est jamais négative : on prévient avant d'enregistrer plus qu'il n'y a.
+  const [shortfall, setShortfall] = useState<{ available: number; amount: number } | null>(null);
 
   const filtered = useMemo(
     () =>
@@ -47,9 +52,17 @@ export default function Expenses() {
     return [...map.entries()].sort((a, b) => b[1] - a[1]);
   }, [filtered]);
 
-  function submit() {
+  function submit(force = false) {
     const amount = toMinor(amountRaw || 0, db.company.currency);
     if (amount <= 0) return;
+    if (!force) {
+      const available = balanceOf(methodAccount(db.company.chart, method), db.entries, 'DEBIT', undefined, date);
+      if (available < amount) {
+        setShortfall({ available, amount });
+        return;
+      }
+    }
+    setShortfall(null);
     addExpense({
       date,
       category: CATEGORY_LABEL[accountKey],
@@ -184,11 +197,24 @@ export default function Expenses() {
           </Field>
           <ProjectSelect value={projectId} onChange={setProjectId} />
         </div>
+        {shortfall && (
+          <div className="mt-4 rounded-input border border-[#B8860B]/50 bg-[#FBF1DF] px-3 py-2.5 text-caption text-ink">
+            <p className="font-semibold">{t('Ce compte n’a pas assez d’argent à cette date.')}</p>
+            <p className="mt-0.5">
+              {t('Disponible : {available} · dépense : {amount}. Une caisse n’est jamais négative : enregistrez d’abord l’argent entré (vente, apport, retrait de la banque), ou choisissez un autre moyen de paiement.', { available: money(shortfall.available), amount: money(shortfall.amount) })}
+            </p>
+          </div>
+        )}
         <div className="mt-6 flex justify-end gap-2">
           <button onClick={() => setOpen(false)} className="btn-ghost">
             {t('Annuler')}
           </button>
-          <button onClick={submit} className="btn-primary">
+          {shortfall ? (
+            <button onClick={() => submit(true)} className="btn-ghost">
+              {t('Enregistrer quand même')}
+            </button>
+          ) : null}
+          <button onClick={() => submit()} className="btn-primary">
             {t('Enregistrer la dépense')}
           </button>
         </div>

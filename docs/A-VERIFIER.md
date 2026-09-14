@@ -316,3 +316,43 @@ en anglais ; puis chaque bouton cliqué un par un (sauf les destructeurs).
 Vérifications comptables rejouées après ces changements : jeu d'essai 383
 événements, balance équilibrée, écart bilan 0, aucun stock négatif ; TVA,
 tiers, clôture, FEC, paie, import : tous OK.
+
+## Retours du comptable (14/09/2026)
+
+Ce qu'il a dit, et ce qui a été fait :
+
+- **« Je valide une vente, rien ne se passe. »** Vrai : seul un petit message
+  en haut de page s'affichait, invisible sur téléphone. Maintenant le **ticket
+  de caisse** s'ouvre par-dessus l'écran après Valider : lignes, total, payé,
+  reste ; boutons Imprimer (format 80 mm), Envoyer sur WhatsApp, Vente
+  suivante. Un devis ouvre le même écran avec « Voir les devis ».
+- **« Trop de données à l'accueil. »** Les six chiffres restent ; la courbe,
+  les meilleures ventes et « À traiter » sont passés en trois onglets, un seul
+  visible à la fois.
+- **« Il faut un manuel. »** docs/MANUEL.md, 22 sections, écran par écran :
+  à quoi ça sert, pas à pas, ce que ça écrit en comptabilité, questions
+  fréquentes. Dans l'application : menu du compte → Manuel d'utilisation,
+  bouton « Manuel » du bandeau de démonstration, Paramètres. Imprimable ou
+  enregistrable en PDF.
+- **« Une caisse n'est jamais négative. »** Deux choses. La démonstration
+  passait le loyer avant l'apport : l'apport est daté plus tôt et couvre la
+  caisse, le compte mobile et la banque (vérifié jour par jour :
+  scripts/cash-check.ts, minimum 0 sur les trois). Et dans Dépenses,
+  l'application prévient avant d'enregistrer plus que le compte ne contient à
+  cette date, avec le disponible ; on peut forcer, l'audit le signale.
+- **« Ce n'est pas une balance, c'est un compte en T. »** La balance a
+  maintenant **six colonnes** : solde d'ouverture, mouvements, solde de
+  clôture, chacun en débit et crédit ; l'ancienne vue reste sous « Débit,
+  crédit, solde ». L'export Excel suit. Contrôle : ouverture, mouvements et
+  clôture équilibrés chacun.
+- **« Les numéros de compte ne respectent pas la nomenclature. »**
+  Immobilisations : un compte par nature selon la catégorie du bien —
+  241 matériel et outillage, 2442 informatique, 2444 mobilier, 245 transport,
+  231 bâtiments, 244 autres — et l'amortissement correspondant (2841, 28442,
+  28444, 2845, 2831, 2844). Report à nouveau : 121 créditeur, 129 débiteur
+  (utilisé à la clôture en cas de perte). PCG et plan générique alignés.
+  La dotation de la démonstration passait par « charges diverses » : corrigé
+  (681 / 28444).
+
+Non fait, à lui demander : « le plan comptable est précédé des 0000 » — on n'a
+pas compris s'il parle de comptes à longueur fixe (4431000) ou d'autre chose.

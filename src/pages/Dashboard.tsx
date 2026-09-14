@@ -88,6 +88,8 @@ function KpiCard({
 export default function Dashboard() {
   const db = useDB();
   const navigate = useNavigate();
+  // Sous les six chiffres, un seul panneau à la fois : courbe, meilleures ventes, à traiter.
+  const [panel, setPanel] = useState<'CHART' | 'TOP' | 'TODO'>('CHART');
   const [period, setPeriod] = useState<Period>(() => {
     try {
       const saved = localStorage.getItem(PERIOD_KEY);
@@ -241,8 +243,35 @@ export default function Dashboard() {
         <span>{t(trade.tip)}</span>
       </p>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-3">
-        <div className="card lg:col-span-2">
+      {(() => {
+        const todoCount = (k.outOfStock > 0 ? 1 : 0) + (k.lowStock > 0 ? 1 : 0) + (k.receivablesOverdue > 0 ? 1 : 0) + (k.openSession ? 1 : 0);
+        const tabs: { id: 'CHART' | 'TOP' | 'TODO'; label: string; badge?: number }[] = [
+          { id: 'CHART', label: t('Courbe') },
+          { id: 'TOP', label: t('Meilleures ventes') },
+          { id: 'TODO', label: t('À traiter'), badge: todoCount },
+        ];
+        return (
+          <div className="mt-5 flex flex-wrap gap-1 border-b border-hairline" role="tablist">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={panel === tab.id}
+                onClick={() => setPanel(tab.id)}
+                className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-[13px] font-bold transition ${panel === tab.id ? 'border-brand-500 text-ink' : 'border-transparent text-muted hover:text-ink'}`}
+              >
+                {tab.label}
+                {tab.badge ? <span className="rounded-full bg-[#FDEDED] px-1.5 text-[10px] font-bold text-[#A63030]">{tab.badge}</span> : null}
+              </button>
+            ))}
+          </div>
+        );
+      })()}
+
+      <div className="mt-4">
+        {panel === 'CHART' && (
+        <div className="card">
           <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
             <div>
               <h2 className="text-section">{t('Recettes, dépenses et trésorerie')}</h2>
@@ -289,8 +318,10 @@ export default function Dashboard() {
             <p className="py-10 text-center text-caption text-muted">{t('Aucune opération sur la période. Enregistrez une vente ou une dépense pour voir la courbe.')}</p>
           )}
         </div>
+        )}
 
         <div className="flex flex-col gap-4">
+          {panel === 'TOP' && (
           <div className="card">
             <div className="mb-2 flex items-baseline justify-between">
               <h2 className="text-section">{t('Meilleures ventes')}</h2>
@@ -322,8 +353,9 @@ export default function Dashboard() {
               <p className="py-6 text-center text-caption text-muted">{t('Aucune vente sur la période')}</p>
             )}
           </div>
+          )}
 
-          {(k.outOfStock > 0 || k.lowStock > 0 || k.receivablesOverdue > 0 || k.openSession) && (
+          {panel === 'TODO' && (
             <div className="card">
               <h2 className="mb-2 flex items-center gap-2 text-section">
                 <IconAlert className="h-4 w-4 text-[#B8860B]" />
@@ -361,6 +393,9 @@ export default function Dashboard() {
                       <IconChevronRight className="h-4 w-4" />
                     </Link>
                   </li>
+                )}
+                {!(k.outOfStock > 0 || k.lowStock > 0 || k.receivablesOverdue > 0 || k.openSession) && (
+                  <li className="py-4 text-center text-muted">{t('Rien à traiter : stock, créances et caisse sont en ordre.')}</li>
                 )}
               </ul>
             </div>
