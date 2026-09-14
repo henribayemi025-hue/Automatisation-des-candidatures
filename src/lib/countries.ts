@@ -81,12 +81,24 @@ export function countryProfile(name: string): CountryProfile | undefined {
   return COUNTRIES.find((c) => c.name === name);
 }
 
+/** Régime d'imposition effectif : l'ancien réglage « taxe activée » vaut réel. */
+export function taxRegime(c: { taxRegime?: Company['taxRegime']; vatEnabled: boolean }): NonNullable<Company['taxRegime']> {
+  return c.taxRegime ?? (c.vatEnabled ? 'REEL' : 'NONE');
+}
+
+export const TAX_REGIMES: { id: NonNullable<Company['taxRegime']>; label: string; hint: string }[] = [
+  { id: 'REEL', label: 'Régime du réel', hint: 'L’entreprise facture la taxe (TVA) sur ses ventes, la déduit sur ses achats et la déclare.' },
+  { id: 'IGS', label: 'Impôt général synthétique (IGS)', hint: 'Pas de TVA facturée. Les fournisseurs peuvent retenir un précompte sur achat, comptabilisé en acompte d’impôt.' },
+  { id: 'NONE', label: 'Non assujetti / autre', hint: 'Aucune taxe sur les ventes ni sur les achats.' },
+];
+
 /** Les réglages qu'un profil pays propose, à appliquer d'un coup (la devise reste un choix à part). */
 export function profileToCompany(p: CountryProfile): Partial<Company> {
   return {
     chart: p.chart,
     vatRateBp: p.vatRateBp,
     vatEnabled: p.vatRateBp > 0,
+    taxRegime: p.vatRateBp > 0 ? 'REEL' : 'NONE',
     taxLabel: p.taxLabel,
     fiscalYearStart: p.fiscalYearStart,
   };

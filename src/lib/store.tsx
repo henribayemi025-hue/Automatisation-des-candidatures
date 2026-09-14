@@ -97,6 +97,8 @@ interface PurchaseInput {
   /** TVA payée en douane, déductible. */
   importVat?: Minor;
   landedPaidWith?: PaymentMethod;
+  /** Précompte sur achat retenu par le fournisseur (acompte d'impôt). */
+  withholding?: Minor;
 }
 
 interface ExpenseInput {
@@ -364,6 +366,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           landed: (input.landed ?? []).filter((c) => c.amount > 0),
           importVat: input.importVat ?? 0,
           landedPaidWith: input.landedPaidWith ?? 'BANK',
+          withholding: input.withholding ?? 0,
           createdAt: new Date().toISOString(),
         };
         dispatch('purchase.record', { purchase });

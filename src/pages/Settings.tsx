@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { hasContent, useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
 import { CURRENCIES, currencyLabel } from '../lib/money';
+import { TAX_REGIMES, taxRegime } from '../lib/countries';
 import { SECTORS } from '../lib/guide';
 import { sectorProfile, tracksStock } from '../lib/sector';
 import { startTour } from '../components/Tour';
@@ -212,10 +213,27 @@ export default function Settings() {
             <Field label={t('Début d’exercice (MM-JJ)')}>
               <input id="set-fy" value={c.fiscalYearStart} disabled={!canEdit} onChange={(e) => setCompany({ fiscalYearStart: e.target.value })} placeholder="01-01" className="field num" />
             </Field>
-            <label className="flex items-center gap-3 rounded-input border border-hairline p-3.5">
-              <input type="checkbox" checked={c.vatEnabled} disabled={!canEdit} onChange={(e) => setCompany({ vatEnabled: e.target.checked })} className="h-4 w-4 accent-teal" />
-              <span className="text-body">{t('Appliquer la taxe sur les ventes et achats')} ({c.taxLabel || 'TVA'})</span>
-            </label>
+            <Field label={t('Régime d’imposition')} hint={t(TAX_REGIMES.find((r) => r.id === taxRegime(c))?.hint ?? '')}>
+              <select id="set-regime" value={taxRegime(c)} disabled={!canEdit} onChange={(e) => setCompany({ taxRegime: e.target.value as Company['taxRegime'] })} className="field">
+                {TAX_REGIMES.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {t(r.label)}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            {taxRegime(c) === 'IGS' && (
+              <Field label={t('Précompte sur achat (%)')} hint={t('Retenu par vos fournisseurs sur leurs factures. Le taux dépend de votre régime et du leur : demandez-le à votre fiscaliste. Laissez 0 si aucun.')}>
+                <input
+                  id="set-withholding"
+                  value={((c.withholdingBp ?? 0) / 100).toString()}
+                  disabled={!canEdit}
+                  onChange={(e) => setCompany({ withholdingBp: Math.round((parseFloat(e.target.value.replace(',', '.')) || 0) * 100) })}
+                  inputMode="decimal"
+                  className="field num"
+                />
+              </Field>
+            )}
             {c.vatEnabled && (
               <>
               <label className="flex items-start gap-3 rounded-input border border-hairline p-3.5">

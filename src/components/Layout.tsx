@@ -194,6 +194,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     items: g.items
       .filter((it) => (expert || !it.expert) && canAccess(role, it.area))
       .filter((it) => withStock || (it.to !== '/stock' && it.to !== '/achats'))
+      .filter((it) => it.to !== '/tva' || company.vatEnabled)
       .map((it) => (RENAMED[it.to] ? { ...it, label: RENAMED[it.to] } : it)),
   })).filter((g) => g.items.length > 0);
 

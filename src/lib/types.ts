@@ -16,6 +16,8 @@ export interface Currency {
 /** SIMPLE : vocabulaire courant, comptabilité masquée. EXPERT : tout est visible. */
 export type AppMode = 'SIMPLE' | 'EXPERT';
 
+export type TaxRegime = 'REEL' | 'IGS' | 'NONE';
+
 export interface Company {
   name: string;
   currency: string;
@@ -36,6 +38,15 @@ export interface Company {
   pricesIncludeTax: boolean;
   /** Nom local de la taxe sur la consommation : TVA, VAT, GST, IVA… */
   taxLabel: string;
+  /**
+   * Régime d'imposition. REEL : l'entreprise facture la taxe (TVA) et la
+   * déclare. IGS : impôt synthétique, pas de TVA facturée, mais un précompte
+   * sur achat peut être retenu par les fournisseurs. NONE : ni l'un ni l'autre
+   * (non assujetti, pays sans taxe). Absent : déduit de vatEnabled.
+   */
+  taxRegime?: TaxRegime;
+  /** Précompte sur achat en points de base (200 = 2 %), retenu par les fournisseurs. 0 : aucun. */
+  withholdingBp?: number;
   /**
    * Suit-on des quantités en stock ? Non renseigné, le métier décide : une
    * boutique oui, un salon de coiffure non. Le réglage explicite gagne.
@@ -213,6 +224,8 @@ export interface Purchase {
   importVat?: Minor;
   /** Avec quoi les frais d'approche et la TVA de douane ont été payés. */
   landedPaidWith?: PaymentMethod;
+  /** Précompte sur achat retenu par le fournisseur : un acompte d'impôt, pas une charge. */
+  withholding?: Minor;
   createdAt: ISODate;
 }
 

@@ -39,6 +39,7 @@ export type AccountKey =
   | 'RENT'
   | 'SERVICES'
   | 'TAXES'
+  | 'TAX_PREPAID'
   | 'PAYROLL'
   | 'FINANCIAL'
   | 'DEPRECIATION_EXPENSE'
@@ -89,6 +90,8 @@ const ROWS: ChartRow[] = [
   { key: 'STAFF_ADVANCE', label: 'Personnel — avances et acomptes', class: 4, kind: 'ASSET', normal: 'DEBIT', SYSCOHADA: '421', PCG: '425', GENERIC: '1260' },
   { key: 'STAFF_PAYABLE', label: 'Personnel — rémunérations dues', class: 4, kind: 'LIABILITY', normal: 'CREDIT', SYSCOHADA: '422', PCG: '421', GENERIC: '2100' },
   { key: 'VAT_COLLECTED', label: 'TVA collectée', class: 4, kind: 'LIABILITY', normal: 'CREDIT', SYSCOHADA: '4431', PCG: '44571', GENERIC: '2200' },
+  // Précompte sur achat, acomptes d'impôt : ce que l'État nous doit déjà.
+  { key: 'TAX_PREPAID', label: 'État — acomptes et précomptes d’impôt', class: 4, kind: 'ASSET', normal: 'DEBIT', SYSCOHADA: '4492', PCG: '444', GENERIC: '1260' },
   { key: 'VAT_DEDUCTIBLE', label: 'TVA déductible', class: 4, kind: 'ASSET', normal: 'DEBIT', SYSCOHADA: '4451', PCG: '44566', GENERIC: '1250' },
   { key: 'BANK', label: 'Banque', class: 5, kind: 'ASSET', normal: 'DEBIT', SYSCOHADA: '521', PCG: '512', GENERIC: '1010' },
   { key: 'MOBILE_MONEY', label: 'Compte mobile / e-wallet', class: 5, kind: 'ASSET', normal: 'DEBIT', SYSCOHADA: '523', PCG: '5115', GENERIC: '1015' },

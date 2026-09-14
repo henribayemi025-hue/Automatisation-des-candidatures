@@ -16,6 +16,7 @@ const LANDED_KINDS: { id: LandedCostKind; label: string }[] = [
 import { Badge, Empty, Field, Money, PageHeader, StatCard, Table, Modal } from '../components/UI';
 import { IconCart, IconPlus, IconX } from '../components/Icons';
 import { t } from '../lib/i18n';
+import { taxRegime } from '../lib/countries';
 import ProjectSelect from '../components/ProjectSelect';
 
 type Filter = 'ALL' | 'PENDING' | 'RECEIVED';
@@ -30,6 +31,8 @@ export default function Purchases() {
   const [projectId, setProjectId] = useState('');
   const [lines, setLines] = useState<PurchaseLine[]>([]);
   const [paidRaw, setPaidRaw] = useState('');
+  // Précompte sur achat : proposé au taux des réglages, modifiable facture par facture.
+  const [withholdingRateRaw, setWithholdingRateRaw] = useState(((db.company.withholdingBp ?? 0) / 100).toString());
   const [error, setError] = useState('');
 
   // Achat à l'étranger : la facture est dans une autre devise, et la
@@ -72,6 +75,9 @@ export default function Purchases() {
     ? lines.map((l) => ({ ...l, unitCost: toLocal(foreignUnit[l.productId] ?? 0) }))
     : lines;
   const total = effectiveLines.reduce((s, l) => s + l.unitCost * l.qty, 0);
+  const withholdingRate = Number(withholdingRateRaw.replace(',', '.')) || 0;
+  const withholdingAmount = abroad ? 0 : Math.round((total * withholdingRate) / 100);
+  const showWithholding = !abroad && (taxRegime(db.company) === 'IGS' || (db.company.withholdingBp ?? 0) > 0);
   const foreignTotal = lines.reduce((s, l) => s + (foreignUnit[l.productId] ?? 0) * l.qty, 0);
   const landedCost = total + landedTotal;
 
@@ -88,6 +94,7 @@ export default function Purchases() {
     setSupplierId('');
     setSupplierName('');
     setPaidRaw('');
+    setWithholdingRateRaw(((db.company.withholdingBp ?? 0) / 100).toString());
     setError('');
     setAbroad(false);
     setFxRateRaw('');
@@ -115,6 +122,7 @@ export default function Purchases() {
       landed: LANDED_KINDS.map((k) => ({ kind: k.id, label: t(k.label), amount: toMinor(landedRaw[k.id] || 0, currency) })).filter((c) => c.amount > 0),
       importVat,
       landedPaidWith,
+      withholding: withholdingAmount,
     });
     reset();
     setOpen(false);
@@ -187,6 +195,11 @@ export default function Purchases() {
                   {(p.landed?.length ?? 0) > 0 && (
                     <span className="block text-[11px] font-normal text-muted">
                       {t('+ frais')} <Money value={(p.landed ?? []).reduce((s, c) => s + c.amount, 0)} />
+                    </span>
+                  )}
+                  {(p.withholding ?? 0) > 0 && (
+                    <span className="block text-[11px] font-normal text-muted">
+                      {t('+ précompte')} <Money value={p.withholding ?? 0} />
                     </span>
                   )}
                 </td>
@@ -404,6 +417,18 @@ export default function Purchases() {
             <span className="num">{formatMoney(landedCost, currency)}</span>
           </div>
         </div>
+
+        {showWithholding && (
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Field label={t('Précompte sur achat (%)')} hint={t('Retenu par le fournisseur sur cette facture. Comptabilisé en acompte d’impôt, pas dans le coût du stock.')}>
+              <input id="pur-withholding" value={withholdingRateRaw} onChange={(e) => setWithholdingRateRaw(e.target.value)} inputMode="decimal" className="field num" />
+            </Field>
+            <div className="flex items-end justify-between rounded-input border border-hairline px-3 py-2.5 text-caption">
+              <span className="text-muted">{t('Précompte dû au fournisseur')}</span>
+              <span className="num font-semibold">{formatMoney(withholdingAmount, currency)}</span>
+            </div>
+          </div>
+        )}
 
         <div className="mt-4">
           <Field label={t('Montant payé au fournisseur à la commande ({c})', { c: currency })} hint={t('Le solde devient une dette fournisseur. Les frais d’approche, eux, sont réglés à la réception.')}>

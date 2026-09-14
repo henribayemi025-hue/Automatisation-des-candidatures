@@ -284,6 +284,26 @@ Posez vos questions en langage courant : « Quel est mon chiffre d'affaires ce m
 - **Mon compte** : se déconnecter.
 - **Données** : charger la démonstration, tout réinitialiser (irréversible).
 
+## 21 bis. Régime d'imposition et précompte sur achat
+
+Au Cameroun comme dans plusieurs pays, toutes les entreprises ne facturent pas la TVA. L'application le sait : le **régime d'imposition** se choisit à l'inscription et se change dans Paramètres.
+
+| Régime | Ce que fait l'application |
+| --- | --- |
+| Régime du réel | La TVA est facturée sur les ventes, déduite sur les achats et la douane, déclarée dans *Déclaration de TVA* |
+| Impôt général synthétique (IGS) | Aucune TVA : ni sur les tickets, ni sur les achats. L'écran de déclaration disparaît du menu |
+| Non assujetti / autre | Aucune taxe |
+
+### Le précompte sur achat (IGS)
+
+Quand un fournisseur, souvent un grossiste, retient un précompte sur sa facture :
+
+1. Dans Paramètres, régime IGS, saisissez le **taux** habituel (demandez-le à votre fiscaliste : il dépend de votre régime et de celui du fournisseur).
+2. Dans chaque bon de commande, le précompte est proposé à ce taux, modifiable facture par facture ; le montant s'affiche.
+3. À la réception, l'écriture est : stock au coût des marchandises (sans le précompte), **État — acomptes et précomptes d'impôt (4492)** au débit pour le précompte, fournisseur au crédit pour le total dû.
+
+Le précompte n'est ni une charge ni un coût du stock : c'est de l'argent déjà versé à l'État, qui viendra en moins de votre impôt. Son cumul s'affiche dans l'écran *Déclaration de TVA* (qui explique alors qu'il n'y a pas de TVA à déclarer).
+
 ## 22. Questions fréquentes
 
 **J'ai validé une vente et rien ne s'est passé.** Le ticket s'affiche par-dessus l'écran ; sur téléphone, il apparaît en bas. Si vous ne le voyez pas, la vente est quand même dans *Ventes*.

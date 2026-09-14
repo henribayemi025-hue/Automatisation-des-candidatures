@@ -356,3 +356,22 @@ Ce qu'il a dit, et ce qui a été fait :
 
 Non fait, à lui demander : « le plan comptable est précédé des 0000 » — on n'a
 pas compris s'il parle de comptes à longueur fixe (4431000) ou d'autre chose.
+
+## Régime d'imposition (retour du comptable, 14/09/2026)
+
+- **Trois régimes** à l'inscription et dans Paramètres : réel (TVA facturée,
+  déduite, déclarée), IGS (pas de TVA, écran de déclaration retiré du menu),
+  non assujetti. Choisir IGS coupe la taxe partout ; revenir au réel la
+  rallume.
+- **Précompte sur achat** : taux dans Paramètres (régime IGS), proposé sur
+  chaque bon de commande et modifiable. À la réception : stock sans le
+  précompte, 4492 « État — acomptes et précomptes d'impôt » au débit,
+  fournisseur au crédit du total dû. Cumul affiché dans l'écran TVA.
+- Aucun taux n'est pré-rempli : il dépend du régime de l'acheteur et de
+  celui du vendeur, c'est au fiscaliste de le dire.
+- Vérifié par scripts/regime-check.ts : IGS sans TVA collectée ni déductible,
+  précompte 2 % sur 200 000 = 4 000 en 4492, fournisseur 204 000, coût
+  unitaire inchangé, bilan équilibré, retour au réel.
+- Pas fait : le côté **vendeur** (un grossiste qui retient lui-même le
+  précompte sur ses ventes). À faire quand le fiscaliste aura confirmé le
+  traitement voulu.

@@ -285,6 +285,8 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       const patch = p.patch as Partial<Company>;
       const before = db.company;
       db.company = { ...before, ...patch };
+      // Le régime commande la taxe : réel = TVA facturée, IGS ou non assujetti = pas de TVA.
+      if (patch.taxRegime) db.company.vatEnabled = patch.taxRegime === 'REEL';
       if (patch.chart && patch.chart !== before.chart) {
         const custom = db.accounts.filter((a) => !a.system);
         db.accounts = [...buildChart(patch.chart), ...custom] as Account[];
@@ -498,6 +500,9 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       const vat = rate === 0 ? 0 : included ? purchase.total - goods : Math.round((purchase.total * rate) / 10000);
       const ttc = goods + vat;
       const importVat = purchase.importVat ?? 0;
+      // Précompte sur achat : retenu par le fournisseur, dû avec la facture, mais
+      // c'est un acompte d'impôt (créance sur l'État), jamais un coût du stock.
+      const withholding = purchase.withholding ?? 0;
 
       // Le stock entre au coût rendu magasin (marchandise + frais d'approche).
       // Le fournisseur n'est dû que de sa facture ; la douane, le fret et la
@@ -506,8 +511,9 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       const entryLines: JournalLine[] = [
         { account: accountCode(chart, 'INVENTORY'), label: 'Entrée en stock', debit: goods + landed, credit: 0 },
         { account: accountCode(chart, 'VAT_DEDUCTIBLE'), label: 'TVA déductible', debit: vat + importVat, credit: 0 },
-        { account: accountCode(chart, 'SUPPLIERS'), label: purchase.supplierName, debit: 0, credit: ttc },
+        { account: accountCode(chart, 'SUPPLIERS'), label: purchase.supplierName, debit: 0, credit: ttc + withholding },
       ];
+      if (withholding > 0) entryLines.push({ account: accountCode(chart, 'TAX_PREPAID'), label: 'Précompte sur achat', debit: withholding, credit: 0 });
       if (landed + importVat > 0) {
         entryLines.push({
           account: methodAccount(chart, purchase.landedPaidWith ?? 'BANK'),
@@ -545,7 +551,7 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
         });
       }
 
-      const remaining = ttc - purchase.paid;
+      const remaining = ttc + withholding - purchase.paid;
       if (remaining > 0) {
         db.debts.unshift({
           id: ids.debt,

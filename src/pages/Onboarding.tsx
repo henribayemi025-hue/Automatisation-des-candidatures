@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import type { TaxRegime } from '../lib/types';
 import { useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
 import { CURRENCIES, currencyLabel } from '../lib/money';
 import { GOALS, SECTORS } from '../lib/guide';
-import { COUNTRIES, countryProfile, profileToCompany } from '../lib/countries';
+import { COUNTRIES, countryProfile, profileToCompany, TAX_REGIMES, taxRegime } from '../lib/countries';
 import { LanguageSwitch, t } from '../lib/i18n';
 import { Field } from '../components/UI';
 import { IconCheck, IconChevronRight } from '../components/Icons';
@@ -18,6 +19,7 @@ export default function Onboarding() {
   const [country, setCountry] = useState(db.company.country);
   const [city, setCity] = useState(db.company.city);
   const [currency, setCurrency] = useState(db.company.currency);
+  const [regime, setRegime] = useState<TaxRegime>(taxRegime(db.company));
   const [goals, setGoals] = useState<string[]>(db.company.goals ?? []);
 
   const steps = ['Votre activité', 'Votre entreprise', 'Ce que vous voulez faire'];
@@ -31,6 +33,7 @@ export default function Onboarding() {
     const expert = goals.includes('accounting') || withDemo;
     setCompany({
       ...(profile ? profileToCompany(profile) : {}),
+      taxRegime: regime,
       sector,
       name: name.trim() || 'Mon entreprise',
       country,
@@ -123,6 +126,7 @@ export default function Onboarding() {
                         setCountry(e.target.value);
                         const p = countryProfile(e.target.value);
                         if (p?.currency && !currency) setCurrency(p.currency);
+                        if (p) setRegime(p.vatRateBp > 0 ? 'REEL' : 'NONE');
                       }}
                       className="field"
                     >
@@ -155,7 +159,16 @@ export default function Onboarding() {
                     </optgroup>
                   </select>
                 </Field>
-                {profile && profile.name !== 'Autre' && (
+                <Field label={t('Régime d’imposition')} hint={t(TAX_REGIMES.find((r) => r.id === regime)?.hint ?? '')}>
+                  <select id="ob-regime" value={regime} onChange={(e) => setRegime(e.target.value as TaxRegime)} className="field">
+                    {TAX_REGIMES.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {t(r.label)}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+                {profile && profile.name !== 'Autre' && regime === 'REEL' && (
                   <p className="rounded-input bg-[#FBF1DF] px-3.5 py-2.5 text-caption text-ink">
                     {t('Profil fiscal proposé pour ce pays : {tax} {rate} %, plan {chart}. À confirmer avec votre comptable.', {
                       tax: profile.taxLabel,

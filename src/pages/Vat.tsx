@@ -2,8 +2,11 @@ import { useMemo, useState } from 'react';
 import { today, useStore } from '../lib/store';
 import { entriesInRange } from '../lib/ledger';
 import { periodBounds } from '../lib/payroll';
-import { FigureStrip, Money, PageHeader, Table } from '../components/UI';
+import { FigureStrip, Money, PageHeader, Table, useMoney } from '../components/UI';
 import { t } from '../lib/i18n';
+import { taxRegime } from '../lib/countries';
+import { accountCode } from '../lib/chart';
+import { balanceOf } from '../lib/ledger';
 
 /**
  * Déclaration de TVA. C'est la première chose qu'un fiscaliste demande :
@@ -16,6 +19,7 @@ type Row = { date: string; ref: string; label: string; base: number; vat: number
 
 export default function Vat() {
   const { db, code } = useStore();
+  const money = useMoney();
   const [period, setPeriod] = useState(today().slice(0, 7));
   const { from, to } = periodBounds(period);
 
@@ -67,7 +71,9 @@ export default function Vat() {
       <>
         <PageHeader title={t('Déclaration de {tax}', { tax: label })} subtitle={t('Ce que vous devez reverser, période par période')} />
         <div className="card text-caption text-muted">
-          {t('La taxe est désactivée dans les paramètres de l’entreprise. Activez-la pour voir la déclaration.')}
+          {taxRegime(db.company) === 'IGS'
+            ? t('Régime de l’impôt général synthétique : l’entreprise ne facture pas la {tax} et n’a pas de déclaration à produire ici. Le précompte sur achat retenu par vos fournisseurs est suivi en acomptes d’impôt : {amount} à ce jour.', { tax: label, amount: money(balanceOf(accountCode(db.company.chart, 'TAX_PREPAID'), db.entries, 'DEBIT')) })
+            : t('La taxe est désactivée dans les paramètres de l’entreprise. Activez-la pour voir la déclaration.')}
         </div>
       </>
     );

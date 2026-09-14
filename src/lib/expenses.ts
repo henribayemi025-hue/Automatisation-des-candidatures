@@ -9,6 +9,7 @@ export const EXPENSE_LABEL: Record<AccountKey, string> = {
   SERVICES: 'Services extérieurs',
   PAYROLL: 'Salaires et charges',
   TAXES: 'Impôts et taxes',
+  TAX_PREPAID: '',
   FINANCIAL: 'Frais bancaires et financiers',
   MISC_EXPENSE: 'Charges diverses',
   // Dotations : jamais saisies à la main, elles viennent de l'écran Immobilisations.
