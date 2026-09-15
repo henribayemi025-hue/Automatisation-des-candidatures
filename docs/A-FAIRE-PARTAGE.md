@@ -231,18 +231,26 @@ comme après). Rien n'a été corrigé en production.
   restauration était inatteignable pour qui change de téléphone. Cycle complet
   vérifié sur un appareil réellement vidé : 263 ventes sauvegardées, effacées,
   retrouvées.
-- 🟠 **Le journal est inviolable, l'instantané ne l'est pas.** `finia_events`
+- ✅ **15/09 — CORRIGÉ : le journal était inviolable, l'instantané ne l'était pas.** `finia_events`
   n'a ni règle `UPDATE` ni règle `DELETE` : un événement écrit ne peut être ni
   modifié ni effacé, par personne. Mais `loadWorkspace` part de
   `finia_workspaces.data` et n'ajoute que les événements postérieurs à
   `snapshot_seq` — deux colonnes que le propriétaire peut réécrire. Les preuves
-  survivent en base ; l'écran, lui, montrerait les chiffres réécrits. À écrire
-  dans la documentation du fiscaliste : **le registre opposable est
-  `finia_events`, pas l'écran.**
-- 🟠 **Un téléphone perdu donne tout.** Cache en clair (noms et téléphones des
+  survivent en base ; l'écran, lui, montrerait les chiffres réécrits. Corrigé :
+  à chaque compactage, l'application inscrit au journal une empreinte de
+  l'instantané (`snapshot.seal`). Le journal n'acceptant ni modification ni
+  suppression, un instantané réécrit cesse de lui correspondre, et l'écran
+  Audit l'annonce. Il y rappelle aussi, dans tous les cas, que **le registre
+  opposable est `finia_events`, pas l'écran**. Vérifié par
+  `scripts/seal-check.ts` : empreinte stable, sensible à un montant modifié,
+  insensible à un renommage, et réécriture détectée.
+- ✅ **15/09 — CORRIGÉ : un téléphone perdu donnait tout.** Cache en clair (noms et téléphones des
   clients, salaires), plus `finia.auth` qui contient le jeton de
-  rafraîchissement. Proposé : verrou d'ouverture, et purge du cache à la
-  déconnexion.
+  rafraîchissement. Corrigé : code d'ouverture facultatif (empreinte salée,
+  jamais le code en clair), redemandé après dix minutes d'inactivité, écran
+  opaque ; et la déconnexion efface désormais `finia.cache.*` et
+  `finia.outbox.*`. La carte de réglage dit franchement la limite : le verrou
+  arrête qui prend le téléphone, pas qui sait ouvrir les outils du navigateur.
 - ✅ **La clé du site est bien la clé publiable.** Aucune trace de
   `service_role` dans aucun commit, aucun JWT en dur dans l'historique complet,
   aucun fichier de secret jamais suivi par git.

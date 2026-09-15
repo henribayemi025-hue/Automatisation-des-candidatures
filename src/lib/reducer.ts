@@ -1101,6 +1101,11 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       break;
     }
 
+    case 'snapshot.seal':
+      // Empreinte de l'instantané, inscrite au journal. Elle ne modifie pas les
+      // chiffres : elle sert de témoin, et le journal ne peut pas être réécrit.
+      break;
+
     case 'workspace.restore': {
       // Recharger une sauvegarde est un événement comme un autre : il part en
       // ligne, les autres appareils convergent, et l'historique garde la trace

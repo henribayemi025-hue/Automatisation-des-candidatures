@@ -2,10 +2,12 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { ReactNode } from 'react';
 import type { RealtimeChannel, User } from '@supabase/supabase-js';
 import { authErrorInUrl, cleanAuthParams, supabase } from './supabase';
-import { hasContent, loadCache, useStoreActions } from './store';
+import { CACHE_PREFIX, hasContent, loadCache, useStoreActions } from './store';
 import { emptyDB, normalizeDB, replay } from './reducer';
 import type { DB, Member, MemberRole, Presence, WorkspaceEvent } from './types';
 import { t } from './i18n';
+import { hashState, verifySeal } from './seal';
+import type { SealVerdict } from './seal';
 import { displayIdentity, isPhoneAddress, phoneDigits, toLogin } from './identity';
 
 export type SyncStatus = 'offline' | 'syncing' | 'synced' | 'pending' | 'error';
@@ -49,6 +51,8 @@ interface CollabValue {
 
   presence: Presence[];
   sync: SyncStatus;
+  /** L'instantané affiché correspond-il à l'empreinte inscrite au journal ? */
+  sealVerdict: SealVerdict | null;
   pending: number;
   localConflict: LocalConflict | null;
   resolveLocalConflict: (choice: 'keep-cloud' | 'import-local') => Promise<void>;
@@ -138,6 +142,8 @@ export function CollabProvider({ children }: { children: ReactNode }) {
   const [invitations, setInvitations] = useState<Workspace[]>([]);
   const [presence, setPresence] = useState<Presence[]>([]);
   const [sync, setSync] = useState<SyncStatus>('offline');
+  // Verdict du scellé : l'écran correspond-il au journal ? Voir src/lib/seal.ts.
+  const [sealVerdict, setSealVerdict] = useState<SealVerdict | null>(null);
   const [pending, setPending] = useState(0);
   const [localConflict, setLocalConflict] = useState<LocalConflict | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
@@ -214,6 +220,8 @@ export function CollabProvider({ children }: { children: ReactNode }) {
         return;
       }
       snapshotSeq.current = Number(row.snapshot_seq ?? 0);
+      // Empreinte de l'instantané reçu, pour la comparer aux scellés du journal.
+      const snapshotHash = row.data ? await hashState(normalizeDB(row.data as Partial<DB>)).catch(() => '') : '';
 
       const { data: rows, error: evError } = await supabase
         .from('finia_events')
@@ -226,6 +234,7 @@ export function CollabProvider({ children }: { children: ReactNode }) {
         return;
       }
       const events = (rows as EventRow[]).map(rowToEvent);
+      setSealVerdict(verifySeal(snapshotSeq.current, snapshotHash, events));
       applied.current = new Set(events.map((e) => e.id));
       lastSeq.current = events.length ? events[events.length - 1].seq! : snapshotSeq.current;
       const base = normalizeDB(row.data as Partial<DB>);
@@ -286,11 +295,23 @@ export function CollabProvider({ children }: { children: ReactNode }) {
     const ws = workspaceRef.current;
     if (!ws || ws.role !== 'owner') return;
     if (lastSeq.current - snapshotSeq.current < COMPACT_AFTER) return;
+    const state = store.getState();
+    const sealedSeq = lastSeq.current;
     const { error } = await supabase
       .from('finia_workspaces')
-      .update({ data: store.getState() as unknown as Record<string, unknown>, snapshot_seq: lastSeq.current, updated_at: new Date().toISOString() })
+      .update({ data: state as unknown as Record<string, unknown>, snapshot_seq: sealedSeq, updated_at: new Date().toISOString() })
       .eq('id', ws.id);
-    if (!error) snapshotSeq.current = lastSeq.current;
+    if (error) return;
+    snapshotSeq.current = sealedSeq;
+    // L'empreinte part au journal, qui lui ne peut être ni modifié ni effacé :
+    // un instantané réécrit après coup cesserait de lui correspondre.
+    try {
+      const hash = await hashState(state);
+      store.sealSnapshot({ sealedSeq, hash, entries: state.entries.length });
+    } catch {
+      // Empreinte impossible (navigateur sans crypto.subtle) : le compactage
+      // reste valide, il sera simplement signalé « non scellé ».
+    }
   }, [store]);
 
   // Chaque action locale part immédiatement ; en cas d'échec réseau elle attend en file.
@@ -534,6 +555,17 @@ export function CollabProvider({ children }: { children: ReactNode }) {
       async signOut() {
         await supabase.auth.signOut();
         localStorage.removeItem(GUEST_KEY);
+        // Le cache garde la comptabilité en clair. Partir sans l'effacer
+        // laisserait les chiffres lisibles à qui rouvre l'application sur cet
+        // appareil — point 4 de docs/SECURITE-2026-09-15.md. Ce qui compte est
+        // en ligne : le prochain chargement le reconstruit.
+        try {
+          for (const key of Object.keys(localStorage)) {
+            if (key.startsWith(CACHE_PREFIX) || key.startsWith(OUTBOX_PREFIX)) localStorage.removeItem(key);
+          }
+        } catch {
+          /* stockage indisponible : rien à effacer */
+        }
         setGuest(false);
       },
       continueAsGuest() {
@@ -605,6 +637,7 @@ export function CollabProvider({ children }: { children: ReactNode }) {
 
       presence,
       sync,
+      sealVerdict,
       pending,
       localConflict,
       async resolveLocalConflict(choice) {

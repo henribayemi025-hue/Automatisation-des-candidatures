@@ -374,6 +374,34 @@ Vous pouvez aussi recharger depuis Paramètres si l'application est déjà
 ouverte. Une fenêtre vous montre alors ce que contient le fichier et ce qui va
 être remplacé, avant de confirmer.
 
+## 21 quinquies. Protéger l'appareil, et vérifier ses comptes
+
+### Un code à l'ouverture
+
+Si l'appareil de caisse passe de main en main, Paramètres puis **Code
+d'ouverture** permet d'en choisir un. Il est demandé à l'ouverture et après dix
+minutes sans activité, jamais au milieu d'une vente.
+
+Ce qu'il fait : il empêche qu'on lise vos ventes, vos clients et vos salaires
+en votre absence. Ce qu'il ne fait pas : il n'arrête pas quelqu'un qui sait
+ouvrir les outils du navigateur. Pour un appareil vraiment sensible, verrouillez
+aussi le téléphone lui-même.
+
+Notez votre code : personne ne peut le retrouver à votre place.
+
+### Se déconnecter efface les données de l'appareil
+
+Quand vous vous déconnectez, la copie locale de vos chiffres est effacée. Ce
+n'est pas une perte : tout est en ligne et revient à la reconnexion. C'est fait
+pour que la personne suivante qui ouvre l'application sur cet appareil ne lise
+rien.
+
+### Le registre qui fait foi
+
+L'écran Audit indique si ce que vous voyez correspond au journal des écritures.
+Le journal est le registre : il ne peut être ni modifié ni effacé, même par
+vous. C'est lui qu'un comptable ou un contrôleur doit lire, pas l'écran.
+
 ## 22. Questions fréquentes
 
 **J'ai validé une vente et rien ne s'est passé.** Le ticket s'affiche par-dessus l'écran ; sur téléphone, il apparaît en bas. Si vous ne le voyez pas, la vente est quand même dans *Ventes*.

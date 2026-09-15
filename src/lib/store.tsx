@@ -41,7 +41,7 @@ export function today(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-const CACHE_PREFIX = 'finia.cache.';
+export const CACHE_PREFIX = 'finia.cache.';
 
 export function loadCache(scope: string): DB | null {
   try {
@@ -174,6 +174,8 @@ export interface StoreActions {
   resetAll: () => void;
   /** Remplace tout le contenu de l'espace par une sauvegarde relue depuis un fichier. */
   restoreBackup: (db: DB) => void;
+  /** Inscrit au journal l'empreinte de l'instantané qui vient d'être enregistré. */
+  sealSnapshot: (payload: { sealedSeq: number; hash: string; entries: number }) => void;
 }
 
 export interface StoreValue extends StoreActions {
@@ -628,6 +630,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
       restoreBackup(next) {
         dispatch('workspace.restore', { db: next });
+      },
+
+      sealSnapshot(payload) {
+        dispatch('snapshot.seal', payload as unknown as Record<string, unknown>);
       },
 
       resetAll() {

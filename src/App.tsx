@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
+import LockScreen from './components/LockScreen';
 import { useCollab } from './lib/collab';
 import { useDB } from './lib/store';
 import Auth from './pages/Auth';
@@ -109,6 +110,7 @@ export default function App() {
 
   return (
     <>
+      <LockScreen />
       <LocalConflict />
       <Layout>
         <Routes>

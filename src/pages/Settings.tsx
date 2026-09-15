@@ -6,6 +6,7 @@ import { CURRENCIES, currencyLabel } from '../lib/money';
 import { TAX_REGIMES, taxRegime } from '../lib/countries';
 import { useOffline } from '../lib/offline';
 import BackupCard from '../components/BackupCard';
+import LockCard from '../components/LockCard';
 import { SECTORS } from '../lib/guide';
 import { sectorProfile, tracksStock } from '../lib/sector';
 import { startTour } from '../components/Tour';
@@ -307,6 +308,8 @@ export default function Settings() {
         </div>
 
         <BackupCard />
+
+        <LockCard />
 
         {c.mode === 'EXPERT' && (
           <div className="card lg:col-span-2">

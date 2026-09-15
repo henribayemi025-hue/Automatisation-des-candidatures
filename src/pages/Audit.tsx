@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useDB } from '../lib/store';
+import { useCollab } from '../lib/collab';
 import { balanceSheet, isBalanced, runAuditChecks, trialBalance } from '../lib/ledger';
 import { outstanding } from '../lib/metrics';
 import { Badge, Money, PageHeader, StatCard, Table } from '../components/UI';
@@ -8,6 +9,7 @@ import { t } from '../lib/i18n';
 
 export default function Audit() {
   const db = useDB();
+  const { sealVerdict } = useCollab();
 
   const checks = useMemo(() => runAuditChecks(db.accounts, db.entries), [db.accounts, db.entries]);
   const errors = checks.filter((c) => c.severity === 'ERROR');
@@ -61,6 +63,54 @@ export default function Audit() {
         title={t('Audit')}
         subtitle={t('Contrôles de cohérence exécutés sur l\'intégralité des écritures')}
       />
+
+      {/* Le registre qui fait foi est le journal, pas cet écran. Ce bloc dit si
+          les deux concordent : voir src/lib/seal.ts et le point 3 de
+          docs/SECURITE-2026-09-15.md. */}
+      {!sealVerdict && (
+        <div className="mb-4 flex flex-wrap items-start gap-3 rounded-card border border-hairline bg-base px-4 py-3 text-caption">
+          <IconShield className="mt-0.5 h-4 w-4 shrink-0 text-muted" />
+          <div className="min-w-0">
+            <p className="font-semibold text-ink">{t('Sans compte, il n’y a pas de journal en ligne')}</p>
+            <p className="mt-0.5 text-ink/85">
+              {t('Ces contrôles portent sur les écritures gardées dans cet appareil. Créez un compte pour que le journal serve de registre, conservé hors de ce téléphone.')}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {sealVerdict && (
+        <div
+          className={`mb-4 flex flex-wrap items-start gap-3 rounded-card border px-4 py-3 text-caption ${
+            sealVerdict.state === 'DIVERGENT'
+              ? 'border-[#D14343]/50 bg-[#FDEDED]'
+              : sealVerdict.state === 'CONFORME'
+                ? 'border-teal/40 bg-teal/10'
+                : 'border-hairline bg-base'
+          }`}
+        >
+          {sealVerdict.state === 'DIVERGENT' ? (
+            <IconAlert className="mt-0.5 h-4 w-4 shrink-0 text-[#A63030]" />
+          ) : sealVerdict.state === 'CONFORME' ? (
+            <IconCheck className="mt-0.5 h-4 w-4 shrink-0 text-teal" />
+          ) : (
+            <IconShield className="mt-0.5 h-4 w-4 shrink-0 text-muted" />
+          )}
+          <div className="min-w-0">
+            <p className="font-semibold text-ink">
+              {sealVerdict.state === 'DIVERGENT'
+                ? t('L’écran ne correspond pas au journal')
+                : sealVerdict.state === 'CONFORME'
+                  ? t('L’écran correspond au journal')
+                  : t('Contrôle du journal')}
+            </p>
+            <p className="mt-0.5 text-ink/85">{t(sealVerdict.detail)}</p>
+            <p className="mt-1 text-muted">
+              {t('Le registre opposable est le journal des écritures, pas cet écran. Il ne peut être ni modifié ni effacé, même par le propriétaire de l’espace.')}
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
