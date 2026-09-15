@@ -32,7 +32,8 @@ interface CollabValue {
   signIn: (email: string, password: string) => Promise<string | null>;
   signUp: (email: string, password: string, name: string) => Promise<string | null>;
   signInWithGoogle: () => Promise<void>;
-  signOut: () => Promise<void>;
+  /** Renvoie un message si la déconnexion est refusée (opérations non envoyées), sinon null. */
+  signOut: () => Promise<string | null>;
   /** Vrai si une session enregistrée a expiré : on le dit au lieu de basculer en mode local. */
   sessionExpired: boolean;
   /** Erreur renvoyée par Google dans l'adresse de retour, s'il y en a une. */
@@ -258,8 +259,11 @@ export function CollabProvider({ children }: { children: ReactNode }) {
       })
       .select('seq')
       .maybeSingle();
+    // Clé déjà présente : l'événement est bien arrivé, c'est la réponse qui
+    // s'était perdue. Le renvoyer sans fin bloquait la file (ligne 7 du
+    // tableau docs/SIMULATION-DECISIONS.md).
+    if (error && error.code === '23505') return true;
     if (error) return false;
-    applied.current.add(ev.id);
     if (data?.seq && data.seq > lastSeq.current) lastSeq.current = data.seq;
     return true;
   }, []);
@@ -319,6 +323,10 @@ export function CollabProvider({ children }: { children: ReactNode }) {
     return store.subscribe(async (ev) => {
       const ws = workspaceRef.current;
       if (!ws || !userRef.current) return;
+      // Marqué « appliqué » avant l'envoi : si le canal temps réel renvoie
+      // l'insertion avant la réponse du serveur, la vente n'est pas comptée
+      // deux fois (ligne 4 du tableau docs/SIMULATION-DECISIONS.md).
+      applied.current.add(ev.id);
       setSync('syncing');
       const ok = await pushEvent(ws.id, ev);
       if (ok) {
@@ -553,6 +561,17 @@ export function CollabProvider({ children }: { children: ReactNode }) {
         });
       },
       async signOut() {
+        // Des ventes encore dans la file partiraient avec la déconnexion. On
+        // tente d'abord de les envoyer ; s'il en reste, on refuse de partir et
+        // on dit combien (ligne 7 du tableau docs/SIMULATION-DECISIONS.md).
+        const ws = workspaceRef.current;
+        if (ws && userRef.current) {
+          await flushOutbox();
+          const left = readOutbox(ws.id).length;
+          if (left > 0) {
+            return t('{n} opération(s) ne sont pas encore envoyées au cloud. Reconnectez-vous au réseau et réessayez : se déconnecter maintenant les perdrait.', { n: left });
+          }
+        }
         await supabase.auth.signOut();
         localStorage.removeItem(GUEST_KEY);
         // Le cache garde la comptabilité en clair. Partir sans l'effacer
@@ -567,6 +586,7 @@ export function CollabProvider({ children }: { children: ReactNode }) {
           /* stockage indisponible : rien à effacer */
         }
         setGuest(false);
+        return null;
       },
       continueAsGuest() {
         localStorage.setItem(GUEST_KEY, '1');
@@ -660,7 +680,7 @@ export function CollabProvider({ children }: { children: ReactNode }) {
         }
       },
     }),
-    [user, loading, guest, sessionExpired, authError, lastEmail, workspace, workspaces, members, invitations, presence, sync, pending, localConflict, rebuild, loadWorkspace],
+    [user, loading, guest, sessionExpired, authError, lastEmail, workspace, workspaces, members, invitations, presence, sync, pending, localConflict, rebuild, loadWorkspace, flushOutbox],
   );
 
   return <CollabContext.Provider value={value}>{children}</CollabContext.Provider>;

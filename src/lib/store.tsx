@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useRef, useState } fro
 import type { ReactNode } from 'react';
 import { accountCode } from './chart';
 import type { AccountKey } from './chart';
+import { nextNumber } from './numbering';
 import { applyEvent, emptyDB, normalizeDB, saleTotals } from './reducer';
 import { buildDemoEvents } from './demo';
 import type {
@@ -97,6 +98,8 @@ interface PurchaseInput {
   /** TVA payée en douane, déductible. */
   importVat?: Minor;
   landedPaidWith?: PaymentMethod;
+  /** Avec quoi le montant payé à la commande a été réglé (espèces par défaut, comme avant). */
+  paidWith?: PaymentMethod;
   /** Précompte sur achat retenu par le fournisseur (acompte d'impôt). */
   withholding?: Minor;
 }
@@ -222,7 +225,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // Identité stable : les composants et la synchro peuvent en dépendre sans boucle.
   const actions = useMemo<StoreActions>(() => {
     const chart = () => dbRef.current.company.chart;
-    const nextNumber = (prefix: string, count: number) => `${prefix}-${String(count + 1).padStart(5, '0')}`;
 
     return {
       code: (key) => accountCode(chart(), key),
@@ -305,10 +307,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         const isQuote = !!input.asQuote;
         const sale: Sale = {
           id: newId(),
-          number: nextNumber(
-            isQuote ? 'DV' : 'FA',
-            dbRef.current.sales.filter((s) => (isQuote ? s.status === 'QUOTE' : s.status !== 'QUOTE')).length,
-          ),
+          number: nextNumber(scope.current, isQuote ? 'DV' : 'FA', dbRef.current.sales.map((s) => s.number)),
           date: input.date || today(),
           projectId: input.projectId ?? null,
           customerId: input.customerId,
@@ -342,7 +341,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           saleId,
           method,
           paid: Math.min(paid, sale.total),
-          number: nextNumber('FA', dbRef.current.sales.filter((s) => s.status !== 'QUOTE').length),
+          number: nextNumber(scope.current, 'FA', dbRef.current.sales.map((s) => s.number)),
           date: today(),
           ids: {
             movements: sale.lines.map(() => newId()),
@@ -357,7 +356,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         const total = input.lines.reduce((s, l) => s + l.unitCost * l.qty, 0);
         const purchase: Purchase = {
           id: newId(),
-          number: nextNumber('BC', dbRef.current.purchases.length),
+          number: nextNumber(scope.current, 'BC', dbRef.current.purchases.map((x) => x.number)),
           date: input.date || today(),
           projectId: input.projectId ?? null,
           supplierId: input.supplierId,
@@ -370,6 +369,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           landed: (input.landed ?? []).filter((c) => c.amount > 0),
           importVat: input.importVat ?? 0,
           landedPaidWith: input.landedPaidWith ?? 'BANK',
+          paidWith: input.paidWith ?? 'CASH',
           withholding: input.withholding ?? 0,
           createdAt: new Date().toISOString(),
         };

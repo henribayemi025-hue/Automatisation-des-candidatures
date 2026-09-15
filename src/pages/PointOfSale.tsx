@@ -87,6 +87,18 @@ export default function PointOfSale() {
   function addToCart(productId: string) {
     const product = db.products.find((p) => p.id === productId);
     if (!product) return;
+    // Plancher de stock (ligne 3 du tableau docs/SIMULATION-DECISIONS.md) :
+    // on ne vend pas en silence ce que l'appareil ne voit plus en rayon. La
+    // caissière peut passer outre, en le sachant ; rien n'est refusé de force.
+    if (withStock) {
+      const inCart = cart.find((l) => l.productId === productId)?.qty ?? 0;
+      if (inCart + 1 > product.stock) {
+        const ok = window.confirm(
+          t('{name} : {stock} en stock d’après cet appareil, {qty} déjà dans le panier. Vendre quand même ? Le stock passera sous zéro.', { name: product.name, stock: product.stock, qty: inCart }),
+        );
+        if (!ok) return;
+      }
+    }
     setCart((prev) => {
       const existing = prev.find((l) => l.productId === productId);
       if (existing) {

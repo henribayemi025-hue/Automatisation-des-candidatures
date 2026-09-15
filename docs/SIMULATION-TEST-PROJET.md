@@ -31,3 +31,16 @@ Le journal est bien en ajout seul et seul le propriétaire supprime l'espace : u
 ## Non fait ici
 
 Les 5 puis 20 caissiers **depuis l'application** (temps réel, canal, doublons sur réseau lent) demandent des navigateurs qui atteignent le projet de test ; la machine de simulation n'a pas de réseau sortant. Les comptes et l'espace sont prêts pour le faire depuis un poste connecté (`VITE_SUPABASE_URL` / clé publiable du projet de test).
+
+## Après le correctif des rôles (migration `20260915190000_finia_events_role_guard.sql`, posée sur le projet de test seulement)
+
+| Qui | Geste | Avant | Après |
+|---|---|---|---|
+| caissier-01 | `workspace.reset` | accepté | **refusé** |
+| caissier-01 | `year.close`, `employee.save` | acceptés | **refusés** |
+| caissier-01 | `sale.record` | accepté | accepté |
+| comptable | `entry.manual`, `year.close` | acceptés | acceptés |
+| comptable | `company.update` | accepté | **refusé** |
+| gérante | `company.update` | accepté | accepté |
+
+Trois refus attendus, trois obtenus, zéro refus manquant (bloc rejoué puis annulé). La grille est celle des menus de l'application. **Non posée en production** : Beau décide.

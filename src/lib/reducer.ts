@@ -126,6 +126,16 @@ function post(
   entry: Omit<JournalEntry, 'createdAt' | 'createdBy' | 'posted'>,
 ): JournalEntry {
   const lines = entry.lines.filter((l) => l.debit !== 0 || l.credit !== 0);
+  // Un exercice clôturé est fermé : y dater une écriture après coup fausserait
+  // le résultat déjà arrêté sans que rien ne le montre (ligne 5 du tableau
+  // docs/SIMULATION-DECISIONS.md). Seules les écritures de clôture et de
+  // réouverture (journal CL) y ont leur place ; pour le reste, on rouvre d'abord.
+  if (entry.journal !== 'CL') {
+    const closed = db.closings.find((c) => entry.date >= c.from && entry.date <= c.to);
+    if (closed) {
+      throw new Error(`Exercice ${closed.from} → ${closed.to} clôturé : rouvrez-le avant d'y passer une écriture datée du ${entry.date}`);
+    }
+  }
   const debit = lines.reduce((s, l) => s + l.debit, 0);
   const credit = lines.reduce((s, l) => s + l.credit, 0);
   if (debit !== credit) {
@@ -546,7 +556,7 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
           sourceId: purchase.id,
           lines: [
             { account: accountCode(chart, 'SUPPLIERS'), label: 'Règlement fournisseur', debit: purchase.paid, credit: 0 },
-            { account: accountCode(chart, 'CASH'), label: 'Sortie de caisse', debit: 0, credit: purchase.paid },
+            { account: methodAccount(chart, purchase.paidWith ?? 'CASH'), label: 'Règlement', debit: 0, credit: purchase.paid },
           ],
         });
       }

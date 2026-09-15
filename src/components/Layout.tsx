@@ -164,6 +164,11 @@ export default function Layout({ children }: { children: ReactNode }) {
     setDemo(false);
     void signOut();
   }
+  const [signOutNotice, setSignOutNotice] = useState('');
+  async function leave() {
+    const refused = await signOut();
+    setSignOutNotice(refused ?? '');
+  }
   const location = useLocation();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -369,12 +374,15 @@ export default function Layout({ children }: { children: ReactNode }) {
                   {t('Équipe')}
                 </NavLink>
                 <button
-                  onClick={() => void signOut()}
+                  onClick={() => void leave()}
                   className="flex w-full items-center gap-3 rounded-input px-3 py-2 text-left text-body text-[#D14343] hover:bg-[#FDEDED]"
                 >
                   <IconLogout />
                   {user ? t('Se déconnecter') : t('Quitter le mode local')}
                 </button>
+                {signOutNotice && (
+                  <p className="mt-1 rounded-input bg-[#FDEDED] px-3 py-2 text-caption font-semibold text-[#A63030]">{signOutNotice}</p>
+                )}
               </div>
             )}
           </div>

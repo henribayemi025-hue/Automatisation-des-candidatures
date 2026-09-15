@@ -58,3 +58,17 @@ tests compris. « ☐ » : à cocher par Beau quand c'est traité.
 ## Ce qui a tenu
 
 Pour que la liste ne cache pas l'essentiel : sur 21 entreprises et dix ans (cinq pour la supérette), balance, bilan, clôture, report à nouveau, taxe déclarée et FEC sont restés justes à chaque horizon ; les exercices décalés (Royaume-Uni, Afrique du Sud, Éthiopie) se clôturent bien ; le précompte IGS, les frais d'approche, les immobilisations et la paie font ce qu'ils doivent ; aucune devise n'est jamais supposée. Les casses sont dans le volume, la synchronisation, les droits, et dans ce que le produit ne sait pas encore représenter (encaissements d'avance, dépôts, tiers, retours, lots).
+
+## Correctifs prêts, en attente de mise en ligne (branche `correctifs-simulation`)
+
+Dans l'ordre demandé par Beau. Rien n'est sur `main`, donc rien n'est en ligne.
+
+| Ligne | Correctif | Où | Vérifié par |
+|---|---|---|---|
+| 1 | Numéro de ticket = préfixe + marque de l'appareil + compteur local (`FA-K7X-00001`), jamais réattribué ; identique sur tous les appareils quel que soit l'ordre d'arrivée | `src/lib/numbering.ts`, `store.tsx` | `scripts/correctifs-check.ts`, vente en navigateur |
+| 7 + 8 | Un envoi refusé pour clé déjà présente compte comme réussi ; la déconnexion envoie d'abord la file et refuse de partir s'il reste des opérations, en le disant | `collab.tsx`, `Layout.tsx` | lecture, typage, build |
+| 4 | L'identifiant est marqué « appliqué » avant l'envoi : le message temps réel ne compte plus deux fois | `collab.tsx` | lecture, typage, build |
+| 3 | Plancher de stock en caisse : au-delà de ce que l'appareil voit en rayon, confirmation explicite ; alerte « stock sous zéro » sur l'accueil et dans le résumé de l'IA | `PointOfSale.tsx`, `assistant.ts` | build |
+| 13 | « Payé avec » sur un achat (espèces, mobile, banque) ; sans le champ, la caisse comme avant | `types.ts`, `store.tsx`, `reducer.ts`, `Purchases.tsx` | `correctifs-check.ts`, formulaire en navigateur |
+| 8 | Rôles côté base : grille rôle × type d'événement dans la règle d'insertion | migration `20260915190000` (projet de test seulement) | scénarios sur le projet de test |
+| 5 | Écriture datée dans un exercice clôturé refusée avec un message ; clôture et réouverture passent toujours | `reducer.ts` (`post`) | `correctifs-check.ts`, 15 scripts *-check |

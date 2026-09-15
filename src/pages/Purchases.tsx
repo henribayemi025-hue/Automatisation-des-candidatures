@@ -46,6 +46,7 @@ export default function Purchases() {
   const [landedRaw, setLandedRaw] = useState<Record<LandedCostKind, string>>({ CUSTOMS: '', FREIGHT: '', FORWARDING: '', INSURANCE: '', HANDLING: '', OTHER: '' });
   const [importVatRaw, setImportVatRaw] = useState('');
   const [landedPaidWith, setLandedPaidWith] = useState<PaymentMethod>('BANK');
+  const [paidWith, setPaidWith] = useState<PaymentMethod>('CASH');
 
   const fxRate = Number(fxRateRaw.replace(',', '.')) || 0;
   /** Convertit un montant en devise étrangère (mineures) vers la devise de l'entreprise (mineures). */
@@ -122,6 +123,7 @@ export default function Purchases() {
       landed: LANDED_KINDS.map((k) => ({ kind: k.id, label: t(k.label), amount: toMinor(landedRaw[k.id] || 0, currency) })).filter((c) => c.amount > 0),
       importVat,
       landedPaidWith,
+      paidWith,
       withholding: withholdingAmount,
     });
     reset();
@@ -431,9 +433,18 @@ export default function Purchases() {
         )}
 
         <div className="mt-4">
-          <Field label={t('Montant payé au fournisseur à la commande ({c})', { c: currency })} hint={t('Le solde devient une dette fournisseur. Les frais d’approche, eux, sont réglés à la réception.')}>
-            <input value={paidRaw} onChange={(e) => setPaidRaw(e.target.value)} inputMode="decimal" className="field num" />
-          </Field>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label={t('Montant payé au fournisseur à la commande ({c})', { c: currency })} hint={t('Le solde devient une dette fournisseur. Les frais d’approche, eux, sont réglés à la réception.')}>
+              <input value={paidRaw} onChange={(e) => setPaidRaw(e.target.value)} inputMode="decimal" className="field num" />
+            </Field>
+            <Field label={t('Payé avec')} hint={t('Le compte débité : un virement ne sort pas de la caisse.')}>
+              <select value={paidWith} onChange={(e) => setPaidWith(e.target.value as PaymentMethod)} className="field">
+                <option value="CASH">{t('Espèces')}</option>
+                <option value="MOBILE">{t('Mobile money')}</option>
+                <option value="BANK">{t('Banque')}</option>
+              </select>
+            </Field>
+          </div>
         </div>
 
         <div className="mt-6 flex justify-end gap-2">

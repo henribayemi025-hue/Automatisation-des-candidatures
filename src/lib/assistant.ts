@@ -237,6 +237,8 @@ export function insights(db: DB): { tone: 'good' | 'warn' | 'bad'; text: string 
   }
 
   if (s.outOfStock > 0) list.push({ tone: 'bad', text: t('{n} produit(s) en rupture : chaque jour sans stock est une vente perdue.', { n: s.outOfStock }) });
+  const negative = db.products.filter((p) => !p.archived && p.stock < 0);
+  if (negative.length) list.push({ tone: 'bad', text: t('{n} article(s) ont un stock sous zéro ({names}) : des ventes ont dépassé le rayon, souvent deux caisses hors ligne. Faites un inventaire et un ajustement.', { n: negative.length, names: negative.slice(0, 3).map((p) => p.name).join(', ') }) });
   if (s.lowStock > 0) list.push({ tone: 'warn', text: t('{n} produit(s) sous le seuil de réappro : préparez une commande fournisseur.', { n: s.lowStock }) });
 
   const errors = runAuditChecks(db.accounts, db.entries).filter((c) => c.severity === 'ERROR');

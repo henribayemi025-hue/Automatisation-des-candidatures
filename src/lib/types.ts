@@ -224,6 +224,8 @@ export interface Purchase {
   importVat?: Minor;
   /** Avec quoi les frais d'approche et la TVA de douane ont été payés. */
   landedPaidWith?: PaymentMethod;
+  /** Avec quoi le montant payé à la commande a été réglé. Absent : espèces (comportement d'origine). */
+  paidWith?: PaymentMethod;
   /** Précompte sur achat retenu par le fournisseur : un acompte d'impôt, pas une charge. */
   withholding?: Minor;
   createdAt: ISODate;
