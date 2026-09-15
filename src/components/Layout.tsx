@@ -13,6 +13,7 @@ import CommandPalette from './CommandPalette';
 import AssistantDrawer from './AssistantDrawer';
 import ModuleIntro from './ModuleIntro';
 import Tour, { startTour } from './Tour';
+import OfflineBar from './OfflineBar';
 import PresenceAvatars, { Avatar } from './PresenceAvatars';
 import TabBar, { TAB_BAR_SPACE } from './TabBar';
 import {
@@ -371,6 +372,8 @@ export default function Layout({ children }: { children: ReactNode }) {
             )}
           </div>
         </header>
+
+        <OfflineBar />
 
         {demo && (
           <div className="flex flex-wrap items-center gap-3 border-b border-brass/40 bg-[#FBF1DF] px-4 py-2.5 text-caption text-ink sm:px-6">

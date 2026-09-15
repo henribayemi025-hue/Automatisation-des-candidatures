@@ -304,6 +304,41 @@ Quand un fournisseur, souvent un grossiste, retient un précompte sur sa facture
 
 Le précompte n'est ni une charge ni un coût du stock : c'est de l'argent déjà versé à l'État, qui viendra en moins de votre impôt. Son cumul s'affiche dans l'écran *Déclaration de TVA* (qui explique alors qu'il n'y a pas de TVA à déclarer).
 
+## 21 ter. Sans réseau, et installer l'application
+
+### L'application fonctionne sans connexion
+
+Dès votre première ouverture avec du réseau, Finjaro Accounting se garde sur l'appareil. Ensuite, elle s'ouvre et fonctionne même sans connexion : vous vendez, vous encaissez, vous imprimez le ticket, vous saisissez des dépenses, vous consultez le stock, le journal, la balance et le bilan.
+
+Quand le réseau manque, un bandeau le dit en haut de l'écran, et précise que vous pouvez continuer. Il disparaît dès que la connexion revient.
+
+### Ce qui demande quand même le réseau
+
+| Fonction | Sans réseau |
+| --- | --- |
+| Vendre, encaisser, imprimer le ticket | Oui |
+| Caisse, dépenses, achats, stock, personnel | Oui |
+| Journal, balance, bilan, TVA, clôture, rapports, FEC | Oui |
+| Assistant complet (photos, questions libres) | Non — l'assistant répond alors avec le moteur local, qui lit vos chiffres sur l'appareil |
+| Travail à plusieurs, sauvegarde en ligne | Non — vos opérations sont mises en file et partent au retour du réseau |
+| Connexion à un compte, création de compte | Non |
+
+Avec un compte, rien n'est perdu : chaque opération faite hors réseau attend dans une file, et le bandeau indique combien d'opérations partiront à la reconnexion.
+
+### Installer l'application
+
+Installée, elle s'ouvre dans sa propre fenêtre, sans barre d'adresse, comme un logiciel — sur téléphone comme sur ordinateur.
+
+- **Ordinateur (Chrome, Edge)** : l'icône d'installation dans la barre d'adresse, ou Paramètres → *Sur cet appareil* → **Installer l'application**.
+- **Android** : le menu du navigateur, puis « Installer l'application ».
+- **iPhone, iPad** : le bouton Partager, puis « Sur l'écran d'accueil ».
+
+Paramètres → *Sur cet appareil* dit si l'application est bien gardée sur la machine et si elle est déjà installée.
+
+### Les mises à jour
+
+Il n'y a rien à télécharger. Quand une nouvelle version est en ligne, un bandeau propose **Mettre à jour** : elle s'installe au rechargement, quand vous le décidez. Jamais au milieu d'une vente.
+
 ## 22. Questions fréquentes
 
 **J'ai validé une vente et rien ne s'est passé.** Le ticket s'affiche par-dessus l'écran ; sur téléphone, il apparaît en bas. Si vous ne le voyez pas, la vente est quand même dans *Ventes*.
@@ -315,5 +350,9 @@ Le précompte n'est ni une charge ni un coût du stock : c'est de l'argent déj�
 **Mon comptable veut mes écritures.** *Journal* → Excel, ou *Documents* → FEC. La balance à six colonnes s'exporte aussi en Excel.
 
 **Je change de plan comptable.** Paramètres → plan comptable. Les numéros de compte changent, les écritures existantes gardent les leurs.
+
+**Le réseau a sauté pendant la journée.** Continuez : tout est enregistré sur l'appareil. Avec un compte, les opérations partent en ligne dès le retour du réseau.
+
+**Je veux l'utiliser comme un logiciel installé.** Paramètres → *Sur cet appareil* → Installer l'application. Voir la section 21 ter.
 
 **Je travaille sans compte.** Les données restent sur l'appareil. Créez un compte pour les sauvegarder en ligne et travailler à plusieurs.

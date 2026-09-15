@@ -4,6 +4,7 @@ import { hasContent, useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
 import { CURRENCIES, currencyLabel } from '../lib/money';
 import { TAX_REGIMES, taxRegime } from '../lib/countries';
+import { useOffline } from '../lib/offline';
 import { SECTORS } from '../lib/guide';
 import { sectorProfile, tracksStock } from '../lib/sector';
 import { startTour } from '../components/Tour';
@@ -29,6 +30,7 @@ export default function Settings() {
   const [confirmReset, setConfirmReset] = useState(false);
   const [applied, setApplied] = useState('');
   const { choice, setChoice } = useTheme();
+  const { installedOffline, canInstall, isInstalled, install } = useOffline();
   const [confirmDemo, setConfirmDemo] = useState(false);
   const [demoDone, setDemoDone] = useState('');
   const c = db.company;
@@ -55,6 +57,36 @@ export default function Settings() {
               {t('Manuel d’utilisation')}
             </Link>
             <LanguageSwitch full />
+          </div>
+        </div>
+
+        {/* Une boutique dont le réseau saute doit pouvoir continuer. Cette carte
+            dit où on en est et propose l'installation quand le navigateur le permet. */}
+        <div className="card lg:col-span-2">
+          <h2 className="text-section">{t('Sur cet appareil')}</h2>
+          <p className="mt-1 text-caption text-muted">
+            {installedOffline
+              ? t('Gardée sur cet appareil : elle s’ouvre et fonctionne sans réseau.')
+              : t('L’application se garde sur cet appareil dès la première visite en ligne. Rouvrez-la une fois connecté pour terminer.')}
+          </p>
+          <ul className="mt-3 space-y-1 text-caption text-ink/85">
+            <li>{t('Ventes, dépenses, caisse, stock et comptabilité : sans réseau.')}</li>
+            <li>{t('Assistant complet et travail à plusieurs : réseau nécessaire.')}</li>
+          </ul>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            {isInstalled ? (
+              <span className="rounded-pill border border-teal/40 bg-teal/10 px-3 py-1.5 text-caption font-semibold text-teal">
+                {t('Installée sur cet appareil')}
+              </span>
+            ) : canInstall ? (
+              <button onClick={() => void install()} className="btn-primary py-1.5 text-caption">
+                {t('Installer l’application')}
+              </button>
+            ) : (
+              <p className="text-caption text-muted">
+                {t('Pour l’installer : sur ordinateur, l’icône d’installation dans la barre d’adresse ; sur iPhone, Partager puis « Sur l’écran d’accueil » ; sur Android, le menu du navigateur puis « Installer ».')}
+              </p>
+            )}
           </div>
         </div>
 

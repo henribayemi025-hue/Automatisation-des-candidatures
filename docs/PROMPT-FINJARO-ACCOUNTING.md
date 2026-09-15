@@ -38,6 +38,7 @@ Ambition : une place de marché et des outils **mondiaux**. Le Cameroun est le m
 ## 5. Pile technique
 
 - React 18 + TypeScript + Vite + Tailwind (jetons CSS en variables, mode sombre via `.dark`), HashRouter.
+- **Application installable et hors réseau** : `public/manifest.webmanifest`, icônes dans `public/icons/`, service worker produit par `scripts/build-sw.mjs` après `vite build` (il connaît les noms de fichiers empreintés, et son contenu change à chaque version, ce qui déclenche la proposition de mise à jour). État exposé par `src/lib/offline.tsx` (`online`, `updateReady`, `canInstall`, `isInstalled`), bandeaux dans `src/components/OfflineBar.tsx`. Rien ne s'enregistre en développement.
 - Tests navigateur avec Playwright (`/opt/pw-browsers/chromium`, `locale: 'fr-FR'`). Le bac à sable n'atteint ni Supabase, ni Google, ni Gemini : tester en mode local / démonstration.
 - Scripts de vérification : `npx vite-node scripts/<nom>.ts` — demo-check (args : date, pays), tax-check, party-check, closing-check, fec-check, payroll-check, import-check, cash-check, regime-check, identity-check, oauth-check, service-check. **Tous doivent être verts avant de pousser.** `npx tsc --noEmit -p .` aussi.
 - Auth Supabase en flux PKCE (obligatoire avec HashRouter). Connexion par téléphone = e-mail synthétique `chiffres@tel.finjaro.net`. Connexion Google : Beau doit ajouter l'URL de redirection dans Supabase, sinon ça rebondit.

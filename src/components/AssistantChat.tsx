@@ -13,6 +13,7 @@ import type { PaymentMethod } from '../lib/types';
 import { EXPENSE_LABEL } from '../lib/expenses';
 import { IconAlert, IconCheck, IconChevronRight, IconSend, IconSparkle } from './Icons';
 import { t } from '../lib/i18n';
+import { useOffline } from '../lib/offline';
 
 interface Message {
   id: number;
@@ -41,6 +42,7 @@ const GENERIC = [
 export default function AssistantChat({ compact = false }: { compact?: boolean }) {
   const { db, saveProduct, addExpense } = useStore();
   const { user } = useCollab();
+  const { online } = useOffline();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -71,7 +73,11 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
     const history = [...messages, userMsg];
     setMessages(history);
 
-    if (user) {
+    if (user && !online) {
+      setNotice(t('Pas de réseau : je réponds avec le moteur local, qui lit vos chiffres sur cet appareil. L’assistant complet (photos, explications libres) revient avec la connexion.'));
+    }
+
+    if (user && online) {
       setBusy(true);
       try {
         const payload: AIMessage[] = history.map((m) => ({ role: m.role, text: m.text }));

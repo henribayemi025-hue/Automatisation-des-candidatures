@@ -6,11 +6,13 @@ import { StoreProvider } from './lib/store';
 import { CollabProvider } from './lib/collab';
 import { ThemeProvider } from './lib/theme';
 import { LangProvider } from './lib/i18n';
+import { OfflineProvider } from './lib/offline';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ThemeProvider>
+      <OfflineProvider>
       <StoreProvider>
         <CollabProvider>
           {/* Monté ici, sous le magasin et la synchro : changer de langue
@@ -24,6 +26,7 @@ createRoot(document.getElementById('root')!).render(
           </LangProvider>
         </CollabProvider>
       </StoreProvider>
+      </OfflineProvider>
     </ThemeProvider>
   </React.StrictMode>,
 );

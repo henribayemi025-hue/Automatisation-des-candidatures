@@ -375,3 +375,42 @@ pas compris s'il parle de comptes à longueur fixe (4431000) ou d'autre chose.
 - Pas fait : le côté **vendeur** (un grossiste qui retient lui-même le
   précompte sur ses ventes). À faire quand le fiscaliste aura confirmé le
   traitement voulu.
+
+## Sans réseau et installation (15/09/2026)
+
+Demande de Beau : « comme les applis genre Money Manager, quelqu'un télécharge
+et tout marche même sans internet ; les parties obligées d'être connectées le
+demandent ».
+
+Ce qui est en place :
+
+- L'application se garde sur l'appareil dès la première ouverture en ligne.
+  Ensuite elle **s'ouvre et fonctionne sans réseau** : vente, ticket imprimé,
+  caisse, dépenses, stock, journal, balance, bilan.
+- Elle **s'installe** sur l'écran d'accueil du téléphone et sur le bureau d'un
+  ordinateur, dans sa propre fenêtre. Paramètres → « Sur cet appareil ».
+- Bandeau « Pas de réseau » qui dit qu'on peut continuer, et compte les
+  opérations qui partiront à la reconnexion. Il disparaît au retour du réseau.
+- Bandeau « Nouvelle version prête » avec un bouton **Mettre à jour** :
+  jamais de rechargement au milieu d'une vente.
+- L'assistant, hors réseau, répond avec le moteur local au lieu d'attendre un
+  appel qui va échouer, et le dit.
+
+À tester par Beau :
+
+1. Ouvrir le lien, attendre quelques secondes, **fermer l'onglet**.
+2. Couper les données mobiles et le wifi.
+3. Rouvrir le lien : l'application doit s'ouvrir, avec ses chiffres.
+4. Faire une vente : le ticket doit sortir.
+5. Remettre le réseau : le bandeau disparaît.
+6. Paramètres → « Sur cet appareil » → **Installer l'application** (sur
+   ordinateur Chrome ou Edge, et sur Android). Sur iPhone : Partager puis
+   « Sur l'écran d'accueil ».
+
+Vérifié en machine, à 1 280 px et 390 px : service worker actif, réouverture
+sans réseau, vente et ticket hors réseau, balance équilibrée hors réseau,
+police conservée, bandeaux affichés et retirés, mise à jour proposée puis
+appliquée, aucune erreur JavaScript.
+
+Ce qui demande toujours le réseau, et le dit : assistant complet, création et
+connexion de compte, travail à plusieurs.
