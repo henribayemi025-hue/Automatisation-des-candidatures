@@ -218,13 +218,19 @@ comme après). Rien n'a été corrigé en production.
   marché, `finia_members` est une table d'Accounting seule. Rejeu de l'attaque :
   refusée. Parcours légitime complet (inviter, changer un rôle, accepter) :
   passe. Base inchangée après essais. **L'écran Équipe peut être ouvert.**
-- 🔴 **Sans compte, tout est perdu et rien n'est récupérable.** Le mode local
+- ✅ **15/09 — CORRIGÉ : sans compte, tout était perdu et rien n'était récupérable.** Le mode local
   que l'application propose activement ne range les chiffres que dans
   `localStorage` : 552 578 octets mesurés, 263 ventes, 576 écritures. Vider le
   cache ou changer de téléphone efface tout, définitivement. Avec un compte, en
   revanche, rien n'est perdu : `finia_events` plus l'instantané reconstruisent
-  tout. Proposé : avertir à l'écran, offrir un export, proposer le compte au-delà
-  d'un seuil. **En attente de l'accord de Beau.**
+  tout. Corrigé avec l'accord de Beau : sauvegarde dans un fichier depuis les
+  réglages, rechargement avec confirmation comparative, et bandeau
+  d'avertissement au-delà de dix opérations sans compte. Un trou trouvé pendant
+  le test a été bouché : après un effacement complet l'application repart sur
+  l'écran de connexion, donc le rechargement y est proposé aussi, sinon la
+  restauration était inatteignable pour qui change de téléphone. Cycle complet
+  vérifié sur un appareil réellement vidé : 263 ventes sauvegardées, effacées,
+  retrouvées.
 - 🟠 **Le journal est inviolable, l'instantané ne l'est pas.** `finia_events`
   n'a ni règle `UPDATE` ni règle `DELETE` : un événement écrit ne peut être ni
   modifié ni effacé, par personne. Mais `loadWorkspace` part de

@@ -339,6 +339,41 @@ Paramètres → *Sur cet appareil* dit si l'application est bien gardée sur la 
 
 Il n'y a rien à télécharger. Quand une nouvelle version est en ligne, un bandeau propose **Mettre à jour** : elle s'installe au rechargement, quand vous le décidez. Jamais au milieu d'une vente.
 
+## 21 quater. Sauvegarder, et changer d'appareil
+
+### Pourquoi c'est important
+
+Si vous travaillez **sans compte**, tout ce que vous saisissez ne vit que dans
+cet appareil. Changer de téléphone, vider le cache du navigateur ou
+désinstaller efface la caisse, le stock, les factures et la paie, sans retour
+possible. Au-delà de dix opérations, l'application vous le rappelle en haut de
+l'écran.
+
+Avec un compte, vos données sont gardées en ligne et se retrouvent sur
+n'importe quel appareil. La sauvegarde reste utile : une copie chez vous ne
+dépend de personne.
+
+### Enregistrer une sauvegarde
+
+1. Paramètres, puis la carte **Sauvegarde**.
+2. **Enregistrer une sauvegarde**.
+3. Sur téléphone, choisissez où la ranger : Fichiers, Drive, ou envoyez-la-vous
+   sur WhatsApp. Sur ordinateur, elle part dans vos téléchargements.
+
+Le fichier porte le nom de votre entreprise et la date. Faites-le au moins une
+fois par semaine si vous n'avez pas de compte.
+
+### Retrouver ses chiffres sur un autre appareil
+
+- **Vous avez un compte** : connectez-vous, tout revient tout seul.
+- **Vous n'avez pas de compte** : sur l'écran de connexion, cliquez
+  **Recharger une sauvegarde**, à côté de « Vous changez d'appareil ? », puis
+  choisissez votre fichier.
+
+Vous pouvez aussi recharger depuis Paramètres si l'application est déjà
+ouverte. Une fenêtre vous montre alors ce que contient le fichier et ce qui va
+être remplacé, avant de confirmer.
+
 ## 22. Questions fréquentes
 
 **J'ai validé une vente et rien ne s'est passé.** Le ticket s'affiche par-dessus l'écran ; sur téléphone, il apparaît en bas. Si vous ne le voyez pas, la vente est quand même dans *Ventes*.
@@ -354,5 +389,7 @@ Il n'y a rien à télécharger. Quand une nouvelle version est en ligne, un band
 **Le réseau a sauté pendant la journée.** Continuez : tout est enregistré sur l'appareil. Avec un compte, les opérations partent en ligne dès le retour du réseau.
 
 **Je veux l'utiliser comme un logiciel installé.** Paramètres → *Sur cet appareil* → Installer l'application. Voir la section 21 ter.
+
+**J'ai changé de téléphone et j'ai tout perdu.** Sans compte, il n'y a pas de copie en ligne. Si vous aviez enregistré une sauvegarde, rechargez-la depuis l'écran de connexion. Sinon, les données ne sont pas récupérables. Créez un compte, c'est ce qui évite ce cas.
 
 **Je travaille sans compte.** Les données restent sur l'appareil. Créez un compte pour les sauvegarder en ligne et travailler à plusieurs.

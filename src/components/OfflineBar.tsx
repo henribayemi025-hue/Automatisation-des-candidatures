@@ -1,19 +1,36 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useOffline } from '../lib/offline';
+import { useDB } from '../lib/store';
+import { isDemo } from '../lib/demo-state';
 import { useCollab } from '../lib/collab';
-import { IconAlert, IconCheck, IconSparkle } from './Icons';
+import { IconAlert, IconCheck, IconSparkle, IconX } from './Icons';
 import { t } from '../lib/i18n';
 
+const LOCAL_WARN_KEY = 'finia.localwarn.hidden';
+
 /**
- * Deux bandeaux, jamais plus d'un à la fois :
+ * Trois bandeaux, jamais plus d'un à la fois :
  *
  * — Hors réseau : dire que ça continue de marcher. Un commerçant qui voit
  *   « pas de connexion » range son téléphone ; il doit lire l'inverse.
+ * — Sans compte, travail réel : dire que rien n'existe ailleurs que sur cet
+ *   appareil. C'est la perte la plus grave qu'on ait (point 2 de
+ *   docs/SECURITE-2026-09-15.md), et se taire serait une faute.
  * — Mise à jour prête : proposer, ne jamais recharger sous les doigts de
  *   quelqu'un en train d'encaisser.
  */
 export default function OfflineBar() {
   const { online, updateReady, applyUpdate } = useOffline();
   const { user, pending } = useCollab();
+  const db = useDB();
+  const [hidden, setHidden] = useState(() => {
+    try {
+      return localStorage.getItem(LOCAL_WARN_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
 
   if (!online) {
     return (
@@ -27,6 +44,39 @@ export default function OfflineBar() {
             {t('{n} opération(s) partiront au retour du réseau', { n: pending })}
           </span>
         )}
+      </div>
+    );
+  }
+
+  // Sans compte, rien n'existe ailleurs que dans ce navigateur. Tant qu'il n'y
+  // a que la démonstration ou deux essais, le dire serait du bruit ; dès qu'il
+  // y a du vrai travail, se taire serait une faute. Seuil : dix opérations.
+  const travailLocal = db.sales.length + db.expenses.length;
+  if (!user && !isDemo() && travailLocal >= 10 && !hidden) {
+    return (
+      <div className="flex flex-wrap items-center gap-2.5 border-b border-[#D14343]/30 bg-[#FDEDED] px-4 py-2 text-caption text-ink sm:px-6">
+        <IconAlert className="h-4 w-4 shrink-0 text-[#A63030]" />
+        <span>
+          <strong>{t('Vos chiffres ne sont que sur cet appareil')}</strong> —{' '}
+          {t('{n} opérations enregistrées, et rien ailleurs. Changer de téléphone ou vider le cache les efface.', { n: travailLocal })}
+        </span>
+        <Link to="/parametres" className="btn-brass ml-auto py-1 text-caption">
+          {t('Sauvegarder ou créer un compte')}
+        </Link>
+        <button
+          onClick={() => {
+            try {
+              localStorage.setItem(LOCAL_WARN_KEY, '1');
+            } catch {
+              /* stockage indisponible : on masque au moins pour cette session */
+            }
+            setHidden(true);
+          }}
+          aria-label={t('Masquer')}
+          className="rounded-full p-1 text-muted hover:bg-brass/20"
+        >
+          <IconX className="h-4 w-4" />
+        </button>
       </div>
     );
   }

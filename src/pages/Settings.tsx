@@ -5,6 +5,7 @@ import { useCollab } from '../lib/collab';
 import { CURRENCIES, currencyLabel } from '../lib/money';
 import { TAX_REGIMES, taxRegime } from '../lib/countries';
 import { useOffline } from '../lib/offline';
+import BackupCard from '../components/BackupCard';
 import { SECTORS } from '../lib/guide';
 import { sectorProfile, tracksStock } from '../lib/sector';
 import { startTour } from '../components/Tour';
@@ -304,6 +305,8 @@ export default function Settings() {
             )}
           </div>
         </div>
+
+        <BackupCard />
 
         {c.mode === 'EXPERT' && (
           <div className="card lg:col-span-2">

@@ -172,6 +172,8 @@ export interface StoreActions {
   postMessage: (input: Omit<Message, 'id' | 'createdAt' | 'authorId' | 'authorName'> & { authorName?: string; authorId?: string | null }) => Message;
   assignToProject: (kind: 'sale' | 'purchase' | 'expense', id: string, projectId: string | null) => void;
   resetAll: () => void;
+  /** Remplace tout le contenu de l'espace par une sauvegarde relue depuis un fichier. */
+  restoreBackup: (db: DB) => void;
 }
 
 export interface StoreValue extends StoreActions {
@@ -622,6 +624,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
       assignToProject(kind, id, projectId) {
         dispatch('project.assign', { kind, id, projectId });
+      },
+
+      restoreBackup(next) {
+        dispatch('workspace.restore', { db: next });
       },
 
       resetAll() {

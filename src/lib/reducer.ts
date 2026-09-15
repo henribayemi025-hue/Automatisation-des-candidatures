@@ -1101,6 +1101,16 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       break;
     }
 
+    case 'workspace.restore': {
+      // Recharger une sauvegarde est un événement comme un autre : il part en
+      // ligne, les autres appareils convergent, et l'historique garde la trace
+      // du remplacement. Un simple remplacement d'état local ne ferait ni l'un
+      // ni l'autre — la restauration disparaîtrait à la reconstruction suivante.
+      const restored = normalizeDB(p.db as Partial<DB>);
+      audit(restored, ev, 'workspace', 'workspace', 'RESTORE', 'Sauvegarde rechargée');
+      return restored;
+    }
+
     case 'workspace.reset': {
       const fresh = emptyDB();
       fresh.company = { ...db.company };

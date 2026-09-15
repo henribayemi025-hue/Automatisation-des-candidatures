@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useCollab } from '../lib/collab';
+import { saveCache } from '../lib/store';
+import { BackupError, readBackup } from '../lib/backup';
 import { Field } from '../components/UI';
 import { LanguageSwitch } from '../lib/i18n';
 import AppSwitcher from '../components/AppSwitcher';
@@ -21,6 +23,12 @@ export default function Auth() {
   const [email, setEmail] = useState(displayIdentity(lastEmail));
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(false);
+  // Un téléphone neuf ouvre l'application ICI, pas dans les réglages : c'est
+  // donc ici que doit se trouver la porte de retour pour qui a une sauvegarde.
+  // Sans ça, quelqu'un qui change d'appareil voit l'écran de connexion et n'a
+  // aucun moyen de revenir à ses chiffres.
+  const backupRef = useRef<HTMLInputElement>(null);
+  const [backupError, setBackupError] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
@@ -39,6 +47,26 @@ export default function Auth() {
     setBusy(false);
     if (err) setError(err);
     else if (mode === 'signup') setNotice(t('Compte créé. Si un email de confirmation vous est envoyé, ouvrez-le puis connectez-vous.'));
+  }
+
+  function rechargerSauvegarde(file: File | undefined) {
+    setBackupError('');
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const backup = readBackup(String(reader.result ?? ''));
+        // On écrit d'abord dans le cache local, PUIS on entre en mode local :
+        // le mode local démarre en lisant ce cache, donc les chiffres sont
+        // déjà là quand l'application s'ouvre.
+        saveCache('guest', backup.data);
+        continueAsGuest();
+      } catch (e) {
+        setBackupError(e instanceof BackupError ? e.message : t('Ce fichier n’a pas pu être lu.'));
+      }
+    };
+    reader.onerror = () => setBackupError(t('Ce fichier n’a pas pu être lu.'));
+    reader.readAsText(file);
   }
 
   return (
@@ -192,6 +220,30 @@ export default function Auth() {
             <button type="button" onClick={continueAsGuest} className="text-caption font-medium text-muted underline-offset-4 hover:text-ink hover:underline">
               {t('Essayer sans compte (données sur cet appareil seulement)')}
             </button>
+
+            <p className="text-caption text-muted">
+              {t('Vous changez d’appareil ?')}{' '}
+              <button
+                type="button"
+                onClick={() => backupRef.current?.click()}
+                className="font-semibold text-teal underline-offset-4 hover:underline"
+              >
+                {t('Recharger une sauvegarde')}
+              </button>
+            </p>
+            <input
+              ref={backupRef}
+              type="file"
+              accept=".json,application/json"
+              className="hidden"
+              onChange={(e) => {
+                rechargerSauvegarde(e.target.files?.[0]);
+                e.target.value = '';
+              }}
+            />
+            {backupError && (
+              <p className="rounded-input border border-[#D14343]/40 bg-[#FDEDED] px-3 py-2 text-caption text-ink">{backupError}</p>
+            )}
             {/* La démonstration ouvre vraiment la démonstration : avant, ce
                 bouton entrait simplement en mode local, écran vide. */}
             <p className="text-caption text-muted">
