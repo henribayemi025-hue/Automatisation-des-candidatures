@@ -200,6 +200,54 @@ qu'on ouvre au navigateur: c'est un écran DANS une application installée.
   la place de marché n'est pas touché. Signalé le 15/09, pas appliqué:
   l'authentification ne se change pas sans l'accord de Beau.
 
+### Sécurité — audit du 15/09, rapport complet dans `docs/SECURITE-2026-09-15.md`
+
+Chaque manœuvre offensive a été jouée dans une transaction **annulée**, et
+l'annulation vérifiée après coup (0 membre, 4 espaces, 12 événements avant
+comme après). Rien n'a été corrigé en production.
+
+- 🔴 **Un utilisateur peut entrer dans l'espace comptable d'un autre.**
+  `finia_members_self_accept` ne contrôle que l'adresse e-mail : ni
+  `workspace_id` ni `role`. Une utilisatrice réelle simulée est passée de
+  « 0 événement lisible, 1 espace visible » à « 10 événements lisibles,
+  2 espaces visibles, rôle owner » en deux instructions SQL. Aucun déclencheur
+  sur la table, et `authenticated` peut modifier toutes les colonnes.
+  Limité aujourd'hui par deux choses seulement : `finia_members` est vide, et
+  il faut connaître l'UUID de l'espace visé. **À corriger avant d'ouvrir
+  l'écran Équipe.** Correctif additif proposé (déclencheur `finia_members_guard`),
+  sans effet sur la place de marché. **En attente de l'accord de Beau.**
+- 🔴 **Sans compte, tout est perdu et rien n'est récupérable.** Le mode local
+  que l'application propose activement ne range les chiffres que dans
+  `localStorage` : 552 578 octets mesurés, 263 ventes, 576 écritures. Vider le
+  cache ou changer de téléphone efface tout, définitivement. Avec un compte, en
+  revanche, rien n'est perdu : `finia_events` plus l'instantané reconstruisent
+  tout. Proposé : avertir à l'écran, offrir un export, proposer le compte au-delà
+  d'un seuil. **En attente de l'accord de Beau.**
+- 🟠 **Le journal est inviolable, l'instantané ne l'est pas.** `finia_events`
+  n'a ni règle `UPDATE` ni règle `DELETE` : un événement écrit ne peut être ni
+  modifié ni effacé, par personne. Mais `loadWorkspace` part de
+  `finia_workspaces.data` et n'ajoute que les événements postérieurs à
+  `snapshot_seq` — deux colonnes que le propriétaire peut réécrire. Les preuves
+  survivent en base ; l'écran, lui, montrerait les chiffres réécrits. À écrire
+  dans la documentation du fiscaliste : **le registre opposable est
+  `finia_events`, pas l'écran.**
+- 🟠 **Un téléphone perdu donne tout.** Cache en clair (noms et téléphones des
+  clients, salaires), plus `finia.auth` qui contient le jeton de
+  rafraîchissement. Proposé : verrou d'ouverture, et purge du cache à la
+  déconnexion.
+- ✅ **La clé du site est bien la clé publiable.** Aucune trace de
+  `service_role` dans aucun commit, aucun JWT en dur dans l'historique complet,
+  aucun fichier de secret jamais suivi par git.
+- ✅ **Un membre retiré perd l'accès immédiatement**, même session ouverte :
+  `finia_is_member` exige une ligne `status = 'active'`. Réserve à connaître :
+  le cache déjà téléchargé reste sur son appareil.
+- ✅ **On ne peut pas s'inviter chez autrui** : l'insertion exige d'être
+  propriétaire, et on n'accepte qu'une ligne portant sa propre adresse.
+- ℹ️ **Deux appareils hors réseau convergent** vers le même état (ordre par
+  `seq` du serveur, moteur déterministe, identifiant en clé primaire). Mais
+  aucun conflit métier n'est détecté : le stock peut passer sous zéro. L'écran
+  Audit le signale après coup.
+
 ### Reste à faire, sans blocage
 
 - Logo: les icônes actuelles sont un dessin provisoire fait faute de mieux.
