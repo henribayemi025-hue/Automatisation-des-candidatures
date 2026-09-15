@@ -206,16 +206,18 @@ Chaque manœuvre offensive a été jouée dans une transaction **annulée**, et
 l'annulation vérifiée après coup (0 membre, 4 espaces, 12 événements avant
 comme après). Rien n'a été corrigé en production.
 
-- 🔴 **Un utilisateur peut entrer dans l'espace comptable d'un autre.**
+- ✅ **15/09 — CORRIGÉ : un utilisateur pouvait entrer dans l'espace comptable d'un autre.**
   `finia_members_self_accept` ne contrôle que l'adresse e-mail : ni
   `workspace_id` ni `role`. Une utilisatrice réelle simulée est passée de
   « 0 événement lisible, 1 espace visible » à « 10 événements lisibles,
   2 espaces visibles, rôle owner » en deux instructions SQL. Aucun déclencheur
   sur la table, et `authenticated` peut modifier toutes les colonnes.
-  Limité aujourd'hui par deux choses seulement : `finia_members` est vide, et
-  il faut connaître l'UUID de l'espace visé. **À corriger avant d'ouvrir
-  l'écran Équipe.** Correctif additif proposé (déclencheur `finia_members_guard`),
-  sans effet sur la place de marché. **En attente de l'accord de Beau.**
+  Corrigé le jour même avec l'accord de Beau : migration additive
+  `20260915131114_finia_members_guard_invitation`, un déclencheur qui voit OLD
+  et NEW là où une politique RLS ne le peut pas. Sans effet sur la place de
+  marché, `finia_members` est une table d'Accounting seule. Rejeu de l'attaque :
+  refusée. Parcours légitime complet (inviter, changer un rôle, accepter) :
+  passe. Base inchangée après essais. **L'écran Équipe peut être ouvert.**
 - 🔴 **Sans compte, tout est perdu et rien n'est récupérable.** Le mode local
   que l'application propose activement ne range les chiffres que dans
   `localStorage` : 552 578 octets mesurés, 263 ventes, 576 écritures. Vider le
