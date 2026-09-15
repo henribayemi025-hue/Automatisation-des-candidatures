@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDB } from '../lib/store';
 import { sectorProfile, tracksStock } from '../lib/sector';
@@ -123,24 +123,40 @@ export default function Tour() {
   }, [navigate, pathname]);
 
   // Première visite : on propose la visite une fois, jamais deux.
+  //
+  // Le compte à rebours ne doit être armé QU'UNE FOIS. `navigate` change
+  // d'identité à chaque changement d'écran dans React Router 6 : sans ce
+  // garde-fou, l'effet se rejouait à chaque navigation et réarmait le minuteur,
+  // qui ramenait à l'accueil une seconde après chaque clic. Beau l'a vu le
+  // 15/09 : « je clique sur stock, deux secondes après ça me renvoie à
+  // l'accueil ». Ça durait tant que la visite n'avait pas été fermée.
+  const scheduled = useRef(false);
+  const timer = useRef<number | undefined>(undefined);
+
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
   useEffect(() => {
+    if (scheduled.current || !company.onboarded) return;
     let done = '1';
     try {
       done = localStorage.getItem(DONE_KEY) ?? '';
     } catch {
       done = '1';
     }
-    if (!done && company.onboarded) {
-      const id = window.setTimeout(() => {
-        setI(0);
-        setOpen(true);
-        // La première étape parle de l'accueil : on y va, au lieu de décrire
-        // l'accueil par-dessus la caisse ou les réglages.
-        if (window.location.hash !== '#/' && window.location.hash !== '') navigate('/');
-      }, 900);
-      return () => window.clearTimeout(id);
-    }
-    return undefined;
+    if (done) return;
+    scheduled.current = true;
+    const from = window.location.hash;
+    timer.current = window.setTimeout(() => {
+      // Si la personne s'est déjà mise à cliquer, elle sait ce qu'elle cherche :
+      // on ne lui prend pas la main. La visite se reproposera à la prochaine
+      // ouverture, et reste accessible depuis le menu du compte.
+      if (window.location.hash !== from) return;
+      setI(0);
+      setOpen(true);
+      // La première étape parle de l'accueil : on y va, au lieu de décrire
+      // l'accueil par-dessus la caisse ou les réglages.
+      if (from !== '#/' && from !== '') navigate('/');
+    }, 900);
   }, [company.onboarded, navigate]);
 
   useEffect(() => {

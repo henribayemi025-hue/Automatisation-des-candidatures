@@ -448,3 +448,23 @@ conséquence aujourd'hui, personne ne l'utilise encore pour de vrai.
 Reste à faire ailleurs, hors de ce dépôt : le sélecteur d'applications de la
 place de marché pointe peut-être encore vers l'ancienne adresse. À vérifier
 dans le dépôt de finjaro.net, que je ne touche pas.
+
+## Corrigé le 15/09 : tout écran revenait à l'accueil
+
+Signalé par Beau : « je clique sur vente, sur stock, et deux secondes après ça
+me renvoie à l'accueil ». Il a d'abord cru à une erreur de sa part. C'en était
+une de ma part.
+
+Tant que la visite guidée n'avait pas été fermée, **chaque** changement
+d'écran était annulé une seconde plus tard. Cause : le minuteur qui ouvre la
+visite au premier passage dépendait de `navigate`, dont l'identité change à
+chaque navigation dans React Router 6. L'effet se rejouait donc à chaque clic
+et réarmait le minuteur, qui ramenait à l'accueil.
+
+Le minuteur ne s'arme plus qu'une fois. Et si la personne s'est déjà mise à
+cliquer pendant la seconde d'attente, la visite ne lui prend pas la main :
+elle se represente à la prochaine ouverture, et reste dans le menu du compte.
+
+Vérifié : ouverture de stock, ventes et produits qui tiennent au bout de deux
+secondes ; la visite s'ouvre toujours pour un nouveau venu, « Suivant » emmène
+bien à l'écran de l'étape, « Passer » la ferme définitivement.
