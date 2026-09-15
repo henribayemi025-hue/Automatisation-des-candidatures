@@ -424,13 +424,22 @@ L'ancienne adresse `automatisation-des-candidatures.finjaro.workers.dev`
 continue de répondre : rien ne casse pendant la transition.
 
 À faire côté Supabase, sinon la connexion Google rebondira sur la nouvelle
-adresse comme elle le faisait sur l'ancienne :
+adresse comme elle le faisait sur l'ancienne. **Un seul réglage, et on
+n'en déplace aucun autre :**
 
-- Authentication → URL Configuration → **Site URL** :
-  `https://accounting.finjaro.net`
-- Authentication → URL Configuration → **Redirect URLs**, ajouter :
+- Authentication → URL Configuration → **Redirect URLs**, AJOUTER :
   `https://accounting.finjaro.net/**`
-  (garder l'ancienne entrée tant que les deux adresses servent).
+  (garder les entrées existantes tant que les autres adresses servent).
+
+**Le Site URL ne se touche pas.** Il reste `https://finjaro.net`.
+
+J'avais écrit ici le contraire le 15/09, et c'était faux. Le Site URL est
+global au projet Supabase, pas propre à une application, et il sert de base
+aux liens des e-mails d'authentification. Le `signUp()` de la place de marché
+ne passe aucun `emailRedirectTo` : le lien de confirmation de chaque nouvelle
+inscription sur finjaro.net est donc construit à partir du Site URL. Le
+déplacer aurait envoyé toute personne s'inscrivant sur finjaro.net vers
+l'outil de comptabilité, sans pouvoir valider son compte. Voir CLAUDE.md.
 
 À savoir : les données d'une application web sont rangées par adresse. Ce qui
 a été saisi en test sur l'ancienne adresse ne suit pas sur la nouvelle. Sans

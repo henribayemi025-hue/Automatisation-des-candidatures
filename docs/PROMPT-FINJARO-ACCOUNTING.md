@@ -33,7 +33,9 @@ Ambition : une place de marché et des outils **mondiaux**. Le Cameroun est le m
 - Dépôt : `henribayemi025-hue/automatisation-des-candidatures`, branche **`main`** (le nom du dépôt est historique, ne pas s'en étonner).
 - **Cloudflare déploie tout seul** à chaque poussée sur `main` : https://accounting.finjaro.net. La CI GitHub ne fait que compiler ; une CI verte ne prouve pas qu'une version est en ligne.
 - **Ne pas toucher** au dépôt de la place de marché (`henribeaubayemi`, finjaro.net, branches `staging` et `claude/finjaro-marketplace-build-xsripr`). Beau l'a dit explicitement : « tu t'occupes juste de Finjaro Accounting ».
-- Supabase : projet **partagé** `bokwivwizghdlaedczbw` avec d'autres applications sur le même `auth.users`. Migrations **additives** seulement, objets préfixés `finia_*`, jamais de suppression de colonne ni de compte. Les fonctions edge sont communes à staging et production.
+- Supabase : projet **partagé** `bokwivwizghdlaedczbw` avec la place de marché, la console, et deux ou trois applications tierces, sur le même `auth.users`. Migrations **additives** seulement, objets préfixés `finia_*`, jamais de suppression de colonne ni de compte. Les fonctions edge sont communes à la préproduction et à la production.
+- **`CLAUDE.md` à la racine fait autorité sur tout ce qui est partagé.** Le lire avant de toucher à quoi que ce soit. En particulier : le **Site URL** de Supabase reste `https://finjaro.net` et ne se change jamais, parce qu'il est global au projet et sert de base aux liens de confirmation d'inscription de la place de marché. Pour qu'une application revienne chez elle après connexion, on **ajoute** son adresse dans les `Redirect URLs`, on ne déplace rien.
+- **Règle de conduite** : tout changement touchant l'authentification, le Site URL, les redirections, `auth.users`, une fonction edge ou une migration concerne les deux applications. On le dit à Beau **avant**, en nommant l'autre application qui peut être affectée. Depuis ce dépôt on ne voit pas le code de la place de marché : une proposition peut paraître logique ici et casser l'autre application. C'est arrivé le 15/09 avec le Site URL.
 
 ## 5. Pile technique
 
@@ -41,7 +43,7 @@ Ambition : une place de marché et des outils **mondiaux**. Le Cameroun est le m
 - **Application installable et hors réseau** : `public/manifest.webmanifest`, icônes dans `public/icons/`, service worker produit par `scripts/build-sw.mjs` après `vite build` (il connaît les noms de fichiers empreintés, et son contenu change à chaque version, ce qui déclenche la proposition de mise à jour). État exposé par `src/lib/offline.tsx` (`online`, `updateReady`, `canInstall`, `isInstalled`), bandeaux dans `src/components/OfflineBar.tsx`. Rien ne s'enregistre en développement.
 - Tests navigateur avec Playwright (`/opt/pw-browsers/chromium`, `locale: 'fr-FR'`). Le bac à sable n'atteint ni Supabase, ni Google, ni Gemini : tester en mode local / démonstration.
 - Scripts de vérification : `npx vite-node scripts/<nom>.ts` — demo-check (args : date, pays), tax-check, party-check, closing-check, fec-check, payroll-check, import-check, cash-check, regime-check, identity-check, oauth-check, service-check. **Tous doivent être verts avant de pousser.** `npx tsc --noEmit -p .` aussi.
-- Auth Supabase en flux PKCE (obligatoire avec HashRouter). Connexion par téléphone = e-mail synthétique `chiffres@tel.finjaro.net`. Connexion Google : Beau doit ajouter l'URL de redirection dans Supabase, sinon ça rebondit.
+- Auth Supabase en flux PKCE (obligatoire avec HashRouter). Connexion par téléphone = e-mail synthétique `chiffres@tel.finjaro.net`. Connexion Google : l'adresse doit figurer dans les `Redirect URLs` de Supabase, sinon Supabase l'ignore **en silence** et retombe sur le Site URL, ce qui renvoie vers finjaro.net sans message d'erreur.
 
 ## 6. Architecture des données
 
