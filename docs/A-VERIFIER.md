@@ -1,7 +1,7 @@
 # À vérifier — liste tenue pour Beau
 
 Quand Beau écrit « rappel », on lui redonne cette liste telle quelle, à jour.
-Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
+Adresse : https://accounting.finjaro.net
 
 ## 1. Entrer dans l'application
 
@@ -13,7 +13,7 @@ Adresse : https://automatisation-des-candidatures.finjaro.workers.dev
       la raison s'affiche en rouge au lieu d'un retour muet.
 - [ ] Si ça retombe encore sur la connexion : vérifier dans Supabase →
       Authentication → URL Configuration que
-      `https://automatisation-des-candidatures.finjaro.workers.dev/` figure
+      `https://accounting.finjaro.net/` figure
       dans les « Redirect URLs ». Ce réglage n'est pas dans le code.
 - [ ] Six points : l'application déjà ouverte est marquée « Ouverte » et n'est
       pas un lien ; « Finjaro » ouvre finjaro.net dans un nouvel onglet.
@@ -414,3 +414,28 @@ appliquée, aucune erreur JavaScript.
 
 Ce qui demande toujours le réseau, et le dit : assistant complet, création et
 connexion de compte, travail à plusieurs.
+
+## Nouvelle adresse (15/09/2026)
+
+L'application a maintenant son nom : **https://accounting.finjaro.net**
+(domaine personnalisé ajouté au worker Cloudflare, zone finjaro.net).
+
+L'ancienne adresse `automatisation-des-candidatures.finjaro.workers.dev`
+continue de répondre : rien ne casse pendant la transition.
+
+À faire côté Supabase, sinon la connexion Google rebondira sur la nouvelle
+adresse comme elle le faisait sur l'ancienne :
+
+- Authentication → URL Configuration → **Site URL** :
+  `https://accounting.finjaro.net`
+- Authentication → URL Configuration → **Redirect URLs**, ajouter :
+  `https://accounting.finjaro.net/**`
+  (garder l'ancienne entrée tant que les deux adresses servent).
+
+À savoir : les données d'une application web sont rangées par adresse. Ce qui
+a été saisi en test sur l'ancienne adresse ne suit pas sur la nouvelle. Sans
+conséquence aujourd'hui, personne ne l'utilise encore pour de vrai.
+
+Reste à faire ailleurs, hors de ce dépôt : le sélecteur d'applications de la
+place de marché pointe peut-être encore vers l'ancienne adresse. À vérifier
+dans le dépôt de finjaro.net, que je ne touche pas.

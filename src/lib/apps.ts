@@ -16,7 +16,7 @@ export const CURRENT_APP_KEY = 'accounting';
 /** Filet de secours hors ligne — la table finjaro_apps fait foi dès qu'elle répond. */
 export const FALLBACK_APPS: FinjaroApp[] = [
   { key: 'marketplace', name: 'Finjaro', tagline: 'La place de marché : acheter, vendre, se faire livrer.', url: 'https://finjaro.net', emoji: '🛍️', accent: 'teal', audience: 'tous', sort_order: 10 },
-  { key: 'accounting', name: 'Finjaro Accounting', tagline: 'Caisse, stock, factures et comptabilité pour ta boutique.', url: 'https://automatisation-des-candidatures.finjaro.workers.dev', emoji: '📒', accent: 'brass', audience: 'tous', sort_order: 20 },
+  { key: 'accounting', name: 'Finjaro Accounting', tagline: 'Caisse, stock, factures et comptabilité pour ta boutique.', url: 'https://accounting.finjaro.net', emoji: '📒', accent: 'brass', audience: 'tous', sort_order: 20 },
 ];
 
 export async function fetchApps(): Promise<FinjaroApp[]> {

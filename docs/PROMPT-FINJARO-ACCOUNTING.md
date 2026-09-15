@@ -31,7 +31,7 @@ Ambition : une place de marché et des outils **mondiaux**. Le Cameroun est le m
 ## 4. Où est le code, où ça tourne
 
 - Dépôt : `henribayemi025-hue/automatisation-des-candidatures`, branche **`main`** (le nom du dépôt est historique, ne pas s'en étonner).
-- **Cloudflare déploie tout seul** à chaque poussée sur `main` : https://automatisation-des-candidatures.finjaro.workers.dev. La CI GitHub ne fait que compiler ; une CI verte ne prouve pas qu'une version est en ligne.
+- **Cloudflare déploie tout seul** à chaque poussée sur `main` : https://accounting.finjaro.net. La CI GitHub ne fait que compiler ; une CI verte ne prouve pas qu'une version est en ligne.
 - **Ne pas toucher** au dépôt de la place de marché (`henribeaubayemi`, finjaro.net, branches `staging` et `claude/finjaro-marketplace-build-xsripr`). Beau l'a dit explicitement : « tu t'occupes juste de Finjaro Accounting ».
 - Supabase : projet **partagé** `bokwivwizghdlaedczbw` avec d'autres applications sur le même `auth.users`. Migrations **additives** seulement, objets préfixés `finia_*`, jamais de suppression de colonne ni de compte. Les fonctions edge sont communes à staging et production.
 
