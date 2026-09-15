@@ -5,6 +5,7 @@ import { CURRENT_APP_KEY, FALLBACK_APPS, fetchApps, fetchAudience, visibleApps }
 import type { FinjaroApp } from '../lib/apps';
 import { IconApps, IconCheck } from './Icons';
 import { t } from '../lib/i18n';
+import { openFinjaroApp } from '../lib/shell';
 
 const ACCENT: Record<FinjaroApp['accent'], string> = {
   teal: 'bg-teal-light text-teal',
@@ -31,8 +32,19 @@ function RowTag({
     current ? 'cursor-default bg-base' : 'hover:bg-teal-light'
   }`;
   if (current) return <div className={className}>{children}</div>;
+  // Dans la fenêtre de l'application Finjaro, ou dans l'application installée,
+  // `target="_blank"` éjecte vers le navigateur du téléphone et on ne sait plus
+  // revenir. `openFinjaroApp` remplace alors la page : le bouton retour ramène ici.
   return (
-    <a href={url} target="_blank" rel="noreferrer" onClick={onDone} className={className}>
+    <a
+      href={url}
+      onClick={(e) => {
+        e.preventDefault();
+        onDone();
+        openFinjaroApp(url);
+      }}
+      className={className}
+    >
       {children}
     </a>
   );

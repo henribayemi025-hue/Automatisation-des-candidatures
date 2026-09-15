@@ -16,7 +16,7 @@ export default function AssistantDrawer() {
       <button
         onClick={() => setOpen(true)}
         aria-label={t('Ouvrir l’assistant')}
-        className={`fixed right-4 z-40 flex items-center gap-2 rounded-pill bg-teal px-4 py-3 text-white shadow-[0_12px_30px_rgba(194,94,56,0.4)] transition hover:bg-teal-hover active:scale-95 bottom-[104px] lg:bottom-6 lg:right-6 ${
+        className={`fixed right-4 z-40 flex items-center gap-2 rounded-pill bg-teal px-4 py-3 text-white shadow-[0_12px_30px_rgba(194,94,56,0.4)] transition hover:bg-teal-hover active:scale-95 safe-fab lg:right-6 ${
           open ? 'hidden' : ''
         }`}
       >

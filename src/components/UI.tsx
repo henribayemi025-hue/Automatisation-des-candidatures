@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
+import { useBackToClose } from '../lib/backclose';
 import { useDB } from '../lib/store';
 import { formatMoney } from '../lib/money';
 import type { Minor } from '../lib/types';
@@ -121,6 +122,14 @@ export function Empty({ title, hint, icon }: { title: string; hint?: string; ico
 }
 
 export function Modal({ open, onClose, title, children, wide }: { open: boolean; onClose: () => void; title: string; children: ReactNode; wide?: boolean }) {
+  // Sur téléphone, le bouton retour est le geste naturel pour fermer.
+  useBackToClose(open, onClose);
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, onClose]);
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-0 backdrop-blur-[2px] sm:items-center sm:p-6">

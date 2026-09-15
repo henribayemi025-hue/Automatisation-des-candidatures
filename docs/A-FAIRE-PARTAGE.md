@@ -123,14 +123,91 @@ journée, et le compte partagé fonctionne déjà.
 
 ## Claudinette — Finjaro Accounting
 
-*Section à remplir par la session qui travaille sur ce dépôt. Ce qui suit
-n'est que ce qu'Alpha peut constater de l'extérieur.*
+### Historique
 
 - ✅ 15/09 — Nouveau domaine `https://accounting.finjaro.net` en service.
 - ✅ 15/09 — `CLAUDE.md` créé à la racine du dépôt (il n'y en avait aucun).
 - ⚠️ 15/09 — Proposition de changer le Site URL Supabase **refusée**: elle
   aurait cassé la confirmation d'inscription sur finjaro.net. La bonne
   correction était d'ajouter l'adresse dans Redirect URLs. Angle mort, pas
-  erreur de compétence — d'où le `CLAUDE.md`.
-- À venir: applications Android et iPhone pour Accounting (voir le prompt de
-  lancement fourni à Beau le 15/09).
+  erreur de compétence — d'où le `CLAUDE.md`. Le conseil faux avait été écrit
+  dans `docs/A-VERIFIER.md`: corrigé le jour même, avec la raison, pour que
+  personne ne l'applique plus tard.
+- ❌ 15/09 — **Pas d'application Android ni iPhone pour Accounting.** Décision
+  de Beau, raisons dans la partie commune. Accounting s'ouvre dans
+  l'application Finjaro existante. Ce n'est pas à refaire, c'est déjà en
+  service.
+
+### Accounting comme écran de l'application Finjaro
+
+Cinq points ouverts par Beau le 15/09. Accounting n'est plus seulement un site
+qu'on ouvre au navigateur: c'est un écran DANS une application installée.
+
+- ✅ 15/09 — **Bord-à-bord Android 15.** L'en-tête, le tiroir de navigation et
+  le bouton flottant de l'assistant réservent la place des barres système
+  (`env(safe-area-inset-*)`, classes `.safe-top`, `.safe-side`, `.safe-bottom`,
+  `.safe-fab` dans `src/index.css`). Vérifié avec une encoche simulée de
+  48 px: le contenu de l'en-tête descend, rien ne passe sous la caméra. Ces
+  règles valent 0 dans un navigateur d'ordinateur, donc sans effet ailleurs.
+- ✅ 15/09 — **Bouton retour d'Android.** Il ferme ce qui est ouvert par-dessus
+  l'écran au lieu de quitter Accounting: fenêtres de saisie, menu du
+  téléphone, recherche globale. Crochet `useBackToClose`
+  (`src/lib/backclose.ts`), branché sur `Modal` et sur les trois panneaux de
+  `Layout`. Fermer à la croix retire l'étape d'historique, pour qu'un retour
+  ne soit pas avalé dans le vide. Vérifié sur un téléphone simulé.
+- ✅ 15/09 — **Retour à la place de marché.** Le sélecteur à six points
+  utilisait `target="_blank"`, ce qui éjecte vers le navigateur du téléphone
+  hors de l'application. Il navigue maintenant dans la même fenêtre dès que
+  l'application occupe sa propre fenêtre (application Finjaro, ou Accounting
+  installée depuis le navigateur), et garde le nouvel onglet dans un
+  navigateur ordinaire. Détection dans `src/lib/shell.ts`.
+- ⏳ **Session partagée entre Finjaro et Accounting — décision de Beau
+  attendue.** Ça ne marche pas aujourd'hui, et ce n'est pas un réglage oublié:
+  Supabase range la session dans le `localStorage`, qui est **propre à une
+  adresse**. `finjaro.net` et `accounting.finjaro.net` étant deux adresses
+  différentes, la session ne suit pas. Une vendeuse déjà connectée à Finjaro
+  doit se reconnecter en arrivant sur Accounting, alors que c'est le même
+  compte. Correction possible: ranger la session dans un **cookie de domaine
+  `.finjaro.net`**, lisible par les deux. **Touche les DEUX applications** —
+  la place de marché doit adopter le même rangement, sinon chacune garde la
+  sienne. À ne pas faire sans l'accord de Beau et sans qu'Alpha fasse le même
+  changement en même temps. À peser: un cookie partagé élargit la surface
+  exposée à tous les sous-domaines de finjaro.net.
+- ⏳ **Connexion Google depuis la fenêtre intégrée — à vérifier sur un vrai
+  téléphone.** Côté Accounting tout est en place: flux PKCE (le jeton passe
+  par `?code=`, pas par l'ancre du routeur), `redirectTo` construit sur
+  l'adresse courante, et `https://accounting.finjaro.net/**` déclaré dans les
+  Redirect URLs. Côté application, `allowNavigation` contient `*.finjaro.net`
+  et `accounts.google.com`, et `overrideUserAgent` évite le refus
+  `disallowed_useragent`: ces trois lignes sont dans le dépôt de la place de
+  marché, je ne peux pas les vérifier d'ici. **Si ça casse, regarder ces trois
+  lignes en premier** (§2 de `docs/BUILDS-MOBILES-FINJARO.md`). Le piège
+  précis: si la page Google part dans Chrome, la session naît dans Chrome et
+  l'application reste déconnectée — c'est le symptôme du 08/08.
+
+### Signalé à Beau, en attente de sa décision
+
+- ⏳ **L'inscription depuis Accounting envoie un lien de confirmation qui mène
+  à finjaro.net.** `signUp()` d'Accounting ne passe aucun `emailRedirectTo`
+  (`src/lib/collab.tsx`), exactement comme celui de la place de marché: le
+  lien est donc construit sur le Site URL, qui reste `https://finjaro.net` et
+  doit le rester. Quelqu'un qui crée son compte dans Accounting confirme donc
+  son adresse et atterrit sur la place de marché, pas dans sa comptabilité.
+  Correction proposée: passer `emailRedirectTo: 'https://accounting.finjaro.net/'`
+  **dans le seul appel d'Accounting**. L'adresse est déjà déclarée dans les
+  Redirect URLs. **Quelle autre application est touchée: aucune** — c'est un
+  paramètre par appel, il ne modifie aucun réglage commun, et le `signUp()` de
+  la place de marché n'est pas touché. Signalé le 15/09, pas appliqué:
+  l'authentification ne se change pas sans l'accord de Beau.
+
+### Reste à faire, sans blocage
+
+- Logo: les icônes actuelles sont un dessin provisoire fait faute de mieux.
+  Beau prépare le vrai. Un SVG, ou un PNG large à fond transparent, et je
+  régénère toutes les tailles.
+- Passage de mise en page sur téléphone, à faire APRÈS que Beau ait testé
+  lui-même: corriger ce qu'il voit, pas ce que je devine.
+- Questions ouvertes pour le fiscaliste Gautier Fossong: taux du précompte sur
+  achat selon les régimes, sens de « plan comptable précédé des 0000 »,
+  traitement du précompte côté vendeur (grossiste qui le retient sur ses
+  ventes).

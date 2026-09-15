@@ -13,6 +13,7 @@ import CommandPalette from './CommandPalette';
 import AssistantDrawer from './AssistantDrawer';
 import ModuleIntro from './ModuleIntro';
 import Tour, { startTour } from './Tour';
+import { useBackToClose } from '../lib/backclose';
 import OfflineBar from './OfflineBar';
 import PresenceAvatars, { Avatar } from './PresenceAvatars';
 import TabBar, { TAB_BAR_SPACE } from './TabBar';
@@ -138,6 +139,12 @@ export default function Layout({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
 
+  // Sur téléphone, le bouton retour referme le menu et la recherche au lieu de
+  // quitter l'écran — ou, dans l'application Finjaro, de sortir d'Accounting.
+  useBackToClose(open, () => setOpen(false));
+  useBackToClose(menu, () => setMenu(false));
+  useBackToClose(palette, () => setPalette(false));
+
   // Ctrl+K (ou ⌘K) ouvre la recherche, comme dans les outils professionnels.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -252,7 +259,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       {open && <button aria-label={t('Fermer le menu')} onClick={() => setOpen(false)} className="fixed inset-0 z-40 bg-ink/40 backdrop-blur-sm lg:hidden" />}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[272px] flex-col border-r border-hairline bg-white transition-transform lg:translate-x-0 ${
+        className={`safe-side safe-bottom fixed inset-y-0 left-0 z-50 flex w-[272px] flex-col border-r border-hairline bg-white transition-transform lg:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -260,7 +267,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col lg:ml-[272px]">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-hairline bg-white px-3 sm:px-5">
+        <header className="safe-top sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-hairline bg-white px-3 sm:px-5">
           <AppSwitcher />
 
           {workspaces.length > 1 ? (
