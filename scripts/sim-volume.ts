@@ -107,7 +107,6 @@ say(`| Empreinte de scellement (hashState) | ${hash.slice(0, 8)}… | ${ms(perfo
 // Une vente en caisse avec la vraie copie d'état.
 g.structuredClone = realClone;
 const [afterOne, tSale] = time(() => applyEvent(big, mkSale(big, 1, today)));
-  const sale: Sale = { id: `vol-s${n}`, number: `FA-VOL-${n}`, date, customerId: null, customerName: 'Client', lines: sl, discount: 0, vat: t.vat, total: t.total, paid: t.total, method: 'CASH', status: 'CONFIRMED', cashier: 'Sim', createdAt: `${date}T10:00:00.000Z` };
 say(`| **Une vente en caisse** (applyEvent avec copie réelle de l’état) | | **${ms(tSale)}** |`);
 const evs = Array.from({ length: 300 }, (_, i) => mkSale(big, 100 + i, today));
 const [, tReplay] = time(() => replay(afterOne, evs));

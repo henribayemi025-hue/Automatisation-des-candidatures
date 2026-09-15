@@ -12,24 +12,24 @@ tests compris. « ☐ » : à cocher par Beau quand c'est traité.
 
 | # | Problème (une phrase) | Métier(s) | Domaine | Gravité | Effort | Décision |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Une vente en caisse met 3,7 s à 214 000 écritures et l'ouverture 13 minutes : le moteur copie tout l'état à chaque événement | tous | Moteur | Bloquant | 5 j | ☐ |
-| 2 | Un caissier peut envoyer n'importe quel événement au serveur, y compris vider l'espace, clôturer, changer la devise ou un salaire : les rôles n'existent que dans les menus | tous | Sécurité | Bloquant | 2 j | ☐ |
+| 1 | Deux caisses sans réseau impriment le même numéro de ticket ; après synchronisation le reçu du client dit « FA-00001 » et les comptes « FA-00001-B » : ce qu’un contrôle fiscal relève en premier | commerce multi-caisses | Hors ligne, fiscalité | Bloquant | 1 j | ☐ |
+| 2 | Une vente en caisse met 3,7 s à 214 000 écritures et l'ouverture 13 minutes : le moteur copie tout l'état à chaque événement | tous | Moteur | Bloquant | 5 j | ☐ |
 | 3 | Deux appareils hors ligne qui vendent le dernier article le passent sous zéro et sortent le coût deux fois, sans aucun signal | commerce | Hors ligne | Bloquant | 2 j | ☐ |
 | 4 | Le même ticket peut être compté deux fois sur l'appareil qui l'a saisi quand le temps réel devance la réponse du serveur | tous | Hors ligne | Bloquant | 1 j | ☐ |
 | 5 | Une écriture datée dans un exercice clôturé est acceptée sans avertir ; le résultat clôturé ne correspond plus au compte de résultat | tous | Comptabilité | Bloquant | 1 j | ☐ |
 | 6 | Le cache local dépasse le quota du navigateur en un trimestre de boutique et l'application cesse de fonctionner hors ligne sans le dire | tous | Hors ligne | Bloquant | 3 j | ☐ |
 | 7 | Se déconnecter avec des ventes non envoyées les efface | tous | Hors ligne | Bloquant | 0,5 j | ☐ |
-| 8 | Un ticket renvoyé après une réponse réseau perdue reste bloqué « en attente » pour toujours | tous | Hors ligne | Majeur | 0,5 j | ☐ |
-| 9 | Les encaissements d'avance (abonnements, carnets, inscriptions, traitements en plusieurs séances) entrent en résultat le jour de la vente : 20 à 127 millions de faux bénéfice par an mesurés | coach, école, dentiste, conseil | Comptabilité | Majeur | 3 j | ☐ |
-| 10 | Les dépôts de garantie entrent en chiffre d'affaires et leur restitution en charge : aucune dette envers les clients au bilan | location | Comptabilité | Majeur | 2 j | ☐ |
-| 11 | Un billet vendu pour une compagnie entre en chiffre d'affaires pour son prix total et la TVA est calculée dessus | agence de voyages, transport | Comptabilité, fiscalité | Majeur | 2 j | ☐ |
-| 12 | Aucun retour ni avoir : reprendre un article vendu est impossible sans passer par une extourne qui ne remet pas le stock | commerce | Point de vente | Majeur | 2 j | ☐ |
-| 13 | Tout achat réceptionné est payé depuis la caisse : un achat réglé par virement met la caisse sous zéro | tous avec stock | Comptabilité | Majeur | 1 j | ☐ |
-| 14 | Un seul taux de taxe par entreprise : impossible d'avoir 5,5 % sur l'alimentaire et 20 % sur le reste, ni deux taxes cumulées (Canada, États-Unis, Inde) | France, Royaume-Uni, Canada, États-Unis, Inde | International, fiscalité | Majeur | 3 j | ☐ |
-| 15 | Acompte sur devis impossible ; à la conversion, le total est encaissé et l'acompte compté deux fois | plombier, artisans, événementiel | Point de vente | Majeur | 1,5 j | ☐ |
-| 16 | Les prestations ont un stock qui descend sous zéro dès qu'un salon ou un garage suit ses produits | salon, garage, plombier, dentiste | Point de vente | Majeur | 1 j | ☐ |
-| 17 | Le propriétaire renvoie l'état complet (16 Mo à un an, 80 Mo pour une supérette) tous les 300 événements ; sans lui, aucun instantané n'est jamais pris | tous | Hors ligne | Majeur | 2 j | ☐ |
-| 18 | Deux appareils hors ligne donnent le même numéro à deux tickets ; l'un change de numéro après synchronisation | commerce multi-caisses | Hors ligne, fiscalité | Majeur | 1 j | ☐ |
+| 8 | Un caissier peut envoyer n'importe quel événement au serveur (vider l'espace, clôturer, changer la devise ou un salaire) : les rôles n'existent que dans les menus. Vérifié en base : le journal est en ajout seul, aucune règle n'autorise à modifier ou effacer une ligne passée, seul le propriétaire supprime l'espace ; un caissier malveillant ne détruit donc rien définitivement, tout reste inscrit et annulable | tous | Sécurité | Majeur | 2 j | ☐ |
+| 9 | Un ticket renvoyé après une réponse réseau perdue reste bloqué « en attente » pour toujours | tous | Hors ligne | Majeur | 0,5 j | ☐ |
+| 10 | Les encaissements d'avance (abonnements, carnets, inscriptions, traitements en plusieurs séances) entrent en résultat le jour de la vente : 20 à 127 millions de faux bénéfice par an mesurés | coach, école, dentiste, conseil | Comptabilité | Majeur | 3 j | ☐ |
+| 11 | Les dépôts de garantie entrent en chiffre d'affaires et leur restitution en charge : aucune dette envers les clients au bilan | location | Comptabilité | Majeur | 2 j | ☐ |
+| 12 | Un billet vendu pour une compagnie entre en chiffre d'affaires pour son prix total et la TVA est calculée dessus | agence de voyages, transport | Comptabilité, fiscalité | Majeur | 2 j | ☐ |
+| 13 | Aucun retour ni avoir : reprendre un article vendu est impossible sans passer par une extourne qui ne remet pas le stock | commerce | Point de vente | Majeur | 2 j | ☐ |
+| 14 | Tout achat réceptionné est payé depuis la caisse : un achat réglé par virement met la caisse sous zéro | tous avec stock | Comptabilité | Majeur | 1 j | ☐ |
+| 15 | Un seul taux de taxe par entreprise : impossible d'avoir 5,5 % sur l'alimentaire et 20 % sur le reste, ni deux taxes cumulées (Canada, États-Unis, Inde) | France, Royaume-Uni, Canada, États-Unis, Inde | International, fiscalité | Majeur | 3 j | ☐ |
+| 16 | Acompte sur devis impossible ; à la conversion, le total est encaissé et l'acompte compté deux fois | plombier, artisans, événementiel | Point de vente | Majeur | 1,5 j | ☐ |
+| 17 | Les prestations ont un stock qui descend sous zéro dès qu'un salon ou un garage suit ses produits | salon, garage, plombier, dentiste | Point de vente | Majeur | 1 j | ☐ |
+| 18 | Le propriétaire renvoie l'état complet (16 Mo à un an, 80 Mo pour une supérette) tous les 300 événements ; sans lui, aucun instantané n'est jamais pris | tous | Hors ligne | Majeur | 2 j | ☐ |
 | 19 | L'IA peut affirmer un montant qui n'est pas dans le résumé qu'elle reçoit (40 articles, 5 ventes, 10 dettes) | tous | Assistant | Majeur | 1 j | ☐ |
 | 20 | L'accueil et l'IA disent « résultat » alors que c'est « encaissé » : en mode Simple, la commerçante lit un bénéfice qui n'en est pas un | services | Design | Majeur | 1 j | ☐ |
 | 21 | Ni lot, ni péremption, ni traçabilité : rappel de lot et casse impossibles à anticiper | pharmacie, jus, alimentaire | Métier | Majeur | 3 j | ☐ |

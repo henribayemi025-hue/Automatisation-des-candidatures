@@ -4,7 +4,7 @@ Gestion commerciale et comptabilité en partie double pour les boutiques et peti
 entreprises, dans l'environnement d'applications Finjaro. Conçue pour être utilisable
 par un mécanicien ou une commerçante, et complète pour un comptable.
 
-En ligne : https://automatisation-des-candidatures.finjaro.workers.dev
+En ligne : https://accounting.finjaro.net (l’ancienne adresse automatisation-des-candidatures.finjaro.workers.dev répond encore)
 
 ## Ce que fait l'application
 
