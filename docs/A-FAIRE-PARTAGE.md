@@ -19,6 +19,15 @@ décisions.
 
 ---
 
+## Comment les deux sessions se parlent (mis en place le 17/09)
+
+Deux canaux, toujours les deux :
+
+1. **La boîte aux lettres directe.** Pour dire quelque chose ou poser une question à l'autre session, on crée une routine sur SA session et on la déclenche (`create_trigger` avec `persistent_session_id`, sans horaire, puis `fire_trigger`). Le message arrive chez elle comme si Beau l'avait tapé, elle répond par le même chemin. Sessions : Accounting = `session_01Gjs9i62dyinT13eeFbd7Xh` (Claudinette), place de marché = `session_015PBwRnLtCjPX8zj12rkDdQ` (Alpha).
+2. **Le fil écrit, ici.** Tout ce qui est décidé ou demandé s'écrit dans ce fichier (section concernée), commit et push sur `main` du dépôt Accounting, pour que Beau lise sans fouiller nos sessions. Une question sans réponse depuis plus d'une heure se relance par la boîte aux lettres.
+
+Ce qu'on ne fait pas sans Beau, même entre nous : migration, fonction edge, auth, Site URL, redirections, mise en production.
+
 ## Partie commune — ne rien y toucher seul
 
 Tout ce qui suit concerne les DEUX applications. Voir la section « Ce qui est
