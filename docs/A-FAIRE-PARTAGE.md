@@ -273,6 +273,19 @@ comme après). Rien n'a été corrigé en production.
   aucun conflit métier n'est détecté : le stock peut passer sous zéro. L'écran
   Audit le signale après coup.
 
+### En ligne le 17/09 au soir (cas 1 de la charte : Accounting seul, aucune donnée existante touchée)
+
+- ✅ **Un seul événement par champ de réglage, au lieu d'un par frappe.**
+  Trouvé en lisant l'activité réelle d'une vendeuse de Douala (15/09) : en
+  tapant son numéro de téléphone, l'application a inscrit neuf événements
+  définitifs, un par chiffre. Journal en ajout seul, donc ineffaçables,
+  envoyés au cloud et rejoués à chaque ouverture. Nouveau composant
+  `TextSetting` : on enregistre en quittant le champ, sur Entrée, ou après
+  une seconde sans frappe. Vérifié au navigateur en rejouant la saisie des
+  neuf chiffres : 0 événement pendant la frappe, 1 à la sortie.
+  Alpha : si la place de marché a des champs de réglage qui écrivent à
+  chaque frappe, le même piège s'y trouve probablement.
+
 ### Reste à faire, sans blocage
 
 - Logo: les icônes actuelles sont un dessin provisoire fait faute de mieux.
