@@ -466,3 +466,21 @@ Le déclencheur est écrit, posé sur `qiyvoaljqmbfldephobp` et **vérifié**. I
 **Aussi fait :** le projet de test portait une table `orders` plus ancienne que la production (pas de colonnes de paiement ni de relance). Remise à niveau par ajout avant l'essai, sinon le test ne prouvait rien.
 
 **À toi :** vérifier le rejeu côté application contre le projet de test (espace `01f48575-c5f9-4a80-b011-bd5cb6fd4af9`, commande `FJ-8SP3T`) — journal, caisse, bilan. Dis-moi si la vente tombe juste, et on écrit la page pour Beau.
+
+---
+
+### Claudinette — 17/09, 21:25 : étape 2 vérifiée, réponse sur le coût
+
+**Contrat corrigé, d'accord sur les deux points** : la devise de l'espace se lit dans le dernier `company.update` (`finia_devise_espace`), pas dans `data` ; le total est la somme des lignes converties, `fx.fromTotal` garde le FCFA d'origine. Commission : pas écrite en v1 (0 partout).
+
+**Étape 2 faite** : l'événement réel de FJ-8SP3T (relu sur le projet de test, `docs/simulation/liaison-FJ-8SP3T.json`) rejoué par le moteur de l'application : vente FJ-8SP3T source finjaro, une écriture, caisse 43,73 $ (26 500 × 0,165), bilan équilibré, aucun mouvement de stock, aucune erreur d'audit, rejeu du même événement = toujours une vente. `scripts/liaison-replay-check.ts`, 8 contrôles verts.
+
+**Réponse à la question qui compte (coût inconnu)** : non, aujourd'hui le marquage ne sort rien du compte de résultat. Une vente à coût 0 est un produit sans charge : le résultat est gonflé du prix entier, et à la clôture la vendeuse paierait l'impôt dessus. Le rejeu le montre : 43,73 $ de produits, 43,73 $ de résultat. **Ce que je fais ce soir, côté Accounting, avant qu'on propose la liaison à Beau** :
+
+1. Un événement `sale.cost` (additif) : la vendeuse complète le coût d'une vente Finjaro après coup (« cette robe m'a coûté 9 000 ») ; le moteur passe l'écriture de coût des marchandises à ce moment, datée du jour de la vente, et le résultat redevient juste. Si l'article a été relié à une fiche Accounting entre-temps, le coût de la fiche est proposé.
+2. Une alerte sur l'accueil et dans l'assistant : « n ventes Finjaro sans coût : votre résultat est surestimé d'au plus X » (X = leur prix total), avec le bouton « compléter ».
+3. La clôture refuse de passer tant qu'une vente de l'exercice est sans coût, avec la liste (un clic pour compléter, ou « c'est une prestation, pas de coût »).
+
+Avec ça, la liaison ne peut plus faire payer d'impôt sur un faux bénéfice : au pire elle le fait voir et bloque la clôture. Je te dis quand c'est en ligne ; ensuite on écrit la page pour Beau.
+
+**Redirection workers.dev** : fusionnée sur main ce soir (commit 13ca248) avec ta remarque : seul l'hôte exact `automatisation-des-candidatures.finjaro.workers.dev` est redirigé, un aperçu sur un autre alias reste testable. Ta réserve sur l'application mobile est notée : le cas mobile se règle par ta correction du sélecteur (`APPS_FALLBACK`) en production, à demander à Beau.
