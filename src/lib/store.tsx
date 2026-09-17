@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { accountCode } from './chart';
 import type { AccountKey } from './chart';
 import { nextNumber } from './numbering';
+import { addPeriod } from './subscriptions';
 import { applyEvent, emptyDB, normalizeDB, saleTotals } from './reducer';
 import { buildDemoEvents } from './demo';
 import type {
@@ -19,6 +20,7 @@ import type {
   ForeignAmount,
   LandedCost,
   Sale,
+  Subscription,
   SaleLine,
   Supplier,
   WorkspaceEvent,
@@ -153,6 +155,11 @@ export interface StoreActions {
   addExpense: (input: ExpenseInput) => void;
   adjustStock: (productId: string, qty: number, reason: string) => void;
   payDebt: (debtId: string, amount: Minor, method: PaymentMethod) => void;
+  /** Crée ou modifie un abonnement (sans encaisser). */
+  saveSubscription: (input: Omit<Subscription, 'id' | 'createdAt' | 'periods' | 'endDate' | 'status'> & { id?: string }) => Subscription;
+  /** Encaisse une période de plus : une vente est enregistrée, la date de fin avance. Renvoie la vente (pour la facture). */
+  renewSubscription: (subscriptionId: string, method: PaymentMethod, amount?: Minor, from?: string) => Sale | null;
+  cancelSubscription: (subscriptionId: string) => void;
   addManualEntry: (input: ManualEntryInput) => void;
   reverseEntry: (entryId: string) => void;
   saveEmployee: (employee: Omit<Employee, 'id' | 'createdAt'> & { id?: string }) => Employee;
@@ -408,6 +415,63 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       adjustStock(productId, qty, reason) {
         if (!dbRef.current.products.some((p) => p.id === productId)) throw new Error('Produit introuvable');
         dispatch('stock.adjust', { productId, qty, reason, date: today(), movementId: newId(), entryId: newId() });
+      },
+
+      saveSubscription(input) {
+        const existing = input.id ? dbRef.current.subscriptions.find((x) => x.id === input.id) : undefined;
+        const subscription: Subscription = {
+          ...input,
+          id: existing?.id ?? newId(),
+          // Sans période payée, l'abonnement finit la veille de son début : il attend son premier encaissement.
+          endDate: existing?.endDate ?? addPeriod(input.startDate, 0, 'DAY'),
+          periods: existing?.periods ?? [],
+          status: existing?.status ?? 'ACTIVE',
+          createdAt: existing?.createdAt ?? new Date().toISOString(),
+        };
+        dispatch('subscription.save', { subscription });
+        return subscription;
+      },
+
+      renewSubscription(subscriptionId, method, amount, from) {
+        const sub = dbRef.current.subscriptions.find((x) => x.id === subscriptionId);
+        if (!sub) return null;
+        const todayISO = today();
+        // La nouvelle période commence là où finit la dernière, sauf si elle est
+        // finie depuis longtemps : alors on repart d'aujourd'hui.
+        const nextDay = addPeriod(sub.endDate, 2, 'DAY');
+        const start = from || (sub.periods.length && nextDay >= todayISO ? nextDay : todayISO);
+        const to = addPeriod(start, sub.every, sub.unit);
+        const price = amount ?? sub.amount;
+        const lines = [{ productId: '', name: `${sub.label} — ${start} → ${to}`, qty: 1, unitPrice: price, unitCost: 0 }];
+        const t = saleTotals(dbRef.current.company, lines, 0);
+        const sale: Sale = {
+          id: newId(),
+          number: nextNumber(scope.current, 'FA', dbRef.current.sales.map((s) => s.number)),
+          date: todayISO,
+          projectId: null,
+          customerId: sub.customerId,
+          customerName: sub.customerName,
+          lines,
+          discount: 0,
+          vat: t.vat,
+          total: t.total,
+          paid: t.total,
+          method,
+          status: 'CONFIRMED',
+          cashier: actor.current.name,
+          createdAt: new Date().toISOString(),
+        };
+        dispatch('subscription.renew', {
+          subscriptionId,
+          sale,
+          ids: { movements: [newId()], saleEntry: newId(), cogsEntry: newId(), debt: newId() },
+          period: { from: start, to, amount: t.total, saleId: sale.id, paidAt: todayISO },
+        });
+        return sale;
+      },
+
+      cancelSubscription(subscriptionId) {
+        dispatch('subscription.cancel', { subscriptionId });
       },
 
       payDebt(debtId, amount, method) {

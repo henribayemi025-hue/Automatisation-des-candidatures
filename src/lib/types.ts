@@ -231,6 +231,42 @@ export interface Purchase {
   createdAt: ISODate;
 }
 
+/** Une période payée d'un abonnement : de telle date à telle date, pour tel montant, avec sa vente. */
+export interface SubscriptionPeriod {
+  from: ISODate;
+  to: ISODate;
+  amount: Minor;
+  /** La vente qui a encaissé cette période (ticket, journal). */
+  saleId: string | null;
+  paidAt: ISODate;
+}
+
+/**
+ * Abonnement : un client paie pour une durée (salle de sport, wifi, cours,
+ * télé…). Ce qui compte pour la commerçante : qui, combien, jusqu'à quand,
+ * et être prévenue avant la fin. Chaque renouvellement est une vente normale.
+ */
+export interface Subscription {
+  id: string;
+  customerId: string | null;
+  customerName: string;
+  phone: string;
+  /** L'offre : « Salle — mensuel », « Wifi 10 Mo », « Cours d'anglais trimestre ». */
+  label: string;
+  /** Prix d'une période. */
+  amount: Minor;
+  /** Durée d'une période. */
+  every: number;
+  unit: 'DAY' | 'MONTH';
+  startDate: ISODate;
+  /** Fin de la dernière période payée. */
+  endDate: ISODate;
+  periods: SubscriptionPeriod[];
+  status: 'ACTIVE' | 'CANCELLED';
+  notes: string;
+  createdAt: ISODate;
+}
+
 export interface Expense {
   id: string;
   date: ISODate;
@@ -488,6 +524,7 @@ export interface DB {
   expenses: Expense[];
   movements: StockMovement[];
   debts: Debt[];
+  subscriptions: Subscription[];
   sessions: CashSession[];
   projects: Project[];
   messages: Message[];

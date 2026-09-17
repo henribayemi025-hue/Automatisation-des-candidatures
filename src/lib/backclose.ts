@@ -15,6 +15,8 @@ import { useEffect, useRef } from 'react';
  * ferme. Si la personne ferme elle-même (croix, Échap, Annuler), on retire
  * l'étape pour ne pas laisser un retour qui ne fait rien.
  */
+let counter = 0;
+
 export function useBackToClose(open: boolean, onClose: () => void): void {
   // `onClose` change à chaque rendu chez les appelants : on le garde dans une
   // référence pour ne pas réinstaller l'écouteur, ce qui perdrait l'étape.
@@ -25,7 +27,8 @@ export function useBackToClose(open: boolean, onClose: () => void): void {
     if (!open) return undefined;
 
     // Marqueur reconnaissable : plusieurs couches peuvent s'empiler.
-    const mark = { finiaOverlay: Date.now() };
+    counter += 1;
+    const mark = { finiaOverlay: counter };
     let ours = true;
     try {
       window.history.pushState(mark, '');
@@ -35,6 +38,9 @@ export function useBackToClose(open: boolean, onClose: () => void): void {
     }
 
     const onPop = () => {
+      // Si l'historique est encore sur notre étape, ce retour concernait une
+      // couche ouverte après nous (un reçu après un formulaire) : pas pour nous.
+      if ((window.history.state as { finiaOverlay?: number } | null)?.finiaOverlay === mark.finiaOverlay) return;
       // L'étape vient d'être consommée par le retour : plus rien à retirer.
       ours = false;
       close.current();
@@ -45,12 +51,20 @@ export function useBackToClose(open: boolean, onClose: () => void): void {
       window.removeEventListener('popstate', onPop);
       // Fermeture par la croix ou Échap : notre étape est encore en haut de la
       // pile, on la retire pour qu'un retour ne soit pas avalé dans le vide.
+      // Un instant plus tard, pour laisser une couche ouverte dans le même
+      // rendu (le reçu qui suit un formulaire) poser sa propre étape : si elle
+      // l'a fait, reculer maintenant la fermerait à sa place. On laisse alors
+      // notre étape sous la sienne ; un retour de plus la consommera sans rien
+      // faire.
       if (ours) {
-        try {
-          window.history.back();
-        } catch {
-          /* rien à faire de plus */
-        }
+        setTimeout(() => {
+          if ((window.history.state as { finiaOverlay?: number } | null)?.finiaOverlay !== mark.finiaOverlay) return;
+          try {
+            window.history.back();
+          } catch {
+            /* rien à faire de plus */
+          }
+        }, 0);
       }
     };
   }, [open]);

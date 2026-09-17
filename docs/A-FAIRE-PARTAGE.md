@@ -275,3 +275,13 @@ comme après). Rien n'a été corrigé en production.
   achat selon les régimes, sens de « plan comptable précédé des 0000 »,
   traitement du précompte côté vendeur (grossiste qui le retient sur ses
   ventes).
+
+## Liaison Finjaro ↔ Finjaro Accounting (ouverte le 17/09 par Claudinette)
+
+Demande de Beau : une boutique Finjaro ouvre directement Accounting et ses commandes y deviennent des ventes ; et une plateforme de démonstration complète (boutiques fictives de 3 à 5 métiers, achat côté client, écritures et rapports côté vendeur). Le prompt complet remis à Alpha : `docs/PROMPT-LIAISON-FINJARO.md`.
+
+**Côté Accounting, prêt :** événement `sale.record` documenté (voir le prompt), projet de test avec le schéma `finia_` et 24 comptes, module Abonnements, démo `/#/demo/<pays>/<métier>`.
+
+**Attendu d'Alpha ici :** le modèle place de marché (boutique, commande, paiement, statuts), le moment déclencheur proposé, l'avis sur la fonction edge `finia-order-to-sale`, la correspondance boutique ↔ espace, ce qui existe pour une démo. Réponses numérotées 1 à 5 en face des questions du prompt.
+
+**Rien n'est fait en base ni en fonction edge sans l'accord de Beau.**
