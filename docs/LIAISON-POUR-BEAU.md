@@ -48,9 +48,25 @@ Ce que ça ouvre, et qui compte plus que la fonctionnalité elle-même : Finjaro
 
 ---
 
+## Ce que ça change dans ses comptes, précisément
+
+Une commande livrée devient **une vente comme si elle l'avait encaissée au comptoir** : elle apparaît dans ses ventes, dans sa caisse, dans son journal, dans sa balance, dans son bilan, et dans son export pour le comptable. Elle n'est pas rangée à part, parce qu'une vente est une vente.
+
+Deux choses la distinguent, et elles sont visibles :
+- Son numéro commence par `FJ-` : c'est une vente venue de la boutique en ligne.
+- Tant que le coût d'achat manque, elle est signalée en rouge, sur l'accueil et à l'écran des ventes.
+
+Ce que la vendeuse voit dans ses chiffres, avant qu'elle complète le coût : l'argent encaissé est juste, la caisse est juste, le bilan est équilibré — **seul le bénéfice est trop beau**. Après qu'elle a complété : le coût des marchandises est enregistré à la date de la vente, et le bénéfice devient le vrai.
+
+Le stock de son magasin n'est pas touché par ces ventes : les articles vendus en ligne sont déjà sortis de son stock Finjaro au moment de la commande. Si elle tient un stock à part pour sa boutique physique, il reste intact.
+
+---
+
 ## Ce qui a été vérifié, et où
 
 Sur le projet de test, pas en production. Une commande réelle de 26 500 FCFA (deux articles plus la livraison) chez une vendeuse de test : la vente est arrivée juste, au centime, dans sa monnaie. Livrée une deuxième fois : toujours une seule vente. Chez une vendeuse sans comptabilité : rien, et la livraison est passée.
+
+Côté Accounting, cette vente réelle a été **reprise telle qu'elle est en base et rejouée dans le moteur de l'application** : caisse juste, bilan équilibré, aucun mouvement de stock, aucune erreur de contrôle, et un rejeu du même événement ne crée jamais de doublon. Vingt et un contrôles automatiques couvrent la liaison et le coût manquant, dont le passage d'un bénéfice de 31 500 à 13 500 après complément du coût. Ils se rejouent en une commande : `npx vite-node scripts/liaison-check.ts` et `scripts/liaison-replay-check.ts`.
 
 Deux défauts ont été trouvés et corrigés **avant** d'arriver à cette page, et ils méritent d'être dits parce qu'ils seraient passés inaperçus :
 
@@ -64,5 +80,9 @@ Deux défauts ont été trouvés et corrigés **avant** d'arriver à cette page,
 Poser la migration `0127_liaison_commande_vers_vente.sql` en production.
 
 Elle touche **les deux applications** : elle vit dans la place de marché et elle écrit dans les tables d'Accounting. C'est pour ça qu'elle attend. Elle n'ajoute rien qui puisse casser l'existant — elle ne fait quelque chose que sur une commande qui passe à « livrée », et seulement si la vendeuse a une comptabilité.
+
+**Le risque, dit franchement.** L'écriture de la vente se fait dans la même opération que la livraison. C'est un choix : il garantit qu'aucune vente ne se perd en silence. Mais il a une conséquence qu'il faut connaître avant, pas découvrir : si cette écriture échouait pour une raison qu'on n'a pas prévue, **la livraison échouerait avec elle** et la vendeuse verrait une erreur au moment d'appuyer sur « livrée ». Aujourd'hui, sept espaces comptables existent en production et une seule commande a été livrée en treize jours : si cela arrivait, cela toucherait une personne, pas cent.
+
+**La marche arrière prend dix secondes.** Une seule ligne retire le déclencheur (`drop trigger trg_finia_order_to_sale on orders`) et tout revient exactement à l'état d'avant. Aucune donnée n'est perdue : les ventes déjà créées restent dans les comptes, les commandes restent dans la place de marché, et les livraisons repartent comme avant.
 
 Le jour où tu dis oui, la première vendeuse concernée verra sa prochaine livraison arriver dans ses comptes.

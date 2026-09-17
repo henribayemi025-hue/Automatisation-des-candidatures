@@ -27,6 +27,16 @@ Ni l'une ni l'autre ne se limite à son dépôt pour **réfléchir** : chacune p
 2. **Fil écrit** : `docs/A-FAIRE-PARTAGE.md` (décisions et suivi), `docs/REUNIONS.md`, `docs/AUDITS.md`, `docs/IDEES.md`. Tout ce qui compte y est, pour que Beau lise sans ouvrir nos sessions.
 3. **Beau reçoit** : un message court quand quelque chose est en ligne, cassé, ou attend sa décision. Pas de bruit.
 
+## Ce qui part en ligne, et qui décide (précisé le 17/09 avec Alpha)
+
+| Cas | Qui décide | Comment |
+|---|---|---|
+| Une correction ou un ajout **dans une seule application**, qui ne change aucune donnée existante | La session qui tient l'application | Elle pousse, et **l'écrit dans le tableau** le jour même (« poussé sur main, commit X, ce que ça change ») |
+| La base partagée, l'authentification, le Site URL, les redirections, une fonction edge, ou tout ce qui touche **l'autre application** | **Beau**, toujours | On lui explique en une page ce que ça fait, ce que ça risque, et comment revenir en arrière |
+| Une donnée existante réécrite, un effacement, une reprise en masse | **Beau**, toujours | Jamais sans son mot, même si c'est réparateur |
+
+Écrit après une confusion réelle : une correction poussée sur `main` part en ligne toute seule (Cloudflare déploie). Le dire dans le tableau n'est pas une formalité, c'est la seule façon pour l'autre session et pour Beau de savoir ce qui tourne.
+
 ## Ce qu'on se doit
 
 - Des faits avant des avis ; un chiffre inventé est une faute.
