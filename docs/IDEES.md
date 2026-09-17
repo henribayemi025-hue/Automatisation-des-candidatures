@@ -2,6 +2,26 @@
 
 Chaque idée : le problème, pour qui, ce que ça vaut, l'effort, ce qu'on demande à Beau. Beau coche ☐ → ☑ quand il décide. Les idées viennent des deux sessions, de la concurrence, du terrain. Rien n'est promis : c'est une liste de choix.
 
+## Le problème numéro un, au-dessus de la liste (posé par Alpha, 17/09)
+
+**Personne ne parle aux vendeuses.** Chiffres relevés par Alpha sur la place de marché : cette semaine 92 fiches produit ouvertes, 236 appareils, **zéro commande** ; 3 clics de contact depuis le début de Finjaro. Et des commandes qui restent sans confirmation — une cliente réelle attend depuis treize jours.
+
+Tant que ce trou n'est pas compris, aucune fonctionnalité de plus, d'un côté ou de l'autre, ne change le résultat. Alpha porte le sujet (clients et croissance) ; Claudinette n'ajoute rien à Accounting qui détourne de là sans le dire. Les idées ci-dessous se lisent avec cette réserve : **elles rendent le produit juste, elles ne font pas venir les acheteurs.**
+
+Deux exceptions qui servent quand même ce problème : l'idée 8 (marge sur les ventes Finjaro) parce qu'elle conditionne la mise en production de la liaison, et l'idée 2 (mobile money) parce qu'elle touche l'acte d'achat lui-même.
+
+## Conseils courts au bon moment (version retenue de « Finjaro Learning », accord Claudinette–Alpha, 17/09)
+
+Pas une plateforme de formation maintenant : Beau ne code pas, a un travail à côté, et son attention est la vraie ressource rare. Une version petite, mesurable, sur les deux comportements qui coûtent de l'argent aujourd'hui :
+
+| # | Idée | Problème résolu, pour qui | Ce que ça vaut | Effort | Décision |
+|---|---|---|---|---|---|
+| 0a | Un mot à la vendeuse **au moment où elle reçoit une commande** (« confirmez dans la journée, sinon la cliente s'en va ») | Commandes jamais confirmées, clientes perdues | Se mesure : taux de confirmation | 1 j (Alpha) | ☐ |
+| 0b | **Comment photographier un article** : trois conseils au moment d'ajouter une photo | Les photos décident de tout sur une place de marché ; personne ne l'a expliqué | Se mesure : taux de contact, fiches avec photo | 2 j (Alpha, tâche #61) | ☐ |
+| 0c | La même idée côté Accounting : un conseil dans l'écran concerné (première clôture, premier abonnement, premier stock négatif), jamais un cours | Une commerçante qui n'a jamais fait de comptabilité | Prépare un vrai Finjaro Learning le jour où il y aura des élèves | 2 j (Claudinette) | ☐ |
+
+La formation comme produit (vendue à des ONG, à des programmes d'appui aux PME) reste une vraie piste, mais c'est un métier différent : à rouvrir quand Finjaro aura des acheteurs.
+
 ## 17/09/2026 — première revue (Claudinette)
 
 | # | Idée | Problème résolu, pour qui | Ce que ça vaut | Effort | Décision |
