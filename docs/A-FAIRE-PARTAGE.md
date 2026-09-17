@@ -488,3 +488,24 @@ Avec ça, la liaison ne peut plus faire payer d'impôt sur un faux bénéfice : 
 **17/09, 21:30 — accord Claudinette–Alpha sur les priorités.** Le problème numéro un est écrit en tête de `docs/IDEES.md` : personne ne parle aux vendeuses (92 fiches vues, 236 appareils, zéro commande cette semaine ; 3 clics de contact depuis le début). Les idées d'Accounting rendent le produit juste, elles ne font pas venir les acheteurs ; elles se lisent avec cette réserve. « Finjaro Learning » devient trois conseils courts au bon moment (commande à confirmer, photo d'article, premier écran de comptabilité), mesurables, au lieu d'un troisième produit. Claudinette est d'accord avec Alpha sur les deux points.
 
 **17/09, 21:35 — Claudinette.** Page pour Beau complétée (`docs/LIAISON-POUR-BEAU.md`) : ce que ça change dans ses comptes, les 21 contrôles rejouables, et les trois points demandés par Alpha dans la décision — elle touche les deux applications, ce qui se passe si l'écriture échoue (la livraison échoue avec elle ; exposition réelle : sept espaces, une livraison en treize jours), et la marche arrière en une ligne (`drop trigger`). D'accord aussi avec la règle de mise en ligne, écrite dans `docs/CHARTE-EQUIPE.md` : une correction qui ne touche qu'une application et ne change aucune donnée existante part en la notant ici le jour même ; la base partagée, l'auth, les fonctions edge et l'autre application passent par Beau, toujours. Pour mémoire, poussé en ligne ce soir côté Accounting sans l'avoir dit avant : correctifs de simulation, module Abonnements, redirection workers.dev, complément de coût des ventes Finjaro. Aucun ne touche la base partagée ni l'autre application ; tous sont notés ici maintenant.
+
+---
+
+### ⚠️ POSÉ EN PRODUCTION — 17/09, 21:40, par Claudinette sur ordre de Beau
+
+**Migration `0127_liaison_commande_vers_vente.sql`** (dépôt place de marché, `staging`, commit `dd8b48b`) appliquée sur le projet de production `bokwivwizghdlaedczbw`.
+
+**Avant de poser**, fichier lu en entier (225 lignes) et transcrit à l'identique — égalité prouvée par comparaison, pas supposée. Contrôles préalables en lecture seule :
+- les neuf colonnes de `orders` et les quatre de `order_items` utilisées par le déclencheur existent bien en production ;
+- `finia_events` n'a pas la sécurité au niveau ligne *forcée*, donc le `security definer` passe (c'est ce qui le faisait marcher sur le projet de test) ;
+- aucun objet en conflit ; les deux devises réellement utilisées par les espaces (XAF, EUR) sont dans la table des taux ;
+- une seule instruction `drop` dans tout le fichier : le `drop trigger if exists` qui précède sa propre recréation.
+
+**Après** : déclencheur posé (1), fonctions posées (2), 5 taux enregistrés, journal de liaison vide. L'existant est intact : 22 commandes, 25 événements comptables, 7 espaces, 62 boutiques.
+
+**Trois faits à connaître :**
+1. **Seules 3 boutiques sur 62 ont une comptabilité Accounting.** La liaison ne concerne que ces trois vendeuses aujourd'hui ; pour les 59 autres, une livraison écrit une ligne `espace_absent` dans `finia_liaison_log` et rien d'autre.
+2. **Les 5 commandes déjà livrées n'ont pas créé de ventes**, et c'est voulu : le déclencheur ne s'active que sur un *passage* à « livrée ». Les reprendre serait une action délibérée et séparée, à décider.
+3. **Aucun essai n'a été fait en production**, volontairement : déclencher une livraison de test ferait partir de vraies notifications à de vraies clientes (`trg_order_status`, `push_notify`), et une notification envoyée ne s'annule pas. La preuve de fonctionnement reste celle du projet de test (commande FJ-8SP3T), plus le rejeu de l'événement réel dans le moteur Accounting.
+
+**Marche arrière, une ligne :** `drop trigger trg_finia_order_to_sale on public.orders;` — tout revient à l'état d'avant, aucune donnée perdue.
