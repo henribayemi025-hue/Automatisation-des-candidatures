@@ -254,7 +254,9 @@ export default {
     // vieux lien ou un favori arrive au bon endroit, et la connexion Google
     // repart depuis accounting.finjaro.net, la seule adresse déclarée à
     // Supabase. L'ancre (#/…) est conservée par le navigateur.
-    if (url.hostname.endsWith('.workers.dev') && req.method === 'GET' && !url.pathname.startsWith('/api/')) {
+    // Seulement l'ancienne adresse exacte : un aperçu (wrangler versions
+    // upload) sur un autre alias workers.dev doit rester testable.
+    if (url.hostname === 'automatisation-des-candidatures.finjaro.workers.dev' && req.method === 'GET' && !url.pathname.startsWith('/api/')) {
       return Response.redirect(`https://accounting.finjaro.net${url.pathname}${url.search}`, 301);
     }
     if (url.pathname === '/api/assistant') return handleAssistant(req, env);
