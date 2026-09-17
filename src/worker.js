@@ -250,6 +250,13 @@ async function handleAssistant(req, env) {
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
+    // L'ancienne adresse (workers.dev) renvoie vers l'adresse officielle : un
+    // vieux lien ou un favori arrive au bon endroit, et la connexion Google
+    // repart depuis accounting.finjaro.net, la seule adresse déclarée à
+    // Supabase. L'ancre (#/…) est conservée par le navigateur.
+    if (url.hostname.endsWith('.workers.dev') && req.method === 'GET' && !url.pathname.startsWith('/api/')) {
+      return Response.redirect(`https://accounting.finjaro.net${url.pathname}${url.search}`, 301);
+    }
     if (url.pathname === '/api/assistant') return handleAssistant(req, env);
     if (url.pathname === '/api/health') {
       // Noms des variables vues par le worker (jamais les valeurs), pour diagnostiquer.
