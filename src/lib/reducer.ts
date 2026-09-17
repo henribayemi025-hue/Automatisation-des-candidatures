@@ -442,6 +442,42 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       break;
     }
 
+    case 'sale.cost': {
+      // Compléter le coût d'une vente arrivée sans (place de marché) : les
+      // lignes reçoivent leur coût, l'écriture de coût des marchandises est
+      // passée à la date de la vente, et le résultat redevient juste.
+      const sale = db.sales.find((s) => s.id === p.saleId);
+      if (!sale || sale.costResolved) break;
+      if (p.service) {
+        sale.costResolved = 'SERVICE';
+        audit(db, ev, 'sale', sale.id, 'COST', `Vente ${sale.number} : prestation, pas de coût`);
+        break;
+      }
+      const costs = p.unitCosts as Minor[];
+      sale.lines.forEach((l, i) => {
+        l.unitCost = Math.max(0, Math.round(costs[i] ?? 0));
+      });
+      const cost = sale.lines.reduce((s, l) => s + l.unitCost * l.qty, 0);
+      if (cost > 0) {
+        post(db, ev, {
+          id: p.entryId as string,
+          date: sale.date,
+          journal: 'OD',
+          ref: `${sale.number}-CMV`,
+          label: `Coût des marchandises vendues ${sale.number}`,
+          sourceType: 'sale',
+          sourceId: sale.id,
+          lines: [
+            { account: accountCode(chart, 'INVENTORY_CHANGE'), label: 'Coût des ventes', debit: cost, credit: 0 },
+            { account: accountCode(chart, 'INVENTORY'), label: 'Sortie de stock', debit: 0, credit: cost },
+          ],
+        });
+      }
+      sale.costResolved = 'SET';
+      audit(db, ev, 'sale', sale.id, 'COST', `Vente ${sale.number} : coût complété (${cost})`);
+      break;
+    }
+
     case 'quote.confirm': {
       const sale = db.sales.find((s) => s.id === p.saleId);
       if (!sale || sale.status !== 'QUOTE') break;

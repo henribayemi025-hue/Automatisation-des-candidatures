@@ -40,5 +40,19 @@ check(db.sales.length === 1 && balanceOf(accountCode('SYSCOHADA', 'CASH'), db.en
 const other = { ...order, sale: { ...order.sale, id: 'another-id', externalId: 'order-uuid-1' } };
 db = applyEvent(db, ev('sale.record', other, '2026-09-15T17:22:00.000Z'));
 check(db.sales.length === 1, 'même commande sous un autre identifiant : ignorée grâce à externalId');
+// Le coût inconnu : signalé, puis complété ; le résultat redevient juste ; la clôture attend.
+const { salesWithoutCost, suggestedCost } = await import('../src/lib/liaison');
+const { incomeStatement } = await import('../src/lib/ledger');
+const before = salesWithoutCost(db, '2026-09-01', '2026-09-30');
+check(before.sales.length === 1 && before.exposure === 31500, `vente sans coût signalée, résultat surestimé d'au plus ${before.exposure}`);
+check(suggestedCost(db, 'Robe wax (M, bleu)') === 9000, 'coût proposé depuis la fiche « Robe wax » (9 000)');
+check(incomeStatement(db.accounts, db.entries, '2026-09-01', '2026-09-30').netIncome === 31500, 'avant complément : résultat = prix entier (31 500)');
+db = applyEvent(db, ev('sale.cost', { saleId: 'order-uuid-1', unitCosts: [9000, 0], entryId: 'fj-cost1' }, '2026-09-20T10:00:00.000Z'));
+const after = incomeStatement(db.accounts, db.entries, '2026-09-01', '2026-09-30').netIncome;
+check(after === 31500 - 18000, `après complément (2 × 9 000) : résultat ${after} = 13 500`);
+check(salesWithoutCost(db).sales.length === 0, 'plus rien à compléter');
+check(db.entries.find((e) => e.ref === 'FJ-X8HKH5-CMV')?.date === '2026-09-15', 'écriture de coût datée du jour de la vente');
+db = applyEvent(db, ev('sale.cost', { saleId: 'order-uuid-1', unitCosts: [1, 1], entryId: 'fj-cost2' }, '2026-09-21T10:00:00.000Z'));
+check(db.entries.filter((e) => e.ref === 'FJ-X8HKH5-CMV').length === 1, 'un second complément est ignoré');
 console.log(failures ? `\n${failures} contrôle(s) en échec` : '\nTous les contrôles passent.');
 process.exit(failures ? 1 : 0);

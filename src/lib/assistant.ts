@@ -3,6 +3,7 @@ import { balanceSheet, incomeStatement, runAuditChecks } from './ledger';
 import { monthStart, outstanding, productPerformance, saleRevenue, snapshot } from './metrics';
 import { formatMoney, formatPercent } from './money';
 import { SOON_DAYS, summarize } from './subscriptions';
+import { salesWithoutCost } from './liaison';
 import { t } from './i18n';
 import type { DB, Minor } from './types';
 
@@ -240,6 +241,8 @@ export function insights(db: DB): { tone: 'good' | 'warn' | 'bad'; text: string 
   if (s.outOfStock > 0) list.push({ tone: 'bad', text: t('{n} produit(s) en rupture : chaque jour sans stock est une vente perdue.', { n: s.outOfStock }) });
   const negative = db.products.filter((p) => !p.archived && p.stock < 0);
   if (negative.length) list.push({ tone: 'bad', text: t('{n} article(s) ont un stock sous zéro ({names}) : des ventes ont dépassé le rayon, souvent deux caisses hors ligne. Faites un inventaire et un ajustement.', { n: negative.length, names: negative.slice(0, 3).map((p) => p.name).join(', ') }) });
+  const noCost = salesWithoutCost(db);
+  if (noCost.sales.length) list.push({ tone: 'bad', text: t('{n} vente(s) Finjaro sans coût d’achat : votre résultat est surestimé d’au plus {amount}. Complétez le coût depuis Ventes.', { n: noCost.sales.length, amount: money(noCost.exposure) }) });
   const subs = summarize(db, new Date().toISOString().slice(0, 10));
   if (subs.expired > 0) list.push({ tone: 'bad', text: t('{n} abonnement(s) expiré(s) : {names}. Un rappel WhatsApp part depuis l’écran Abonnements.', { n: subs.expired, names: subs.expiredList.slice(0, 3).map((x) => x.customerName).join(', ') }) });
   if (subs.soon > 0) list.push({ tone: 'warn', text: t('{n} abonnement(s) finissent dans moins de {d} jours : {names}.', { n: subs.soon, d: SOON_DAYS, names: subs.soonList.slice(0, 3).map((x) => x.customerName).join(', ') }) });

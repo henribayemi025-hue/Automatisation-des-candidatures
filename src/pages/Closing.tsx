@@ -3,10 +3,12 @@ import { today, useStore } from '../lib/store';
 import { closingPlan, currentFiscalYear, nextToClose } from '../lib/closing';
 import { incomeStatement } from '../lib/ledger';
 import { buildFec, fecFileName } from '../lib/fec';
-import { currency as currencyOf } from '../lib/money';
+import { currency as currencyOf, formatMoney } from '../lib/money';
+import { Link } from 'react-router-dom';
 import { Empty, Field, FigureStrip, Modal, Money, PageHeader, Table } from '../components/UI';
 import { IconCheck, IconDownload } from '../components/Icons';
 import { t } from '../lib/i18n';
+import { salesWithoutCost } from '../lib/liaison';
 
 /**
  * Clôture d'exercice. Une fois l'année terminée et vérifiée, les comptes de
@@ -30,6 +32,7 @@ export default function Closing() {
   const current = currentFiscalYear(db.company, now);
   const income = incomeStatement(db.accounts, db.entries, range.from, range.to);
   const openYear = range.to >= now;
+  const noCost = salesWithoutCost(db, range.from, range.to);
 
   function exportFec() {
     const text = buildFec(db.accounts, db.entries, {
@@ -88,6 +91,12 @@ export default function Closing() {
           ]}
         />
 
+        {noCost.sales.length > 0 && (
+          <p className="mt-4 rounded-lg bg-[#FDEDED] px-3 py-2 text-caption text-[#A63030]">
+            {t('{n} vente(s) venue(s) de Finjaro n’ont pas de coût d’achat ({list}). Sans lui, le résultat serait surestimé d’au plus {amount} et l’impôt calculé dessus. Complétez-les dans Ventes avant de clôturer.', { n: noCost.sales.length, list: noCost.sales.slice(0, 3).map((x) => x.number).join(', '), amount: formatMoney(noCost.exposure, db.company.currency) })}{' '}
+            <Link to="/ventes" className="font-semibold underline">{t('Ouvrir Ventes')}</Link>
+          </p>
+        )}
         {openYear && (
           <p className="mt-4 rounded-lg bg-brand-500/10 px-3 py-2 text-caption text-ink">
             {t('Cet exercice n’est pas terminé. On ne clôture qu’une année révolue — sinon les mois restants n’auraient plus où s’écrire.')}
@@ -95,7 +104,7 @@ export default function Closing() {
         )}
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <button onClick={() => setConfirm(true)} disabled={plan.empty || openYear} className="btn-primary disabled:opacity-40">
+          <button onClick={() => setConfirm(true)} disabled={plan.empty || openYear || noCost.sales.length > 0} className="btn-primary disabled:opacity-40">
             <IconCheck className="h-4 w-4" />
             {t('Clôturer cet exercice')}
           </button>

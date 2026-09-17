@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
-import { useDB } from '../lib/store';
+import { useStore } from '../lib/store';
+import { formatMoney, toMajor, toMinor } from '../lib/money';
+import { needsCost, suggestedCost } from '../lib/liaison';
 import { saleRevenue } from '../lib/metrics';
 import { Badge, Empty, Modal, Money, PageHeader, StatCard, Table } from '../components/UI';
 import { IconReceipt } from '../components/Icons';
@@ -15,12 +17,13 @@ const METHOD_LABEL: Record<string, string> = {
 };
 
 export default function Sales() {
-  const db = useDB();
+  const { db, completeSaleCost } = useStore();
   const [status, setStatus] = useState('');
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [detail, setDetail] = useState<Sale | null>(null);
   const [q, setQ] = useState('');
+  const [costRaw, setCostRaw] = useState<Record<number, string>>({});
 
   const sales = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -180,6 +183,46 @@ export default function Sales() {
                 </dd>
               </div>
             </dl>
+
+            {needsCost(detail) && (
+              <div className="mt-5 rounded-input border border-[#D14343]/40 bg-[#FDEDED] p-3">
+                <h3 className="text-sm font-bold text-[#A63030]">{t('Vente venue de Finjaro : coût d’achat inconnu')}</h3>
+                <p className="mt-1 text-caption text-ink">
+                  {t('La place de marché ne connaît pas ce que vous ont coûté ces articles. Sans le coût, votre résultat est surestimé de {amount}. Indiquez le coût d’achat de chaque ligne, ou dites que c’est une prestation.', { amount: formatMoney(detail.total - detail.vat, db.company.currency) })}
+                </p>
+                <div className="mt-3 grid gap-2">
+                  {detail.lines.map((l, i) => (
+                    <label key={i} className="flex items-center justify-between gap-3 text-caption">
+                      <span className="min-w-0 truncate">{l.qty} × {l.name}</span>
+                      <input
+                        value={costRaw[i] ?? ''}
+                        onChange={(e) => setCostRaw({ ...costRaw, [i]: e.target.value })}
+                        inputMode="decimal"
+                        placeholder={String(toMajor(suggestedCost(db, l.name), db.company.currency) || '')}
+                        className="field num w-32"
+                        aria-label={t('Coût unitaire de {name}', { name: l.name })}
+                      />
+                    </label>
+                  ))}
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => {
+                      const costs = detail.lines.map((l, i) => toMinor(costRaw[i] || toMajor(suggestedCost(db, l.name), db.company.currency) || 0, db.company.currency));
+                      completeSaleCost(detail.id, costs);
+                      setCostRaw({});
+                      setDetail(null);
+                    }}
+                    className="btn-primary py-1.5 text-caption"
+                  >
+                    {t('Enregistrer le coût')}
+                  </button>
+                  <button onClick={() => { completeSaleCost(detail.id, 'SERVICE'); setDetail(null); }} className="btn-ghost py-1.5 text-caption">
+                    {t('C’est une prestation, pas de coût')}
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="mt-5">
               <h3 className="mb-2 text-sm font-bold">{t('Écritures comptables générées')}</h3>

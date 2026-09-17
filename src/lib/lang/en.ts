@@ -3,6 +3,16 @@
  * A missing key simply shows the French text.
  */
 export const EN: Record<string, string> = {
+  // ---- Liaison Finjaro : coût inconnu ----
+  'Vente venue de Finjaro : coût d’achat inconnu': 'Sale from Finjaro: purchase cost unknown',
+  'La place de marché ne connaît pas ce que vous ont coûté ces articles. Sans le coût, votre résultat est surestimé de {amount}. Indiquez le coût d’achat de chaque ligne, ou dites que c’est une prestation.': 'The marketplace does not know what these items cost you. Without it, your profit is overstated by {amount}. Enter the purchase cost of each line, or say it is a service.',
+  'Coût unitaire de {name}': 'Unit cost of {name}',
+  'Enregistrer le coût': 'Save cost',
+  'C’est une prestation, pas de coût': 'It is a service, no cost',
+  '{n} vente(s) Finjaro sans coût : résultat surestimé d’au plus {amount}': '{n} Finjaro sale(s) without cost: profit overstated by up to {amount}',
+  '{n} vente(s) Finjaro sans coût d’achat : votre résultat est surestimé d’au plus {amount}. Complétez le coût depuis Ventes.': '{n} Finjaro sale(s) without purchase cost: your profit is overstated by up to {amount}. Complete the cost from Sales.',
+  '{n} vente(s) venue(s) de Finjaro n’ont pas de coût d’achat ({list}). Sans lui, le résultat serait surestimé d’au plus {amount} et l’impôt calculé dessus. Complétez-les dans Ventes avant de clôturer.': '{n} sale(s) from Finjaro have no purchase cost ({list}). Without it, profit would be overstated by up to {amount} and tax computed on it. Complete them in Sales before closing.',
+  'Ouvrir Ventes': 'Open Sales',
   // ---- Abonnements ----
   'Abonnements': 'Subscriptions',
   'Qui est abonné, jusqu’à quand, et qui arrive au bout': 'Who is subscribed, until when, and who is about to run out',

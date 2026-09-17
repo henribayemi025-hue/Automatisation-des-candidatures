@@ -160,6 +160,8 @@ export interface StoreActions {
   /** Encaisse une période de plus : une vente est enregistrée, la date de fin avance. Renvoie la vente (pour la facture). */
   renewSubscription: (subscriptionId: string, method: PaymentMethod, amount?: Minor, from?: string) => Sale | null;
   cancelSubscription: (subscriptionId: string) => void;
+  /** Complète le coût d'une vente venue de la place de marché ('SERVICE' : rien à sortir). */
+  completeSaleCost: (saleId: string, unitCosts: Minor[] | 'SERVICE') => void;
   addManualEntry: (input: ManualEntryInput) => void;
   reverseEntry: (entryId: string) => void;
   saveEmployee: (employee: Omit<Employee, 'id' | 'createdAt'> & { id?: string }) => Employee;
@@ -472,6 +474,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
       cancelSubscription(subscriptionId) {
         dispatch('subscription.cancel', { subscriptionId });
+      },
+
+      completeSaleCost(saleId, unitCosts) {
+        if (unitCosts === 'SERVICE') dispatch('sale.cost', { saleId, service: true });
+        else dispatch('sale.cost', { saleId, unitCosts, entryId: newId() });
       },
 
       payDebt(debtId, amount, method) {

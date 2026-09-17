@@ -4,6 +4,7 @@ import { Area, Bar, CartesianGrid, ComposedChart, Legend, ResponsiveContainer, T
 import { today, useDB } from '../lib/store';
 import { dashboard, delta } from '../lib/kpi';
 import { summarize } from '../lib/subscriptions';
+import { salesWithoutCost } from '../lib/liaison';
 import type { Period } from '../lib/kpi';
 import { productPerformance } from '../lib/metrics';
 import { factor, formatMoney, formatNumber } from '../lib/money';
@@ -104,6 +105,7 @@ export default function Dashboard() {
   const todayISO = today();
   const k = useMemo(() => dashboard(db, period, todayISO, divisor), [db, period, todayISO, divisor]);
   const subs = useMemo(() => summarize(db, todayISO), [db, todayISO]);
+  const noCost = useMemo(() => salesWithoutCost(db), [db]);
   const top = useMemo(() => productPerformance(db, k.series.dates[0], todayISO).slice(0, 6), [db, k.series.dates, todayISO]);
   const topMax = top[0]?.revenue ?? 1;
   const hasData = k.series.revenue.some((v) => v > 0) || k.series.expenses.some((v) => v > 0);
@@ -246,7 +248,7 @@ export default function Dashboard() {
       </p>
 
       {(() => {
-        const todoCount = (k.outOfStock > 0 ? 1 : 0) + (k.lowStock > 0 ? 1 : 0) + (k.receivablesOverdue > 0 ? 1 : 0) + (k.openSession ? 1 : 0) + (subs.expired > 0 ? 1 : 0) + (subs.soon > 0 ? 1 : 0);
+        const todoCount = (noCost.sales.length > 0 ? 1 : 0) + (k.outOfStock > 0 ? 1 : 0) + (k.lowStock > 0 ? 1 : 0) + (k.receivablesOverdue > 0 ? 1 : 0) + (k.openSession ? 1 : 0) + (subs.expired > 0 ? 1 : 0) + (subs.soon > 0 ? 1 : 0);
         const tabs: { id: 'CHART' | 'TOP' | 'TODO'; label: string; badge?: number }[] = [
           { id: 'CHART', label: t('Courbe') },
           { id: 'TOP', label: t('Meilleures ventes') },
@@ -364,6 +366,14 @@ export default function Dashboard() {
                 {t('À traiter')}
               </h2>
               <ul className="space-y-1.5 text-caption">
+                {noCost.sales.length > 0 && (
+                  <li>
+                    <Link to="/ventes" className="flex justify-between hover:text-teal">
+                      <span>{t('{n} vente(s) Finjaro sans coût : résultat surestimé d’au plus {amount}', { n: noCost.sales.length, amount: formatMoney(noCost.exposure, db.company.currency) })}</span>
+                      <IconChevronRight className="h-4 w-4" />
+                    </Link>
+                  </li>
+                )}
                 {subs.expired > 0 && (
                   <li>
                     <Link to="/abonnements" className="flex justify-between hover:text-teal">

@@ -174,6 +174,12 @@ export interface Sale {
   externalId?: string;
   /** Conversion appliquée par la source : montant brut, taux, devise obtenue. Pour relire un même chiffre à chaque rejeu. */
   fx?: { fromCurrency: string; fromTotal: Minor; rate: number; currency: string };
+  /**
+   * Une vente venue de la place de marché arrive sans coût d'achat. Tant que
+   * la vendeuse ne l'a pas complété, le résultat est surestimé du prix entier.
+   * 'SET' : coût saisi, écriture de coût passée. 'SERVICE' : rien à sortir.
+   */
+  costResolved?: 'SET' | 'SERVICE';
 }
 
 export interface PurchaseLine {
