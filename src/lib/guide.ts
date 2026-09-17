@@ -121,6 +121,13 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
     example: 'Enregistrez « Maman Ngo » pour lui vendre à crédit et suivre ses paiements.',
     questions: ['Qui me doit de l’argent ?', 'Combien je dois à mes fournisseurs ?'],
   },
+  '/abonnements': {
+    title: 'Abonnements',
+    what: 'Qui est abonné, à quoi, pour combien, jusqu’à quand. Le compte à rebours et les alertes disent qui arrive au bout ; chaque renouvellement est une vente normale, avec sa facture à envoyer sur WhatsApp.',
+    when: 'Une salle de sport, un wifi, des cours, une télé, un parking : tout ce qui se paie pour une durée.',
+    example: 'Awa paie 10 000 pour un mois le 3 mars : elle est couverte jusqu’au 2 avril ; le 27 mars, l’accueil vous prévient et vous lui envoyez un rappel.',
+    questions: ['Qui expire cette semaine ?', 'Combien d’abonnés actifs ?'],
+  },
   '/dettes': {
     title: 'Dettes & crédits',
     what: 'D’un côté ce que les clients vous doivent, de l’autre ce que vous devez aux fournisseurs. Chaque règlement s’enregistre ici.',

@@ -16,6 +16,8 @@ import type {
   Product,
   Purchase,
   Sale,
+  Subscription,
+  SubscriptionPeriod,
   Supplier,
   WorkspaceEvent,
   Project,
@@ -59,6 +61,7 @@ export function emptyDB(): DB {
     expenses: [],
     movements: [],
     debts: [],
+    subscriptions: [],
     sessions: [],
     projects: [],
     messages: [],
@@ -94,6 +97,7 @@ export function normalizeDB(raw: Partial<DB> | null | undefined): DB {
     accounts: mergeAccounts(raw.accounts, (raw.company?.chart ?? base.company.chart) as Company['chart']),
     // Ajouté après coup : un instantané ancien n'a pas de projets.
     projects: raw.projects ?? [],
+    subscriptions: raw.subscriptions ?? [],
     messages: raw.messages ?? [],
     employees: raw.employees ?? [],
     attendance: raw.attendance ?? [],
@@ -1017,6 +1021,40 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       });
       original.reversedBy = reversal.id;
       audit(db, ev, 'entry', original.id, 'REVERSE', `Écriture ${original.ref} extournée par ${reversal.ref}`);
+      break;
+    }
+
+    case 'subscription.save': {
+      const sub = p.subscription as Subscription;
+      const idx = db.subscriptions.findIndex((x) => x.id === sub.id);
+      if (idx < 0) db.subscriptions.unshift(sub);
+      else db.subscriptions[idx] = { ...db.subscriptions[idx], ...sub, periods: db.subscriptions[idx].periods };
+      audit(db, ev, 'subscription', sub.id, idx < 0 ? 'CREATE' : 'UPDATE', `Abonnement ${sub.label} — ${sub.customerName}`);
+      break;
+    }
+
+    case 'subscription.renew': {
+      // Une période de plus, encaissée : c'est une vente comme une autre
+      // (ticket, journal, caisse), sans stock ni coût des marchandises.
+      const sub = db.subscriptions.find((x) => x.id === p.subscriptionId);
+      if (!sub) break;
+      const sale = structuredClone(p.sale as Sale);
+      sale.number = uniqueNumber(db.sales.map((s) => s.number), sale.number);
+      db.sales.unshift(sale);
+      applySale(db, ev, sale, p.ids as never);
+      const period = p.period as SubscriptionPeriod;
+      sub.periods.push({ ...period, saleId: sale.id });
+      if (period.to > sub.endDate) sub.endDate = period.to;
+      sub.status = 'ACTIVE';
+      audit(db, ev, 'subscription', sub.id, 'RENEW', `Abonnement ${sub.label} — ${sub.customerName} jusqu'au ${period.to}`);
+      break;
+    }
+
+    case 'subscription.cancel': {
+      const sub = db.subscriptions.find((x) => x.id === p.subscriptionId);
+      if (!sub) break;
+      sub.status = 'CANCELLED';
+      audit(db, ev, 'subscription', sub.id, 'CANCEL', `Abonnement ${sub.label} — ${sub.customerName} arrêté`);
       break;
     }
 

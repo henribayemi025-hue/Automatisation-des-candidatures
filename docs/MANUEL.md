@@ -421,3 +421,15 @@ vous. C'est lui qu'un comptable ou un contrôleur doit lire, pas l'écran.
 **J'ai changé de téléphone et j'ai tout perdu.** Sans compte, il n'y a pas de copie en ligne. Si vous aviez enregistré une sauvegarde, rechargez-la depuis l'écran de connexion. Sinon, les données ne sont pas récupérables. Créez un compte, c'est ce qui évite ce cas.
 
 **Je travaille sans compte.** Les données restent sur l'appareil. Créez un compte pour les sauvegarder en ligne et travailler à plusieurs.
+
+## 22. Abonnements
+
+Pour tout ce qui se paie pour une durée : salle de sport, wifi, cours, télé, parking.
+
+- **Nouvel abonnement** : le client (ou son nom et son WhatsApp), l'offre, le prix d'une période, la durée (1 mois, 3 mois, 30 jours…), la date de début. Cochez « Encaisser la première période maintenant » : une vente est enregistrée avec son ticket, comme au comptoir.
+- **Compte à rebours** : chaque abonné affiche les jours restants. Vert : en cours. Orange : finit dans moins de sept jours. Rouge : dépassé. L'accueil, onglet « À traiter », compte ceux qui finissent dans la semaine et ceux qui sont expirés ; l'assistant le dit aussi.
+- **Rappel WhatsApp** : un message prêt, avec la date de fin et le prix pour continuer. **Facture WhatsApp** : la dernière période payée, avec le numéro de ticket.
+- **Encaisser une période** : la nouvelle période commence à la suite de l'actuelle (ou aujourd'hui si elle est finie depuis longtemps). Une vente de plus, un ticket de plus.
+- **Arrêter** : l'abonné sort de la liste des actifs ; ce qu'il a payé reste dans les comptes.
+
+Côté comptabilité, chaque encaissement est une vente de prestation, sans stock. Ce qui reste à faire par un comptable à la clôture : la part des périodes payées qui courent encore après la date de clôture est un produit constaté d'avance (ligne 10 du tableau `docs/SIMULATION-DECISIONS.md`).

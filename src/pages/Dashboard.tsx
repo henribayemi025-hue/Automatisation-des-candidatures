@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Area, Bar, CartesianGrid, ComposedChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { today, useDB } from '../lib/store';
 import { dashboard, delta } from '../lib/kpi';
+import { summarize } from '../lib/subscriptions';
 import type { Period } from '../lib/kpi';
 import { productPerformance } from '../lib/metrics';
 import { factor, formatMoney, formatNumber } from '../lib/money';
@@ -102,6 +103,7 @@ export default function Dashboard() {
   const divisor = factor(currency);
   const todayISO = today();
   const k = useMemo(() => dashboard(db, period, todayISO, divisor), [db, period, todayISO, divisor]);
+  const subs = useMemo(() => summarize(db, todayISO), [db, todayISO]);
   const top = useMemo(() => productPerformance(db, k.series.dates[0], todayISO).slice(0, 6), [db, k.series.dates, todayISO]);
   const topMax = top[0]?.revenue ?? 1;
   const hasData = k.series.revenue.some((v) => v > 0) || k.series.expenses.some((v) => v > 0);
@@ -244,7 +246,7 @@ export default function Dashboard() {
       </p>
 
       {(() => {
-        const todoCount = (k.outOfStock > 0 ? 1 : 0) + (k.lowStock > 0 ? 1 : 0) + (k.receivablesOverdue > 0 ? 1 : 0) + (k.openSession ? 1 : 0);
+        const todoCount = (k.outOfStock > 0 ? 1 : 0) + (k.lowStock > 0 ? 1 : 0) + (k.receivablesOverdue > 0 ? 1 : 0) + (k.openSession ? 1 : 0) + (subs.expired > 0 ? 1 : 0) + (subs.soon > 0 ? 1 : 0);
         const tabs: { id: 'CHART' | 'TOP' | 'TODO'; label: string; badge?: number }[] = [
           { id: 'CHART', label: t('Courbe') },
           { id: 'TOP', label: t('Meilleures ventes') },
@@ -362,6 +364,22 @@ export default function Dashboard() {
                 {t('À traiter')}
               </h2>
               <ul className="space-y-1.5 text-caption">
+                {subs.expired > 0 && (
+                  <li>
+                    <Link to="/abonnements" className="flex justify-between hover:text-teal">
+                      <span>{t('{n} abonnement(s) expiré(s)', { n: subs.expired })}</span>
+                      <IconChevronRight className="h-4 w-4" />
+                    </Link>
+                  </li>
+                )}
+                {subs.soon > 0 && (
+                  <li>
+                    <Link to="/abonnements" className="flex justify-between hover:text-teal">
+                      <span>{t('{n} abonnement(s) finissent dans la semaine', { n: subs.soon })}</span>
+                      <IconChevronRight className="h-4 w-4" />
+                    </Link>
+                  </li>
+                )}
                 {k.outOfStock > 0 && (
                   <li>
                     <Link to="/stock" className="flex justify-between hover:text-teal">

@@ -2,6 +2,7 @@ import { accountCode } from './chart';
 import { balanceSheet, incomeStatement, runAuditChecks } from './ledger';
 import { monthStart, outstanding, productPerformance, saleRevenue, snapshot } from './metrics';
 import { formatMoney, formatPercent } from './money';
+import { SOON_DAYS, summarize } from './subscriptions';
 import { t } from './i18n';
 import type { DB, Minor } from './types';
 
@@ -237,6 +238,9 @@ export function insights(db: DB): { tone: 'good' | 'warn' | 'bad'; text: string 
   }
 
   if (s.outOfStock > 0) list.push({ tone: 'bad', text: t('{n} produit(s) en rupture : chaque jour sans stock est une vente perdue.', { n: s.outOfStock }) });
+  const subs = summarize(db, new Date().toISOString().slice(0, 10));
+  if (subs.expired > 0) list.push({ tone: 'bad', text: t('{n} abonnement(s) expiré(s) : {names}. Un rappel WhatsApp part depuis l’écran Abonnements.', { n: subs.expired, names: subs.expiredList.slice(0, 3).map((x) => x.customerName).join(', ') }) });
+  if (subs.soon > 0) list.push({ tone: 'warn', text: t('{n} abonnement(s) finissent dans moins de {d} jours : {names}.', { n: subs.soon, d: SOON_DAYS, names: subs.soonList.slice(0, 3).map((x) => x.customerName).join(', ') }) });
   if (s.lowStock > 0) list.push({ tone: 'warn', text: t('{n} produit(s) sous le seuil de réappro : préparez une commande fournisseur.', { n: s.lowStock }) });
 
   const errors = runAuditChecks(db.accounts, db.entries).filter((c) => c.severity === 'ERROR');

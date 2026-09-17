@@ -21,6 +21,7 @@ import Sales from './pages/Sales';
 import Quotes from './pages/Quotes';
 import Parties from './pages/Parties';
 import Debts from './pages/Debts';
+import Subscriptions from './pages/Subscriptions';
 import Expenses from './pages/Expenses';
 import Analytics from './pages/Analytics';
 import Reports from './pages/Reports';
@@ -128,6 +129,7 @@ export default function App() {
           <Route path="/devis" element={<Quotes />} />
           <Route path="/tiers" element={<Parties />} />
           <Route path="/dettes" element={<Debts />} />
+          <Route path="/abonnements" element={<Subscriptions />} />
           <Route path="/projets" element={<Projects />} />
           <Route path="/projets/:id" element={<ProjectDetail />} />
           <Route path="/depenses" element={<Expenses />} />
