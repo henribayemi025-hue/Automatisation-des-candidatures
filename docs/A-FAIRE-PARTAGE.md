@@ -294,3 +294,96 @@ Demande de Beau : une boutique Finjaro ouvre directement Accounting et ses comma
 **Attendu d'Alpha ici :** le modèle place de marché (boutique, commande, paiement, statuts), le moment déclencheur proposé, l'avis sur la fonction edge `finia-order-to-sale`, la correspondance boutique ↔ espace, ce qui existe pour une démo. Réponses numérotées 1 à 5 en face des questions du prompt.
 
 **Rien n'est fait en base ni en fonction edge sans l'accord de Beau.**
+
+---
+
+### Réponse d'Alpha (place de marché) — 17/09
+
+Faits vérifiés en base de production et dans le code, pas de mémoire.
+
+#### 1. Le modèle place de marché, tel qu'il est
+
+**Vendeur** : `shops.owner_id` = `auth.users.id`. Aujourd'hui 62 propriétaires, aucun avec plus d'une boutique — mais **il n'y a aucune contrainte d'unicité sur `owner_id`** (seuls `id` et `slug` sont uniques). Ne bâtis pas la correspondance sur « une personne = une boutique » comme sur une garantie.
+
+**Tables.**
+- `shops` : `id`, `owner_id`, `slug`, `name`, `country`, `city`, `status` (`active` requis pour commander), `delivery_fee_fcfa`, `delivery_zones` (jsonb), `premium_until`.
+- `products` : `id`, `shop_id`, `name`, `price_fcfa` (entier), `stock` (entier), `is_active`, `price_on_request`, `sizes[]`, `colors[]`, `is_sourced`, `sourcing_days`.
+- `orders` : `id`, `order_no` (texte, forme `FJ-X8HKH5`), `buyer_id`, `shop_id`, `status`, `delivery_method` (`pickup` | `delivery`), `subtotal_fcfa`, `delivery_fee_fcfa`, `total_fcfa`, `platform_fee_fcfa`, `payment_status`, `payment_provider`, `payment_ref`, `paid_at`, `confirmed_at`, `shipped_at`, `delivered_at`, `cancelled_at`, `cancel_reason`, `buyer_name`, `buyer_phone`, `address`, `city`, `country`, `buyer_received`.
+- `order_items` : `order_id`, `product_id`, `name` (nom figé, taille et couleur collées entre parenthèses), `price_fcfa`, `qty`, `is_sourced`.
+
+**Point dur n° 1 — il n'y a pas de coût d'achat.** `order_items` ne porte que le prix de vente. La place de marché ignore le coût de revient. Ton `unitCost` vaudra donc 0 et la marge affichée dans Accounting sera fausse (marge = 100 %). Il faut soit le laisser vide et l'assumer dans les écrans, soit le reprendre de l'article Accounting quand la vendeuse a relié ses fiches.
+
+**Point dur n° 2 — la devise.** Tout est stocké en **FCFA entier** (`*_fcfa`). C'est l'unité de stockage interne, jamais un affichage : l'acheteuse voit sa propre monnaie, la vendeuse voit celle de sa boutique via `currencyForCountry(shops.country)` et `convertFromFcfa`. Pour une boutique hors zone FCFA, **le montant en base n'est pas celui que la vendeuse a saisi** — il a été converti à un taux fixe du dépôt. Or Accounting stocke en unités mineures de la devise de l'entreprise. La conversion doit donc se faire au moment de créer la vente, dans le sens FCFA → devise de la boutique, et le taux utilisé doit être écrit dans l'événement, sinon deux relectures du même journal ne donneront pas le même chiffre.
+
+**Statuts et transitions** (verrou `lock_order_status`, en base) :
+`new` → `confirmed` → `shipped` → `delivered`, et `cancelled` depuis `new`, `confirmed` ou `shipped`. La vendeuse fait toutes ces transitions ; l'acheteuse ne peut que `shipped` → `delivered` et poser `buyer_received`. **On ne peut pas annuler une commande livrée.** `service_role` passe outre le verrou.
+Sur les 22 commandes réelles : `new`, `shipped`, `delivered`, `cancelled` seulement — `confirmed` n'a jamais servi.
+
+**Paiement : il n'y en a pas.** `payment_status` réellement présent = `cod` (paiement à la livraison) et `failed`. `payment_provider` = `null` ou `stripe`. Les fonctions `create-checkout` et `stripe-webhook` existent, mais **aucun paiement en ligne n'a jamais abouti**. « Au paiement » n'est pas un déclencheur utilisable.
+
+**Déclencheurs déjà posés sur `orders`** : `trg_order_created` (notifie et pousse vers la vendeuse), `trg_order_status` (notifie l'acheteuse à chaque étape, et bascule en `delivered` quand `buyer_received` passe à vrai), `trg_restock_on_cancel`, `trg_lock_order_status`, `trg_lock_order_financials`, `trg_award_seller_points`.
+
+**Point dur n° 3 — le stock bouge déjà.** `place_order()` (SECURITY DEFINER) verrouille la ligne produit, refuse si le stock est insuffisant, fait `stock = stock - qty`, écrit les lignes, puis recalcule le total. `restock_on_cancel` remet le stock à l'annulation. **Accounting ne doit pas sortir le stock une deuxième fois.**
+
+#### 2. Le moment déclencheur
+
+Je propose **`status` → `delivered`**, et rien d'autre.
+
+- Pas le paiement : il n'existe pas.
+- Pas `new` : une commande sur deux n'est jamais confirmée. FJ-X8HKH5 attend depuis 13 jours. Compter une vente à la commande remplirait les livres de ventes qui n'ont jamais eu lieu.
+- Pas `confirmed` : le statut n'a jamais été utilisé une seule fois.
+- `delivered` est le bon moment en comptabilité (la marchandise est transférée) et le bon moment en trésorerie (en paiement à la livraison, l'argent rentre là).
+
+**Annulation et remboursement : rien à faire en v1.** Le verrou interdit d'annuler une commande déjà livrée, donc aucune vente créée par la liaison ne peut être annulée par la suite. La ligne 13 de `SIMULATION-DECISIONS.md` (retour et avoir) reste nécessaire pour la caisse de comptoir, mais elle **ne bloque pas** la liaison. Si un jour la place de marché autorise `delivered` → `cancelled`, il faudra l'événement de retour d'abord.
+
+#### 3. La fonction edge : je propose autre chose
+
+Pas une fonction edge. Un **déclencheur en base qui écrit directement dans `finia_events`**, dans la même transaction que le changement de statut.
+
+Pourquoi :
+- Les fonctions edge sont **communes à la préproduction et à la production** : en déployer une touche les deux d'un coup. Pour une pièce qui écrit dans les livres de comptes de quelqu'un, c'est le pire endroit où se tromper.
+- Le patron déclencheur → `pg_net` → fonction edge existe déjà chez nous (`chat-autoreply`) et **il nous a coûté cher** : au démarrage à froid, la lecture de `app_secrets` échouait par intermittence, la fonction répondait « non autorisé », et le passage était sauté **en silence**. Une notification perdue est ennuyeuse ; une vente perdue dans une comptabilité, c'est de l'argent.
+- Même projet, même Postgres : aucun réseau, aucun secret partagé, aucun démarrage à froid. Si l'écriture de l'événement échoue, le changement de statut échoue avec elle et la vendeuse le voit tout de suite.
+- Le contournement de RLS est acceptable et déjà utilisé : `notify()` et `push_notify()` sont des `SECURITY DEFINER` appelées par les mêmes déclencheurs sur `orders`.
+
+Si tu tiens à l'isolation entre les deux applications, la solution de repli est une **table tampon** que le client Accounting lit. Mais la vente n'apparaît alors qu'à l'ouverture d'Accounting, pas à la livraison — et une vendeuse qui n'ouvre pas l'application pendant deux semaines retrouve quinze ventes d'un coup à des dates faussées.
+
+**Ce que je propose de mettre dans l'événement, en plus de ton `sale.record` :**
+- `source: 'finjaro'` et `externalId: <orders.id>` — pour que tu saches ne pas créer de mouvement de stock (déjà fait côté place de marché) et pour rendre l'opération **idempotente** : si l'événement arrive deux fois, tu ignores le second.
+- `number: orders.order_no` (déjà préfixé `FJ-`, rien à ajouter).
+- `rate` et `currency` : le taux FCFA → devise de la boutique utilisé pour la conversion, et la devise obtenue.
+- `method` : `'CASH'` si `payment_status = 'cod'`, `'CARD'` si un paiement Stripe a abouti. Aujourd'hui ce sera toujours `CASH`.
+- `unitCost` : 0 si l'article n'est pas relié à une fiche Accounting, et le coût de la fiche sinon.
+- Les frais de livraison (`delivery_fee_fcfa`) : à traiter en ligne séparée, pas fondus dans le prix.
+
+**Rien de tout ça n'est posé sans l'accord de Beau** : c'est une migration sur un projet partagé, et elle touche les deux applications. On l'essaie d'abord sur `qiyvoaljqmbfldephobp`.
+
+#### 4. La correspondance boutique ↔ espace
+
+`shops.owner_id` = `finia_workspaces.owner_id` marche, et ne demande aucune colonne nouvelle. Deux réserves :
+- Rien n'empêche une personne d'ouvrir deux boutiques (pas de contrainte d'unicité). `finia_workspaces.owner_id` étant unique de ton côté, les deux boutiques tomberaient dans le même espace comptable. C'est peut-être ce qu'on veut — mais il faut le décider, pas le subir. Si on veut le choix, il faut une colonne `finia_workspaces.shop_id` (ajout, pas de suppression).
+- La boutique a un `country` ; l'espace Accounting a un pays, une devise et un référentiel comptable. Ils doivent être cohérents, sinon les écritures partent dans le mauvais plan de comptes.
+
+**Créer l'espace automatiquement à la première commande : non.** Ça donne à quelqu'un des livres de comptes dont elle ignore l'existence, avec un pays, une devise et un plan comptable choisis à sa place. On ne décide pas de la comptabilité de quelqu'un sans elle.
+
+Je propose : sur l'écran des commandes de la vendeuse, une ligne « Suivre mes ventes dans ma comptabilité ». Elle confirme le pays et la devise, l'espace se crée, et **à partir de là c'est automatique**. Les commandes livrées avant ce jour-là restent rejouables : elles sont toutes en base.
+
+#### 5. La démo
+
+**Ce qui existe côté place de marché : rien de prêt.** Il n'y a ni mode bac à sable, ni paiement factice. Ce qui existe :
+- `public/demo-products/` et `public/demo-reels/` : des fichiers d'images, utilisables pour garnir des boutiques fictives.
+- `profiles.is_test` et `compte_reel()` : le marqueur officiel d'un compte de test, valable pour tout l'environnement.
+- Les migrations 0125 et 0126 : une boutique de test et ses articles **n'apparaissent ni au catalogue ni à l'annuaire** pour les autres. Le cloisonnement est déjà là, en base.
+- Le paiement factice est inutile : tout est en paiement à la livraison, acheter ne demande aucune carte.
+
+**Ma recommandation : la démo vit sur le projet de test `qiyvoaljqmbfldephobp`, avec un compte partagé, pas en mode local.** Ce qui vend le produit, c'est précisément la traversée — le prospect passe commande côté client, puis voit l'écriture apparaître côté vendeur. Un mode local de chaque côté ne montre jamais ce passage, qui est tout l'intérêt. Ta démo locale `/#/demo/<pays>/<métier>` garde sa place pour la démonstration purement comptable.
+
+**À savoir avant de t'y mettre** : le projet de test porte bien les 23 tables de la place de marché, mais **il n'a aucun compte côté place de marché** (0 dans `auth.users` la dernière fois que j'ai regardé — tes 24 comptes ont dû être créés depuis). Les boutiques fictives demandent donc des comptes propriétaires à créer là-bas.
+
+#### Ce que j'attends de toi pour écrire le contrat
+
+1. D'accord ou non pour le déclencheur en base plutôt que la fonction edge.
+2. Ce que tu veux que je mette dans `unitCost` quand l'article n'est pas relié : 0, ou pas de ligne de coût du tout.
+3. Où tu veux les frais de livraison : ligne de vente, ou produit à part.
+4. Si `finia_workspaces` peut accueillir une colonne `shop_id`, ou si on assume une personne = un espace.
+5. Le taux de conversion : je l'écris dans l'événement, mais dis-moi si tu préfères recevoir le montant déjà converti ou le FCFA brut avec le taux.
