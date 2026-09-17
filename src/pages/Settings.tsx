@@ -19,6 +19,7 @@ import type { ThemeChoice } from '../lib/theme';
 import { COUNTRIES, countryProfile, profileToCompany } from '../lib/countries';
 import { IconLogout, IconUsers } from '../components/Icons';
 import { t } from '../lib/i18n';
+import TextSetting from '../components/TextSetting';
 
 const CHARTS: { value: Company['chart']; label: string; hint: string }[] = [
   { value: 'SYSCOHADA', label: 'SYSCOHADA', hint: 'Zone OHADA (Afrique de l’Ouest et centrale)' },
@@ -139,7 +140,7 @@ export default function Settings() {
           <h2 className="text-section">{t('Entreprise')}</h2>
           <div className="mt-4 space-y-4">
             <Field label={t('Nom de l’entreprise')}>
-              <input id="set-name" value={c.name} disabled={!canEdit} onChange={(e) => setCompany({ name: e.target.value })} className="field" />
+              <TextSetting id="set-name" value={c.name} disabled={!canEdit} onCommit={(v) => setCompany({ name: v })} />
             </Field>
             <Field label={t('Activité')}>
               <select id="set-sector" value={c.sector} disabled={!canEdit} onChange={(e) => setCompany({ sector: e.target.value })} className="field">
@@ -195,11 +196,11 @@ export default function Settings() {
                 </select>
               </Field>
               <Field label={t('Ville')}>
-                <input id="set-city" value={c.city} disabled={!canEdit} onChange={(e) => setCompany({ city: e.target.value })} className="field" />
+                <TextSetting id="set-city" value={c.city} disabled={!canEdit} onCommit={(v) => setCompany({ city: v })} />
               </Field>
             </div>
             <Field label={t('Téléphone')}>
-              <input id="set-phone" value={c.phone} disabled={!canEdit} onChange={(e) => setCompany({ phone: e.target.value })} className="field" />
+              <TextSetting id="set-phone" value={c.phone} disabled={!canEdit} inputMode="tel" onCommit={(v) => setCompany({ phone: v })} />
             </Field>
           </div>
         </div>
@@ -245,7 +246,7 @@ export default function Settings() {
               </select>
             </Field>
             <Field label={t('Début d’exercice (MM-JJ)')}>
-              <input id="set-fy" value={c.fiscalYearStart} disabled={!canEdit} onChange={(e) => setCompany({ fiscalYearStart: e.target.value })} placeholder="01-01" className="field num" />
+              <TextSetting id="set-fy" value={c.fiscalYearStart} disabled={!canEdit} placeholder="01-01" className="field num" onCommit={(v) => setCompany({ fiscalYearStart: v })} />
             </Field>
             <Field label={t('Régime d’imposition')} hint={t(TAX_REGIMES.find((r) => r.id === taxRegime(c))?.hint ?? '')}>
               <select id="set-regime" value={taxRegime(c)} disabled={!canEdit} onChange={(e) => setCompany({ taxRegime: e.target.value as Company['taxRegime'] })} className="field">
@@ -258,14 +259,7 @@ export default function Settings() {
             </Field>
             {taxRegime(c) === 'IGS' && (
               <Field label={t('Précompte sur achat (%)')} hint={t('Retenu par vos fournisseurs sur leurs factures. Le taux dépend de votre régime et du leur : demandez-le à votre fiscaliste. Laissez 0 si aucun.')}>
-                <input
-                  id="set-withholding"
-                  value={((c.withholdingBp ?? 0) / 100).toString()}
-                  disabled={!canEdit}
-                  onChange={(e) => setCompany({ withholdingBp: Math.round((parseFloat(e.target.value.replace(',', '.')) || 0) * 100) })}
-                  inputMode="decimal"
-                  className="field num"
-                />
+                <TextSetting id="set-withholding" value={((c.withholdingBp ?? 0) / 100).toString()} disabled={!canEdit} inputMode="decimal" className="field num" onCommit={(v) => setCompany({ withholdingBp: Math.round((parseFloat(v.replace(',', '.')) || 0) * 100) })} />
               </Field>
             )}
             {c.vatEnabled && (
@@ -288,17 +282,17 @@ export default function Settings() {
               </label>
 
               <Field label={t('Nom de la taxe')}>
-                <input id="set-taxlabel" value={c.taxLabel} disabled={!canEdit} onChange={(e) => setCompany({ taxLabel: e.target.value })} placeholder="TVA, VAT, GST…" className="field" />
+                <TextSetting id="set-taxlabel" value={c.taxLabel} disabled={!canEdit} placeholder="TVA, VAT, GST…" onCommit={(v) => setCompany({ taxLabel: v })} />
               </Field>
               </>
             )}
             {c.vatEnabled && (
               <Field label={t('Taux de la taxe (%)')}>
-                <input
+                <TextSetting
                   id="set-vat"
                   value={(c.vatRateBp / 100).toString()}
                   disabled={!canEdit}
-                  onChange={(e) => setCompany({ vatRateBp: Math.round((parseFloat(e.target.value.replace(',', '.')) || 0) * 100) })}
+                  onCommit={(v) => setCompany({ vatRateBp: Math.round((parseFloat(v.replace(',', '.')) || 0) * 100) })}
                   inputMode="decimal"
                   className="field num"
                 />
