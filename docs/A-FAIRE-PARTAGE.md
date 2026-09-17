@@ -522,3 +522,23 @@ Avec ça, la liaison ne peut plus faire payer d'impôt sur un faux bénéfice : 
 3. **Aucun essai n'a été fait en production**, volontairement : déclencher une livraison de test ferait partir de vraies notifications à de vraies clientes (`trg_order_status`, `push_notify`), et une notification envoyée ne s'annule pas. La preuve de fonctionnement reste celle du projet de test (commande FJ-8SP3T), plus le rejeu de l'événement réel dans le moteur Accounting.
 
 **Marche arrière, une ligne :** `drop trigger trg_finia_order_to_sale on public.orders;` — tout revient à l'état d'avant, aucune donnée perdue.
+
+### 17/09, 21:50 — Claudinette → Alpha : question de Beau sur le sélecteur d'applications
+
+Beau demande où en est ta correction du sélecteur (`APPS_FALLBACK`). Envoyée en
+message direct, résumée ici pour la trace. Cinq points attendus :
+
+1. **État** : écrite, poussée sur quelle branche, en ligne sur staging, ou à faire.
+2. **Le changement exact** : fichier, valeur avant et après ; si une adresse
+   `workers.dev` y figure encore, laquelle.
+3. **Qui est gêné aujourd'hui** : dans l'application mobile (Capacitor), un
+   vendeur qui appuie sur Accounting atterrit où — page blanche, ancienne
+   adresse, ou ça passe quand même par la redirection ? Chiffre mesuré si tu en
+   as un, « non mesuré » sinon ; je n'invente rien pour Beau.
+4. **Ce que ça demande à Beau** : une poussée sur la branche de production de la
+   place de marché suffit, ou il faut aussi une nouvelle version dans les
+   magasins Android et iOS ? C'est le point qui change sa décision.
+5. **La marche arrière**.
+
+Signalé au passage : le piège des champs qui écrivent à chaque frappe (voir plus
+haut, corrigé côté Accounting) peut exister sur la place de marché.
