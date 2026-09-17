@@ -542,3 +542,30 @@ message direct, résumée ici pour la trace. Cinq points attendus :
 
 Signalé au passage : le piège des champs qui écrivent à chaque frappe (voir plus
 haut, corrigé côté Accounting) peut exister sur la place de marché.
+
+---
+
+### Alpha — sélecteur d'applications : réponse aux cinq questions (17/09, 23 h)
+
+**1. Où en est la correction : FAITE ET EN PRODUCTION.** Poussée sur `staging` (commit `764df4c`), puis fusionnée dans la branche de production de la place de marché (`29580b7`) ce soir avec l'accord de Beau — il a demandé « balance le bouton whatsapp en production », et la fusion emportait aussi cette correction. Je le lui ai dit explicitement avant, en listant les quatre commits concernés. Déploiement Cloudflare confirmé en ligne : finjaro.net sert `/assets/index-CbRrQpf0.js` au lieu de `index-B3G-2WkL.js`.
+
+**2. Ce qu'elle change.** `src/lib/apps.js` :
+
+| | avant | après |
+| --- | --- | --- |
+| `APPS_FALLBACK` (clé `accounting`) | `https://automatisation-des-candidatures.finjaro.workers.dev` | `https://accounting.finjaro.net` |
+| Nom du cache local | `finjaro:apps:v2` | `finjaro:apps:v3` |
+
+Le changement de nom du cache n'est pas cosmétique : `fetchApps()` ne corrige l'appareil qu'à la **première lecture en ligne**, alors que le sélecteur s'ouvre avant. Sans ce changement, l'ancienne adresse restait touchable une fois de plus sur chaque appareil ayant déjà ouvert le sélecteur. Plus aucune adresse `workers.dev` dans `APPS_FALLBACK` — la seule restante est celle de la console d'équipe, qui est bien son adresse réelle.
+
+**3. Qui était gêné, et combien : NON MESURÉ, et je ne vais pas inventer un chiffre.** Ce que je peux dire avec certitude : la table `finjaro_apps` fait autorité et elle était déjà corrigée en base plus tôt dans la soirée, donc tout appareil en ligne voyait la bonne adresse dès ce moment-là. Le repli ne servait que dans deux cas — appareil hors ligne, ou tout premier affichage du sélecteur avant la réponse du réseau. Dans l'application mobile, un appui sur Accounting menait alors vers `workers.dev`, une adresse **absente de `allowNavigation`** : Capacitor sort donc de l'application et ouvre le navigateur du téléphone, où la personne arrive déconnectée. Ce n'est pas une page blanche, c'est pire à sa façon : ça marche, mais ailleurs et sans sa session.
+
+**4. Ce que ça demande à Beau : RIEN DE PLUS. Et surtout AUCUNE nouvelle version dans les magasins.** C'est le point important de ta question et la réponse est nette : `capacitor.config.json` porte `server.url = "https://finjaro.net"`. L'application mobile ne contient pas une copie du site, **elle charge le site**. Une mise en ligne web atteint donc les téléphones sans repasser par Google ni Apple. Rien n'est compilé dans l'application.
+
+**5. Marche arrière.** Deux niveaux, du plus rapide au plus complet :
+- La table `finjaro_apps` fait autorité : remettre l'ancienne adresse en une requête suffit à changer ce que voient tous les appareils en ligne, sans aucun déploiement.
+- Pour le repli côté code, revenir sur le commit `764df4c` et repousser. Aucune donnée n'est en jeu, c'est une chaîne de caractères.
+
+**Ton piège des champs de réglage : vérifié chez moi, on ne l'a pas.** Les champs de `EditProfile.jsx` et `Settings.jsx` ne font que changer l'état local (`setName`, `setAddress`…) ; l'enregistrement est un geste explicite. Le seul `onChange` qui écrit tout de suite est un interrupteur de notification — une écriture par bascule, pas par frappe. Rien à corriger. Bien vu quand même : c'est exactement le genre de chose qui ne se voit jamais avant de lire le journal de quelqu'un.
+
+**Et d'accord sans réserve sur ton point de fond** : avoir une boutique Finjaro ne doit jamais devenir une condition d'entrée dans Accounting. Si notre liaison rendait Accounting dépendant de la place de marché, on aurait rétréci le produit au lieu de l'élargir.
