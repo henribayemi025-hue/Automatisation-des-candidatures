@@ -2,17 +2,45 @@
 
 Chaque idée : le problème, pour qui, ce que ça vaut, l'effort, ce qu'on demande à Beau. Beau coche ☐ → ☑ quand il décide. Les idées viennent des deux sessions, de la concurrence, du terrain. Rien n'est promis : c'est une liste de choix.
 
-## Le problème numéro un, au-dessus de la liste (posé par Alpha, 17/09)
+## Le problème numéro un, au-dessus de la liste (posé par Alpha, 17/09 — chiffre corrigé le soir même)
 
-**Personne ne parle aux vendeuses.** Chiffres relevés par Alpha sur la place de marché : cette semaine 92 fiches produit ouvertes, 236 appareils, **zéro commande** ; 3 clics de contact depuis le début de Finjaro. Et des commandes qui restent sans confirmation — une cliente réelle attend depuis treize jours.
+**Ce n'est pas que les gens ne veulent pas parler aux vendeuses : c'est qu'on leur demande de créer un compte pour poser une question.**
 
-Tant que ce trou n'est pas compris, aucune fonctionnalité de plus, d'un côté ou de l'autre, ne change le résultat. Alpha porte le sujet (clients et croissance) ; Claudinette n'ajoute rien à Accounting qui détourne de là sans le dire. Les idées ci-dessous se lisent avec cette réserve : **elles rendent le produit juste, elles ne font pas venir les acheteurs.**
+⚠️ **Correction d'un chiffre faux, écrit ici quelques heures plus tôt.** On avait noté « 3 clics de contact depuis le début ». Cette mesure ne couvrait que la fiche boutique et l'en-tête du chat ; le bouton de contact de la **fiche article** — le chemin principal, l'écran le plus visité — n'enregistrait rien. On mesurait à côté du bon chemin et on en tirait la mauvaise conclusion. Alpha l'a vu et l'a dit ; le chiffre ci-dessous est celui lu en base.
 
-Deux exceptions qui servent quand même ce problème : l'idée 8 (marge sur les ventes Finjaro) parce qu'elle conditionne la mise en production de la liaison, et l'idée 2 (mobile money) parce qu'elle touche l'acte d'achat lui-même.
+**Les vrais chiffres**, relevés par Alpha en production le 17/09 :
 
-## Conseils courts au bon moment (version retenue de « Finjaro Learning », accord Claudinette–Alpha, 17/09)
+| Mesure | Valeur |
+|---|---|
+| Acheteuses réelles ayant écrit à une boutique, depuis le début de Finjaro | **1** |
+| Messages écrits par ces acheteuses | 4 |
+| Conversations ouvertes par de vraies personnes | 6, dont 3 sur 30 jours |
+| Ouvertures de fiches article sur 30 jours | 403 |
+| … dont par des gens **non connectés** | **317 (79 %)**, sur 81 appareils |
+| Commandes cette semaine | 0 |
 
-Pas une plateforme de formation maintenant : Beau ne code pas, a un travail à côté, et son attention est la vraie ressource rare. Une version petite, mesurable, sur les deux comportements qui coûtent de l'argent aujourd'hui :
+**Les deux causes, trouvées dans le code, vérifiées :**
+
+1. **Le mur.** Sur la fiche article, le bouton de contact commence par exiger un compte (`if (!user) return requireLogin()`). Quatre visiteurs sur cinq ne sont pas connectés : pour demander « est-ce que vous livrez chez moi ? », il faut d'abord s'inscrire. Personne ne s'inscrit pour poser une question.
+2. **Le bouton muet.** Même avec un compte, le seul contact sur la fiche article est un petit carré avec une bulle, **sans aucun texte**, à côté du gros bouton coloré « ajouter au panier ». Rien ne dit qu'on peut parler à quelqu'un.
+
+**Ce qu'Alpha a déjà fait** (mesure manquante, n'exige l'arbitrage de personne) : un événement `contact_intent` posé **avant** le mur, avec un drapeau indiquant si la personne était connectée. Il séparera enfin deux choses aujourd'hui confondues : ceux qui ne veulent pas parler, et ceux qui se cognent au mur. Sur `staging`, commit `f84874e`.
+
+**La décision qui revient à Beau :** 55 des 59 boutiques actives ont un numéro WhatsApp. Un bouton écrit en toutes lettres, qui ouvre WhatsApp **sans compte**, enlèverait les deux obstacles d'un coup. Le prix : la conversation sort de Finjaro, donc plus de trace, plus de relance à 72 h, plus de modération. Avis d'Alpha, que Claudinette partage : à ce stade, prendre les clients ; un registre parfait de conversations qui n'existent pas ne vaut rien.
+
+Les idées ci-dessous se lisent avec cette réserve : **elles rendent le produit juste, elles ne font pas venir les acheteurs.** Deux exceptions qui servent quand même ce problème : l'idée 8 (marge sur les ventes Finjaro) parce qu'elle conditionnait la mise en production de la liaison, et l'idée 2 (mobile money) parce qu'elle touche l'acte d'achat lui-même.
+
+## Finjaro Learning — décision de Beau (17/09) : oui, après la liaison et la démo
+
+**C'est sa décision, et son argument est meilleur que le nôtre.** Alpha et Claudinette proposaient de repousser Learning au motif que l'attention de Beau est la ressource rare. Beau a tranché : personne n'utilise Finjaro en ce moment, donc le temps passé à construire n'est volé à rien, et **une troisième session qui travaille seule ne lui coûte pas d'attention**.
+
+Le plan qu'il a posé : finir la liaison et la démo, stabiliser les deux côtés, **puis** lancer une troisième session dédiée à Learning. Alpha prépare le prompt de départ de cette session.
+
+À ne pas relire comme « Alpha n'était pas d'accord » : le désaccord portait sur le moment, il est tranché, et la raison de Beau tient.
+
+### En attendant, la version courte, utile tout de suite
+
+Des conseils au bon moment, mesurables, sur les comportements qui coûtent de l'argent aujourd'hui — ils deviendront la matière de Learning :
 
 | # | Idée | Problème résolu, pour qui | Ce que ça vaut | Effort | Décision |
 |---|---|---|---|---|---|
