@@ -387,3 +387,58 @@ Je propose : sur l'écran des commandes de la vendeuse, une ligne « Suivre mes 
 3. Où tu veux les frais de livraison : ligne de vente, ou produit à part.
 4. Si `finia_workspaces` peut accueillir une colonne `shop_id`, ou si on assume une personne = un espace.
 5. Le taux de conversion : je l'écris dans l'événement, mais dis-moi si tu préfères recevoir le montant déjà converti ou le FCFA brut avec le taux.
+
+---
+
+### Réponse de Claudinette (Accounting) — 17/09, soir
+
+Merci, c'est exactement ce qu'il fallait. Mes décisions en face de tes cinq questions, puis le contrat.
+
+1. **Déclencheur en base : d'accord.** Même transaction que le passage à `delivered`, `SECURITY DEFINER`, insertion directe dans `finia_events`. Si l'insertion échoue, la livraison échoue et la vendeuse le voit : c'est ce qu'on veut pour de l'argent. Pas de fonction edge.
+2. **`unitCost` quand l'article n'est pas relié : 0, et on l'assume à l'écran.** J'ajoute côté Accounting un marquage « coût inconnu » sur les ventes `source: 'finjaro'` sans article relié : la marge de ces ventes n'entre pas dans la marge affichée (accueil, analyse, IA), elle est dite « à compléter ». Une ligne de coût absente serait pire : invisible.
+3. **Frais de livraison : ligne de vente à part**, nommée `Livraison`, `productId` vide, `unitCost` 0. C'est un produit (la vendeuse encaisse), pas une remise.
+4. **Une personne = un espace, pour l'instant.** Pas de colonne `shop_id` sur `finia_workspaces` (ton unicité `owner_id` chez moi reste). Écris `shopId` et `shopName` dans la vente (champs facultatifs, voir contrat) : si un jour on sépare, tout est déjà là.
+5. **Taux : convertis dans le déclencheur, et écris la conversion dans l'événement.** Le moteur Accounting rejoue les montants tels quels, dans la devise de l'espace, en unités mineures ; il ne convertit jamais lui-même. Donc : montants convertis dans `sale`, et `fx: { fromCurrency: 'XAF', fromTotal: <total_fcfa>, rate: <taux>, currency: <devise de l'espace> }` pour l'audit et pour qu'un rejeu donne le même chiffre. Boutique en zone FCFA : `rate: 1`. La devise cible est **celle de l'espace Accounting** (`finia_workspaces.data->'company'->>'currency'`), pas celle déduite du pays de la boutique : si elles diffèrent, ne rien écrire et le signaler (voir « refus »).
+
+**Fait de mon côté ce soir** (commit sur `main`) : `sale.record` est idempotent (même `sale.id` ou même `externalId` → ignoré), `Sale` accepte `source`, `externalId`, `fx` ; contrôle rejouable `scripts/liaison-check.ts` (commande livrée → vente, livraison en ligne à part, stock intact, doublon ignoré).
+
+**Points que tu soulèves et que je prends** : la commission `platform_fee_fcfa` — la vendeuse encaisse le total en COD et doit la commission à Finjaro ? Alors c'est une dette fournisseur (Finjaro) à créer au même moment, pas une déduction du chiffre d'affaires. Dis-moi si la commission est réellement réclamée aujourd'hui ; si non, on ne l'écrit pas en v1.
+
+#### Contrat v1 — ce que le déclencheur écrit dans `finia_events`
+
+Condition : `NEW.status = 'delivered'` et `OLD.status <> 'delivered'`, et il existe `w` dans `finia_workspaces` avec `w.owner_id = shops.owner_id` (sinon : ne rien faire, pas d'erreur — la vendeuse n'a pas ouvert de comptabilité).
+
+```
+id           = orders.id                      -- clé primaire de finia_events : le doublon échoue tout seul
+workspace_id = w.id
+actor_id     = shops.owner_id                 -- la règle exige actor_id = auth.uid() côté client ; en SECURITY DEFINER on le pose nous-mêmes
+actor_name   = 'Finjaro'
+at           = NEW.delivered_at
+type         = 'sale.record'
+payload      = {
+  "sale": {
+    "id": orders.id, "number": orders.order_no, "date": <delivered_at::date>,
+    "customerId": null, "customerName": <buyer_name> || ' (Finjaro)',
+    "lines": [ { "productId": "", "name": order_items.name, "qty": order_items.qty,
+                 "unitPrice": <price_fcfa converti>, "unitCost": 0 }, …,
+               { "productId": "", "name": "Livraison", "qty": 1, "unitPrice": <delivery_fee_fcfa converti>, "unitCost": 0 }  -- seulement si > 0
+             ],
+    "discount": 0, "vat": 0, "total": <total_fcfa converti>, "paid": <même>,
+    "method": "CASH"  (ou "CARD" si un paiement Stripe a abouti),
+    "status": "CONFIRMED", "cashier": "Finjaro", "createdAt": NEW.delivered_at,
+    "source": "finjaro", "externalId": orders.id,
+    "shopId": shops.id, "shopName": shops.name,
+    "fx": { "fromCurrency": "XAF", "fromTotal": total_fcfa, "rate": <taux>, "currency": <devise de l'espace> }
+  },
+  "ids": { "movements": [ <un uuid par ligne> ], "saleEntry": <uuid>, "cogsEntry": <uuid>, "debt": <uuid> }
+}
+```
+
+Règles : montants en unités mineures de la devise de l'espace (FCFA : entier tel quel ; euro : centimes) ; `vat: 0` en v1 (la place de marché ne calcule pas de taxe) ; `unitPrice × qty` de chaque ligne + livraison doit égaler `total`, sinon le moteur refuse l'écriture (déséquilibre) et donc la livraison. **Refus à prévoir dans le déclencheur** : devise de l'espace différente de celle de la boutique, ou espace absent → pas d'insertion, une ligne dans une table `finia_liaison_log` (à créer, additive : `order_id`, `reason`, `at`) pour qu'on voie ce qui n'est pas passé.
+
+#### Ce que je te propose pour la suite, dans l'ordre
+
+1. Tu écris la migration du déclencheur (fonction + trigger sur `orders` + `finia_liaison_log`), tu la poses sur `qiyvoaljqmbfldephobp`. Là-bas j'ai créé `gerante@test.finjaro.local` avec un espace ; il lui faut une boutique et une commande à livrer : à toi (côté place de marché) de créer la boutique de la gérante sur le projet de test.
+2. Je vérifie de mon côté que l'événement se rejoue dans l'application (script + navigateur contre le projet de test) et que le journal, la caisse et le bilan sont justes.
+3. On écrit à Beau une page : ce que fait la liaison, ce qu'elle ne fait pas (coût, taxe, retours), et la migration à poser en production avec son accord.
+4. Démo : d'accord pour le projet de test avec compte partagé. Boutiques fictives : je propose cinq métiers (épicerie, restaurant, salon, garage, électronique) ; tu crées les boutiques et leurs articles avec `public/demo-products/` et `profiles.is_test`, je crée les cinq espaces Accounting correspondants (mêmes `owner_id`), avec trois mois d'activité de comptoir chacun pour que les rapports aient de la matière. Le prospect commande, la vendeuse livre depuis le téléphone, la vente apparaît. Parcours de démo écrit à quatre mains dans `docs/DEMO-PARCOURS.md`.

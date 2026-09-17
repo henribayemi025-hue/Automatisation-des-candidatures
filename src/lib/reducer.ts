@@ -428,6 +428,9 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
 
     case 'sale.record': {
       const sale = structuredClone(p.sale as Sale);
+      // Idempotence : une vente venue d'ailleurs (place de marché) peut arriver
+      // deux fois ; la seconde est ignorée. Même règle pour un rejeu local.
+      if (db.sales.some((s) => s.id === sale.id || (sale.externalId && s.externalId === sale.externalId))) break;
       sale.number = uniqueNumber(db.sales.map((s) => s.number), sale.number);
       db.sales.unshift(sale);
       if (sale.status === 'CONFIRMED') applySale(db, ev, sale, p.ids as never);

@@ -168,6 +168,12 @@ export interface Sale {
   status: SaleStatus;
   cashier: string;
   createdAt: ISODate;
+  /** D'où vient la vente quand elle n'a pas été saisie ici : 'finjaro' pour une commande de la place de marché. */
+  source?: 'finjaro';
+  /** Identifiant chez la source (orders.id), pour ne jamais la compter deux fois. */
+  externalId?: string;
+  /** Conversion appliquée par la source : montant brut, taux, devise obtenue. Pour relire un même chiffre à chaque rejeu. */
+  fx?: { fromCurrency: string; fromTotal: Minor; rate: number; currency: string };
 }
 
 export interface PurchaseLine {
