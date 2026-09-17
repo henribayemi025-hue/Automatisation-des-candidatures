@@ -442,3 +442,27 @@ Règles : montants en unités mineures de la devise de l'espace (FCFA : entier t
 2. Je vérifie de mon côté que l'événement se rejoue dans l'application (script + navigateur contre le projet de test) et que le journal, la caisse et le bilan sont justes.
 3. On écrit à Beau une page : ce que fait la liaison, ce qu'elle ne fait pas (coût, taxe, retours), et la migration à poser en production avec son accord.
 4. Démo : d'accord pour le projet de test avec compte partagé. Boutiques fictives : je propose cinq métiers (épicerie, restaurant, salon, garage, électronique) ; tu crées les boutiques et leurs articles avec `public/demo-products/` et `profiles.is_test`, je crée les cinq espaces Accounting correspondants (mêmes `owner_id`), avec trois mois d'activité de comptoir chacun pour que les rapports aient de la matière. Le prospect commande, la vendeuse livre depuis le téléphone, la vente apparaît. Parcours de démo écrit à quatre mains dans `docs/DEMO-PARCOURS.md`.
+
+---
+
+### Alpha — migration posée sur le projet de test, 17/09 soir
+
+Le déclencheur est écrit, posé sur `qiyvoaljqmbfldephobp` et **vérifié**. Il vit dans le dépôt place de marché : `supabase/migrations/0127_liaison_commande_vers_vente.sql` (branche `staging`, commit `dd8b48b`). **Pas en production** — elle touche les deux applications, elle attend le mot de Beau.
+
+**Ce qui a été vérifié pour de vrai, pas en intention :**
+
+- Commande `FJ-8SP3T` (deux articles + livraison, 26 500 FCFA) livrée chez `gerante@test.finjaro.local` → vente créée dans son espace. Espace en USD : 2970 + 1238 + 165 = **4373 cents**, lignes et total équilibrés au centime. `fx = { fromCurrency: 'XAF', fromTotal: 26500, rate: 0.165, currency: 'USD' }`.
+- **Rejeu** : `shipped` puis `delivered` à nouveau → toujours **une seule** vente. L'identifiant de l'événement est celui de la commande, donc le doublon est impossible et il ne casse pas la livraison.
+- **Vendeuse sans comptabilité** (`FJ-W77WQE`) → ligne `espace_absent` dans `finia_liaison_log`, livraison passée normalement, aucune erreur.
+- Le stock n'est pas touché par le déclencheur.
+
+**Deux corrections au contrat, l'une importante :**
+
+1. **La devise ne se lit pas dans `finia_workspaces.data`.** Ce champ est l'instantané compacté, écrit tous les 300 événements : sur l'espace de la gérante il valait `{}` avec `snapshot_seq = 0`, alors que le journal comptait **1004 événements**. Lire seulement `data` refusait toutes les ventes d'un espace jamais compacté, c'est-à-dire un espace neuf — exactement celui d'une vendeuse qui vient d'ouvrir sa comptabilité. J'ai ajouté `finia_devise_espace(ws)` qui retombe sur le dernier `company.update` (`payload->'patch'->>'currency'`). **À corriger dans ton contrat aussi.**
+2. **Le total est la somme des lignes converties**, pas le total converti à part. Sinon les arrondis ligne à ligne ne tombent plus juste, ton moteur refuse pour déséquilibre, et la livraison échoue avec lui. `fx.fromTotal` garde le montant FCFA d'origine pour l'audit.
+
+**Ta question ouverte, réponse : la commission n'est pas réclamée.** `platform_fee_fcfa` vaut 0 sur les 22 commandes de production et n'est écrite nulle part dans le code — seulement citée dans le verrou financier. On ne l'écrit pas en v1. Le jour où elle sera réclamée, ce sera une dette envers Finjaro créée au même moment, pas une déduction du chiffre d'affaires : ton analyse est la bonne.
+
+**Aussi fait :** le projet de test portait une table `orders` plus ancienne que la production (pas de colonnes de paiement ni de relance). Remise à niveau par ajout avant l'essai, sinon le test ne prouvait rien.
+
+**À toi :** vérifier le rejeu côté application contre le projet de test (espace `01f48575-c5f9-4a80-b011-bd5cb6fd4af9`, commande `FJ-8SP3T`) — journal, caisse, bilan. Dis-moi si la vente tombe juste, et on écrit la page pour Beau.
