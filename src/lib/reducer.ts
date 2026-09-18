@@ -1,3 +1,4 @@
+import { revenueSchedule } from './subscriptions';
 import { accountCode, buildChart, assetAccounts } from './chart';
 import { tracksStock } from './sector';
 import type { AccountKey } from './chart';
@@ -1092,6 +1093,57 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       db.sales.unshift(sale);
       applySale(db, ev, sale, p.ids as never);
       const period = p.period as SubscriptionPeriod;
+
+      // Payé d'avance : on ne compte en recette que le mois servi.
+      //
+      // Signalé par Alpha le 18/09. Une salle de sport qui encaisse douze mois
+      // en janvier ne gagne pas douze mois en janvier : tant que les mois ne
+      // sont pas servis, l'argent reçu est une dette envers le client. Compté
+      // comme une recette ordinaire, il gonfle le bénéfice de l'exercice et le
+      // commerçant paie l'impôt sur un bénéfice qu'il n'a pas fait.
+      //
+      // `applySale` a déjà porté la totalité en chiffre d'affaires. On la
+      // renvoie donc en « produits constatés d'avance », puis on la ramène en
+      // recette mois par mois, chaque écriture datée du mois qu'elle concerne.
+      // Les écritures des mois à venir existent dès maintenant : les rapports
+      // filtrant par date, elles ne comptent qu'une fois leur mois arrivé, et
+      // rien n'a besoin de tourner en arrière-plan.
+      //
+      // La TVA n'est pas touchée : elle est due à l'encaissement, pas au
+      // service rendu.
+      const tranches = revenueSchedule(period.from, period.to, saleTotals(db.company, sale.lines, sale.discount).net);
+      if (tranches.length > 1) {
+        const chart = db.company.chart;
+        post(db, ev, {
+          id: `${sale.id}-pca`,
+          date: sale.date,
+          journal: 'OD',
+          ref: sale.number,
+          label: `Abonnement ${sub.label} — encaissé d'avance`,
+          sourceType: 'subscription',
+          sourceId: sub.id,
+          lines: [
+            { account: accountCode(chart, 'SALES'), label: 'Annulation de la recette immédiate', debit: tranches.reduce((n, x) => n + x.amount, 0), credit: 0 },
+            { account: accountCode(chart, 'DEFERRED_REVENUE'), label: `Période ${period.from} → ${period.to}`, debit: 0, credit: tranches.reduce((n, x) => n + x.amount, 0) },
+          ],
+        });
+        tranches.forEach((tranche, i) => {
+          post(db, ev, {
+            id: `${sale.id}-pca-${i}`,
+            date: tranche.date,
+            journal: 'OD',
+            ref: sale.number,
+            label: `Abonnement ${sub.label} — mois de ${tranche.date.slice(0, 7)}`,
+            sourceType: 'subscription',
+            sourceId: sub.id,
+            lines: [
+              { account: accountCode(chart, 'DEFERRED_REVENUE'), label: 'Mois servi', debit: tranche.amount, credit: 0 },
+              { account: accountCode(chart, 'SALES'), label: "Chiffre d'affaires", debit: 0, credit: tranche.amount },
+            ],
+          });
+        });
+      }
+
       sub.periods.push({ ...period, saleId: sale.id });
       if (period.to > sub.endDate) sub.endDate = period.to;
       sub.status = 'ACTIVE';

@@ -36,6 +36,7 @@ export const EXPENSE_LABEL: Record<AccountKey, string> = {
   SUPPLIERS: '',
   CUSTOMERS: '',
   VAT_COLLECTED: '',
+  DEFERRED_REVENUE: '',
   VAT_DEDUCTIBLE: '',
   BANK: '',
   CASH: '',

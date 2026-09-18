@@ -32,6 +32,7 @@ export type AccountKey =
   | 'BANK'
   | 'CASH'
   | 'MOBILE_MONEY'
+  | 'DEFERRED_REVENUE'
   | 'PURCHASES'
   | 'INVENTORY_CHANGE'
   | 'UTILITIES'
@@ -90,6 +91,11 @@ const ROWS: ChartRow[] = [
   { key: 'STAFF_ADVANCE', label: 'Personnel — avances et acomptes', class: 4, kind: 'ASSET', normal: 'DEBIT', SYSCOHADA: '421', PCG: '425', GENERIC: '1260' },
   { key: 'STAFF_PAYABLE', label: 'Personnel — rémunérations dues', class: 4, kind: 'LIABILITY', normal: 'CREDIT', SYSCOHADA: '422', PCG: '421', GENERIC: '2100' },
   { key: 'VAT_COLLECTED', label: 'TVA collectée', class: 4, kind: 'LIABILITY', normal: 'CREDIT', SYSCOHADA: '4431', PCG: '44571', GENERIC: '2200' },
+  // Un abonnement payé d'avance n'est pas encore une recette : tant que les
+  // mois ne sont pas servis, l'argent encaissé est une DETTE envers le client.
+  // Sans ce compte, une salle de sport qui encaisse douze mois en janvier
+  // affiche douze mois de bénéfice en janvier — et paie l'impôt dessus.
+  { key: 'DEFERRED_REVENUE', label: 'Produits constatés d’avance', class: 4, kind: 'LIABILITY', normal: 'CREDIT', SYSCOHADA: '477', PCG: '487', GENERIC: '2300' },
   // Précompte sur achat, acomptes d'impôt : ce que l'État nous doit déjà.
   { key: 'TAX_PREPAID', label: 'État — acomptes et précomptes d’impôt', class: 4, kind: 'ASSET', normal: 'DEBIT', SYSCOHADA: '4492', PCG: '444', GENERIC: '1260' },
   { key: 'VAT_DEDUCTIBLE', label: 'TVA déductible', class: 4, kind: 'ASSET', normal: 'DEBIT', SYSCOHADA: '4451', PCG: '44566', GENERIC: '1250' },
