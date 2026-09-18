@@ -138,12 +138,29 @@ export default function Tour() {
   useEffect(() => {
     if (scheduled.current || !company.onboarded) return;
     let done = '1';
+    let demo = false;
     try {
       done = localStorage.getItem(DONE_KEY) ?? '';
+      // Un espace ouvert par un lien de démonstration n'appartient à personne :
+      // la personne est venue VOIR quelque chose, pas apprendre à se servir de
+      // son propre espace. Lui poser une visite guidée par-dessus, c'est lui
+      // cacher ce qu'on lui a promis.
+      //
+      // Défaut signalé par Alpha le 18/09 sur la place de marché — sa page de
+      // présentation se superposait aux adresses qu'on envoie aux prospects.
+      // Chez nous l'adresse exposée est « /demo/<pays>/<métier> », qui est le
+      // bouton de fin de SON parcours de démonstration.
+      //
+      // Honnêteté sur ce garde-fou : je n'ai PAS réussi à reproduire la visite
+      // s'ouvrant sur cette page au navigateur, ni même sur une première
+      // ouverture ordinaire qui me servait de témoin. Le chemin du code y mène
+      // pourtant. C'est donc une précaution, pas la correction d'un défaut
+      // constaté — et c'est écrit ici pour que personne ne le prenne pour tel.
+      demo = localStorage.getItem('finia.demo') === '1';
     } catch {
       done = '1';
     }
-    if (done) return;
+    if (done || demo) return;
     scheduled.current = true;
     const from = window.location.hash;
     timer.current = window.setTimeout(() => {
