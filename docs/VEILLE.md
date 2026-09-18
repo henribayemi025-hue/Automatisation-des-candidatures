@@ -113,9 +113,16 @@ sont pas prêts pour les raisons exactes auxquelles Finjaro répond.**
   décembre 2025 et du 31 juillet 2026 ; les applications déjà publiées
   continuent de tourner. [Capacitor 8](https://capacitorjs.com/docs/updating/8-0)
   · [8.5](https://ionic.io/blog/capacitor-8-5-released)
-  **Pour nous** : avant tout passage, il faut mesurer combien de vendeuses sont
-  sur un téléphone antérieur à Android 7.0 — elles seraient exclues de
-  l'application mobile. C'est une décision de produit, pas de technique.
+  **Pour nous — et ma première formulation était fausse.** J'avais écrit qu'il
+  fallait mesurer « avant tout passage ». Alpha m'a corrigée et j'ai vérifié
+  dans le dépôt : la place de marché est **déjà** sur Capacitor 8.5 et
+  `android/variables.gradle` porte `minSdkVersion = 24`, soit Android 7.0. Ce
+  n'est pas une décision à venir, c'est l'état de l'application publiée. La
+  vraie question est donc : **qui avons-nous déjà exclu, et pourquoi ne le
+  savons-nous pas ?** La table des jetons de notification n'enregistre pas la
+  version du système. Chiffre certain : 13 appareils Android et 4 iOS ont
+  enregistré un jeton, donc tournent au moins sous Android 7.0. Le reste est
+  **non mesuré et non mesurable aujourd'hui**.
 
 - **WhatsApp relève certains tarifs au 1er octobre 2026** dans plusieurs pays,
   dont le Maroc ; montants non chiffrés dans la page lue.
@@ -142,15 +149,48 @@ sont pas prêts pour les raisons exactes auxquelles Finjaro répond.**
   **Pour nous** : un petit modèle vocal peut tourner sur le téléphone, mais à
   38 % d'erreur, **jamais de montant saisi à la voix sans relecture à l'écran**.
 
+### Corrections apportées après relecture par Alpha, le même jour
+
+Alpha a relu cette note et repris deux choses. Les deux étaient justes, je les
+ai vérifiées moi-même avant de corriger — c'est la règle qu'on s'est donnée :
+celle qui voit un chiffre sans provenance reprend l'autre.
+
+1. **Capacitor : ma formulation était fausse**, corrigée ci-dessus. Vérifié dans
+   `package.json` et `android/variables.gradle` de la branche de production.
+2. **L'occasion ivoirienne n'est pas une campagne.** Sur les boutiques de la
+   place de marché il y a **une seule boutique ivoirienne** — Cameroun 50,
+   France 7, Canada 2, Togo 1, Côte d'Ivoire 1, Allemagne 1. Chiffre relevé par
+   Alpha, vérifié par moi par une lecture en base le 18/09. L'obligation légale
+   ivoirienne reste un axe de produit, mais commercialement c'est aujourd'hui un
+   appel téléphonique, pas un marché.
+3. **Sa remarque que je garde, parce qu'elle vise juste** : cette obligation
+   légale ne change pas son ordre de priorités, elle devrait changer le mien.
+   Son problème est d'attirer des acheteuses ; le mien est que personne ne
+   revient un deuxième jour dans Accounting. Une obligation avec une date
+   dessus est la meilleure raison de revenir qu'on ait jamais eue à proposer.
+4. **Le bouton WhatsApp en production n'est pas concerné par la hausse
+   d'octobre** : il ouvre `wa.me`, donc une conversation ordinaire entre deux
+   personnes, sans tarif. La hausse porte sur les messages envoyés par
+   l'interface de programmation professionnelle, que nous n'utilisons pas.
+
 ### Ce qui n'a pas pu être vérifié aujourd'hui
 
-- Le parcours d'achat sur un téléphone, demandé par Alpha : l'ouverture de
-  finjaro.net dans un navigateur piloté échoue sur la vérification du
-  certificat de l'environnement, et la manipulation nécessaire pour la corriger
-  est refusée par la protection de l'environnement. Les pages répondent bien en
-  direct (sitemap de 438 adresses lu, morceau `AppLauncher` vérifié), mais le
-  parcours vu d'un œil neuf attend soit un contournement propre, soit Beau sur
-  son propre téléphone.
+- Le parcours d'achat sur un téléphone, demandé par Alpha : l'ouverture dans un
+  navigateur piloté échoue sur la vérification du certificat de
+  l'environnement, et la manipulation nécessaire pour la corriger est refusée
+  par la protection de Claude Code. **Alpha a buté exactement au même endroit**
+  de son côté, et a renoncé pour la même raison : contourner une protection de
+  sécurité pour aller plus vite est précisément ce qu'on ne doit pas faire. Ce
+  n'est donc pas un défaut d'une session, c'est une limite commune aux deux.
+  Les pages répondent bien en direct (sitemap de 438 adresses lu, morceau
+  `AppLauncher` vérifié).
+  **Ce qu'Alpha a quand même obtenu sans la base, et qui vaut le détour** : une
+  personne qui arrive sur Finjaro pour la première fois voit **trois choses
+  empilées avant le site** — un carrousel de bienvenue, un bandeau cookies, et
+  une bannière « Finjaro est plus rapide dans l'app · Installer ». Même en
+  arrivant directement sur une adresse de recherche, on ne voit pas le
+  résultat : on voit ça. Reproductible, capture à l'appui. Le parcours ne
+  commence pas là où on croyait.
 - Facture électronique au Cameroun : annoncée par la loi de finances 2026, mais
   aucune source ne donne ni article, ni seuil, ni format, ni date. Rien
   d'actionnable.

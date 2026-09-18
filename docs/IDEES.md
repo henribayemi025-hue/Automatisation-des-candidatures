@@ -92,7 +92,10 @@ un reçu conforme dans ces pays. *Pour qui* : tout utilisateur dans ces trois
 pays. *Valeur* : c'est un risque avant d'être une occasion — un commerçant qui
 croirait être en règle grâce à nous serait trompé. *Effort* : petit pour la
 mention honnête, très gros pour la conformité réelle. *Décision demandée* :
-écrire la mention maintenant, oui ou non.
+écrire la mention maintenant, oui ou non. *Alpha soutient, et va plus loin* :
+les reçus de commande de la place de marché ne sont pas des factures non plus,
+et personne ne le dit nulle part. Si Beau dit oui, les deux mentions s'écrivent
+dans les mêmes termes, une par application.
 
 ☐ **3. Prendre la conformité de facturation en zone OHADA comme axe, ou pas.**
 *Problème* : Zoho industrialise la conformité pays par pays (seizième édition
@@ -106,6 +109,18 @@ et daté, pas un confort. *Effort* : gros, et il commence par une démarche
 administrative, pas par du code — se raccorder à la plateforme ivoirienne,
 obtenir l'agrément gabonais. *Décision demandée* : est-ce que Beau veut
 engager ces démarches, et dans quel pays d'abord.
+*Chiffre qui remet l'urgence à sa place, mesuré par Alpha et vérifié par moi en
+base le 18/09* : sur les boutiques de la place de marché, il y a **une seule
+boutique ivoirienne** (Cameroun 50, France 7, Canada 2, Togo 1, Côte d'Ivoire
+1, Allemagne 1). L'occasion ivoirienne n'est donc pas une campagne aujourd'hui,
+c'est **un appel téléphonique**. Elle reste un axe de produit, pas une urgence
+commerciale.
+*Et la remarque d'Alpha qui vaut plus que tout le reste* : chez Accounting le
+problème n'est pas d'attirer, c'est de donner une raison de REVENIR — sept
+espaces, personne un deuxième jour, aucune vente saisie. Une obligation légale
+avec une date dessus est la meilleure raison de revenir que nous ayons jamais
+eue à proposer. C'est ce qui devrait bousculer mon ordre de priorités, pas le
+sien.
 
 ☐ **4. Ne jamais faire saisir un montant à la voix sans relecture.**
 *Problème* : les modèles vocaux compacts publiés le 1er juin 2026 pour 19
@@ -115,13 +130,21 @@ séduisante, mais un montant mal entendu fausse une comptabilité. *Effort* :
 moyen. *Règle proposée, indépendamment de la décision* : la voix peut proposer,
 l'écran doit confirmer le chiffre.
 
-☐ **5. Mesurer combien de vendeuses sont sur un téléphone antérieur à Android
-7.0.** *Problème* : la prochaine version de la brique qui fabrique
-l'application mobile exige Android 7.0 au minimum. Passer dessus exclurait les
-téléphones plus anciens. *Pour qui* : les utilisatrices d'entrée de gamme, qui
-sont notre cœur de cible. *Valeur* : évite de couper des gens sans le savoir.
-*Effort* : petit — c'est une mesure à faire, pas un développement. *Chiffre
-actuel* : **non mesuré**, et je n'en inventerai pas.
+☐ **5. Savoir qui l'application mobile exclut DÉJÀ, et se donner les moyens de
+le mesurer.** *Corrigé par Alpha le 18/09, et vérifié par moi dans le dépôt* :
+j'avais écrit ça comme un risque à venir, c'était faux. La place de marché est
+**déjà** sur Capacitor 8.5, et `android/variables.gradle` porte
+`minSdkVersion = 24`, c'est-à-dire Android 7.0. Ce n'est donc pas une décision
+à prendre, c'est l'état de l'application publiée. *Le vrai problème* : nous ne
+savons pas qui est exclu, et **nous ne pouvons pas le savoir** — la table des
+jetons de notification n'enregistre pas la version du système. Ce qui est
+certain : 13 appareils Android et 4 appareils iOS ont enregistré un jeton, donc
+ces 13 tournent au moins sous Android 7.0, puisqu'ils font tourner
+l'application. Combien de vendeuses sont sous 7.0 et n'ont jamais pu
+installer : **non mesuré, et non mesurable aujourd'hui.** *Décision demandée* :
+ajouter la version du système à l'enregistrement du jeton — deux lignes selon
+Alpha, et le chiffre existe dans un mois. Pas ce soir, et aucun chiffre
+inventé en attendant.
 
 ☐ **6. Mesurer notre lecture de photos de reçus contre le barème public.**
 *Problème* : nous ne savons pas ce que vaut vraiment notre lecture de reçus
