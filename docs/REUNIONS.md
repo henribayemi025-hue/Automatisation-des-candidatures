@@ -7,6 +7,97 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 2 — 18/09/2026 (matin)
+
+### Le fait de la journée : j'ai compté où les gens s'arrêtent, et c'est net
+
+Lecture du journal en production, sept espaces, un par ligne. Aucun chiffre
+estimé : c'est un décompte d'événements réels.
+
+| Espace | Événements | Jours | Ce qu'ils ont fait |
+|---|---|---|---|
+| 10/09 | 10 | 1 | réglages, **un article créé**, **une caisse ouverte** |
+| 11/09 | 1 | 1 | réglages seulement |
+| 12/09 | 1 | 1 | réglages seulement |
+| 15/09 | 12 | 1 | réglages seulement (les 12 sont la frappe d'un numéro) |
+| 15/09 | 1 | 1 | réglages seulement |
+| — | 0 | 0 | compte créé, installation jamais terminée |
+| — | 0 | 0 | compte créé, installation jamais terminée |
+
+Trois choses en ressortent, et elles ne sont pas discutables :
+
+1. **Aucune vente n'a jamais été enregistrée.** Pas une seule, depuis le début,
+   tous espaces confondus.
+2. **Personne n'est revenu un deuxième jour.** Sept espaces, sept fois « 1 jour ».
+3. **Celui qui est allé le plus loin a créé un article et ouvert sa caisse — et
+   n'a pas vendu.** L'endroit exact où ça casse est là, entre « ma caisse est
+   ouverte » et « j'encaisse ma première vente ».
+
+Et les douze événements du 15/09 sont ceux de la vendeuse de Douala qui tapait
+son numéro de téléphone : cinq minutes d'application, douze écritures, zéro
+progrès. C'est corrigé depuis hier soir, mais ça dit à quoi ressemblait son
+expérience.
+
+### Ce que ça change dans mes priorités
+
+Hier je proposais les photos d'articles, la caisse en grille, l'imprimante
+Bluetooth. Tout cela reste juste, et tout cela sert des gens qui vendent déjà.
+**Or personne ne vend.** Améliorer la caisse d'un commerçant qui n'a jamais fait
+sa première vente, c'est repeindre une porte que personne n'a franchie.
+
+La priorité devient : **amener quelqu'un jusqu'à sa première vente.** C'est le
+seul chiffre qui compte cette semaine, et il vaut zéro aujourd'hui.
+
+Alpha a formulé l'autre moitié du problème mieux que moi : son sujet est
+d'attirer des acheteuses, le mien est de donner **une raison de revenir**. Sept
+personnes ont installé et aucune n'est revenue le lendemain. Une obligation
+légale avec une date dessus est la meilleure raison de revenir qu'on ait à
+proposer, mais elle ne concerne aujourd'hui qu'une boutique.
+
+### La première ouverture, regardée comme Alpha a regardé la sienne
+
+Alpha a montré qu'un visiteur de la place de marché voit trois interruptions
+empilées avant le site. J'ai regardé la nôtre, sans navigateur — le certificat
+de nos environnements nous bloque toutes les deux — donc en lisant le chemin
+dans le code.
+
+**Bonne nouvelle** : avant la connexion, il n'y a rien. Pas de bandeau cookies,
+pas de carrousel, pas d'invitation à installer. L'écran de connexion propose
+même d'essayer sans compte, et la démonstration s'ouvre en un clic.
+
+**Ce qui s'empile est après.** Entre la création du compte et la première
+vente : l'inscription, trois étapes d'installation, puis le tableau de bord —
+sur lequel se superposent un guide de démarrage, une visite guidée et une
+présentation de module. Le chiffre de la première vente dit ce que ça donne.
+
+### Décisions du jour
+
+1. **Tout ce qui ne mène pas à la première vente attend.** Photos d'articles,
+   grille, imprimante : gardés, repoussés.
+2. **Je prépare un chemin direct vers la première vente** après l'installation,
+   au lieu d'un tableau de bord vide couvert d'aides. Je le monte sur une
+   branche à part et je le montre à Beau avant qu'il parte en ligne : c'est un
+   changement que les gens verront, pas une correction.
+3. **Aucun chiffre sans provenance, dans les deux sens.** Alpha m'a reprise
+   deux fois hier (Capacitor, Côte d'Ivoire), j'avais tort les deux fois. Je
+   l'avais reprise la veille sur un chiffre de contacts. C'est la règle
+   maintenant : celle qui voit un chiffre sans source reprend l'autre.
+
+### Ce que j'attends d'Alpha
+
+- Le chiffre des abandons sur ses trois écrans d'accueil, si ses données le
+  permettent.
+- Son avis sur le chemin direct vers la première vente, vu de la place de
+  marché.
+
+### Ce que j'attends de Beau
+
+Trois décisions en attente dans `docs/IDEES.md`, dont deux qui touchent sa
+responsabilité et pas notre code : la mention disant que nos reçus ne sont pas
+des factures conformes, et l'agrément du logiciel au Gabon.
+
+---
+
 ## Réunion n° 1 — 17/09/2026 (soir, réunion de lancement)
 
 ### Ce qui est en place ce soir
