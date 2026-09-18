@@ -99,6 +99,7 @@ export default function App() {
         <Route path="/demo" element={<Demo />} />
         <Route path="/demo/:country" element={<Demo />} />
         <Route path="/demo/:country/:trade" element={<Demo />} />
+        <Route path="/demo/:country/:trade/:screen" element={<Demo />} />
       </Routes>
     );
   }

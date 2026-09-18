@@ -72,16 +72,41 @@ export function tradeSlug(id: string): string {
   return preferred[id] ?? id;
 }
 
+/**
+ * Troisième morceau du lien : l'écran sur lequel la personne atterrit.
+ *
+ * Demandé par Alpha le 18/09 pour son parcours de démonstration : quelqu'un
+ * qui vient de faire une vente sur la place de marché doit voir l'écriture
+ * ici, pas un accueil où il faudrait la chercher. Chercher à ce moment-là,
+ * c'est perdre ce qu'on venait de lui montrer.
+ *
+ * Volontairement court et tolérant : on accepte les mots qu'on écrirait
+ * naturellement dans un lien, et tout ce qu'on ne reconnaît pas ramène à
+ * l'accueil plutôt que sur une page vide.
+ */
+const SCREENS: Record<string, string> = {
+  accueil: '/', journal: '/journal', ecritures: '/journal',
+  ventes: '/ventes', caisse: '/caisse', stock: '/stock',
+  resultats: '/analyse', analyse: '/analyse',
+  bilan: '/etats', etats: '/etats', comptes: '/etats',
+  'grand-livre': '/grand-livre', balance: '/balance', documents: '/rapports',
+};
+
+export function screenFromSlug(value: string | undefined): string {
+  if (!value) return '/';
+  return SCREENS[slug(value)] ?? '/';
+}
+
 export default function Demo() {
   const { db, setCompany, loadDemo } = useStore();
   const { continueAsGuest } = useCollab();
-  const { country: fromUrl, trade: tradeUrl } = useParams();
+  const { country: fromUrl, trade: tradeUrl, screen: screenUrl } = useParams();
   const [country, setCountry] = useState('');
   const [trade, setTrade] = useState('retail');
   const [busy, setBusy] = useState(false);
   const started = useRef(false);
 
-  function open(name: string, tradeId = trade) {
+  function open(name: string, tradeId = trade, screen = '/') {
     const profile = countryProfile(name);
     if (!profile || busy) return;
     setBusy(true);
@@ -90,7 +115,7 @@ export default function Demo() {
     // métier si le lien en demande un autre, pour comparer sans tout recharger.
     if (localStorage.getItem(DEMO_KEY) === '1' && hasContent(db)) {
       if (tradeId !== db.company.sector) setCompany({ sector: tradeId, tracksStock: undefined, name: t('Démonstration — {trade}', { trade: t(SECTORS.find((s) => s.id === tradeId)?.label ?? 'Boutique / commerce') }) });
-      window.location.hash = '#/';
+      window.location.hash = `#${screen}`;
       return;
     }
     continueAsGuest();
@@ -107,7 +132,7 @@ export default function Demo() {
     });
     loadDemo();
     localStorage.setItem(DEMO_KEY, '1');
-    window.location.hash = '#/';
+    window.location.hash = `#${screen}`;
   }
 
   // Lien direct « #/demo/cameroun » ou « #/demo/cameroun/coiffure » : la
@@ -117,9 +142,9 @@ export default function Demo() {
     const match = COUNTRIES.find((c) => slug(c.name) === slug(fromUrl));
     if (!match) return;
     started.current = true;
-    open(match.name, tradeFromSlug(tradeUrl) ?? 'retail');
+    open(match.name, tradeFromSlug(tradeUrl) ?? 'retail', screenFromSlug(screenUrl));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fromUrl, tradeUrl]);
+  }, [fromUrl, tradeUrl, screenUrl]);
 
   return (
     <div className="min-h-screen bg-base px-4 py-8 sm:px-8">
