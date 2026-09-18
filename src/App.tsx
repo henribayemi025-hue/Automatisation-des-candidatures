@@ -109,6 +109,7 @@ export default function App() {
   const needsOnboarding = !db.company.onboarded && (!workspace || workspace.role === 'owner');
   if (needsOnboarding) return <Onboarding />;
 
+
   return (
     <>
       <LockScreen />

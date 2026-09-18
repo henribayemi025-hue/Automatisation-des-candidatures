@@ -151,11 +151,19 @@ export default function Tour() {
       // on ne lui prend pas la main. La visite se reproposera à la prochaine
       // ouverture, et reste accessible depuis le menu du compte.
       if (window.location.hash !== from) return;
+      // La visite ne déplace plus personne.
+      //
+      // Elle commençait par ramener à l'accueil, parce que sa première étape
+      // parle de l'accueil. Conséquence vue au navigateur le 18/09 : quelqu'un
+      // qui sortait de l'installation arrivait bien sur la caisse, et 900 ms
+      // plus tard se retrouvait sur l'accueil sans avoir rien demandé. La
+      // visite annulait l'écran utile.
+      //
+      // Désormais elle ne s'ouvre que si la personne est DÉJÀ sur l'accueil.
+      // Ailleurs, elle se tait — et reste disponible dans le menu du compte.
+      if (from !== '#/' && from !== '') return;
       setI(0);
       setOpen(true);
-      // La première étape parle de l'accueil : on y va, au lieu de décrire
-      // l'accueil par-dessus la caisse ou les réglages.
-      if (from !== '#/' && from !== '') navigate('/');
     }, 900);
   }, [company.onboarded, navigate]);
 

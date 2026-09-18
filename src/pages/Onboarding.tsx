@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import type { TaxRegime } from '../lib/types';
 import { useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
@@ -14,7 +13,6 @@ import AppSwitcher from '../components/AppSwitcher';
 export default function Onboarding() {
   const { db, setCompany, loadDemo } = useStore();
   const { user, signOut } = useCollab();
-  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [sector, setSector] = useState(db.company.sector);
   const [name, setName] = useState(db.company.name === 'Mon entreprise' ? '' : db.company.name);
@@ -53,8 +51,19 @@ export default function Onboarding() {
       onboarded: true,
     });
     // Découverte : trois mois d'activité déjà saisis, dans la devise choisie.
+    // Ouvrir la caisse plutôt que le tableau de bord.
+    //
+    // Deux façons de faire ont échoué avant celle-ci, vérifiées au navigateur
+    // le 18/09 : `navigate('/pos')` ici se perd quand `setCompany` remonte
+    // l'arbre ; une marque lue puis effacée pendant le rendu d'App se fait
+    // manger par le double rendu de React (la première passe l'efface, la
+    // seconde ne voit plus rien et affiche l'accueil).
+    //
+    // L'adresse, elle, ne dépend d'aucun rendu : on la pose directement, et le
+    // routeur la suit. Avec des données d'exemple, le tableau de bord a du sens
+    // et reste l'écran d'arrivée.
     if (withDemo) loadDemo();
-    else navigate('/pos');
+    else window.location.hash = '#/pos';
   }
 
   const canNext = step === 0 ? !!sector : step === 1 ? name.trim().length > 0 && !!currency : goals.length > 0;
