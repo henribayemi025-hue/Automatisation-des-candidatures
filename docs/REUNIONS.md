@@ -7,6 +7,91 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 3 — 18/09/2026 (soir)
+
+Réunion demandée par Beau : « tu n'as pas eu de réunion depuis avec Alpha ».
+Il a raison. On s'est écrit sept fois dans la journée, mais le dernier compte
+rendu datait de six heures du matin. Des messages ne sont pas une réunion.
+
+### Ce qui est parti en ligne aujourd'hui
+
+Dix-neuf enregistrements, dont six qui changent ce que les gens voient :
+
+| Ce qui a changé | Pourquoi |
+|---|---|
+| Un seul événement par champ de réglage | une vendeuse tapait son numéro, l'application écrivait neuf écritures définitives |
+| Vente rapide | il fallait créer une fiche article pour encaisser 500 F |
+| On arrive sur la caisse après l'installation | le tableau de bord d'un commerce qui n'a rien vendu n'affiche que des zéros |
+| La visite guidée ne prend plus la main | elle annulait la caisse 900 ms plus tard |
+| Abonnement payé d'avance étalé sur les mois servis | douze mois encaissés en janvier affichaient douze mois de bénéfice |
+| Un plat vendu sort ses ingrédients | une restauratrice vendait quarante plats et voyait son riz inchangé |
+
+### Ce qu'Alpha a apporté, et que je n'aurais pas trouvé seule
+
+1. **Les deux entonnoirs chiffrés.** Son côté vendeuse est sain (82 inscriptions,
+   57 boutiques, 38 avec un article) ; le mur est côté acheteuse. En face,
+   zéro pour cent de mes espaces enregistrent une vente.
+2. **Ma cible était creuse.** Je visais « la première vente » ; une vente
+   d'exemple aurait suffi à la produire. Sa formule est meilleure : **une
+   première journée tenue**, fermeture de caisse comprise.
+3. **Le danger des abonnements payés d'avance.** C'est elle qui l'a vu. Sans
+   elle, un commerçant aurait payé l'impôt sur un bénéfice qu'il n'a pas fait.
+4. **La méthode par métier** : chercher l'opération quotidienne qui n'existe
+   pas, avant de ranger les menus. « Ranger une maison ne construit pas la
+   pièce qui manque. »
+5. **Tous les réglages vidéo**, et la liste de ce que Beau a déjà rejeté.
+
+### Ce que j'ai apporté de mon côté
+
+- Deux corrections d'Alpha vérifiées avant d'être écrites, et deux de mes
+  affirmations corrigées parce qu'elles étaient fausses (Capacitor, Côte
+  d'Ivoire).
+- Le piège du screencast : il ne capte que ce qui change à l'écran, pas le
+  pointeur. Elle ne le savait pas.
+- La vérification que sa table de prospection, qui contient des données
+  personnelles, a bien la sécurité active sans aucune règle ouverte.
+
+### La leçon du jour, pour nous deux
+
+Elle a dit « ça compile n'est pas un test » après avoir découvert qu'une de
+ses mesures enregistrait zéro ligne depuis deux jours. J'ai ajouté la
+variante qui vise nos propres contrôles : **« ça passe les contrôles » n'est
+pas un test non plus.** Mes vingt-et-un scripts passaient sur une application
+qui affichait le mauvais chiffre, et sur une redirection annulée une seconde
+plus tard.
+
+La règle qui en sort : **piloter l'application avant de pousser.**
+
+### Ce que Beau a rejeté aujourd'hui, et qui devient une règle
+
+Sur les vidéos : « tu n'as pas montré caisse, stock, vente, t'es juste allé
+compta, faut être sérieux. »
+
+> **Montrer le travail de la personne avant le résultat pour un tiers.** La
+> comptabilité arrive en dernier — et c'est ce qui la rend impressionnante :
+> elle s'est faite pendant qu'on regardait autre chose.
+
+Les deux vidéos ont été refaites sur ce principe : 1 min 55 en vertical,
+2 min 28 en paysage.
+
+### Ce qui attend Beau
+
+1. La mention disant que nos reçus ne sont pas des factures conformes, dans
+   les deux applications.
+2. L'agrément du logiciel au Gabon — une démarche administrative, pas du code.
+3. Les deux lignes pour enregistrer la version des téléphones, seule façon de
+   savoir qui l'application mobile exclut déjà.
+4. **Sa voix sur les vidéos.** Celle d'Alpha attend depuis le 12 septembre.
+
+### Demain
+
+- Moi : les rendez-vous pour les salons de coiffure, le manque numéro deux
+  de la liste par métier.
+- Alpha : le premier message d'une acheteuse à une vendeuse, le geste qui
+  n'arrive jamais.
+
+---
+
 ## Réunion n° 2 — 18/09/2026 (matin)
 
 ### Le fait de la journée : j'ai compté où les gens s'arrêtent, et c'est net
