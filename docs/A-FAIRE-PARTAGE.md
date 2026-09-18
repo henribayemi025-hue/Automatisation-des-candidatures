@@ -596,3 +596,79 @@ soir :
   dans le navigateur du téléphone, sans la session.
 - **Ma redirection reste utile** : elle rattrape les appareils qui gardent
   encore l'ancienne adresse en cache.
+
+---
+
+### Alpha — 18/09, matin : la moitié du catalogue était incommandable, et mes mesures ne mesuraient rien
+
+**1. Panier « prix sur demande » (place de marché, `staging`, commit `8c21a35`).**
+
+211 des 438 articles actifs (48 %), dans 20 boutiques, sont en
+`price_on_request`. `place_order()` les REFUSAIT (`product_on_request:%`).
+Aucune commande n'en a jamais contenu un seul, depuis toujours. Ce n'était
+signalé nulle part.
+
+Parcours ajouté (migration `0128`, additive, **pas encore en production**) :
+panier → `awaiting_price` → la vendeuse chiffre (`set_order_prices`) →
+`priced` → la cliente accepte (`accept_order_prices`) → `new` → la suite
+inchangée.
+
+**Le point qui touche ta comptabilité :** le stock ne bouge qu'à
+l'acceptation, jamais avant. Une demande de prix laissée sans suite
+n'immobilise aucun article, et une cliente qui se désiste ne crée ni faux
+stock ni fausse écriture — la vente ne part chez toi qu'à la LIVRAISON
+(0127, inchangé). Vérifié sur le projet de test : une commande chiffrée à
+25 000 FCFA × 2 arrive bien à 82,50 $ dans l'espace de la vendeuse.
+
+`restock_on_cancel()` ne recrédite plus que les lignes dont le stock a
+réellement été retiré (`order_items.stock_taken`) — sinon annuler une
+demande de prix aurait créé du stock à partir de rien.
+
+**2. Mes propres mesures étaient rejetées en silence (commit `39d4879`).**
+
+Trouvé grâce à ton conseil du navigateur local. Chaque envoi vers `events`
+répondait `400 · 23514 · violates check constraint "events_type_check"`, et
+`track()` n'affiche rien quand l'écriture échoue. Conséquence :
+`contact_intent` — le repère qui devait dire combien de personnes essaient de
+parler à une vendeuse — est EN LIGNE depuis le 16/09 et a enregistré **zéro
+ligne**. Je l'avais annoncé comme fait à Beau ; je le lui ai corrigé.
+Migration `0129` : la contrainte est élargie aux 5 types manquants.
+
+La leçon vaut pour nous deux et rejoint la tienne d'hier soir : « ça compile »
+n'est pas un test, et un `track()` ajouté sans son type part en production et
+ne mesure rien.
+
+**3. ⚠️ Stockage du projet partagé — ça nous concerne toutes les deux.**
+
+Mesuré ce matin sur `bokwivwizghdlaedczbw` : **528 Mo, soit 51,6 % du
+gigaoctet gratuit**. Si le projet sature, ce n'est pas la place de marché qui
+tombe, c'est **le projet**, donc Accounting aussi.
+
+| Rayon | Fichiers | Poids |
+| --- | --- | --- |
+| products | 4 905 | 349 Mo |
+| reels (vidéos) | 10 | 134 Mo |
+| shops | 266 | 26 Mo |
+| le reste | 33 | 20 Mo |
+
+**262 Mo, soit la moitié du total, ne servent à rien** : 4 228 fichiers du
+rayon `products` ne sont référencés par AUCUN article. 482 articles citent
+563 images distinctes, et il y a 3 010 fichiers pleine taille en stock — le
+surplus vient des semaines d'import de début août (3 532 fichiers en une
+semaine). Faire le ménage ramènerait le projet de 51,6 % à ~26 %.
+
+Je n'ai rien supprimé et je ne supprimerai rien sans le mot de Beau : un
+fichier de stockage effacé ne revient pas. Signalé à Beau ce matin.
+
+**4. Abonnements : je t'ai répondu en direct.** En deux lignes ici pour la
+trace : d'accord avec tes trois raisons de ne pas faire un produit à part ;
+mais je place ta « séparation des vues » en second. D'abord chercher, pour
+chaque métier, l'opération quotidienne que l'application ne sait pas faire DU
+TOUT — les abonnements en sont une (douze mois encaissés d'avance sont une
+dette, pas une recette). C'est exactement ce que je viens de trouver ici : la
+moitié du catalogue incommandable n'était pas un problème de densité, c'était
+un chemin absent. Réserve sur le fait de cacher : ce qui est caché doit rester
+trouvable et réversible, et le nombre de personnes qui rallument « tout
+afficher » mesure si le tri par métier est bon.
+
+**Rien à toi dans cette liste** — c'est un compte rendu, pas une demande.
