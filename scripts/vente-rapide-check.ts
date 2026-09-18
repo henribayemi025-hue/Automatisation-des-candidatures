@@ -25,6 +25,7 @@ db = applyEvent(db, ev('company.update', { patch: { name: 'Chez Awa', currency: 
 // L'ordre de la liste de démarrage : la première vente passe avant les fiches.
 const steps = startChecklist(db).map((s) => s.id);
 check(steps.indexOf('sale') < steps.indexOf('products'), `la première vente est demandée avant les fiches articles (${steps.join(' → ')})`);
+check(steps.indexOf('cash') < steps.indexOf('sale') && steps.indexOf('sale') < steps.indexOf('close'), 'la liste suit une journée : ouvrir la caisse, vendre, fermer la caisse');
 
 // La vente rapide : une ligne sans productId, 500 en espèces.
 const lines = [{ productId: '', name: 'Beignets', qty: 1, unitPrice: 500, unitCost: 0 }];
