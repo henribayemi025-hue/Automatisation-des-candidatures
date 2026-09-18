@@ -212,28 +212,61 @@ function applySale(
   ids: { movements: string[]; saleEntry: string; cogsEntry: string; debt: string },
 ) {
   const chart = db.company.chart;
-  const t = saleTotals(db.company, sale.lines, sale.discount);
   // Un métier qui vend du temps (salon, artisan) n'a rien à sortir d'un stock :
   // ni mouvement, ni coût des marchandises vendues. Sinon chaque prestation
   // creuserait un stock négatif et un compte de stock faux au bilan.
   const stocked = tracksStock(db.company);
 
-  sale.lines.forEach((line, i) => {
+  // Un plat préparé n'a pas de stock à lui : ce sont ses ingrédients qui
+  // sortent.
+  //
+  // Manque relevé le 18/09 en cherchant, métier par métier, l'opération
+  // quotidienne que l'application ne savait pas faire. Une restauratrice qui
+  // vendait quarante plats voyait son stock de riz inchangé : sa comptabilité
+  // mentait tous les jours, et elle ne connaissait la marge d'aucun plat.
+  //
+  // Le coût de revient est recalculé ICI, à partir des ingrédients, et non
+  // repris de ce que l'appareil a envoyé : un téléphone en retard d'une
+  // version enverrait un coût périmé, et le bilan s'en souviendrait pour
+  // toujours.
+  if (stocked) {
+    for (const line of sale.lines) {
+      const product = db.products.find((p) => p.id === line.productId);
+      if (!product?.components?.length) continue;
+      line.unitCost = product.components.reduce((somme, c) => {
+        const ing = db.products.find((p) => p.id === c.productId);
+        return somme + (ing ? ing.cost * c.qty : 0);
+      }, 0);
+    }
+  }
+
+  const t = saleTotals(db.company, sale.lines, sale.discount);
+
+  let mouvement = 0;
+  sale.lines.forEach((line) => {
     const product = db.products.find((p) => p.id === line.productId);
     if (!product || !stocked) return;
-    product.stock -= line.qty;
-    db.movements.unshift({
-      id: ids.movements[i] ?? `${sale.id}-m${i}`,
-      date: sale.date,
-      productId: product.id,
-      productName: product.name,
-      type: 'OUT',
-      qty: line.qty,
-      resulting: product.stock,
-      reason: 'Vente',
-      ref: sale.number,
-      by: ev.actorName,
-    });
+    const sorties = product.components?.length
+      ? product.components.map((c) => ({ id: c.productId, qty: c.qty * line.qty, pour: product.name }))
+      : [{ id: product.id, qty: line.qty, pour: '' }];
+    for (const sortie of sorties) {
+      const cible = db.products.find((p) => p.id === sortie.id);
+      if (!cible) continue;
+      cible.stock -= sortie.qty;
+      db.movements.unshift({
+        id: ids.movements[mouvement] ?? `${sale.id}-m${mouvement}`,
+        date: sale.date,
+        productId: cible.id,
+        productName: cible.name,
+        type: 'OUT',
+        qty: sortie.qty,
+        resulting: cible.stock,
+        reason: sortie.pour ? `Vente — ${sortie.pour}` : 'Vente',
+        ref: sale.number,
+        by: ev.actorName,
+      });
+      mouvement += 1;
+    }
   });
 
   const unpaid = sale.total - sale.paid;

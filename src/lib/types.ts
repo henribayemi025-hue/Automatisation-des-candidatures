@@ -113,6 +113,16 @@ export interface Product {
   stock: number;
   reorderPoint: number;
   unit: string;
+  /**
+   * Ce qu'il faut pour en fabriquer un, quand l'article est préparé et non
+   * revendu tel quel : un plat, un cocktail, un bouquet, un menu.
+   *
+   * Vide ou absent, l'article se comporte comme avant : on vend la fiche, on
+   * sort la fiche du stock. Renseigné, c'est l'inverse : la fiche n'a pas de
+   * stock propre, ce sont ses ingrédients qui sortent, et le coût de revient
+   * est celui des ingrédients.
+   */
+  components?: { productId: string; qty: number }[];
   archived?: boolean;
   createdAt: ISODate;
 }

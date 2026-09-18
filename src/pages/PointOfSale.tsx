@@ -8,6 +8,7 @@ import { IconBox, IconCart, IconCheck, IconDoc, IconSearch, IconX } from '../com
 import { scanFeedback, useBarcodeScanner } from '../lib/scanner';
 import { t } from '../lib/i18n';
 import { sectorProfile, tracksStock } from '../lib/sector';
+import { availableQty, isComposed, missingFor } from '../lib/recipes';
 import ProjectSelect from '../components/ProjectSelect';
 
 const METHODS: { value: PaymentMethod; label: string }[] = [
@@ -95,9 +96,15 @@ export default function PointOfSale() {
     // caissière peut passer outre, en le sachant ; rien n'est refusé de force.
     if (withStock) {
       const inCart = cart.find((l) => l.productId === productId)?.qty ?? 0;
-      if (inCart + 1 > product.stock) {
+      // Un plat préparé n'a pas de stock à lui : ce qu'on peut encore servir
+      // dépend de son ingrédient le plus rare.
+      const dispo = availableQty(db, product);
+      if (inCart + 1 > dispo) {
+        const manque = missingFor(db, product, inCart + 1).map((m) => `${m.name} (−${m.manque})`).join(', ');
         const ok = window.confirm(
-          t('{name} : {stock} en stock d’après cet appareil, {qty} déjà dans le panier. Vendre quand même ? Le stock passera sous zéro.', { name: product.name, stock: product.stock, qty: inCart }),
+          isComposed(product)
+            ? t('{name} : il manque {manque} pour en servir {qty}. Vendre quand même ? Le stock passera sous zéro.', { name: product.name, manque: manque || t('des ingrédients'), qty: inCart + 1 })
+            : t('{name} : {stock} en stock d’après cet appareil, {qty} déjà dans le panier. Vendre quand même ? Le stock passera sous zéro.', { name: product.name, stock: product.stock, qty: inCart }),
         );
         if (!ok) return;
       }
@@ -356,20 +363,21 @@ export default function PointOfSale() {
                 <button
                   key={p.id}
                   onClick={() => addToCart(p.id)}
-                  disabled={withStock && p.stock <= 0}
+                  disabled={withStock && availableQty(db, p) <= 0}
                   className="group rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-400 hover:shadow-md disabled:opacity-40 dark:border-white/10"
                 >
                   <div className="mb-2 flex items-start justify-between gap-2">
                     <span className="line-clamp-3 text-sm font-semibold leading-snug">{p.name}</span>
                     {/* Un salon ou un artisan ne compte pas de quantités : une
                         prestation n'est jamais « en rupture ». */}
-                    {!withStock ? null : p.stock <= 0 ? (
-                      <Badge tone="danger">{t('Rupture')}</Badge>
-                    ) : p.stock <= p.reorderPoint ? (
-                      <Badge tone="warn">{p.stock}</Badge>
-                    ) : (
-                      <Badge>{p.stock}</Badge>
-                    )}
+                    {!withStock ? null : (() => {
+                      // Pour un plat, le badge annonce ce qu'on peut encore
+                      // servir, pas un stock qui vaudrait toujours zéro.
+                      const dispo = availableQty(db, p);
+                      if (dispo <= 0) return <Badge tone="danger">{t('Rupture')}</Badge>;
+                      if (dispo <= p.reorderPoint) return <Badge tone="warn">{dispo}</Badge>;
+                      return <Badge>{dispo}</Badge>;
+                    })()}
                   </div>
                   <div className="text-base font-extrabold text-brand-600 num">
                     {formatMoney(p.price, currency)}

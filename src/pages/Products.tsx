@@ -21,6 +21,7 @@ const BLANK = {
   stock: '',
   reorderPoint: '',
   unit: 'pièce',
+  components: [] as { productId: string; qty: string }[],
 };
 
 export default function Products() {
@@ -133,6 +134,7 @@ export default function Products() {
       stock: String(p.stock),
       reorderPoint: String(p.reorderPoint),
       unit: p.unit,
+      components: (p.components ?? []).map((c) => ({ productId: c.productId, qty: String(c.qty) })),
     });
     setOpen(true);
   }
@@ -151,6 +153,10 @@ export default function Products() {
       stock: editing ? editing.stock : Number(form.stock) || 0,
       reorderPoint: Number(form.reorderPoint) || 0,
       unit: form.unit || 'pièce',
+      // Une recette vide n'est pas enregistrée : l'article reste ordinaire.
+      components: form.components
+        .filter((c) => c.productId && Number(c.qty) > 0)
+        .map((c) => ({ productId: c.productId, qty: Number(c.qty) })),
     });
     setOpen(false);
   }
@@ -332,6 +338,77 @@ export default function Products() {
           <Field label={t('Prix de vente ({c})', { c: currency })}>
             <input value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} inputMode="decimal" className="field num" />
           </Field>
+          {withStock && (
+            <div className="sm:col-span-2 rounded-card border border-hairline bg-white p-4">
+              {/* Un plat, un cocktail, un menu : ce sont les ingrédients qui
+                  sortent du stock, pas la fiche. Trouvé le 18/09 : une
+                  restauratrice vendait quarante plats et voyait son riz
+                  inchangé. */}
+              <div className="flex items-baseline justify-between gap-2">
+                <h3 className="font-display text-[17px] font-bold text-ink">{t('Préparé avec')}</h3>
+                <span className="text-[11px] text-muted">{t('facultatif')}</span>
+              </div>
+              <p className="mt-0.5 text-caption text-muted">
+                {t('Si cet article est préparé (un plat, un menu, un cocktail), dites avec quoi. Ce sont alors les ingrédients qui sortent du stock, et le coût de revient est le leur.')}
+              </p>
+              {form.components.map((c, i) => (
+                <div key={i} className="mt-3 flex flex-wrap items-end gap-2">
+                  <label className="min-w-[10rem] flex-[2]">
+                    <span className="mb-1 block text-caption font-semibold text-muted">{t('Ingrédient')}</span>
+                    <select
+                      value={c.productId}
+                      onChange={(e) => setForm({ ...form, components: form.components.map((x, j) => (j === i ? { ...x, productId: e.target.value } : x)) })}
+                      className="field"
+                    >
+                      <option value="">{t('— Choisir —')}</option>
+                      {db.products
+                        .filter((p) => !p.archived && !p.components?.length && p.id !== editing?.id)
+                        .map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.name} {p.unit ? `(${p.unit})` : ''}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+                  <label className="w-24">
+                    <span className="mb-1 block text-caption font-semibold text-muted">{t('Quantité')}</span>
+                    <input
+                      value={c.qty}
+                      inputMode="decimal"
+                      onChange={(e) => setForm({ ...form, components: form.components.map((x, j) => (j === i ? { ...x, qty: e.target.value } : x)) })}
+                      className="field num text-right"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, components: form.components.filter((_, j) => j !== i) })}
+                    className="btn-ghost py-2 text-caption text-[#A63030]"
+                  >
+                    {t('Retirer')}
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, components: [...form.components, { productId: '', qty: '1' }] })}
+                className="btn-ghost mt-3 py-1.5 text-caption"
+              >
+                {t('Ajouter un ingrédient')}
+              </button>
+              {form.components.some((c) => c.productId && Number(c.qty) > 0) && (
+                <p className="mt-3 text-caption font-semibold text-[#1F6F65]">
+                  {t('Coût de revient calculé :')}{' '}
+                  {formatMoney(
+                    form.components.reduce((somme, c) => {
+                      const ing = db.products.find((p) => p.id === c.productId);
+                      return somme + (ing ? ing.cost * (Number(c.qty) || 0) : 0);
+                    }, 0),
+                    currency,
+                  )}
+                </p>
+              )}
+            </div>
+          )}
           <Field label={t("Coût d'achat ({c})", { c: currency })}>
             <input value={form.cost} onChange={(e) => setForm({ ...form, cost: e.target.value })} inputMode="decimal" className="field num" />
           </Field>
