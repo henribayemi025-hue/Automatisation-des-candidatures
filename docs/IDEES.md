@@ -153,3 +153,55 @@ mai 2026. *Pour qui* : les utilisateurs qui photographient une facture au lieu
 de la saisir. *Valeur* : remplace une impression par une mesure. *Effort* :
 moyen. *Réserve* : le barème ne couvre pas les photos froissées ou floues, qui
 sont notre cas réel.
+
+---
+
+## Ce que chaque métier fait tous les jours et que l'application ne sait pas faire — 18/09
+
+Méthode proposée par Alpha le 18/09, et elle est meilleure que la mienne :
+avant de ranger les menus par métier, chercher **l'opération quotidienne qui
+n'existe pas du tout**. Un menu de trop se contourne ; une pièce manquante,
+non. Les abonnements payés d'avance en étaient un exemple : ce n'était pas un
+écran mal placé, c'était un mécanisme absent, et il faisait payer un impôt sur
+un bénéfice fictif.
+
+Chaque absence ci-dessous a été **vérifiée dans le code**, pas supposée.
+
+☐ **Restaurant, snack, boulangerie — le plat n'entame pas les ingrédients.**
+*Vérifié* : un article n'a ni composition ni nomenclature ; vendre un plat
+sort le plat du stock, pas la farine ni l'huile. *Conséquence* : une
+restauratrice ne peut pas suivre son vrai stock, ni connaître la marge d'un
+plat. Elle compte ses sacs de riz à la main, donc elle ne saisit rien.
+*Effort* : moyen. C'est le plus gros manque de la liste.
+
+☐ **Salon, barbier, onglerie — pas de rendez-vous.** *Vérifié* : aucune notion
+de rendez-vous ni d'agenda dans l'application. *Conséquence* : une coiffeuse
+tient son carnet de rendez-vous à côté, donc elle vit dans le carnet et pas
+chez nous. C'est le geste qu'elle fait dix fois par jour, et nous ne
+l'accompagnons pas. *Effort* : moyen. *Réserve* : un agenda est un produit en
+soi, attention à ne pas s'y perdre ; la version utile tient peut-être en « qui
+vient aujourd'hui, à quelle heure, pour quoi ».
+
+☐ **Pharmacie, parapharmacie — pas de date de péremption ni de lot.**
+*Vérifié* : un article porte un stock, pas de lots ni de dates. *Conséquence* :
+on ne peut ni alerter sur ce qui périme, ni sortir le plus ancien d'abord, ni
+retirer un lot rappelé. Pour ce métier, c'est disqualifiant, et ce n'est pas
+une question de menus. *Effort* : gros.
+
+☐ **Garage — pas d'ordre de réparation.** *À creuser avant de conclure* : les
+devis et les projets existent et couvrent peut-être le besoin. La question
+réelle : est-ce qu'un garagiste peut suivre « ce véhicule, ces pièces, ces
+heures, ce client » sans bricoler ? Je ne l'ai pas vérifié en le faisant, donc
+je ne l'affirme pas.
+
+**Ce que je ne classe PAS comme manque** : boutique, import-négoce et services.
+La caisse, le stock, les dettes, les devis et l'import couvrent leur journée, et
+la simulation des vingt et un métiers l'avait montré.
+
+**Ce que ça change pour le rangement par métier** : il reste utile, mais
+après. Et avec le garde-fou d'Alpha, que je reprends : ce qui est caché doit
+rester trouvable, avec un interrupteur « tout afficher » visible, jamais un
+verrou posé à l'installation. Une salle de sport qui achète un tapis de course
+et ne retrouve pas l'écran n'appelle pas au secours, elle arrête de saisir. Et
+c'est mesurable : si beaucoup de gens activent l'interrupteur, le tri est
+mauvais.
