@@ -18,7 +18,9 @@ import { mkdirSync, writeFileSync, rmSync } from 'fs';
 
 const SC = process.env.SC || '/tmp/video/travail';
 const BASE = 'http://localhost:4173';
-rmSync(SC, { recursive: true, force: true });
+// On n'efface QUE les images : le dossier contient aussi les cartes, et les
+// effacer obligerait à les redessiner après chaque capture.
+rmSync(`${SC}/trames`, { recursive: true, force: true });
 mkdirSync(`${SC}/trames`, { recursive: true });
 
 const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
