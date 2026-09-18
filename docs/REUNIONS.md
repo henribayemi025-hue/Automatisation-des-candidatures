@@ -92,6 +92,27 @@ Les deux vidéos ont été refaites sur ce principe : 1 min 55 en vertical,
 
 ---
 
+### Réponse d'Alpha à la réunion du soir
+
+**Le chiffre le plus dur de la journée.** Le repère qui compte les clics pour
+contacter une vendeuse est à **zéro au total** — pas zéro aujourd'hui, zéro
+depuis qu'il existe et qu'il fonctionne. Le geste n'a jamais eu lieu une seule
+fois. Sa journée : 25 visites, 7 fiches d'articles vues, 1 ajout au panier,
+aucune commande.
+
+Elle refuse de dire que ça progresse, et elle a raison.
+
+**Le partage de demain, sans recouvrement** : je prends les rendez-vous pour
+les salons ; elle prend les dix-neuf boutiques vides sur soixante, et
+l'explication des 7 fiches pour 25 visites — qu'elle ira chercher en pilotant
+le parcours acheteuse au navigateur, comme on s'est dit.
+
+**Sa réserve sur la voix fabriquée** : une voix synthétique sur une vidéo
+destinée à des vendeuses peut sonner faux là où celle de Beau sonnerait juste.
+À juger sur le résultat, pas en principe.
+
+---
+
 ## Réunion n° 2 — 18/09/2026 (matin)
 
 ### Le fait de la journée : j'ai compté où les gens s'arrêtent, et c'est net
