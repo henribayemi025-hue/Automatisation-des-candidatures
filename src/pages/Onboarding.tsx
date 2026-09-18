@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { TaxRegime } from '../lib/types';
 import { useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
@@ -13,6 +14,7 @@ import AppSwitcher from '../components/AppSwitcher';
 export default function Onboarding() {
   const { db, setCompany, loadDemo } = useStore();
   const { user, signOut } = useCollab();
+  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [sector, setSector] = useState(db.company.sector);
   const [name, setName] = useState(db.company.name === 'Mon entreprise' ? '' : db.company.name);
@@ -30,6 +32,13 @@ export default function Onboarding() {
   }
 
   function finish(withDemo = false) {
+    // Après l'installation, on ouvre la caisse, pas le tableau de bord.
+    //
+    // Compté le 18/09 : sept espaces, aucune vente jamais enregistrée, personne
+    // revenu un deuxième jour. Le tableau de bord d'un commerce qui n'a rien
+    // vendu n'affiche que des zéros et trois aides superposées — il ne donne
+    // aucune raison de rester. La caisse en donne une : encaisser.
+    // Avec des données d'exemple, le tableau de bord a du sens : on l'y laisse.
     const expert = goals.includes('accounting') || withDemo;
     setCompany({
       ...(profile ? profileToCompany(profile) : {}),
@@ -45,6 +54,7 @@ export default function Onboarding() {
     });
     // Découverte : trois mois d'activité déjà saisis, dans la devise choisie.
     if (withDemo) loadDemo();
+    else navigate('/pos');
   }
 
   const canNext = step === 0 ? !!sector : step === 1 ? name.trim().length > 0 && !!currency : goals.length > 0;

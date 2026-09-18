@@ -268,10 +268,27 @@ export interface ChecklistStep {
 export function startChecklist(db: DB): ChecklistStep[] {
   return [
     { id: 'company', label: 'Nommer mon entreprise et choisir ma devise', hint: '30 secondes', to: '/parametres', done: db.company.onboarded },
-    { id: 'products', label: 'Créer mes premiers produits', hint: 'Nom, prix de vente, prix d’achat, stock', to: '/produits', done: db.products.length > 0 },
-    { id: 'cash', label: 'Ouvrir la caisse avec le fond du jour', hint: 'Pour savoir ce soir s’il manque de l’argent', to: '/caisse', done: db.sessions.length > 0 },
-    { id: 'sale', label: 'Enregistrer ma première vente', hint: 'Depuis « Vendre »', to: '/pos', done: db.sales.some((s) => s.status === 'CONFIRMED') },
+    // L'ordre suit UNE JOURNÉE de commerce, pas un ordre logique de logiciel.
+    //
+    // Compté le 18/09 : sept espaces, aucune vente jamais enregistrée, personne
+    // revenu un deuxième jour. Deux corrections en découlent.
+    //
+    // 1. La première vente passe AVANT la création des fiches articles.
+    //    Demander une fiche article avant d'encaisser, c'est demander un
+    //    travail de bureau à quelqu'un qui a une cliente devant lui.
+    //
+    // 2. La liste ne s'arrête plus à la vente, elle va jusqu'à la FERMETURE DE
+    //    CAISSE. Remarque d'Alpha, le 18/09 : viser la première vente seule
+    //    donne un chiffre creux — quelqu'un peut taper une vente d'exemple pour
+    //    finir le parcours, nous aurons notre événement et elle n'aura rien
+    //    gagné. Ce qui fait revenir quelqu'un le lendemain, c'est une journée
+    //    tenue en entier : caisse ouverte, vraie vente, caisse fermée avec
+    //    l'écart expliqué. C'est justement ce qui manque à nos sept espaces.
+    { id: 'cash', label: 'Ouvrir la caisse avec le fond du jour', hint: 'Le matin : ce qu’il y a dans le tiroir en arrivant', to: '/caisse', done: db.sessions.length > 0 },
+    { id: 'sale', label: 'Enregistrer ma première vente', hint: 'Un montant suffit : la vente rapide n’a pas besoin de fiche article', to: '/pos', done: db.sales.some((s) => s.status === 'CONFIRMED') },
     { id: 'expense', label: 'Noter une dépense', hint: 'Loyer, électricité, transport…', to: '/depenses', done: db.expenses.length > 0 },
+    { id: 'close', label: 'Fermer la caisse le soir', hint: 'Comptez le tiroir : l’écart avec les ventes apparaît tout seul', to: '/caisse', done: db.sessions.some((s) => s.closedAt) },
+    { id: 'products', label: 'Créer mes fiches articles', hint: 'Quand vous aurez le temps : nom, prix, stock', to: '/produits', done: db.products.length > 0 },
     { id: 'results', label: 'Regarder mes résultats', hint: 'Marge, meilleur produit, tendance', to: '/analyse', done: db.sales.filter((s) => s.status === 'CONFIRMED').length >= 3 },
   ];
 }
