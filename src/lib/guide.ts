@@ -268,9 +268,14 @@ export interface ChecklistStep {
 export function startChecklist(db: DB): ChecklistStep[] {
   return [
     { id: 'company', label: 'Nommer mon entreprise et choisir ma devise', hint: '30 secondes', to: '/parametres', done: db.company.onboarded },
-    { id: 'products', label: 'Créer mes premiers produits', hint: 'Nom, prix de vente, prix d’achat, stock', to: '/produits', done: db.products.length > 0 },
+    // La première vente passe AVANT la création des fiches articles.
+    // Compté le 18/09 : personne n'a jamais enregistré de vente, et celui qui
+    // est allé le plus loin s'était arrêté juste après avoir créé un article.
+    // Demander une fiche article avant d'encaisser, c'est demander un travail
+    // de bureau à quelqu'un qui a une cliente devant lui.
+    { id: 'sale', label: 'Enregistrer ma première vente', hint: 'Un montant suffit : la vente rapide n’a pas besoin de fiche article', to: '/pos', done: db.sales.some((s) => s.status === 'CONFIRMED') },
+    { id: 'products', label: 'Créer mes premiers produits', hint: 'Quand vous aurez le temps : nom, prix, stock', to: '/produits', done: db.products.length > 0 },
     { id: 'cash', label: 'Ouvrir la caisse avec le fond du jour', hint: 'Pour savoir ce soir s’il manque de l’argent', to: '/caisse', done: db.sessions.length > 0 },
-    { id: 'sale', label: 'Enregistrer ma première vente', hint: 'Depuis « Vendre »', to: '/pos', done: db.sales.some((s) => s.status === 'CONFIRMED') },
     { id: 'expense', label: 'Noter une dépense', hint: 'Loyer, électricité, transport…', to: '/depenses', done: db.expenses.length > 0 },
     { id: 'results', label: 'Regarder mes résultats', hint: 'Marge, meilleur produit, tendance', to: '/analyse', done: db.sales.filter((s) => s.status === 'CONFIRMED').length >= 3 },
   ];

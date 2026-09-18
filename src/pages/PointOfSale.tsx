@@ -51,6 +51,9 @@ export default function PointOfSale() {
   const [scanNote, setScanNote] = useState<{ ok: boolean; text: string } | null>(null);
   const [held, setHeld] = useState<HeldTicket[]>(() => loadHeld());
   const [customerPanel, setCustomerPanel] = useState(false);
+  // Vente rapide : un montant, rien d'autre. Voir le commentaire de addQuick.
+  const [quickAmount, setQuickAmount] = useState('');
+  const [quickLabel, setQuickLabel] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
 
   const currency = db.company.currency;
@@ -115,6 +118,36 @@ export default function PointOfSale() {
         },
       ];
     });
+  }
+
+  /**
+   * Vente rapide : un montant, et c'est encaissé.
+   *
+   * Compté le 18/09 dans le journal réel : sept espaces ouverts, AUCUNE vente
+   * jamais enregistrée, et personne revenu un deuxième jour. Celui qui est allé
+   * le plus loin avait créé un article et ouvert sa caisse — puis s'est arrêté.
+   *
+   * La raison tient au chemin qu'on imposait : pour encaisser 500 F de
+   * beignets, il fallait d'abord créer une fiche article avec un nom, un prix
+   * de vente, un prix d'achat et un stock. Personne ne fait ça debout derrière
+   * un comptoir avec une cliente qui attend. Le cahier, lui, accepte « 500 »
+   * tout de suite : c'est notre vrai concurrent.
+   *
+   * Ici la vente passe sans fiche article : ligne sans `productId`, donc aucun
+   * mouvement de stock et aucun coût des marchandises — le moteur sait déjà
+   * traiter ce cas, c'est ce qu'il fait pour une prestation. La comptabilité
+   * reste juste : la recette est enregistrée, l'encaissement aussi. La marge de
+   * cette ligne n'est pas connue, et c'est honnête : on ne l'invente pas.
+   */
+  function addQuick() {
+    const amount = toMinor(quickAmount || 0, currency);
+    if (amount <= 0) return;
+    setCart((prev) => [
+      ...prev,
+      { productId: '', name: quickLabel.trim() || t('Vente'), qty: 1, unitPrice: amount, unitCost: 0 },
+    ]);
+    setQuickAmount('');
+    setQuickLabel('');
   }
 
   /** Un code scanné ou tapé puis Entrée : correspondance exacte sur le code-barres ou la référence. */
@@ -257,6 +290,55 @@ export default function PointOfSale() {
             )}
           </p>
 
+          {/* Vente rapide. Mise en avant tant qu'aucun article n'existe : c'est
+              le seul chemin qui mène à une première vente sans passer par la
+              création d'une fiche. Elle reste disponible ensuite, repliée. */}
+          <div className={`mb-4 rounded-card border px-4 py-3 ${db.products.length === 0 ? 'border-teal bg-[#FBF1DF]' : 'border-hairline bg-white'}`}>
+            <div className="flex items-baseline justify-between gap-2">
+              <h3 className="font-display text-[17px] font-bold text-ink">{t('Vente rapide')}</h3>
+              <span className="text-[11px] text-muted">{t('sans créer de fiche article')}</span>
+            </div>
+            {db.products.length === 0 && (
+              <p className="mt-1 text-caption text-muted">
+                {t('Tapez le montant encaissé, validez : la vente est enregistrée. Vous créerez vos articles plus tard, quand vous aurez le temps.')}
+              </p>
+            )}
+            <form
+              className="mt-3 flex flex-wrap items-end gap-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                addQuick();
+              }}
+            >
+              <label className="min-w-[8rem] flex-1">
+                <span className="mb-1 block text-caption font-semibold text-muted">{t('Montant')}</span>
+                <input
+                  id="pos-quick-amount"
+                  value={quickAmount}
+                  onChange={(e) => setQuickAmount(e.target.value)}
+                  inputMode="decimal"
+                  placeholder="0"
+                  className="field num text-right text-[20px] font-extrabold"
+                  autoComplete="off"
+                />
+              </label>
+              <label className="min-w-[8rem] flex-[2]">
+                <span className="mb-1 block text-caption font-semibold text-muted">{t('C’était quoi ? (facultatif)')}</span>
+                <input
+                  id="pos-quick-label"
+                  value={quickLabel}
+                  onChange={(e) => setQuickLabel(e.target.value)}
+                  placeholder={t('Beignets, coupe, réparation…')}
+                  className="field"
+                  autoComplete="off"
+                />
+              </label>
+              <button type="submit" disabled={toMinor(quickAmount || 0, currency) <= 0} className="btn-primary">
+                {t('Ajouter')}
+              </button>
+            </form>
+          </div>
+
           {held.length > 0 && (
             <div className="mb-4 flex flex-wrap items-center gap-2 rounded-input bg-[#FBF1DF] px-3 py-2 text-caption">
               <span className="font-semibold text-[#8C6A3D]">{t('En attente :')}</span>
@@ -298,8 +380,8 @@ export default function PointOfSale() {
             </div>
           ) : (
             <Empty
-              title={query ? 'Aucun produit ne correspond' : 'Aucun produit enregistré'}
-              hint={query ? undefined : 'Créez vos produits pour commencer à vendre.'}
+              title={query ? 'Aucun produit ne correspond' : 'Pas encore d’articles'}
+              hint={query ? undefined : 'Ce n’est pas bloquant : encaissez avec la vente rapide ci-dessus, et créez vos fiches quand vous aurez le temps.'}
               icon={<IconBox className="h-10 w-10" />}
             />
           )}
