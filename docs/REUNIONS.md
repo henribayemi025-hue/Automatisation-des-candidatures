@@ -141,3 +141,57 @@ Ce qu'utilisent aujourd'hui les commerçantes visées, et ce que ça nous appren
 - Claudinette : commence le point 1 (photos d'articles) et le point 5 (voyant hors ligne) ; vérifie le déploiement en ligne ; relit les réponses d'Alpha ; prépare les cinq espaces de démo.
 - Attendu d'Alpha : la migration du déclencheur sur le projet de test avec une boutique et une commande à livrer ; sa réponse sur la commission ; son avis sur le stockage des photos (réutiliser celui de la place de marché ?).
 - Beau, quand il a une minute : ouvrir accounting.finjaro.net sur son téléphone, vendre un article, encaisser un abonnement, et dire ce qui l'agace. C'est la meilleure source de problèmes.
+
+---
+
+## Complément à la réunion n° 2 — 18/09, fin de matinée
+
+Alpha a répondu avec des chiffres, et l'un d'eux a changé ma cible.
+
+### Les deux entonnoirs, côte à côte
+
+| Place de marché — acheteuses (30 j) | | Place de marché — vendeuses (60 j) | |
+|---|---|---|---|
+| ont ouvert Finjaro | 299 | inscriptions | 82 |
+| ont ouvert un article | 92 | ont ouvert une boutique | 57 |
+| ont mis au panier | 1 | ont publié un article | 38 |
+| commandes | 1 | ont reçu une commande | 2 |
+
+Chiffres comptés par Alpha, par appareil distinct et comptes de test exclus.
+
+**Le côté vendeuse est sain** : sept sur dix ouvrent une boutique, presque une
+sur deux publie un article. **Le mur est du côté acheteuse** : entre « j'ouvre
+un article » et « je mets au panier », on perd presque tout le monde. Alpha
+pose elle-même la réserve — le panier n'est pas le seul chemin — mais une seule
+acheteuse a écrit à une boutique depuis le début de Finjaro. Deux mesures
+indépendantes qui disent la même chose, c'est une conclusion.
+
+**Comparaison qui remet mon travail à sa place** : 46 % des inscrites de la
+place de marché publient un article ; 0 % de mes espaces enregistrent une
+vente.
+
+### Ma cible était mal choisie, Alpha l'a vu
+
+Je visais « la première vente ». Sa remarque : quelqu'un peut taper une vente
+d'exemple pour finir mon parcours ; j'aurai mon événement et elle n'aura rien
+gagné. La bonne cible est **une première journée vraiment tenue** — caisse
+ouverte, vraie vente, caisse fermée avec l'écart expliqué. C'est ce qui fait
+revenir le lendemain, et c'est exactement ce qui manque à nos sept espaces.
+
+Appliqué le jour même sur la branche `premiere-vente` : la liste de démarrage
+suivait un ordre de logiciel, elle suit maintenant une journée de commerce, et
+la fermeture de caisse y entre — elle n'y figurait pas du tout.
+
+### Ce qui remonte à Beau et change l'ordre des choses
+
+Alpha : **si une vendeuse déjà connectée sur la place de marché doit refaire un
+compte dans Accounting, je perds des gens avant même mon premier écran.** Mon
+entonnoir ne commence donc pas chez moi. La session partagée entre les deux
+adresses cesse d'être un confort et devient une marche de mon propre parcours.
+
+### Mesure posée, chiffres pas encore là
+
+Les trois écrans qui s'empilent avant la place de marché n'étaient mesurés par
+rien du tout. Alpha a posé la mesure le 18/09 sur staging. **Non mesuré à ce
+jour ; chiffres attendus sous une semaine, une fois en production.** Rien ne
+sera écrit avant que la donnée existe.
