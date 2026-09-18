@@ -12,12 +12,20 @@ const W = 1920, H = 1080;
 export const ECRAN = { x: 240, y: 232, w: 1440, h: 810, r: 26 };
 
 const CHAPITRES = [
-  { k: 'accueil',    n: '',        t: 'Le même espace, en grand',  s: 'Tout ce qui ne tient pas sur un téléphone.' },
-  { k: 'journal',    n: 'ÉTAPE 1', t: 'Le journal',                s: 'Chaque opération, à sa date, avec sa pièce.' },
-  { k: 'grandlivre', n: 'ÉTAPE 2', t: 'Le grand livre',            s: 'Compte par compte, dans l’ordre.' },
-  { k: 'balance',    n: 'ÉTAPE 3', t: 'La balance',                s: 'Débit, crédit, solde — et elle tombe juste.' },
-  { k: 'etats',      n: 'ÉTAPE 4', t: 'Bilan et compte de résultat', s: 'Ce que le comptable demande, prêt.' },
-  { k: 'rapports',   n: 'ÉTAPE 5', t: 'Les documents',             s: 'À imprimer, à exporter, à transmettre.' },
+  { k: 'accueil',    n: '',        t: 'Le tableau du jour',        s: 'Ce qui rentre, ce qui sort, ce qui reste.' },
+  { k: 'encaisser',  n: 'LA VENTE',   t: 'Encaisser',              s: 'Un montant, ou un article. Le ticket suit.' },
+  { k: 'carte',      n: 'LA VENTE',   t: 'Les articles',           s: 'Prix, coût, stock — et la recette d’un plat.' },
+  { k: 'stock',      n: 'LA VENTE',   t: 'Le stock',               s: 'Chaque entrée, chaque sortie, chaque alerte.' },
+  { k: 'achats',     n: 'LES ACHATS', t: 'Les achats',             s: 'Fournisseurs, réceptions, coût de revient.' },
+  { k: 'ventes',     n: 'LE SUIVI',   t: 'Les ventes',             s: 'Tous les tickets, retrouvables.' },
+  { k: 'dettes',     n: 'LE SUIVI',   t: 'Qui doit quoi',          s: 'Crédits clients, acomptes, relances.' },
+  { k: 'depenses',   n: 'LE SUIVI',   t: 'Les dépenses',           s: 'Loyer, énergie, transport, salaires.' },
+  { k: 'analyse',    n: 'LE SUIVI',   t: 'Les résultats',          s: 'Ce qui rapporte, ce qui coûte, la tendance.' },
+  { k: 'journal',    n: 'LA COMPTA',  t: 'Le journal',             s: 'Chaque opération, à sa date, avec sa pièce.' },
+  { k: 'grandlivre', n: 'LA COMPTA',  t: 'Le grand livre',         s: 'Compte par compte, dans l’ordre.' },
+  { k: 'balance',    n: 'LA COMPTA',  t: 'La balance',             s: 'Débit, crédit, solde — et elle tombe juste.' },
+  { k: 'etats',      n: 'LA COMPTA',  t: 'Bilan et compte de résultat', s: 'Ce que le comptable demande, prêt.' },
+  { k: 'rapports',   n: 'LA COMPTA',  t: 'Les documents',          s: 'À imprimer, à exporter, à transmettre.' },
 ];
 
 const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
@@ -69,9 +77,10 @@ await carte('carte-intro', ({ W, H }) => {
   g.textAlign = 'left'; g.fillStyle = '#9A7A3E'; esp('FINJARO ACCOUNTING', '600 24px Inter, sans-serif', 9, W / 2, 400);
   g.strokeStyle = '#C9A96A'; g.lineWidth = 2; g.beginPath(); g.moveTo(W / 2 - 60, 448); g.lineTo(W / 2 + 60, 448); g.stroke();
   g.textAlign = 'center'; g.fillStyle = '#171B26'; g.font = '500 104px Fraunces, Georgia, serif';
-  g.fillText('L’autre moitié', W / 2, 584);
+  g.fillText('Toute la boutique,', W / 2, 560);
+  g.fillText('sur un écran', W / 2, 664);
   g.fillStyle = '#8A7D6B'; g.font = '400 40px Fraunces, Georgia, serif';
-  g.fillText('Le comptoir tient dans un téléphone. Les comptes demandent un écran.', W / 2, 664);
+  g.fillText('La caisse, le stock, les achats, les ventes — et la comptabilité au bout.', W / 2, 744);
   return document.getElementById('c').toDataURL('image/png').split(',')[1];
 });
 
@@ -81,7 +90,7 @@ await carte('carte-fin', ({ W, H }) => {
   const esp = (txt, police, e, x, y) => { g.font = police; let tw = 0; for (const c of txt) tw += g.measureText(c).width + e; tw -= e; let cx = x - tw / 2; for (const c of txt) { g.fillText(c, cx, y); cx += g.measureText(c).width + e; } };
   g.textAlign = 'left'; g.fillStyle = '#9A7A3E'; esp('FINJARO ACCOUNTING', '600 24px Inter, sans-serif', 9, W / 2, 360);
   g.textAlign = 'center'; g.fillStyle = '#171B26'; g.font = '500 78px Fraunces, Georgia, serif';
-  g.fillText('Elle vend au comptoir.', W / 2, 500);
+  g.fillText('Elle tient sa boutique.', W / 2, 500);
   g.fillStyle = '#C25E38'; g.font = '500 78px Fraunces, Georgia, serif';
   g.fillText('Son comptable ouvre le reste.', W / 2, 600);
   g.strokeStyle = '#C9A96A'; g.lineWidth = 2; g.beginPath(); g.moveTo(W / 2 - 60, 668); g.lineTo(W / 2 + 60, 668); g.stroke();

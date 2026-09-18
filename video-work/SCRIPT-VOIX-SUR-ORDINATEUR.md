@@ -1,40 +1,47 @@
-# Texte à dire — « L'autre moitié, sur ordinateur »
+# Texte à dire — « Toute la boutique, sur un écran »
 
 À enregistrer par Beau. La vidéo est muette, la voix se pose dessus.
 
-**Règles tenues** : aucun chiffre, aucun pays, pas de « je ». Phrases courtes.
-Si ça déborde, couper une phrase du milieu, **jamais la dernière**.
+**Règles tenues** : aucun chiffre, aucun pays, pas de « je ». Phrases courtes,
+on respire entre chaque. Si ça déborde, couper une phrase du milieu, **jamais
+la dernière**.
 
-Durée de l'image : **1 min 12**. Format paysage, pour une page web ou un
-courriel à un comptable — pas pour WhatsApp.
+Durée de l'image : **2 min 28**. Paysage, pour une page web, une projection ou
+un courriel — pas pour WhatsApp.
 
 ---
 
-| Quand | Ce qui est à l'écran | À dire |
+| Quand | À l'écran | À dire |
 |---|---|---|
-| 0:00 – 0:04 | Carte d'intro | Le comptoir tient dans un téléphone. Les comptes demandent un écran. |
-| 0:04 – 0:11 | Le même espace, en grand | C'est le même espace. Les mêmes chiffres. Simplement, il y a la place. |
-| 0:11 – 0:24 | Le journal | Le journal. Chaque opération, à sa date, avec sa pièce. Rien n'a été saisi deux fois. |
-| 0:24 – 0:36 | Le grand livre | Le grand livre. Un compte, ses mouvements, son solde. |
-| 0:36 – 0:46 | La balance | La balance. Débit, crédit, solde. Elle tombe juste, parce qu'aucune écriture déséquilibrée n'a pu entrer. |
-| 0:46 – 0:57 | Bilan et compte de résultat | Le bilan et le compte de résultat. Prêts, sans rien préparer. |
-| 0:57 – 1:07 | Les documents | Et les documents à transmettre. À imprimer, à exporter. |
-| 1:07 – 1:12 | Carte de fin | Elle vend au comptoir. Son comptable ouvre le reste. |
+| 0:00 | Carte d'intro | Une boutique, ce n'est pas que des comptes. |
+| 0:04 | Le tableau du jour | On ouvre, et tout est là. Ce qui rentre, ce qui sort, ce qui reste. |
+| 0:11 | Encaisser | On encaisse. Un montant suffit. Le ticket part imprimé, ou sur WhatsApp. |
+| 0:24 | Les articles | Les articles. Leur prix, leur coût, leur marge. Un plat dit avec quoi il est fait. |
+| 0:33 | Le stock | Le stock suit tout seul. Chaque entrée, chaque sortie, chaque alerte. |
+| 0:45 | Les achats | Les achats. Les fournisseurs, les réceptions, le vrai coût de revient. |
+| 0:52 | Les ventes | Toutes les ventes restent là. On retrouve un ticket en quelques secondes. |
+| 1:04 | Qui doit quoi | Et les crédits. Qui doit quoi, depuis quand. |
+| 1:10 | Les dépenses | Les dépenses aussi. Le loyer, l'énergie, le transport. |
+| 1:21 | Les résultats | Alors on voit ce qui rapporte, et ce qui coûte. |
+| 1:32 | Le journal | Pendant tout ce temps, les écritures se sont faites. Personne ne les a saisies. |
+| 1:42 | Le grand livre | Le grand livre. Un compte, ses mouvements, son solde. |
+| 1:53 | La balance | La balance. Elle tombe juste, parce qu'une écriture déséquilibrée ne peut pas entrer. |
+| 2:03 | Bilan et résultat | Le bilan et le compte de résultat. Prêts, sans rien préparer. |
+| 2:13 | Les documents | Et les documents à transmettre. |
+| 2:23 | Carte de fin | Elle tient sa boutique. Son comptable ouvre le reste. |
 
 ---
 
 ## Si une phrase doit sauter
 
-Dans cet ordre :
-
-1. « Simplement, il y a la place. »
-2. « Rien n'a été saisi deux fois. »
-3. « À imprimer, à exporter. »
+1. « Le loyer, l'énergie, le transport. »
+2. « Les fournisseurs, les réceptions, le vrai coût de revient. »
+3. « On retrouve un ticket en quelques secondes. »
 
 La dernière phrase ne se coupe jamais.
 
 ## À qui montrer celle-ci
 
-Pas la même cible que la vidéo téléphone. Celle-ci s'adresse à un comptable, à
-un expert-comptable, ou à une commerçante qui veut être rassurée sur le sérieux
-de l'outil. Le mot qui porte est **« prêts, sans rien préparer »**.
+À un comptable, à un expert-comptable, ou à une commerçante qui veut être
+rassurée sur le sérieux de l'outil. Ce qui porte : **la comptabilité arrive à
+la fin, parce qu'elle arrive toute seule.**

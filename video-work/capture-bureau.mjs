@@ -66,49 +66,99 @@ await p.waitForTimeout(900);
 
 marque('accueil');
 await parcourir(700, 4200);
-await parcourir(-700, 3600);
+await parcourir(-700, 3400);
+
+marque('encaisser');
+await p.goto(`${BASE}/#/pos`, { waitUntil: 'networkidle' });
+await p.waitForTimeout(1600);
+await p.locator('#pos-quick-amount').click({ force: true });
+for (const c of '2500') { await p.keyboard.type(c); await p.waitForTimeout(220); }
+await p.locator('#pos-quick-label').click({ force: true });
+for (const c of 'Menu du jour') { await p.keyboard.type(c); await p.waitForTimeout(80); }
+await p.waitForTimeout(800);
+await p.getByRole('button', { name: /^Ajouter$/ }).click({ force: true });
+await p.waitForTimeout(1600);
+await parcourir(600, 3200);
+await parcourir(-600, 2400);
+
+marque('carte');
+await p.goto(`${BASE}/#/produits`, { waitUntil: 'networkidle' });
+await p.waitForTimeout(1600);
+await parcourir(900, 4600);
+await parcourir(-600, 2800);
+
+marque('stock');
+await p.goto(`${BASE}/#/stock`, { waitUntil: 'networkidle' });
+await p.waitForTimeout(1600);
+await parcourir(900, 4600);
+await parcourir(-500, 2600);
+
+marque('achats');
+await p.goto(`${BASE}/#/achats`, { waitUntil: 'networkidle' });
+await p.waitForTimeout(1600);
+await parcourir(800, 4200);
+await parcourir(-500, 2400);
+
+marque('ventes');
+await p.goto(`${BASE}/#/ventes`, { waitUntil: 'networkidle' });
+await p.waitForTimeout(1600);
+await parcourir(900, 4600);
+await parcourir(-500, 2600);
+
+marque('dettes');
+await p.goto(`${BASE}/#/dettes`, { waitUntil: 'networkidle' });
+await p.waitForTimeout(1600);
+await parcourir(800, 4200);
+await parcourir(-400, 2200);
+
+marque('depenses');
+await p.goto(`${BASE}/#/depenses`, { waitUntil: 'networkidle' });
+await p.waitForTimeout(1600);
+await parcourir(800, 4200);
+await parcourir(-400, 2200);
+
+marque('analyse');
+await p.goto(`${BASE}/#/analyse`, { waitUntil: 'networkidle' });
+await p.waitForTimeout(1800);
+await parcourir(900, 5000);
+await parcourir(-600, 2800);
 
 marque('journal');
 await p.goto(`${BASE}/#/journal`, { waitUntil: 'networkidle' });
 await p.waitForTimeout(1600);
 await parcourir(900, 5000);
-await parcourir(-500, 3000);
+await parcourir(-500, 2800);
 
 marque('grandlivre');
 await p.goto(`${BASE}/#/grand-livre`, { waitUntil: 'networkidle' });
 await p.waitForTimeout(1600);
-// Le grand livre n'affiche rien tant qu'aucun compte n'est choisi : on en
-// choisit un, sinon le chapitre montre un écran vide.
 const compte = p.locator('select').first();
 const vCompte = await compte.evaluate((el) => {
   const o = Array.from(el.options).find((x) => /vente|client|caisse/i.test(x.textContent));
   return o ? o.value : (el.options[1] ? el.options[1].value : '');
 });
 if (vCompte) { await compte.selectOption(vCompte); await p.waitForTimeout(1600); }
-await parcourir(800, 5000);
-await parcourir(-400, 2800);
+await parcourir(800, 4600);
+await parcourir(-400, 2400);
 
 marque('balance');
 await p.goto(`${BASE}/#/balance`, { waitUntil: 'networkidle' });
 await p.waitForTimeout(1600);
-await parcourir(800, 5000);
-await parcourir(-400, 2800);
+await parcourir(800, 4600);
+await parcourir(-400, 2400);
 
 marque('etats');
 await p.goto(`${BASE}/#/etats`, { waitUntil: 'networkidle' });
-await p.waitForTimeout(1600);
-await parcourir(900, 5400);
-await parcourir(-500, 3000);
+await p.waitForTimeout(1800);
+await parcourir(900, 5200);
+await parcourir(-500, 2800);
 
 marque('rapports');
 await p.goto(`${BASE}/#/rapports`, { waitUntil: 'networkidle' });
 await p.waitForTimeout(1600);
-await parcourir(800, 5000);
-await parcourir(-400, 2600);
+await parcourir(800, 4600);
+await parcourir(-400, 2400);
 
-// L'écran « Équipe » ne défile pas : sans défilement, aucune image n'arrive
-// et le chapitre durerait un dixième de seconde. Le screencast ne capte que
-// ce qui change à l'écran — le pointeur n'en fait pas partie.
 marque('fin');
 await cdp.send('Page.stopScreencast');
 await p.waitForTimeout(400);

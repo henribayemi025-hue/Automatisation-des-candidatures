@@ -28,7 +28,7 @@ const ctx = await br.newContext({
   viewport: { width: 390, height: 844 },
   deviceScaleFactor: 2,
   isMobile: true, hasTouch: true, locale: 'fr-FR',
-  storageState: '/tmp/video/etat.json',
+  storageState: '/tmp/video/etat-demo.json',
 });
 const p = await ctx.newPage();
 const erreurs = [];
@@ -53,93 +53,94 @@ const marque = (nom) => {
   console.log(`  ${nom.padEnd(14)} ${t.toFixed(1)} s`);
 };
 
-await p.goto(`${BASE}/#/caisse`, { waitUntil: 'networkidle' });
-await p.waitForTimeout(1200);
+await p.goto(`${BASE}/#/`, { waitUntil: 'networkidle' });
+await p.waitForTimeout(1500);
 await cdp.send('Page.startScreencast', { format: 'jpeg', quality: 92, maxWidth: 780, maxHeight: 1688, everyNthFrame: 1 });
 await p.waitForTimeout(900);
 
-/** Un petit défilement : l'écran doit bouger, sinon l'image se fige et la
- *  durée du chapitre se perd (les images n'arrivent qu'au changement). */
-async function respirer(ms = 1400, dy = 0) {
-  if (dy) { await p.mouse.wheel(0, dy); await p.waitForTimeout(500); }
-  const pas = 6, t = Math.max(1, Math.round(ms / pas));
-  for (let i = 0; i < pas; i++) { await p.mouse.move(10 + i, 10 + i); await p.waitForTimeout(t); }
+/** L'écran doit bouger : le screencast ne capte que ce qui change, et le
+ *  pointeur n'en fait pas partie. Sans défilement, le chapitre se réduit à
+ *  rien au montage. */
+async function parcourir(dy, ms = 2600) {
+  const pas = 22, t = Math.max(1, Math.round(ms / pas));
+  for (let i = 0; i < pas; i++) { await p.mouse.wheel(0, dy / pas); await p.waitForTimeout(t); }
 }
 
-// ── 1. Ouvrir la caisse, le matin
-marque('ouvrir');
-await respirer(1200);
-const fond = p.locator('input.field.num').first();
-await fond.click({ force: true });
-for (const c of '10000') { await p.keyboard.type(c); await p.waitForTimeout(240); }
-await respirer(1400);
-await p.getByRole('button', { name: /Ouvrir la caisse/i }).click({ force: true });
-await p.waitForTimeout(2600);
-await respirer(1800, 260);
+marque('accueil');
+await parcourir(800, 4400);
+await parcourir(-800, 3200);
 
-// ── 2. Encaisser en tapant un montant
 marque('encaisser');
 await p.goto(`${BASE}/#/pos`, { waitUntil: 'networkidle' });
 await p.waitForTimeout(1600);
 await p.locator('#pos-quick-amount').click({ force: true });
-for (const c of '500') { await p.keyboard.type(c); await p.waitForTimeout(260); }
-await p.waitForTimeout(700);
+for (const c of '2500') { await p.keyboard.type(c); await p.waitForTimeout(240); }
 await p.locator('#pos-quick-label').click({ force: true });
-for (const c of 'Beignets') { await p.keyboard.type(c); await p.waitForTimeout(90); }
-await p.waitForTimeout(900);
-await p.getByRole('button', { name: /^Ajouter$/ }).click({ force: true });
-await p.waitForTimeout(1800);
-await respirer(2000, 240);
-
-// ── 2. Un plat, et ses ingrédients
-marque('plat');
-await p.getByText('Poulet DG').first().scrollIntoViewIfNeeded();
+for (const c of 'Menu du jour') { await p.keyboard.type(c); await p.waitForTimeout(85); }
 await p.waitForTimeout(800);
-await p.getByText('Poulet DG').first().click({ force: true });
-await p.waitForTimeout(1100);
-await p.getByText('Poulet DG').first().click({ force: true });
+await p.getByRole('button', { name: /^Ajouter$/ }).click({ force: true });
 await p.waitForTimeout(1600);
-await respirer(2400, 300);
+await parcourir(700, 3400);
 
-// ── 3. Le ticket
 marque('ticket');
 await p.getByRole('button', { name: /Valider|Encaisser/i }).first().click({ force: true });
-await p.waitForTimeout(2400);
-await respirer(3000, 220);
-await respirer(1800, -220);
+await p.waitForTimeout(2600);
+await parcourir(600, 3600);
+await parcourir(-600, 2600);
 
-// ── 4. Le stock a suivi
+marque('carte');
+await p.goto(`${BASE}/#/produits`, { waitUntil: 'networkidle' });
+await p.waitForTimeout(1600);
+await parcourir(900, 4600);
+await parcourir(-600, 2600);
+
 marque('stock');
 await p.goto(`${BASE}/#/stock`, { waitUntil: 'networkidle' });
-await p.waitForTimeout(1800);
-await respirer(2600, 260);
-await respirer(2200, 240);
+await p.waitForTimeout(1600);
+await parcourir(900, 4600);
+await parcourir(-500, 2600);
 
-// ── 5. La comptabilité écrite toute seule
+marque('ventes');
+await p.goto(`${BASE}/#/ventes`, { waitUntil: 'networkidle' });
+await p.waitForTimeout(1600);
+await parcourir(900, 4400);
+await parcourir(-500, 2400);
+
+marque('dettes');
+await p.goto(`${BASE}/#/dettes`, { waitUntil: 'networkidle' });
+await p.waitForTimeout(1600);
+await parcourir(800, 4200);
+await parcourir(-400, 2200);
+
+marque('abonnements');
+await p.goto(`${BASE}/#/abonnements`, { waitUntil: 'networkidle' });
+await p.waitForTimeout(1600);
+await parcourir(700, 4000);
+await parcourir(-400, 2200);
+
+marque('depenses');
+await p.goto(`${BASE}/#/depenses`, { waitUntil: 'networkidle' });
+await p.waitForTimeout(1600);
+await parcourir(800, 4200);
+await parcourir(-400, 2200);
+
+marque('analyse');
+await p.goto(`${BASE}/#/analyse`, { waitUntil: 'networkidle' });
+await p.waitForTimeout(1800);
+await parcourir(900, 4800);
+await parcourir(-500, 2600);
+
 marque('journal');
 await p.goto(`${BASE}/#/journal`, { waitUntil: 'networkidle' });
 await p.waitForTimeout(1600);
-await respirer(2600, 280);
-await respirer(2400, 280);
+await parcourir(900, 4800);
+await parcourir(-500, 2600);
 
-// ── 6. Fermer la caisse le soir
-marque('fermer');
-await p.goto(`${BASE}/#/caisse`, { waitUntil: 'networkidle' });
-await p.waitForTimeout(1600);
-const compte = p.locator('input.field.num').first();
-await compte.click({ force: true });
-for (const c of '15500') { await p.keyboard.type(c); await p.waitForTimeout(230); }
-await respirer(2200);
-await p.getByRole('button', { name: /Clôturer la caisse/i }).click({ force: true });
-await p.waitForTimeout(2600);
-await respirer(2000, 240);
-
-// ── 7. Les chiffres du jour
-marque('accueil');
-await p.goto(`${BASE}/#/`, { waitUntil: 'networkidle' });
+marque('etats');
+await p.goto(`${BASE}/#/etats`, { waitUntil: 'networkidle' });
 await p.waitForTimeout(1800);
-await respirer(2600, 260);
-await respirer(2400, 260);
+await parcourir(900, 5000);
+await parcourir(-500, 2600);
 
 marque('fin');
 await cdp.send('Page.stopScreencast');

@@ -19,14 +19,18 @@ const W = 1080, H = 1920;
 export const TEL = { x: 180, y: 250, w: 720, h: 1558, r: 54 };
 
 const CHAPITRES = [
-  { k: 'ouvrir',    n: '',        t: 'Le matin, la caisse',   s: 'On déclare ce qu’il y a dans le tiroir.' },
-  { k: 'encaisser', n: 'ÉTAPE 1', t: 'Encaisser',             s: 'Un montant, un mot. Aucune fiche à créer.' },
-  { k: 'plat',      n: 'ÉTAPE 2', t: 'Vendre un plat',        s: 'Ce sont les ingrédients qui sortent du stock.' },
-  { k: 'ticket',    n: 'ÉTAPE 3', t: 'Le ticket',             s: 'Imprimé, ou envoyé sur WhatsApp.' },
-  { k: 'stock',     n: 'ÉTAPE 4', t: 'Le stock a suivi',      s: 'Sans une seule saisie de plus.' },
-  { k: 'journal',   n: 'ÉTAPE 5', t: 'Les écritures',         s: 'Elles se sont écrites pendant la vente.' },
-  { k: 'fermer',    n: 'ÉTAPE 6', t: 'Le soir, on compte',    s: 'Le tiroir, puis l’écart s’affiche seul.' },
-  { k: 'accueil',   n: '',        t: 'La journée, en un écran', s: 'Ce qui est entré, ce qui reste.' },
+  { k: 'accueil',     n: '',           t: 'Le tableau du jour',  s: 'Ce qui rentre, ce qui sort, ce qui reste.' },
+  { k: 'encaisser',   n: 'LA VENTE',   t: 'Encaisser',           s: 'Un montant, ou un article. Rien à créer.' },
+  { k: 'ticket',      n: 'LA VENTE',   t: 'Le ticket',           s: 'Imprimé, ou envoyé sur WhatsApp.' },
+  { k: 'carte',       n: 'LA BOUTIQUE', t: 'Les articles',       s: 'Prix, coût, stock — et la recette d’un plat.' },
+  { k: 'stock',       n: 'LA BOUTIQUE', t: 'Le stock',           s: 'Chaque entrée, chaque sortie, chaque alerte.' },
+  { k: 'ventes',      n: 'LE SUIVI',   t: 'Les ventes',          s: 'Tous les tickets, retrouvables.' },
+  { k: 'dettes',      n: 'LE SUIVI',   t: 'Qui doit quoi',       s: 'Crédits clients, acomptes, relances.' },
+  { k: 'abonnements', n: 'LE SUIVI',   t: 'Les abonnements',     s: 'Qui arrive au bout, et quand.' },
+  { k: 'depenses',    n: 'LE SUIVI',   t: 'Les dépenses',        s: 'Loyer, énergie, transport, salaires.' },
+  { k: 'analyse',     n: 'LE SUIVI',   t: 'Les résultats',       s: 'Ce qui rapporte, ce qui coûte, la tendance.' },
+  { k: 'journal',     n: 'LA COMPTA',  t: 'Les écritures',       s: 'Elles se sont faites pendant la vente.' },
+  { k: 'etats',       n: 'LA COMPTA',  t: 'Bilan et résultat',   s: 'Ce que le comptable demande, prêt.' },
 ];
 
 const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
@@ -78,10 +82,10 @@ await carte('carte-intro', ({ W, H }) => {
   g.textAlign = 'left'; g.fillStyle = '#9A7A3E'; esp('FINJARO ACCOUNTING', '600 28px Inter, sans-serif', 9, W / 2, 740);
   g.strokeStyle = '#C9A96A'; g.lineWidth = 2; g.beginPath(); g.moveTo(W / 2 - 60, 800); g.lineTo(W / 2 + 60, 800); g.stroke();
   g.textAlign = 'center'; g.fillStyle = '#171B26'; g.font = '500 112px Fraunces, Georgia, serif';
-  g.fillText('Une journée', W / 2, 970);
-  g.fillText('au comptoir', W / 2, 1082);
+  g.fillText('Toute la boutique,', W / 2, 950);
+  g.fillText('dans la poche', W / 2, 1062);
   g.fillStyle = '#8A7D6B'; g.font = '400 40px Fraunces, Georgia, serif';
-  g.fillText('Tenir sa caisse sans tenir de comptabilité.', W / 2, 1176);
+  g.fillText('La caisse, le stock, les ventes — et la comptabilité au bout.', W / 2, 1156);
   return document.getElementById('c').toDataURL('image/png').split(',')[1];
 });
 
@@ -100,7 +104,7 @@ await carte('carte-fin', ({ W, H }) => {
   g.fillStyle = '#8A7D6B'; g.font = '400 38px Fraunces, Georgia, serif'; g.fillText('Sur le téléphone, même sans réseau.', W / 2, 1382);
   g.fillText('Gratuit jusqu’en novembre.', W / 2, 1446);
   g.fillStyle = '#9A7A3E'; g.font = '500 22px Inter, sans-serif';
-  g.fillText('Tous les chiffres montrés sont calculés par l’application.', W / 2, 1720);
+  g.fillText('Écrans réels, sur les données d’exemple fournies avec l’application.', W / 2, 1720);
   return document.getElementById('c').toDataURL('image/png').split(',')[1];
 });
 
