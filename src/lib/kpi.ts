@@ -68,9 +68,44 @@ export interface PeriodFigures {
   averageTicket: Minor;
 }
 
+/**
+ * Correction des encaissements d'avance, par jour.
+ *
+ * Les chiffres de l'accueil se calculent sur les VENTES, pas sur les comptes.
+ * Or un abonnement payé d'avance est encaissé en une fois et ne devient une
+ * recette que mois par mois (voir `subscription.renew` dans le réducteur). Sans
+ * cette correction, le bilan disait une chose et l'accueil une autre — vu à
+ * l'écran le 18/09 : 120 000 encaissés pour douze mois s'affichaient comme
+ * 100 629 de chiffre d'affaires du mois, alors que le mois n'en valait que le
+ * douzième.
+ *
+ * On lit donc les mouvements du compte de produits constatés d'avance : ce qui
+ * y entre (crédit) sort du chiffre d'affaires du jour, ce qui en sort (débit)
+ * y rentre. Une entreprise sans abonnement long n'a aucune écriture sur ce
+ * compte, et la correction vaut zéro partout.
+ */
+function deferralByDay(db: DB): Map<string, Minor> {
+  const compte = accountCode(db.company.chart, 'DEFERRED_REVENUE');
+  const parJour = new Map<string, Minor>();
+  for (const entry of db.entries) {
+    if (!entry.posted) continue;
+    for (const line of entry.lines) {
+      if (line.account !== compte) continue;
+      parJour.set(entry.date, (parJour.get(entry.date) ?? 0) + line.debit - line.credit);
+    }
+  }
+  return parJour;
+}
+
+function deferralOver(db: DB, from: string, to: string): Minor {
+  let total = 0;
+  for (const [date, montant] of deferralByDay(db)) if (date >= from && date <= to) total += montant;
+  return total;
+}
+
 function figures(db: DB, range: Range): PeriodFigures {
   const sales = db.sales.filter((s) => s.status === 'CONFIRMED' && s.date >= range.from && s.date <= range.to);
-  const revenue = sales.reduce((s, x) => s + saleRevenue(x), 0);
+  const revenue = sales.reduce((s, x) => s + saleRevenue(x), 0) + deferralOver(db, range.from, range.to);
   const cost = sales.reduce((s, x) => s + saleCost(x), 0);
   const expenses = db.expenses.filter((e) => e.date >= range.from && e.date <= range.to).reduce((s, e) => s + e.amount, 0);
   const grossMargin = revenue - cost;
@@ -109,6 +144,7 @@ export function dailySeriesFor(db: DB, range: Range, divisor: number): Series {
   const revenueByDay = new Map<string, number>();
   const expensesByDay = new Map<string, number>();
   for (const s of db.sales) if (s.status === 'CONFIRMED') revenueByDay.set(s.date, (revenueByDay.get(s.date) ?? 0) + saleRevenue(s));
+  for (const [date, montant] of deferralByDay(db)) revenueByDay.set(date, (revenueByDay.get(date) ?? 0) + montant);
   for (const e of db.expenses) expensesByDay.set(e.date, (expensesByDay.get(e.date) ?? 0) + e.amount);
 
   // Trésorerie : solde des comptes de trésorerie à la veille du début, puis cumul jour par jour.

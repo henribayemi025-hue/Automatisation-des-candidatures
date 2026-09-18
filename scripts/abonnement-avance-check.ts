@@ -6,6 +6,7 @@
 import { accountCode } from '../src/lib/chart';
 import { applyEvent, emptyDB, saleTotals } from '../src/lib/reducer';
 import { balanceOf, balanceSheet } from '../src/lib/ledger';
+import { dashboard } from '../src/lib/kpi';
 import { addPeriod, revenueSchedule } from '../src/lib/subscriptions';
 import type { DB, Sale, Subscription, WorkspaceEvent } from '../src/lib/types';
 
@@ -62,6 +63,14 @@ const avant = espace();
 const unMois = abonner(avant, 1, 10000);
 check(unMois.entries.every((e) => !e.id.includes('-pca')), 'un abonnement d’un mois ne crée aucune écriture d’étalement');
 check(balanceOf(accountCode('SYSCOHADA', 'SALES'), unMois.entries, 'CREDIT') === 10000, 'et sa recette est comptée tout de suite');
+
+// Ce que voit la commerçante sur son accueil doit dire la même chose que ses comptes.
+const ecran = dashboard(db, 'MTD', '2026-01-31', 1);
+check(ecran.current.revenue === 10000, `l'accueil au 31 janvier affiche un mois de recette (${ecran.current.revenue})`);
+const ecranJuin = dashboard(db, 'MTD', '2026-06-30', 1);
+check(ecranJuin.current.revenue === 10000, `l'accueil au 30 juin affiche le mois de juin seul (${ecranJuin.current.revenue})`);
+const ecranAn = dashboard(db, 'YTD', '2026-12-31', 1);
+check(ecranAn.current.revenue === 120000, `l'accueil sur l'année entière affiche les douze mois (${ecranAn.current.revenue})`);
 
 console.log(failures ? `\n${failures} contrôle(s) en échec` : '\nTous les contrôles passent.');
 process.exit(failures ? 1 : 0);
