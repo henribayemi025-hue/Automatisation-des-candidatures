@@ -71,3 +71,44 @@ export function durationLabel(every: number, unit: 'DAY' | 'MONTH', t: (s: strin
   if (unit === 'MONTH') return every === 1 ? t('1 mois') : t('{n} mois', { n: every });
   return every === 1 ? t('1 jour') : t('{n} jours', { n: every });
 }
+
+/**
+ * Étalement d'une période payée d'avance, mois par mois.
+ *
+ * Signalé par Alpha le 18/09 : une salle de sport qui encaisse douze mois en
+ * janvier ne gagne pas douze mois en janvier. Tant que les mois ne sont pas
+ * servis, l'argent reçu est une DETTE envers le client. Enregistré comme une
+ * recette ordinaire, il gonfle le bénéfice de l'exercice — et le commerçant
+ * paie l'impôt sur un bénéfice qu'il n'a pas fait.
+ *
+ * On découpe donc la période en mois civils : la part du mois de
+ * l'encaissement est une recette tout de suite, le reste attend son mois. Le
+ * dernier mois prend le reste de la division, pour que la somme retombe au
+ * centime sur le montant encaissé.
+ *
+ * Une période d'un mois ou moins donne une seule tranche : rien ne change pour
+ * la grande majorité des abonnements, et aucune écriture n'est ajoutée.
+ */
+export function revenueSchedule(from: string, to: string, net: number): { date: string; amount: number }[] {
+  // On découpe au rythme de l'abonnement, pas au calendrier : un abonnement
+  // pris le 5 janvier pour douze mois se sert du 5 au 5, et donne douze
+  // tranches. Un découpage en mois civils en donnait treize, parce que la
+  // période mord sur un treizième mois — faux, et vu en essai le 18/09.
+  const starts: string[] = [from];
+  const jour = Number(from.slice(8, 10));
+  for (let i = 1; ; i += 1) {
+    const d = new Date(`${from.slice(0, 8)}01T12:00:00.000Z`);
+    d.setUTCMonth(d.getUTCMonth() + i);
+    // Un abonnement pris le 31 se sert le 30 des mois courts.
+    const dernier = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate();
+    d.setUTCDate(Math.min(jour, dernier));
+    const iso = d.toISOString().slice(0, 10);
+    if (iso > to) break;
+    starts.push(iso);
+  }
+  const part = Math.floor(net / starts.length);
+  return starts.map((date, i) => ({
+    date,
+    amount: i === starts.length - 1 ? net - part * (starts.length - 1) : part,
+  }));
+}
