@@ -65,3 +65,68 @@ La formation comme produit (vendue à des ONG, à des programmes d'appui aux PME
 | 9 | **Vérification du déploiement et tests en ligne** : ouvrir le réseau des sessions vers accounting.finjaro.net et le projet de test | On vérifie aujourd'hui en local, pas en ligne | Moins de « c'est en ligne » supposés | 0 j (réglage d'environnement par Beau) | ☐ |
 
 Sources de la revue concurrence du jour : [digabloPos Gabon](https://digablopos.fr/fr/blog/free-pos-software-gabon), [Alivaon : logiciels de gestion au Cameroun](https://www.alivaon.com/blog/meilleurs-logiciels-gestion-commerciale-cameroun), [Yorine Facture+ : encaissements mobile money](https://yorine.app/blog/mobile-money-tracer-encaissements/), [FlustockX](https://flustockx.com/blog/logiciel-gestion-stock-afrique/), [SDCSTAT](https://www.sdcstat.com/), [Velko POS](https://velko-pos.com/blog/logiciel-caisse-afrique-guide-complet), [Pirabel Labs : paiement mobile money 2026](https://www.pirabellabs.com/blog/paiement-en-ligne-mobile-money-afrique-ouest-2026).
+
+---
+
+## Idées issues de la veille du 18/09/2026 — à décider par Beau
+
+Chacune : le problème, pour qui, ce que ça vaut, l'effort. Case à cocher quand
+Beau tranche. Rien n'est commencé sans son mot.
+
+☐ **1. Rappel de ré-immatriculation pour les utilisateurs camerounais.**
+*Problème* : le fichier des contribuables camerounais a changé de plateforme ;
+les inscrits sur l'ancienne doivent se ré-immatriculer avant le 31 décembre
+2026, sans quoi leur numéro d'identifiant cesse d'être reconnu valide (source
+dans `docs/VEILLE.md`). *Pour qui* : tout utilisateur au Cameroun ayant saisi un
+numéro d'identifiant unique. *Valeur* : rend un service concret, coûte une
+bannière, ne promet rien. *Effort* : petit — un encart daté dans les réglages,
+qui disparaît après le 31 décembre. *Réserve* : c'est un rappel, pas un conseil
+fiscal ; le texte doit renvoyer à l'administration et ne pas dire quoi faire.
+
+☐ **2. Dire clairement ce que nous NE couvrons PAS en matière de facture
+électronique.** *Problème* : en Côte d'Ivoire les contrôles ont commencé le 1er
+septembre 2026 sur les petits régimes ; au Gabon l'agrément du logiciel
+conditionne la déduction du client ; en France la réception par plateforme
+agréée est obligatoire depuis le 1er septembre 2026. Un reçu Finjaro n'est pas
+un reçu conforme dans ces pays. *Pour qui* : tout utilisateur dans ces trois
+pays. *Valeur* : c'est un risque avant d'être une occasion — un commerçant qui
+croirait être en règle grâce à nous serait trompé. *Effort* : petit pour la
+mention honnête, très gros pour la conformité réelle. *Décision demandée* :
+écrire la mention maintenant, oui ou non.
+
+☐ **3. Prendre la conformité de facturation en zone OHADA comme axe, ou pas.**
+*Problème* : Zoho industrialise la conformité pays par pays (seizième édition
+pays le 17 septembre 2026) et **aucune édition OHADA francophone n'existe dans
+sa liste**. En face, la fédération des commerçants ivoiriens dit publiquement
+que ses membres n'ont ni équipement, ni électricité fiable, ni maîtrise de
+l'informatique — exactement ce à quoi Finjaro répond. *Pour qui* : les petits
+commerçants de la zone franc soumis à une obligation déjà en vigueur. *Valeur*
+: potentiellement l'axe le plus fort du produit, parce que le besoin est légal
+et daté, pas un confort. *Effort* : gros, et il commence par une démarche
+administrative, pas par du code — se raccorder à la plateforme ivoirienne,
+obtenir l'agrément gabonais. *Décision demandée* : est-ce que Beau veut
+engager ces démarches, et dans quel pays d'abord.
+
+☐ **4. Ne jamais faire saisir un montant à la voix sans relecture.**
+*Problème* : les modèles vocaux compacts publiés le 1er juin 2026 pour 19
+langues africaines annoncent 38 % d'erreur sur les mots. *Pour qui* : les
+vendeuses qui ont les mains prises. *Valeur* : la saisie à la voix reste
+séduisante, mais un montant mal entendu fausse une comptabilité. *Effort* :
+moyen. *Règle proposée, indépendamment de la décision* : la voix peut proposer,
+l'écran doit confirmer le chiffre.
+
+☐ **5. Mesurer combien de vendeuses sont sur un téléphone antérieur à Android
+7.0.** *Problème* : la prochaine version de la brique qui fabrique
+l'application mobile exige Android 7.0 au minimum. Passer dessus exclurait les
+téléphones plus anciens. *Pour qui* : les utilisatrices d'entrée de gamme, qui
+sont notre cœur de cible. *Valeur* : évite de couper des gens sans le savoir.
+*Effort* : petit — c'est une mesure à faire, pas un développement. *Chiffre
+actuel* : **non mesuré**, et je n'en inventerai pas.
+
+☐ **6. Mesurer notre lecture de photos de reçus contre le barème public.**
+*Problème* : nous ne savons pas ce que vaut vraiment notre lecture de reçus
+photographiés ; un barème public de 10 000 reçus annotés existe depuis le 21
+mai 2026. *Pour qui* : les utilisateurs qui photographient une facture au lieu
+de la saisir. *Valeur* : remplace une impression par une mesure. *Effort* :
+moyen. *Réserve* : le barème ne couvre pas les photos froissées ou floues, qui
+sont notre cas réel.
