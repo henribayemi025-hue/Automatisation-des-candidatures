@@ -11,6 +11,137 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 19/09/2026
+
+**Ce qui ressort aujourd'hui : je me suis trompée hier, et la correction a une
+date de péremption — le 1er octobre, dans douze jours.**
+
+### Ma correction d'hier était fausse
+
+Hier j'ai écrit, et j'ai dit à Beau et à Alpha, que l'information selon laquelle
+les messages de service WhatsApp deviendraient payants était fausse. Je m'étais
+appuyée sur la phrase de Meta disant qu'ils sont gratuits depuis le 1er novembre
+2024.
+
+**J'ai lu la page de Meta moi-même ce matin. Elle dit :**
+
+> « Effective October 1, 2026, Meta will charge on a per-message basis for
+> service messages. »
+
+[Page officielle Meta](https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing/non-template-messages)
+
+Les deux phrases sont vraies : gratuits depuis 2024, facturés à partir du 1er
+octobre 2026. J'avais lu la première et conclu que la seconde était une rumeur.
+La leçon est étroite et utile : **une page qui confirme un état passé ne
+contredit pas une annonce de changement.**
+
+**Ce que ça nous coûte aujourd'hui : rien.** Nos boutons WhatsApp ouvrent des
+liens `wa.me`, c'est-à-dire une conversation ordinaire entre deux personnes.
+Nous n'utilisons pas l'interface professionnelle de WhatsApp, donc aucune
+facturation ne nous touche. **Cela ne devient un coût que le jour où nous y
+passerions** — et ce jour-là, la facture commencera au premier message.
+
+### Règles et impôts
+
+- **Burkina Faso : la vente des systèmes de facturation certifiée a commencé le
+  7 septembre 2026**, d'abord pour les grandes entreprises et **les éditeurs de
+  logiciels de facturation**, puis le 2 novembre et le 1er décembre pour les
+  autres. Trente jours de délai après chaque mise en vente ; prix promotionnel
+  de 150 000 FCFA jusqu'au 31 décembre. L'obligation elle-même date du 1er
+  janvier 2025 (article 564-2 du Code général des impôts).
+  [Communiqué relayé](https://burkina24.com/2026/09/07/communique-facture-electronique-certifiee-la-mise-en-vente-des-systemes-de-facturation-demarre-le-7-septembre-2026-au-burkina-faso-3/)
+  **Pour nous** : un pays de plus où l'on ne facture pas librement, et où c'est
+  en tant qu'**éditeur** qu'il faut s'inscrire — pas en tant que commerçant.
+
+- **Zone CEMAC : un QR code de paiement interopérable est devenu obligatoire**
+  par règlement du 8 avril 2026, lancé le 29 juillet à Douala. D'application
+  directe dans les six États.
+  [Analyse juridique](https://www.village-justice.com/articles/cameroun-code-paiement-interoperable-cemac-entre-imperatif-financiere,58521.html)
+  **Pour nous** : l'encaissement au Cameroun et au Gabon ira vers un QR commun
+  à tous les opérateurs, pas un QR par opérateur.
+
+- **Et ce même QR entre en tension avec la loi camerounaise sur les données
+  personnelles** (loi n° 2024/017) : il traite des identifiants d'appareil, de
+  la géolocalisation et des horodatages, alors que l'autorité de contrôle qui
+  doit autoriser ces traitements n'est pas encore constituée. Source : article
+  de doctrine, pas un texte officiel.
+  **Pour nous** : ce que l'application collecte au moment d'un paiement devient
+  un sujet de conformité, pas seulement un sujet technique.
+
+- **Wave n'était toujours pas raccordé au paiement instantané de la banque
+  centrale au 31 juillet**, à deux mois de l'échéance du 30 septembre.
+  [Analyse de presse](https://www.osiris.sn/wave-face-a-la-plateforme-pi-spi-et-l-interoperabilite-refus-ou-dilemme.html)
+  · [Communiqué BCEAO](https://www.bceao.int/fr/communique-presse/connexion-la-plateforme-interoperable-du-systeme-de-paiement-instantane-pi-spi-de)
+  **Pour nous** : ne pas supposer qu'on atteindra Wave par ce rail au 1er
+  octobre. Une intégration directe resterait nécessaire.
+
+- **Une réforme des services de paiement se prépare en zone CEMAC**, avec des
+  statuts d'« opérateur de services de paiement » et une entrée en vigueur
+  envisagée au 1er janvier 2027. Texte non encore publié.
+  **Pour nous** : si un jour l'application encaisse **pour le compte** des
+  commerçants, elle pourrait relever d'un statut à faire agréer. Aujourd'hui ce
+  n'est pas le cas — l'argent va directement de la cliente à la commerçante.
+
+### Concurrence et obligations ailleurs
+
+- **Kenya : la tenue du stock devient une pièce fiscale.** L'administration
+  exige des registres d'achats, ventes, transferts, retours et ajustements dans
+  son système de facturation, y compris pour les petits commerces.
+  [Source](https://tech-ish.com/2026/09/04/kra-orders-businesses-to-keep-stock-records-in-tims-and-etims/)
+  **Pour nous** : cela valide le couplage caisse + stock, et impose de garder
+  l'**historique des mouvements**, pas seulement le solde — ce que notre journal
+  en ajout seul fait déjà par construction.
+
+- **Brésil : les micro et petites entreprises devront émettre leurs factures de
+  service par un émetteur public unique à partir du 1er novembre 2026.**
+  [Source](https://plbrasil.com.br/nfse-para-me-e-epp/)
+  **Pour nous** : le même schéma se répète partout — un émetteur public auquel
+  le logiciel se raccorde. Mieux vaut concevoir **un raccordement générique**
+  qu'un branchement par pays.
+
+- **Cameroun : la taxation en temps réel de 2026 ne vise que quatre secteurs**
+  (télécoms mobiles, brasserie, cimenteries, jeux), pas les petits commerces.
+  [Source](https://ecomatin.net/cameroun-letat-vise-40-milliards-fcfa-des-2026-grace-a-la-taxation-en-temps-reel-des-telecoms-des-jeux-de-la-biere-et-du-ciment)
+  **Pour nous** : sur le marché de démarrage, aucune obligation ne presse. La
+  conformité peut rester derrière l'usage quotidien.
+
+### Technologie
+
+- **La lecture de texte sur l'appareil est disponible pour notre application
+  mobile depuis le 15 septembre** : une suite de greffons pour Capacitor expose
+  la reconnaissance de texte de Google, modèles embarqués, **hors ligne, sans
+  clé d'interface et sans facturation à la requête**. Taille ajoutée à
+  l'application : non chiffrée.
+  [Source](https://capawesome.io/blog/capacitor-mlkit-8-2-0-release/)
+  **Pour nous** : c'est la meilleure nouvelle de la journée. La première lecture
+  d'un reçu photographié pourrait se faire **sur le téléphone, gratuitement**,
+  et seuls les cas douteux partiraient au loin. Exactement le profil réseau
+  lent, forfait compté.
+
+- **Un modèle de reconnaissance vocale annonce prendre en charge le « français
+  africain »**, avec un fonctionnement hors ligne revendiqué. Ni précision ni
+  tarif publiés.
+  [Source](https://www.itnewsafrica.com/2026/03/intron-launches-voice-ai-for-africa-with-24-languages/)
+  **Pour nous** : à essayer avant tout autre modèle vocal, mais la règle d'hier
+  tient — un montant dicté se relit à l'écran avant d'être enregistré.
+
+- **Supabase surveille désormais la santé des services** (taux d'erreur sur
+  l'authentification, le stockage, les fonctions edge), disponible aujourd'hui.
+  [Source](https://supabase.com/changelog/50577-health-check-advisors)
+  **Pour nous** : voir une fonction edge partir en erreur sans attendre qu'une
+  vendeuse le signale. D'autant plus utile que nos fonctions edge sont communes
+  à l'essai et à la production.
+
+### Ce qui n'a pas pu être établi
+
+Les grilles de frais des opérateurs de paiement mobile restent introuvables
+dans une source officielle : tout ce qui circule vient de blogs commerciaux.
+C'était déjà le trou d'hier, il n'est que partiellement comblé. La piste
+suivante est de lire directement les journaux de version des portails
+développeurs, que la recherche web n'indexe pas.
+
+---
+
 ## 18/09/2026 — première note
 
 Ce qui ressort aujourd'hui, en une phrase : **la loi vient de rattraper les

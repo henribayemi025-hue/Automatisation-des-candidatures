@@ -205,3 +205,47 @@ verrou posé à l'installation. Une salle de sport qui achète un tapis de cours
 et ne retrouve pas l'écran n'appelle pas au secours, elle arrête de saisir. Et
 c'est mesurable : si beaucoup de gens activent l'interrupteur, le tri est
 mauvais.
+
+---
+
+## Idées issues de la veille du 19/09/2026 — à décider par Beau
+
+☐ **7. Lire un reçu photographié SUR le téléphone, sans rien payer.**
+*Problème* : la lecture d'un reçu part aujourd'hui vers un service distant —
+donc du forfait consommé, de l'attente sur réseau lent, et rien du tout hors
+ligne. *Ce qui a changé* : depuis le 15/09, une suite de greffons pour notre
+brique mobile expose la reconnaissance de texte de Google avec les modèles
+**embarqués dans l'application** : hors ligne, sans clé, sans facturation à la
+requête (source dans `docs/VEILLE.md`). *Pour qui* : toute personne qui
+photographie une facture au lieu de la saisir. *Valeur* : forte — c'est le
+profil exact de nos utilisatrices. *Effort* : moyen. *Réserve honnête* : la
+taille ajoutée à l'application n'est pas chiffrée par la source, et un
+téléphone d'entrée de gamme compte ses mégaoctets. À mesurer avant de décider.
+
+☐ **8. S'inscrire comme éditeur de logiciel de facturation, et dans quel pays
+d'abord.** *Problème* : trois pays de plus se sont ajoutés à la liste où l'on
+ne facture pas librement — Burkina Faso (vente des systèmes certifiée depuis le
+7 septembre, les **éditeurs** étant dans la première vague), Brésil (émetteur
+public unique au 1er novembre), Kenya (le stock devient une pièce fiscale).
+Avec le Gabon et la Côte d'Ivoire d'hier, le schéma se répète partout. *Pour
+qui* : tout commerçant soumis à une obligation déjà en vigueur. *Valeur* :
+c'est la porte d'entrée légale du produit. *Effort* : gros, et administratif
+avant d'être technique. *Décision demandée* : est-ce qu'on conçoit **un
+raccordement générique** à un émetteur public — le même schéma partout — plutôt
+qu'un branchement par pays ? Et lequel en premier ?
+
+☐ **9. Surveiller la santé des fonctions edge.** *Problème* : une fonction edge
+qui part en erreur ne se voit que si une vendeuse le signale — et Alpha a déjà
+vécu deux jours avec une mesure rejetée en silence. *Ce qui a changé* : la
+surveillance existe depuis le 18/09 chez notre hébergeur de base. *Effort* :
+petit, c'est un réglage. *Réserve* : nos fonctions edge sont communes à l'essai
+et à la production, donc ce qui s'y règle touche les deux.
+
+☐ **10. Ce que l'application collecte au moment d'un paiement.** *Problème* :
+le QR de paiement devenu obligatoire en zone CEMAC traite identifiants
+d'appareil, position et horodatage, et la loi camerounaise de 2024 soumet ces
+traitements à une autorisation d'une autorité qui n'existe pas encore. *Pour
+qui* : nos utilisateurs camerounais, donc la grande majorité. *Valeur* : éviter
+de collecter aujourd'hui ce qu'il faudra justifier demain. *Effort* : petit —
+c'est une relecture de ce qu'on enregistre, pas un développement. *Source* :
+article de doctrine, pas un texte officiel ; à confirmer avant toute décision.
