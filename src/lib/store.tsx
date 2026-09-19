@@ -20,6 +20,7 @@ import type {
   ForeignAmount,
   LandedCost,
   Sale,
+  Appointment,
   Subscription,
   SaleLine,
   Supplier,
@@ -160,6 +161,8 @@ export interface StoreActions {
   /** Encaisse une période de plus : une vente est enregistrée, la date de fin avance. Renvoie la vente (pour la facture). */
   renewSubscription: (subscriptionId: string, method: PaymentMethod, amount?: Minor, from?: string) => Sale | null;
   cancelSubscription: (subscriptionId: string) => void;
+  saveAppointment: (input: Omit<Appointment, 'id' | 'createdAt' | 'status' | 'saleId'> & { id?: string; status?: Appointment['status'] }) => Appointment;
+  setAppointmentStatus: (appointmentId: string, status: Appointment['status'], saleId?: string) => void;
   /** Complète le coût d'une vente venue de la place de marché ('SERVICE' : rien à sortir). */
   completeSaleCost: (saleId: string, unitCosts: Minor[] | 'SERVICE') => void;
   addManualEntry: (input: ManualEntryInput) => void;
@@ -470,6 +473,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           period: { from: start, to, amount: t.total, saleId: sale.id, paidAt: todayISO },
         });
         return sale;
+      },
+
+      saveAppointment(input) {
+        const existing = input.id ? dbRef.current.appointments.find((x) => x.id === input.id) : undefined;
+        const appointment: Appointment = {
+          ...input,
+          id: existing?.id ?? newId(),
+          status: input.status ?? existing?.status ?? 'BOOKED',
+          saleId: existing?.saleId ?? null,
+          createdAt: existing?.createdAt ?? new Date().toISOString(),
+        };
+        dispatch('appointment.save', { appointment });
+        return appointment;
+      },
+
+      setAppointmentStatus(appointmentId, status, saleId) {
+        dispatch('appointment.status', { appointmentId, status, ...(saleId === undefined ? {} : { saleId }) });
       },
 
       cancelSubscription(subscriptionId) {

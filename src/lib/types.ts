@@ -264,6 +264,42 @@ export interface SubscriptionPeriod {
 }
 
 /**
+ * Rendez-vous : le geste qu'une coiffeuse fait dix fois par jour et que
+ * l'application ne savait pas faire.
+ *
+ * Relevé le 18/09 en cherchant, métier par métier, l'opération quotidienne
+ * absente. Sans rendez-vous, une coiffeuse tient son carnet à côté — donc elle
+ * vit dans le carnet et pas chez nous, et rien de ce qu'elle y note ne rejoint
+ * jamais ses comptes.
+ *
+ * Volontairement pauvre : qui vient, quand, pour quoi. Ce n'est pas un agenda,
+ * c'est la page du carnet. Un rendez-vous n'écrit AUCUNE écriture comptable :
+ * tant que rien n'est encaissé, il ne s'est rien passé en comptabilité. La
+ * vente n'arrive qu'au moment où la personne paie, par la caisse comme
+ * d'habitude.
+ */
+export interface Appointment {
+  id: string;
+  customerId: string | null;
+  customerName: string;
+  phone: string;
+  /** Ce qui est prévu : « Tresses », « Coupe + barbe », « Vidange ». */
+  label: string;
+  date: ISODate;
+  /** Heure de début, « 14:30 ». Une journée se lit dans l'ordre des heures. */
+  time: string;
+  /** Durée prévue, en minutes. Sert à repérer les chevauchements. */
+  minutes: number;
+  /** Ce que ça devrait coûter, si elle le sait d'avance. Zéro = on ne sait pas. */
+  amount: Minor;
+  notes: string;
+  status: 'BOOKED' | 'DONE' | 'CANCELLED' | 'NOSHOW';
+  /** La vente encaissée pour ce rendez-vous, quand il a eu lieu. */
+  saleId: string | null;
+  createdAt: ISODate;
+}
+
+/**
  * Abonnement : un client paie pour une durée (salle de sport, wifi, cours,
  * télé…). Ce qui compte pour la commerçante : qui, combien, jusqu'à quand,
  * et être prévenue avant la fin. Chaque renouvellement est une vente normale.
@@ -547,6 +583,7 @@ export interface DB {
   movements: StockMovement[];
   debts: Debt[];
   subscriptions: Subscription[];
+  appointments: Appointment[];
   sessions: CashSession[];
   projects: Project[];
   messages: Message[];

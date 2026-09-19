@@ -17,6 +17,7 @@ import type {
   Product,
   Purchase,
   Sale,
+  Appointment,
   Subscription,
   SubscriptionPeriod,
   Supplier,
@@ -63,6 +64,7 @@ export function emptyDB(): DB {
     movements: [],
     debts: [],
     subscriptions: [],
+    appointments: [],
     sessions: [],
     projects: [],
     messages: [],
@@ -1181,6 +1183,28 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       if (period.to > sub.endDate) sub.endDate = period.to;
       sub.status = 'ACTIVE';
       audit(db, ev, 'subscription', sub.id, 'RENEW', `Abonnement ${sub.label} — ${sub.customerName} jusqu'au ${period.to}`);
+      break;
+    }
+
+    case 'appointment.save': {
+      // Un rendez-vous ne produit AUCUNE écriture : tant que rien n'est
+      // encaissé, il ne s'est rien passé en comptabilité. La vente arrive
+      // quand la personne paie, par la caisse, comme n'importe quelle vente.
+      const rdv = p.appointment as Appointment;
+      const i = db.appointments.findIndex((a) => a.id === rdv.id);
+      if (i >= 0) db.appointments[i] = { ...db.appointments[i], ...rdv };
+      else db.appointments.unshift(rdv);
+      audit(db, ev, 'appointment', rdv.id, i >= 0 ? 'UPDATE' : 'CREATE', `Rendez-vous ${rdv.customerName} — ${rdv.date} ${rdv.time}`);
+      break;
+    }
+
+    case 'appointment.status': {
+      const rdv = db.appointments.find((a) => a.id === p.appointmentId);
+      if (!rdv) break;
+      rdv.status = p.status as Appointment['status'];
+      if (p.saleId !== undefined) rdv.saleId = (p.saleId as string) || null;
+      const mots: Record<string, string> = { BOOKED: 'replacé', DONE: 'honoré', CANCELLED: 'annulé', NOSHOW: 'non venu' };
+      audit(db, ev, 'appointment', rdv.id, 'STATUS', `Rendez-vous ${rdv.customerName} — ${mots[rdv.status] ?? rdv.status}`);
       break;
     }
 

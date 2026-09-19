@@ -22,6 +22,7 @@ import Quotes from './pages/Quotes';
 import Parties from './pages/Parties';
 import Debts from './pages/Debts';
 import Subscriptions from './pages/Subscriptions';
+import Appointments from './pages/Appointments';
 import Expenses from './pages/Expenses';
 import Analytics from './pages/Analytics';
 import Reports from './pages/Reports';
@@ -132,6 +133,7 @@ export default function App() {
           <Route path="/tiers" element={<Parties />} />
           <Route path="/dettes" element={<Debts />} />
           <Route path="/abonnements" element={<Subscriptions />} />
+          <Route path="/rendez-vous" element={<Appointments />} />
           <Route path="/projets" element={<Projects />} />
           <Route path="/projets/:id" element={<ProjectDetail />} />
           <Route path="/depenses" element={<Expenses />} />

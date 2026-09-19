@@ -86,6 +86,7 @@ const NAV: NavGroup[] = [
       { to: '/ventes', label: 'Ventes', icon: <IconReceipt />, area: 'sell' },
       { to: '/devis', label: 'Devis', icon: <IconDoc />, area: 'sell' },
       { to: '/dettes', label: 'Dettes & crédits', icon: <IconCard />, area: 'finance' },
+      { to: '/rendez-vous', label: 'Rendez-vous', icon: <IconHistory />, area: 'sell' },
       { to: '/abonnements', label: 'Abonnements', icon: <IconHistory />, area: 'sell' },
       { to: '/projets', label: 'Projets', icon: <IconFolder />, area: 'finance' },
       { to: '/depenses', label: 'Dépenses', icon: <IconWallet />, area: 'finance' },
