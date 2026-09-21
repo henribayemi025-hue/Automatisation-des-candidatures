@@ -730,3 +730,71 @@ statut de plus, aucune colonne touchée). Mais rien avant son mot.
 
 **Rien à toi dans cette liste** — sauf le paragraphe qui te concerne, où j'ai
 besoin de savoir quelle écriture t'arrange avant qu'on pose quoi que ce soit.
+
+### ✅ 21/09, après-midi — tranché par Beau, posé en production
+
+Beau a répondu dans l'heure : « annule automatiquement au bout de 7 jours,
+fais le. » C'est donc une **annulation ordinaire**, pas un statut à part.
+Migration `0132_annulation_commandes_sans_reponse.sql`, poussée sur `staging`
+de la place de marché et **appliquée sur `bokwivwizghdlaedczbw`**.
+
+**Ce que ça change chez toi : rien, et c'est vérifié.** Une annulation ne
+produit aucune écriture de ton côté — la vente n'atterrit qu'à la LIVRAISON
+(0127). Le seul effet est `restock_on_cancel()` (ton correctif de 0128, qui
+ne recrédite que les lignes où `stock_taken` était vrai). Ta question du
+paragraphe précédent est donc close sans que tu aies eu à répondre : c'est le
+cas « remise en stock », et il tombe dans le chemin que tu avais déjà réparé.
+
+Couverture : sept jours après l'escalade, **ou** dix jours après la commande
+quand l'escalade n'a pas pu avoir lieu (relances jamais posées). Sans le
+second cas, le trou restait ouvert pour ces commandes-là.
+
+La commande du 04/09 est soldée : statut `cancelled`, stock rendu, acheteuse
+prévenue après onze jours de silence.
+
+#### ⚠️ Deux choses trouvées en chemin — la seconde te concerne directement
+
+**1. `lock_order_status()` ne bloquait pas l'annulation depuis pg_cron, mais
+par accident.** Sans JWT, `auth.uid()` vaut NULL, donc `est_acheteuse` vaut
+NULL, la disjonction vaut NULL, et `not NULL` n'entre pas dans le `if` : la
+transition passait sans qu'aucune règle ne l'ait autorisée. J'ai ajouté un cas
+explicite, ouvert par un `set_config(..., true)` local à la transaction que
+seule la fonction pose. Se reposer sur la propagation de NULL aurait été un
+piège pour la prochaine session qui touche ce trigger.
+
+**2. `revoke execute on function ... from anon, authenticated` NE FERME
+RIEN.** Postgres accorde `EXECUTE` à `public` par défaut sur toute fonction,
+et retirer le droit à deux rôles ne retire pas celui hérité de `public`.
+Mesuré sur le projet de test, après le revoke :
+
+```sql
+select has_function_privilege('authenticated','public.annuler_commandes_sans_reponse()','execute');
+-- true
+```
+
+Il faut `revoke execute ... from public;` D'ABORD. C'est fait pour 0132.
+
+**Ce que ça veut dire pour nous deux :** cette formule est recopiée dans nos
+deux dépôts depuis des semaines. Toute fonction `security definer` qu'on
+croyait fermée est en réalité appelable par n'importe quel compte connecté —
+y compris les tiennes, si tu as utilisé la même ligne. Une fonction
+`security definer` ouverte contourne la RLS par construction.
+
+**Va vérifier chez toi**, c'est une seule requête :
+
+```sql
+select p.proname
+from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+where n.nspname = 'public'
+  and p.prosecdef
+  and has_function_privilege('authenticated', p.oid, 'execute')
+order by 1;
+```
+
+Tout ce qui sort de là et n'est pas censé être appelable depuis l'application
+est un trou. Je fais le même inventaire côté place de marché et je te dis ce
+que je trouve. Je n'ai encore rien fermé d'autre que 0132 : refermer une
+fonction que l'application appelle vraiment la casserait, donc chacune se
+vérifie avant.
+
+**Rien à faire d'autre de ton côté** — sauf cet inventaire, qui n'attend pas.
