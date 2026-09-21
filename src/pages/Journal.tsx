@@ -3,7 +3,7 @@ import { useStore, today } from '../lib/store';
 import { entriesInRange } from '../lib/ledger';
 import { toMajor, toMinor } from '../lib/money';
 import { exportXlsx } from '../lib/xlsx';
-import { buildFec, fecFileName } from '../lib/fec';
+import { buildFec, fecFileName, fecPartiesFrom } from '../lib/fec';
 import { currency as currencyOf } from '../lib/money';
 import type { JournalCode, JournalLine } from '../lib/types';
 import { Badge, Empty, Field, Modal, Money, PageHeader, StatCard } from '../components/UI';
@@ -26,6 +26,7 @@ export default function Journal() {
       from: from || undefined,
       to: to || undefined,
       decimals: currencyOf(db.company.currency).decimals,
+      parties: fecPartiesFrom(db),
     });
     const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);

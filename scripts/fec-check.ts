@@ -64,3 +64,30 @@ for (const [label, state] of [['XAF (0 décimale)', demoFor('Cameroun')], ['EUR 
   }
 }
 console.log('OK — FEC conforme sur les deux devises.');
+
+// ── Comptes auxiliaires : une créance client porte QUI est le client ────────
+// Relevé le 21/09 : CompAuxNum et CompAuxLib étaient vides depuis le début.
+{
+  const { fecPartiesFrom } = await import('../src/lib/fec');
+  const { accountCode } = await import('../src/lib/chart');
+  const state = demoFor('France');
+  const text = buildFec(state.accounts, state.entries, { decimals: 2, parties: fecPartiesFrom(state) });
+  const rows = text.split('\r\n').slice(1).map((l) => l.split('\t'));
+  const c411 = accountCode('PCG', 'CUSTOMERS');
+  const f401 = accountCode('PCG', 'SUPPLIERS');
+  const clients = rows.filter((r) => r[4] === c411);
+  const fournisseurs = rows.filter((r) => r[4] === f401);
+  const clientsNommes = clients.filter((r) => r[6] && r[7]);
+  const fournisseursNommes = fournisseurs.filter((r) => r[6] && r[7]);
+  const horsTiers = rows.filter((r) => r[4] !== c411 && r[4] !== f401 && (r[6] || r[7]));
+  console.log('--- comptes auxiliaires (France) ---');
+  console.log('lignes 411 :', clients.length, '· avec tiers nommé :', clientsNommes.length);
+  console.log('lignes 401 :', fournisseurs.length, '· avec tiers nommé :', fournisseursNommes.length);
+  console.log('auxiliaire hors 411/401 (doit être 0) :', horsTiers.length);
+  const stable = new Set(clientsNommes.map((r) => r[6])).size <= new Set(clientsNommes.map((r) => r[7])).size + 1;
+  if (!clients.length || !clientsNommes.length || !fournisseursNommes.length || horsTiers.length || !stable) {
+    console.log('ÉCHEC — comptes auxiliaires');
+    process.exit(1);
+  }
+  console.log('OK — comptes auxiliaires remplis sur 411 et 401, vides ailleurs.');
+}

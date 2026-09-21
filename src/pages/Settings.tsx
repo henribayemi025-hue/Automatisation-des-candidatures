@@ -202,6 +202,31 @@ export default function Settings() {
             <Field label={t('Téléphone')}>
               <TextSetting id="set-phone" value={c.phone} disabled={!canEdit} inputMode="tel" onCommit={(v) => setCompany({ phone: v })} />
             </Field>
+
+            {/*
+              Ce qu'une facture doit porter pour être conforme. Facultatif pour
+              démarrer, mais dit clairement : une comptable française a relevé
+              le 21/09 que la facture ne portait que le nom.
+            */}
+            <div className="rounded-input border border-hairline p-3.5">
+              <p className="text-caption font-semibold text-ink">{t('Sur vos factures')}</p>
+              <p className="mt-1 text-caption text-muted">
+                {t('Une facture conforme porte l’adresse, le numéro d’immatriculation et, si vous facturez la TVA, votre numéro de TVA. Sans eux, le ticket reste un reçu.')}
+              </p>
+              <div className="mt-3 space-y-3">
+                <Field label={t('Adresse')}>
+                  <TextSetting id="set-address" value={c.address ?? ''} disabled={!canEdit} placeholder={t('rue, code postal, ville')} onCommit={(v) => setCompany({ address: v })} />
+                </Field>
+                <Field label={c.country === 'France' ? t('SIREN / SIRET') : c.chart === 'SYSCOHADA' ? t('RCCM') : t('Numéro d’immatriculation')}>
+                  <TextSetting id="set-registration" value={c.registrationId ?? ''} disabled={!canEdit} onCommit={(v) => setCompany({ registrationId: v })} />
+                </Field>
+                {c.vatEnabled && (
+                  <Field label={c.country === 'France' ? t('Numéro de TVA intracommunautaire') : t('Identifiant fiscal ({tax})', { tax: c.taxLabel || 'TVA' })}>
+                    <TextSetting id="set-vatid" value={c.vatId ?? ''} disabled={!canEdit} onCommit={(v) => setCompany({ vatId: v })} />
+                  </Field>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 

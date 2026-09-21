@@ -31,6 +31,37 @@ function legalMention(company: Company): string {
 }
 
 /**
+ * L'identité de l'émetteur, ligne par ligne, sans inventer ce qui n'est pas
+ * renseigné : une ligne absente vaut mieux qu'une ligne « SIRET : — ».
+ */
+function identityLines(company: Company): string[] {
+  const out: string[] = [];
+  if (company.address) out.push(company.address);
+  if (company.phone) out.push(company.phone);
+  if (company.registrationId) {
+    const label = company.country === 'France' ? 'SIREN' : company.chart === 'SYSCOHADA' ? 'RCCM' : t('N°');
+    out.push(`${label} ${company.registrationId}`);
+  }
+  if (company.vatEnabled && company.vatId) out.push(`${t('TVA')} ${company.vatId}`);
+  return out;
+}
+
+/**
+ * Ce qu'une facture française à un professionnel doit porter en plus du reste.
+ * Ces deux phrases sont exigées par le Code de commerce (L441-10 et D441-5) ;
+ * les montants ne sont pas de nous. On ne les imprime que lorsqu'une cliente
+ * est identifiée : sur un ticket de comptoir, elles n'ont pas de sens.
+ */
+function proMentions(company: Company, sale: Sale): string[] {
+  if (company.country !== 'France') return [];
+  if (!sale.customerId || sale.status === 'QUOTE') return [];
+  return [
+    t('Pénalités de retard : trois fois le taux d’intérêt légal. Indemnité forfaitaire pour frais de recouvrement : 40 €.'),
+    t('Pas d’escompte pour paiement anticipé.'),
+  ];
+}
+
+/**
  * Les libellés d'une vente sans fiche client. « Client passager » est
  * l'ancien, gardé parce que les ventes déjà enregistrées le portent : le
  * journal ne se réécrit pas.
@@ -49,7 +80,8 @@ function receiptText(company: Company, sale: Sale): string {
   const cur = company.currency;
   const lines = [
     company.name,
-    `${sale.status === 'QUOTE' ? t('Devis') : t('Ticket')} ${sale.number} — ${sale.date}`,
+    ...identityLines(company),
+    `${sale.status === 'QUOTE' ? t('Devis') : sale.customerId ? t('Facture') : t('Ticket')} ${sale.number} — ${sale.date}`,
     '',
     ...sale.lines.map((l) => `${l.qty} × ${l.name} — ${formatMoney(l.unitPrice * l.qty, cur)}`),
     '',
@@ -63,6 +95,7 @@ function receiptText(company: Company, sale: Sale): string {
   }
   const mention = legalMention(company);
   if (mention) lines.push('', mention);
+  for (const m of proMentions(company, sale)) lines.push(m);
   lines.push('', t('Merci de votre confiance.'));
   return lines.join('\n');
 }
@@ -83,7 +116,8 @@ function printReceipt(company: Company, sale: Sale): void {
   .foot { margin-top: 12px; text-align: center; font-size: 11px; }
 </style></head><body>
 <h1>${esc(company.name)}</h1>
-<div class="c">${sale.status === 'QUOTE' ? t('Devis') : t('Ticket')} ${esc(sale.number)}<br>${esc(sale.date)}${sale.customerName && !ANONYME.has(sale.customerName) ? `<br>${esc(sale.customerName)}` : ''}</div>
+${identityLines(company).length ? `<div class="c" style="font-size:11px">${identityLines(company).map(esc).join('<br>')}</div>` : ''}
+<div class="c">${sale.status === 'QUOTE' ? t('Devis') : sale.customerId ? t('Facture') : t('Ticket')} ${esc(sale.number)}<br>${esc(sale.date)}${sale.customerName && !ANONYME.has(sale.customerName) ? `<br>${esc(sale.customerName)}` : ''}</div>
 <table>
 ${sale.lines.map((l) => `<tr><td>${l.qty} × ${esc(l.name)}</td><td class="n">${esc(formatMoney(l.unitPrice * l.qty, cur))}</td></tr>`).join('')}
 ${sale.discount > 0 ? `<tr><td>${t('Remise')}</td><td class="n">−${esc(formatMoney(sale.discount, cur))}</td></tr>` : ''}
@@ -93,6 +127,7 @@ ${sale.status !== 'QUOTE' ? `<tr><td>${t('Payé')} — ${esc(t(METHOD_LABEL[sale
 ${sale.total - sale.paid > 0 && sale.status !== 'QUOTE' ? `<tr><td>${t('Reste à payer')}</td><td class="n">${esc(formatMoney(sale.total - sale.paid, cur))}</td></tr>` : ''}
 </table>
 ${legalMention(company) ? `<div class="foot">${esc(legalMention(company))}</div>` : ''}
+${proMentions(company, sale).map((m) => `<div class="foot" style="font-size:10px">${esc(m)}</div>`).join('')}
 <div class="foot">${t('Merci de votre confiance.')}<br>${esc(new Date().toLocaleString(locale()))}</div>
 <script>window.onload=function(){window.print()}</script>
 </body></html>`;
@@ -126,8 +161,11 @@ export default function Receipt({ sale, company, onClose }: { sale: Sale | null;
 
       <div className="mx-auto mt-4 max-w-[340px] rounded-card border border-hairline bg-base px-4 py-4 font-mono text-[12.5px] text-ink">
         <p className="text-center font-bold">{company.name}</p>
+        {identityLines(company).map((l) => (
+          <p key={l} className="text-center text-[11px] text-muted">{l}</p>
+        ))}
         <p className="text-center text-muted">
-          {isQuote ? t('Devis') : t('Ticket')} {sale.number} · {sale.date}
+          {isQuote ? t('Devis') : sale.customerId ? t('Facture') : t('Ticket')} {sale.number} · {sale.date}
         </p>
         {sale.customerName && !ANONYME.has(sale.customerName) && <p className="text-center text-muted">{sale.customerName}</p>}
         <table className="mt-3 w-full">
@@ -187,6 +225,9 @@ export default function Receipt({ sale, company, onClose }: { sale: Sale | null;
         {legalMention(company) && (
           <p className="mt-3 text-center text-[11px] text-muted">{legalMention(company)}</p>
         )}
+        {proMentions(company, sale).map((m) => (
+          <p key={m} className="mt-1 text-center text-[10px] text-muted">{m}</p>
+        ))}
         <p className="mt-3 text-center text-muted">{t('Merci de votre confiance.')}</p>
       </div>
 

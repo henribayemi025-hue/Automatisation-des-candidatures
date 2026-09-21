@@ -25,6 +25,20 @@ export interface Company {
   city: string;
   sector: string;
   phone: string;
+  /**
+   * Identité imprimée sur les factures. Facultatif au démarrage — une
+   * commerçante qui essaie l'application n'a pas à remplir un formulaire
+   * administratif avant sa première vente — mais sans ces trois lignes, une
+   * facture française n'est pas conforme. L'écran Réglages le dit.
+   *
+   * Relevé le 21/09 avec le retour d'une comptable française : la facture ne
+   * portait que le nom de l'entreprise.
+   */
+  address?: string;
+  /** SIREN/SIRET en France, RCCM en zone OHADA, numéro d'entreprise ailleurs. */
+  registrationId?: string;
+  /** Numéro de TVA intracommunautaire (ou identifiant fiscal local). */
+  vatId?: string;
   /** Référentiel du plan comptable utilisé. */
   chart: 'SYSCOHADA' | 'PCG' | 'GENERIC';
   vatEnabled: boolean;

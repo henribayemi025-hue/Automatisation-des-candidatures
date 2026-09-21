@@ -3,7 +3,7 @@ import { useDB } from '../lib/store';
 import { balanceSheet, incomeStatement, trialBalance } from '../lib/ledger';
 import { monthStart, outstanding, productPerformance, saleRevenue } from '../lib/metrics';
 import { formatMoney, currency as currencyOf } from '../lib/money';
-import { buildFec, fecFileName } from '../lib/fec';
+import { buildFec, fecFileName, fecPartiesFrom } from '../lib/fec';
 import type { Minor } from '../lib/types';
 import { Field, PageHeader } from '../components/UI';
 import { IconBook, IconBox, IconCard, IconDoc, IconReceipt, IconScale, IconTrend } from '../components/Icons';
@@ -173,7 +173,7 @@ export default function Reports() {
   }
 
   function exportFec() {
-    const text = buildFec(db.accounts, db.entries, { from, to, decimals: currencyOf(db.company.currency).decimals });
+    const text = buildFec(db.accounts, db.entries, { from, to, decimals: currencyOf(db.company.currency).decimals, parties: fecPartiesFrom(db) });
     const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { today, useStore } from '../lib/store';
 import { closingPlan, currentFiscalYear, nextToClose } from '../lib/closing';
 import { incomeStatement } from '../lib/ledger';
-import { buildFec, fecFileName } from '../lib/fec';
+import { buildFec, fecFileName, fecPartiesFrom } from '../lib/fec';
 import { currency as currencyOf, formatMoney } from '../lib/money';
 import { Link } from 'react-router-dom';
 import { Empty, Field, FigureStrip, Modal, Money, PageHeader, Table } from '../components/UI';
@@ -39,6 +39,7 @@ export default function Closing() {
       from: range.from,
       to: range.to,
       decimals: currencyOf(db.company.currency).decimals,
+      parties: fecPartiesFrom(db),
     });
     const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);

@@ -1,4 +1,5 @@
-import type { Account, Company, JournalEntry } from './types';
+import type { Account, Company, DB, JournalEntry } from './types';
+import { accountCode } from './chart';
 
 /**
  * Export FEC — Fichier des Écritures Comptables. En France, l'administration
@@ -59,11 +60,62 @@ function clean(value: string): string {
   return (value ?? '').replace(/[\t\r\n]+/g, ' ').trim();
 }
 
+/**
+ * Comptes auxiliaires : sur une ligne 411 ou 401, le FEC attend QUI est le
+ * client ou le fournisseur (CompAuxNum, CompAuxLib). Sans ça, l'administration
+ * voit un 411 global et ne peut pas rapprocher une créance d'une personne.
+ *
+ * Relevé le 21/09 avec le retour d'une comptable française : les deux
+ * colonnes étaient vides depuis le début. Le journal savait pourtant tout —
+ * chaque écriture porte sa source (vente, achat, règlement), et la source
+ * porte son tiers.
+ *
+ * Une vente au comptoir n'a pas de tiers : ses colonnes restent vides, c'est
+ * exact. Le numéro auxiliaire est stable dans le temps (dérivé de
+ * l'identifiant de la fiche), jamais de la position dans une liste.
+ */
+export interface FecParties {
+  customersAccount: string;
+  suppliersAccount: string;
+  /** Pour une écriture, le tiers concerné — ou rien pour une vente au comptoir. */
+  resolve(entry: JournalEntry): { num: string; lib: string } | undefined;
+}
+
+export function fecPartiesFrom(db: Pick<DB, 'company' | 'sales' | 'purchases' | 'debts' | 'customers' | 'suppliers'>): FecParties {
+  const chart = db.company.chart;
+  const aux = (prefix: 'C' | 'F', id: string | null, name: string) =>
+    id ? { num: `${prefix}${id.replace(/-/g, '').slice(0, 10).toUpperCase()}`, lib: name } : undefined;
+  return {
+    customersAccount: accountCode(chart, 'CUSTOMERS'),
+    suppliersAccount: accountCode(chart, 'SUPPLIERS'),
+    resolve(entry) {
+      switch (entry.sourceType) {
+        case 'sale': {
+          const sale = db.sales.find((x) => x.id === entry.sourceId);
+          return sale ? aux('C', sale.customerId, sale.customerName) : undefined;
+        }
+        case 'purchase': {
+          const purchase = db.purchases.find((x) => x.id === entry.sourceId);
+          return purchase ? aux('F', purchase.supplierId, purchase.supplierName) : undefined;
+        }
+        case 'debt': {
+          const debt = db.debts.find((x) => x.id === entry.sourceId);
+          return debt ? aux(debt.party === 'CUSTOMER' ? 'C' : 'F', debt.partyId, debt.partyName) : undefined;
+        }
+        default:
+          return undefined;
+      }
+    },
+  };
+}
+
 export interface FecOptions {
   from?: string;
   to?: string;
   /** Décimales de la devise (XAF 0, EUR 2). */
   decimals: number;
+  /** Absent : colonnes auxiliaires vides — à réserver aux contrôles de format. */
+  parties?: FecParties;
 }
 
 export function buildFec(
@@ -82,7 +134,12 @@ export function buildFec(
   let num = 0;
   for (const entry of kept) {
     num += 1;
+    const tiers = options.parties?.resolve(entry);
     for (const line of entry.lines) {
+      const auxiliaire =
+        tiers && (line.account === options.parties?.customersAccount || line.account === options.parties?.suppliersAccount)
+          ? tiers
+          : undefined;
       rows.push(
         [
           entry.journal,
@@ -91,8 +148,8 @@ export function buildFec(
           fecDate(entry.date),
           line.account,
           clean(labelOf.get(line.account) ?? line.label ?? ''),
-          '',
-          '',
+          clean(auxiliaire?.num ?? ''),
+          clean(auxiliaire?.lib ?? ''),
           clean(entry.ref),
           fecDate(entry.date),
           clean(line.label ? `${entry.label} — ${line.label}` : entry.label),
