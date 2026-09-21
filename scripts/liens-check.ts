@@ -44,6 +44,16 @@ for (const q of ['place de marché', 'je veux vendre en ligne', 'comment ouvrir 
   const a = answer(db, q);
   check(a.text.includes('https://finjaro.net'), `« ${q} » → l’adresse de la place de marché`);
 }
+// Finia par son nom, dans toutes ses graphies — c'est le mot que les gens
+// emploient réellement. « Finou » est son ancien nom.
+for (const q of ['tu connais finia ?', 'Finia', 'FINIA c est qui', 'c’est quoi Finou ?', 'finia peut m’aider ?']) {
+  const a = answer(db, q);
+  check(/Finia est l’assistante/.test(a.text), `« ${q} » → elle sait qui est Finia`);
+  check(a.text.includes('https://finjaro.net'), `« ${q} » → avec l’adresse`);
+}
+// Et elle ne doit pas prétendre voir ce qui s'y passe.
+check(/ne voit pas/.test(answer(db, 'tu connais finia ?').text), 'elle dit ce que Finia ne voit pas, et ce qu’elle-même ne voit pas');
+
 const presentation = answer(db, 'qui es-tu ?').text;
 check(presentation.includes('https://finjaro.net'), 'sa présentation cite la place de marché');
 check(!/diaspora/i.test(presentation), 'sa présentation ne parle pas de « diaspora »');

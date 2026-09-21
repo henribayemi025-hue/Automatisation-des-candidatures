@@ -85,6 +85,25 @@ export function answer(db: DB, question: string): Answer {
     };
   }
 
+  // Finia, par son nom.
+  //
+  // Beau a testé : « tu connais finia ? » → « Je ne connais pas Finia ».
+  // J'avais appris « place de marché » et « market place », pas le NOM de
+  // l'assistante d'en face. C'est pourtant le mot que les gens emploient :
+  // une vendeuse dira « Finia m'a dit que… », jamais « l'assistante de la
+  // place de marché m'a dit que… ». Un outil qu'on ne reconnaît pas à son nom
+  // est un outil qui n'existe pas.
+  //
+  // « Finou » est son ancien nom, qui traîne encore dans le code d'en face :
+  // quelqu'un qui l'a connue sous ce nom-là doit être reconnu aussi.
+  if (/\bfin(ia|ou)\b/i.test(question)) {
+    return {
+      text: t(
+        'Finia est l’assistante de la place de marché Finjaro : https://finjaro.net — elle aide à ouvrir une boutique, à publier des articles, à suivre les commandes et les livraisons.\n\nElle ne voit pas votre comptabilité, et moi je ne vois pas ce qui se passe sur la place de marché. Chacune son côté, même compte pour vous.\n\nCe qui passe de l’une à l’autre : une commande LIVRÉE là-bas entre toute seule dans votre journal ici.',
+      ),
+    };
+  }
+
   // Elle doit aussi savoir dire ce qu'elle est, sans enfermer Finjaro dans une
   // région : c'est la faute qu'Alpha venait de corriger chez elle.
   if (/qui es[- ]tu|tu es qui|c[’']est quoi finjaro|finjaro accounting|pr[ée]sente[- ]toi|what are you/.test(q)) {
