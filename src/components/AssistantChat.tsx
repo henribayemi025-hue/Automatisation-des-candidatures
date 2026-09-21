@@ -14,6 +14,7 @@ import { EXPENSE_LABEL } from '../lib/expenses';
 import { IconAlert, IconCheck, IconChevronRight, IconSend, IconSparkle } from './Icons';
 import { t } from '../lib/i18n';
 import { useOffline } from '../lib/offline';
+import { Linkify } from './Linkify';
 
 interface Message {
   id: number;
@@ -199,7 +200,7 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
           <div key={m.id} className={m.role === 'user' ? 'flex justify-end' : 'flex justify-start'}>
             <div className={`max-w-[88%] rounded-card px-4 py-3 ${m.role === 'user' ? 'bg-teal text-white' : 'bg-base'}`}>
               {m.imageName && <div className="mb-1 text-[11px] opacity-80">📷 {m.imageName}</div>}
-              <p className="whitespace-pre-wrap text-caption leading-relaxed sm:text-body">{m.text}</p>
+              <p className="whitespace-pre-wrap text-caption leading-relaxed sm:text-body"><Linkify text={m.text} /></p>
               {m.facts && m.facts.length > 0 && (
                 <ul className="mt-2 space-y-1 border-t border-black/10 pt-2 text-caption">
                   {m.facts.map((f, i) => (

@@ -65,6 +65,36 @@ export function answer(db: DB, question: string): Answer {
 
   if (!q) return { text: t('Posez une question sur vos chiffres : ventes, dépenses, marge, stock, créances…') };
 
+  // La place de marché existe, et l'assistante doit le savoir.
+  //
+  // Beau a posé la même question aux deux assistantes le 21/09 : aucune des
+  // deux ne savait que l'autre application existait, alors qu'elles partagent
+  // le même compte. Alpha a fait le symétrique de son côté.
+  //
+  // Ce qu'on dit est vrai et vérifiable : une commande LIVRÉE sur la place de
+  // marché arrive toute seule ici (le raccordement `finia_order_to_sale`).
+  // Ce qu'on ne dit pas : que ça a déjà servi. Mesuré en production ce matin,
+  // le journal de liaison est à zéro ligne — le tuyau est posé, il attend des
+  // gens aux deux bouts. Annoncer un usage qui n'existe pas serait un chiffre
+  // inventé.
+  if (/place de march|market ?place|boutique en ligne|vendre en ligne|finjaro\.net|livraison|livrer|nouveaux clients|trouver des clients/.test(q)) {
+    return {
+      text: t(
+        'Finjaro est la place de marché du même groupe : on y ouvre une boutique, on vend, on se fait livrer. C’est le MÊME compte qu’ici — pas d’inscription à refaire. https://finjaro.net\n\nCe qui vous concerne comptablement : une commande LIVRÉE sur la place de marché entre toute seule dans votre journal, comme une vente de caisse. Vous n’avez rien à ressaisir.\n\nJe ne peux pas ouvrir la boutique à votre place ni voir ce qui s’y passe : je ne lis que vos comptes.',
+      ),
+    };
+  }
+
+  // Elle doit aussi savoir dire ce qu'elle est, sans enfermer Finjaro dans une
+  // région : c'est la faute qu'Alpha venait de corriger chez elle.
+  if (/qui es[- ]tu|tu es qui|c[’']est quoi finjaro|finjaro accounting|pr[ée]sente[- ]toi|what are you/.test(q)) {
+    return {
+      text: t(
+        'Finjaro Accounting tient les comptes d’un commerce : caisse, stock, ventes, dépenses, dettes — et derrière chaque opération, une comptabilité en partie double. Je réponds avec VOS chiffres, calculés sur cet appareil, jamais inventés.\n\nÀ côté, il y a la place de marché Finjaro, pour vendre en ligne : https://finjaro.net — même compte.',
+      ),
+    };
+  }
+
   if (/d[ée]pens|charge|co[uû]t|spend|expense/.test(q) && !/marge|margin/.test(q)) {
     const list = db.expenses.filter((e) => e.date >= period.from && e.date <= period.to);
     const total = list.reduce((acc, e) => acc + e.amount, 0);
