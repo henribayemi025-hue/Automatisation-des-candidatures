@@ -323,7 +323,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           date: input.date || today(),
           projectId: input.projectId ?? null,
           customerId: input.customerId,
-          customerName: input.customerName || 'Client passager',
+          customerName: input.customerName || 'Vente au comptoir',
           lines: input.lines,
           discount: input.discount,
           vat: t.vat,

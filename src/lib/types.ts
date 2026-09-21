@@ -16,7 +16,7 @@ export interface Currency {
 /** SIMPLE : vocabulaire courant, comptabilité masquée. EXPERT : tout est visible. */
 export type AppMode = 'SIMPLE' | 'EXPERT';
 
-export type TaxRegime = 'REEL' | 'IGS' | 'NONE';
+export type TaxRegime = 'REEL' | 'MICRO' | 'IGS' | 'NONE';
 
 export interface Company {
   name: string;
@@ -40,9 +40,13 @@ export interface Company {
   taxLabel: string;
   /**
    * Régime d'imposition. REEL : l'entreprise facture la taxe (TVA) et la
-   * déclare. IGS : impôt synthétique, pas de TVA facturée, mais un précompte
-   * sur achat peut être retenu par les fournisseurs. NONE : ni l'un ni l'autre
-   * (non assujetti, pays sans taxe). Absent : déduit de vatEnabled.
+   * déclare. MICRO : micro-entreprise française en franchise en base — pas de
+   * TVA facturée ni déduite, et une mention obligatoire sur la facture. IGS :
+   * impôt synthétique OHADA, pas de TVA facturée, mais un précompte sur achat
+   * peut être retenu par les fournisseurs. NONE : ni l'un ni l'autre (non
+   * assujetti, pays sans taxe). Absent : déduit de vatEnabled.
+   *
+   * Les régimes proposés dépendent du pays — voir `taxRegimesFor`.
    */
   taxRegime?: TaxRegime;
   /** Précompte sur achat en points de base (200 = 2 %), retenu par les fournisseurs. 0 : aucun. */

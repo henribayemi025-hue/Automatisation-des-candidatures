@@ -86,11 +86,55 @@ export function taxRegime(c: { taxRegime?: Company['taxRegime']; vatEnabled: boo
   return c.taxRegime ?? (c.vatEnabled ? 'REEL' : 'NONE');
 }
 
-export const TAX_REGIMES: { id: NonNullable<Company['taxRegime']>; label: string; hint: string }[] = [
-  { id: 'REEL', label: 'Régime du réel', hint: 'L’entreprise facture la taxe (TVA) sur ses ventes, la déduit sur ses achats et la déclare.' },
-  { id: 'IGS', label: 'Impôt général synthétique (IGS)', hint: 'Pas de TVA facturée. Les fournisseurs peuvent retenir un précompte sur achat, comptabilisé en acompte d’impôt.' },
-  { id: 'NONE', label: 'Non assujetti / autre', hint: 'Aucune taxe sur les ventes ni sur les achats.' },
-];
+type RegimeOption = { id: NonNullable<Company['taxRegime']>; label: string; hint: string };
+
+const REEL: RegimeOption = {
+  id: 'REEL',
+  label: 'Régime du réel',
+  hint: 'L’entreprise facture la taxe (TVA) sur ses ventes, la déduit sur ses achats et la déclare.',
+};
+const IGS: RegimeOption = {
+  id: 'IGS',
+  label: 'Impôt général synthétique (IGS)',
+  hint: 'Pas de TVA facturée. Les fournisseurs peuvent retenir un précompte sur achat, comptabilisé en acompte d’impôt.',
+};
+const MICRO: RegimeOption = {
+  id: 'MICRO',
+  label: 'Micro-entreprise (micro-BIC / micro-BNC)',
+  hint: 'Franchise en base : pas de TVA facturée, pas de TVA déduite. La facture doit porter la mention « TVA non applicable, art. 293 B du CGI ».',
+};
+const AUCUN: RegimeOption = {
+  id: 'NONE',
+  label: 'Non assujetti / autre',
+  hint: 'Aucune taxe sur les ventes ni sur les achats.',
+};
+
+/**
+ * Les régimes proposés suivent le PAYS.
+ *
+ * Relevé le 21/09 par une comptable française : on lui proposait l'IGS, qui
+ * n'existe pas en France, et il manquait le micro-BIC/micro-BNC, qui est le
+ * régime de la plupart des activités qu'on vise là-bas. Proposer à quelqu'un
+ * un régime qui n'existe pas dans son pays, c'est lui dire qu'on ne connaît
+ * pas son pays.
+ *
+ * L'IGS est un régime OHADA : il ne s'affiche que pour les pays dont le
+ * référentiel est SYSCOHADA. La micro-entreprise est française : elle ne
+ * s'affiche que pour la France. Ailleurs, réel ou non assujetti — on ne
+ * devine pas un régime local qu'on n'a pas vérifié.
+ */
+export function taxRegimesFor(country: string | undefined): RegimeOption[] {
+  const profil = country ? countryProfile(country) : undefined;
+  if (country === 'France') return [REEL, MICRO, AUCUN];
+  if (profil?.chart === 'SYSCOHADA') return [REEL, IGS, AUCUN];
+  // Pays inconnu (ou « Autre ») : on garde tout, plutôt que de retirer à
+  // quelqu'un le régime qui est le sien parce qu'on n'a pas listé son pays.
+  if (!profil) return [REEL, MICRO, IGS, AUCUN];
+  return [REEL, AUCUN];
+}
+
+/** Tous les régimes, pour retrouver le libellé d'un régime déjà enregistré. */
+export const TAX_REGIMES: RegimeOption[] = [REEL, MICRO, IGS, AUCUN];
 
 /** Les réglages qu'un profil pays propose, à appliquer d'un coup (la devise reste un choix à part). */
 export function profileToCompany(p: CountryProfile): Partial<Company> {

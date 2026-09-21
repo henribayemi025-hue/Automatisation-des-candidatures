@@ -3,6 +3,8 @@ import { useStore, today } from '../lib/store';
 import { entriesInRange } from '../lib/ledger';
 import { toMajor, toMinor } from '../lib/money';
 import { exportXlsx } from '../lib/xlsx';
+import { buildFec, fecFileName } from '../lib/fec';
+import { currency as currencyOf } from '../lib/money';
 import type { JournalCode, JournalLine } from '../lib/types';
 import { Badge, Empty, Field, Modal, Money, PageHeader, StatCard } from '../components/UI';
 import { IconPlus, IconReceipt, IconX } from '../components/Icons';
@@ -19,6 +21,21 @@ const JOURNALS: { code: JournalCode; label: string }[] = [
 export default function Journal() {
   const { db, addManualEntry, reverseEntry } = useStore();
   const [journal, setJournal] = useState('');
+  function exportFec() {
+    const text = buildFec(db.accounts, db.entries, {
+      from: from || undefined,
+      to: to || undefined,
+      decimals: currencyOf(db.company.currency).decimals,
+    });
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fecFileName(db.company, to || today());
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [open, setOpen] = useState(false);
@@ -107,6 +124,19 @@ export default function Journal() {
             >
               {t('Excel')}
             </button>
+            {/*
+              L'export Excel est un journal de lecture, pas un FEC. Une
+              comptable française a cherché le FEC sur cet écran le 21/09 et ne
+              l'a pas trouvé : il n'existait que dans Rapports et dans Clôture.
+              Le bouton est ici, là où on regarde le journal, et seulement pour
+              le plan français — c'est une obligation française (article A47
+              A-1 du Livre des procédures fiscales).
+            */}
+            {db.company.chart === 'PCG' && (
+              <button onClick={exportFec} className="btn-ghost" title={t('Fichier des Écritures Comptables, format légal français')}>
+                {t('FEC')}
+              </button>
+            )}
             <button onClick={() => setOpen(true)} className="btn-primary">
               <IconPlus className="h-4 w-4" />
               {t('Écriture manuelle')}

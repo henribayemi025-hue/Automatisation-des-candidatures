@@ -15,6 +15,28 @@ import { IconCheck, IconDoc } from './Icons';
  * envoyer par WhatsApp (texte prêt), ou fermer et enchaîner.
  */
 
+/**
+ * La mention légale que le régime impose sur le document remis au client.
+ *
+ * Une micro-entreprise française qui ne porte pas « TVA non applicable, art.
+ * 293 B du CGI » remet une facture non conforme. Relevé le 21/09 avec le reste
+ * du retour d'une comptable française.
+ *
+ * Rien pour les autres régimes tant qu'on n'a pas vérifié le texte exact du
+ * pays : une mention fausse est pire qu'une mention absente.
+ */
+function legalMention(company: Company): string {
+  if (company.taxRegime === 'MICRO') return t('TVA non applicable, art. 293 B du CGI');
+  return '';
+}
+
+/**
+ * Les libellés d'une vente sans fiche client. « Client passager » est
+ * l'ancien, gardé parce que les ventes déjà enregistrées le portent : le
+ * journal ne se réécrit pas.
+ */
+const ANONYME = new Set(['Vente au comptoir', 'Client passager']);
+
 const METHOD_LABEL: Record<string, string> = {
   CASH: 'Espèces',
   MOBILE: 'Mobile money',
@@ -39,6 +61,8 @@ function receiptText(company: Company, sale: Sale): string {
     lines.push(`${t('Payé')} : ${formatMoney(sale.paid, cur)} (${t(METHOD_LABEL[sale.method] ?? sale.method)})`);
     if (sale.total - sale.paid > 0) lines.push(`${t('Reste à payer')} : ${formatMoney(sale.total - sale.paid, cur)}`);
   }
+  const mention = legalMention(company);
+  if (mention) lines.push('', mention);
   lines.push('', t('Merci de votre confiance.'));
   return lines.join('\n');
 }
@@ -59,7 +83,7 @@ function printReceipt(company: Company, sale: Sale): void {
   .foot { margin-top: 12px; text-align: center; font-size: 11px; }
 </style></head><body>
 <h1>${esc(company.name)}</h1>
-<div class="c">${sale.status === 'QUOTE' ? t('Devis') : t('Ticket')} ${esc(sale.number)}<br>${esc(sale.date)}${sale.customerName && sale.customerName !== 'Client passager' ? `<br>${esc(sale.customerName)}` : ''}</div>
+<div class="c">${sale.status === 'QUOTE' ? t('Devis') : t('Ticket')} ${esc(sale.number)}<br>${esc(sale.date)}${sale.customerName && !ANONYME.has(sale.customerName) ? `<br>${esc(sale.customerName)}` : ''}</div>
 <table>
 ${sale.lines.map((l) => `<tr><td>${l.qty} × ${esc(l.name)}</td><td class="n">${esc(formatMoney(l.unitPrice * l.qty, cur))}</td></tr>`).join('')}
 ${sale.discount > 0 ? `<tr><td>${t('Remise')}</td><td class="n">−${esc(formatMoney(sale.discount, cur))}</td></tr>` : ''}
@@ -68,6 +92,7 @@ ${sale.vat > 0 ? `<tr><td>${esc(company.taxLabel || t('TVA'))}</td><td class="n"
 ${sale.status !== 'QUOTE' ? `<tr><td>${t('Payé')} — ${esc(t(METHOD_LABEL[sale.method] ?? sale.method))}</td><td class="n">${esc(formatMoney(sale.paid, cur))}</td></tr>` : ''}
 ${sale.total - sale.paid > 0 && sale.status !== 'QUOTE' ? `<tr><td>${t('Reste à payer')}</td><td class="n">${esc(formatMoney(sale.total - sale.paid, cur))}</td></tr>` : ''}
 </table>
+${legalMention(company) ? `<div class="foot">${esc(legalMention(company))}</div>` : ''}
 <div class="foot">${t('Merci de votre confiance.')}<br>${esc(new Date().toLocaleString(locale()))}</div>
 <script>window.onload=function(){window.print()}</script>
 </body></html>`;
@@ -104,7 +129,7 @@ export default function Receipt({ sale, company, onClose }: { sale: Sale | null;
         <p className="text-center text-muted">
           {isQuote ? t('Devis') : t('Ticket')} {sale.number} · {sale.date}
         </p>
-        {sale.customerName && sale.customerName !== 'Client passager' && <p className="text-center text-muted">{sale.customerName}</p>}
+        {sale.customerName && !ANONYME.has(sale.customerName) && <p className="text-center text-muted">{sale.customerName}</p>}
         <table className="mt-3 w-full">
           <tbody>
             {sale.lines.map((l) => (
@@ -159,6 +184,9 @@ export default function Receipt({ sale, company, onClose }: { sale: Sale | null;
             )}
           </tbody>
         </table>
+        {legalMention(company) && (
+          <p className="mt-3 text-center text-[11px] text-muted">{legalMention(company)}</p>
+        )}
         <p className="mt-3 text-center text-muted">{t('Merci de votre confiance.')}</p>
       </div>
 

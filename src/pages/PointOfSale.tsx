@@ -38,7 +38,7 @@ function loadHeld(): HeldTicket[] {
 }
 
 export default function PointOfSale() {
-  const { db, recordSale } = useStore();
+  const { db, recordSale, saveCustomer } = useStore();
   const [query, setQuery] = useState('');
   const [cart, setCart] = useState<SaleLine[]>([]);
   const [customerId, setCustomerId] = useState('');
@@ -52,6 +52,15 @@ export default function PointOfSale() {
   const [scanNote, setScanNote] = useState<{ ok: boolean; text: string } | null>(null);
   const [held, setHeld] = useState<HeldTicket[]>(() => loadHeld());
   const [customerPanel, setCustomerPanel] = useState(false);
+  const [customerQuery, setCustomerQuery] = useState('');
+  // Les dix premières qui correspondent : au-delà, la liste cesse d'aider.
+  const clientsTrouves = useMemo(() => {
+    const q = customerQuery.trim().toLowerCase();
+    return db.customers
+      .filter((c) => !c.archived)
+      .filter((c) => !q || c.name.toLowerCase().includes(q) || c.phone.includes(q))
+      .slice(0, 10);
+  }, [db.customers, customerQuery]);
   // Vente rapide : un montant, rien d'autre. Voir le commentaire de addQuick.
   const [quickAmount, setQuickAmount] = useState('');
   const [quickLabel, setQuickLabel] = useState('');
@@ -233,7 +242,7 @@ export default function PointOfSale() {
       discount,
       method,
       customerId: customerId || null,
-      customerName: customer?.name ?? 'Client passager',
+      customerName: customer?.name ?? 'Vente au comptoir',
       paid: effectivePaid,
       asQuote,
       projectId: projectId || null,
@@ -459,25 +468,66 @@ export default function PointOfSale() {
           )}
 
           <div className="space-y-3 border-t border-slate-100 pt-4 dark:border-white/10">
+            {/*
+              Chercher une cliente, ou la créer sans quitter la caisse.
+              Relevé le 21/09 : on ne proposait qu'une liste déroulante, donc
+              inutilisable passé trente clientes, et aucun moyen d'en créer une
+              ici. Or c'est là que le besoin naît — au moment d'encaisser.
+            */}
             {customerPanel || customerId || isCredit ? (
-              <Field label={t('Client')} hint={t('Nécessaire seulement pour une vente à crédit ou un suivi par client.')}>
-                <select value={customerId} onChange={(e) => setCustomerId(e.target.value)} className="field">
-                  <option value="">{t('Client passager (comptoir)')}</option>
-                  {db.customers.filter((c) => !c.archived).map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+              <Field label={t('Client')} hint={t('Nécessaire pour une vente à crédit, un acompte, ou pour suivre les habitudes d’une cliente.')}>
+                {customerId ? (
+                  <div className="flex items-center justify-between rounded-input border border-hairline px-3 py-2">
+                    <span className="font-semibold text-ink">{db.customers.find((c) => c.id === customerId)?.name}</span>
+                    <button type="button" onClick={() => { setCustomerId(''); setCustomerQuery(''); }} className="text-caption font-semibold text-muted">
+                      {t('Changer')}
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      value={customerQuery}
+                      onChange={(e) => setCustomerQuery(e.target.value)}
+                      placeholder={t('Chercher un nom ou un numéro, ou en saisir un nouveau')}
+                      className="field"
+                    />
+                    <div className="mt-2 max-h-40 space-y-1 overflow-y-auto">
+                      {clientsTrouves.map((c) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => setCustomerId(c.id)}
+                          className="flex w-full items-center justify-between rounded-input px-3 py-2 text-left text-sm hover:bg-base"
+                        >
+                          <span className="font-semibold text-ink">{c.name}</span>
+                          {c.phone && <span className="text-caption text-muted">{c.phone}</span>}
+                        </button>
+                      ))}
+                      {customerQuery.trim() && !clientsTrouves.some((c) => c.name.toLowerCase() === customerQuery.trim().toLowerCase()) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const cree = saveCustomer({ name: customerQuery.trim(), phone: '', email: '', address: '' });
+                            setCustomerId(cree.id);
+                            setCustomerQuery('');
+                          }}
+                          className="w-full rounded-input bg-base px-3 py-2 text-left text-sm font-semibold text-teal"
+                        >
+                          {t('Créer la fiche « {n} »', { n: customerQuery.trim() })}
+                        </button>
+                      )}
+                    </div>
+                  </>
+                )}
               </Field>
             ) : (
               <div className="flex items-center justify-between rounded-input bg-base px-3 py-2 text-caption">
                 <span>
-                  <span className="font-semibold text-ink">{t('Client passager')}</span>
+                  <span className="font-semibold text-ink">{t('Vente au comptoir')}</span>
                   <span className="text-muted"> — {t('aucune fiche à créer')}</span>
                 </span>
                 <button type="button" onClick={() => setCustomerPanel(true)} className="font-semibold text-teal">
-                  {t('Identifier')}
+                  {t('Identifier la cliente')}
                 </button>
               </div>
             )}

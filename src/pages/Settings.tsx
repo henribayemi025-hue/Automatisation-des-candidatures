@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { hasContent, useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
 import { CURRENCIES, currencyLabel } from '../lib/money';
-import { TAX_REGIMES, taxRegime } from '../lib/countries';
+import { TAX_REGIMES, taxRegimesFor, taxRegime } from '../lib/countries';
 import { useOffline } from '../lib/offline';
 import BackupCard from '../components/BackupCard';
 import LockCard from '../components/LockCard';
@@ -250,7 +250,14 @@ export default function Settings() {
             </Field>
             <Field label={t('Régime d’imposition')} hint={t(TAX_REGIMES.find((r) => r.id === taxRegime(c))?.hint ?? '')}>
               <select id="set-regime" value={taxRegime(c)} disabled={!canEdit} onChange={(e) => setCompany({ taxRegime: e.target.value as Company['taxRegime'] })} className="field">
-                {TAX_REGIMES.map((r) => (
+                {/*
+                  Les régimes suivent le pays. Celui déjà enregistré reste dans
+                  la liste même s'il n'y figure plus : on ne fait pas disparaître
+                  sous les yeux de quelqu'un le réglage qu'il a choisi.
+                */}
+                {[...new Set([...taxRegimesFor(c.country).map((r) => r.id), taxRegime(c)])]
+                  .map((id) => TAX_REGIMES.find((r) => r.id === id)!)
+                  .map((r) => (
                   <option key={r.id} value={r.id}>
                     {t(r.label)}
                   </option>

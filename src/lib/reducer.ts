@@ -387,7 +387,8 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       const patch = p.patch as Partial<Company>;
       const before = db.company;
       db.company = { ...before, ...patch };
-      // Le régime commande la taxe : réel = TVA facturée, IGS ou non assujetti = pas de TVA.
+      // Le régime commande la taxe : seul le réel facture la TVA. Micro, IGS et
+      // non assujetti ne la facturent pas.
       if (patch.taxRegime) db.company.vatEnabled = patch.taxRegime === 'REEL';
       if (patch.chart && patch.chart !== before.chart) {
         const custom = db.accounts.filter((a) => !a.system);

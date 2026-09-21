@@ -4,7 +4,7 @@ import { useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
 import { CURRENCIES, currencyLabel } from '../lib/money';
 import { GOALS, SECTORS } from '../lib/guide';
-import { COUNTRIES, countryProfile, profileToCompany, TAX_REGIMES, taxRegime } from '../lib/countries';
+import { COUNTRIES, countryProfile, profileToCompany, taxRegimesFor, taxRegime } from '../lib/countries';
 import { LanguageSwitch, t } from '../lib/i18n';
 import { Field } from '../components/UI';
 import { IconCheck, IconChevronRight } from '../components/Icons';
@@ -24,6 +24,9 @@ export default function Onboarding() {
 
   const steps = ['Votre activité', 'Votre entreprise', 'Ce que vous voulez faire'];
   const profile = countryProfile(country);
+  // Les régimes suivent le pays : pas d'IGS en France, pas de micro-entreprise
+  // au Cameroun. Voir `taxRegimesFor`.
+  const regimes = taxRegimesFor(country);
 
   function toggleGoal(id: string) {
     setGoals((g) => (g.includes(id) ? g.filter((x) => x !== id) : [...g, id]));
@@ -178,9 +181,9 @@ export default function Onboarding() {
                     </optgroup>
                   </select>
                 </Field>
-                <Field label={t('Régime d’imposition')} hint={t(TAX_REGIMES.find((r) => r.id === regime)?.hint ?? '')}>
+                <Field label={t('Régime d’imposition')} hint={t(regimes.find((r) => r.id === regime)?.hint ?? '')}>
                   <select id="ob-regime" value={regime} onChange={(e) => setRegime(e.target.value as TaxRegime)} className="field">
-                    {TAX_REGIMES.map((r) => (
+                    {regimes.map((r) => (
                       <option key={r.id} value={r.id}>
                         {t(r.label)}
                       </option>
