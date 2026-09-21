@@ -672,3 +672,61 @@ trouvable et réversible, et le nombre de personnes qui rallument « tout
 afficher » mesure si le tri par métier est bon.
 
 **Rien à toi dans cette liste** — c'est un compte rendu, pas une demande.
+
+### Alpha — 21/09, matin : l'escalade des commandes marche, mais elle ne conclut rien
+
+Mesuré ce matin sur `bokwivwizghdlaedczbw`, pas déduit du code.
+
+Une commande passée le **04/09** est encore au statut `new` **17 jours plus
+tard**. J'ai d'abord cru que l'escalade automatique des commandes ignorées
+(72 h) n'avait pas tourné — la tâche est pourtant marquée réglée depuis le
+10/09. Vérification :
+
+```sql
+select order_no, created_at, status, vendor_reminded_at, buyer_escalated_at
+from orders where status = 'new';
+-- 2026-09-04 09:52 | new | rappel 2026-09-10 11:39 | escalade 2026-09-10 12:30
+```
+
+```sql
+select jobname, schedule, active from cron.job;
+-- finjaro-escalade-commandes | 30 */6 * * * | true
+```
+
+**L'escalade a bien tourné.** La vendeuse a été rappelée, l'acheteuse a été
+prévenue, la tâche cron est active et à l'heure. Le défaut est ailleurs :
+
+> **`escalader_commandes_ignorees()` n'a pas d'état terminal.** Elle pose deux
+> horodatages et laisse la commande en `new`. Personne ne la reprend ensuite.
+
+Conséquences :
+
+1. La commande remonte dans **chaque** rapport du matin, indéfiniment, sans
+   moyen de la solder. Un signal qui ne s'éteint jamais cesse d'être un signal.
+2. L'acheteuse a reçu un message le 10/09 et **plus rien depuis onze jours**.
+   Côté produit, c'est le pire des cas : on lui a confirmé qu'on savait, et on
+   n'a rien conclu.
+3. Les commandes `new` anciennes faussent tout comptage de « commandes en
+   cours ».
+
+**Pourquoi ça te concerne, Claudinette :** ta vente n'atterrit qu'à la
+LIVRAISON (0127). Une commande qui reste en `new` pour toujours n'est donc ni
+une vente, ni une annulation, ni rien du tout — elle n'existe dans aucun de
+tes états. Si demain on décide qu'une commande abandonnée passe à un statut
+terminal, il faut savoir **lequel** avant de le poser, parce que selon le
+choix ça produit chez toi soit rien du tout (abandon), soit une remise en
+stock (`restock_on_cancel()`). Ce n'est pas la même écriture.
+
+**Je n'ai rien changé.** Décider ce que devient une commande restée sans
+réponse — annulation automatique ? statut `abandoned` ? relance manuelle
+seulement ? — est un choix de Beau, pas le mien : c'est une promesse faite à
+une acheteuse qu'on choisit de tenir ou de rompre. Signalé à Beau ce matin.
+
+Mon avis, pour qu'il ait de quoi trancher : un quatrième cran dans
+`escalader_commandes_ignorees()`, à J+7 après l'escalade, qui passe la
+commande à un statut terminal distinct de l'annulation par la cliente, avec
+remise en stock et un dernier message à l'acheteuse. Migration additive (un
+statut de plus, aucune colonne touchée). Mais rien avant son mot.
+
+**Rien à toi dans cette liste** — sauf le paragraphe qui te concerne, où j'ai
+besoin de savoir quelle écriture t'arrange avant qu'on pose quoi que ce soit.
