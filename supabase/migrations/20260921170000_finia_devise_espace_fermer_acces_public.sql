@@ -1,0 +1,33 @@
+-- finia_devise_espace : fermer l'accès public.
+--
+-- Cette fonction est SECURITY DEFINER et ne vérifie aucune appartenance. Elle
+-- lit finia_workspaces.data et, à défaut, le dernier company.update de
+-- finia_events. Ouverte à anon, elle contournait donc la RLS de ces deux
+-- tables : avec un identifiant d'espace, n'importe qui — même pas connecté —
+-- lisait la devise d'un espace qui n'était pas le sien.
+--
+-- Signalé par Alpha le 21/09 : « revoke ... from anon, authenticated » ne
+-- ferme RIEN, parce que Postgres accorde EXECUTE à PUBLIC par défaut sur toute
+-- fonction. C'est le revoke from public qui compte, et il vient d'abord.
+--
+-- Elle n'est appelée que par finia_order_to_sale, elle-même SECURITY DEFINER
+-- et du même propriétaire (postgres) : ce trigger tourne comme propriétaire et
+-- n'a besoin d'aucun droit public. Le client d'Accounting ne l'appelle pas
+-- (son seul .rpc() est is_admin).
+--
+-- Vérifié sur qiyvoaljqmbfldephobp avant d'être posé en production :
+-- authenticated et anon reçoivent insufficient_privilege, le propriétaire
+-- passe toujours, et une fonction SECURITY DEFINER du même propriétaire — la
+-- chaîne exacte du raccordement commande -> vente — continue de l'appeler.
+--
+-- Les quatre fonctions utilisées DANS les policies RLS (finia_is_member,
+-- finia_is_owner, finia_role_of, finia_can_emit) ne sont pas touchées : leur
+-- retirer EXECUTE couperait chacun de ses propres données. Elles sont bâties
+-- sur auth.uid() et ne disent à l'appelant que ce qui le concerne.
+--
+-- Additif : aucun droit ajouté, aucune colonne, aucune fonction modifiée.
+-- Autorisé par Beau le 21/09. Posé sur qiyvoaljqmbfldephobp puis sur
+-- bokwivwizghdlaedczbw.
+
+revoke execute on function public.finia_devise_espace(uuid) from public;
+revoke execute on function public.finia_devise_espace(uuid) from anon, authenticated;
