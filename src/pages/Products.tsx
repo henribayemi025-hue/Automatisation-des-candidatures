@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useStore } from '../lib/store';
 import { formatMoney, toMajor, toMinor } from '../lib/money';
-import type { Product } from '../lib/types';
+import type { Product, RevenueKind } from '../lib/types';
 import { Badge, Empty, Field, Modal, PageHeader, Table } from '../components/UI';
 import { IconBox, IconDownload, IconPlus, IconSearch } from '../components/Icons';
 import ImportProducts from '../components/ImportProducts';
@@ -16,6 +16,7 @@ const BLANK = {
   barcode: '',
   category: '',
   brand: '',
+  kind: 'GOODS' as RevenueKind,
   price: '',
   cost: '',
   stock: '',
@@ -30,6 +31,10 @@ export default function Products() {
   // Le vocabulaire suit le métier : une carte pour un restaurant, des pièces
   // pour un garage, des références pour une pharmacie.
   const trade = sectorProfile(db.company.sector);
+  // Le formulaire vierge part de ce que vend le métier : un salon propose
+  // « Prestation » d'emblée, une boutique « Marchandise ». Modifiable, parce
+  // qu'un salon vend aussi des crèmes.
+  const vierge = { ...BLANK, kind: trade.sells };
   // Un salon ou un artisan ne compte pas des quantités : les colonnes et les
   // champs de stock disparaissent au lieu de rester vides.
   const withStock = tracksStock(db.company);
@@ -117,7 +122,7 @@ export default function Products() {
 
   function openNew() {
     setEditing(null);
-    setForm(BLANK);
+    setForm(vierge);
     setOpen(true);
   }
 
@@ -129,6 +134,7 @@ export default function Products() {
       barcode: p.barcode,
       category: p.category,
       brand: p.brand,
+      kind: p.kind ?? trade.sells,
       price: String(toMajor(p.price, currency)),
       cost: String(toMajor(p.cost, currency)),
       stock: String(p.stock),
@@ -148,6 +154,7 @@ export default function Products() {
       barcode: form.barcode.trim(),
       category: form.category.trim(),
       brand: form.brand.trim(),
+      kind: form.kind,
       price: toMinor(form.price || 0, currency),
       cost: toMinor(form.cost || 0, currency),
       stock: editing ? editing.stock : Number(form.stock) || 0,
@@ -328,6 +335,25 @@ export default function Products() {
           </Field>
           <Field label={t('Code-barres')}>
             <input value={form.barcode} onChange={(e) => setForm({ ...form, barcode: e.target.value })} className="field" />
+          </Field>
+          <Field
+            label={t('Nature')}
+            hint={t('Décide du compte de produits : marchandise revendue, ou travail facturé.')}
+          >
+            <div className="flex gap-2">
+              {(['GOODS', 'SERVICE'] as RevenueKind[]).map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => setForm({ ...form, kind: k })}
+                  className={`flex-1 rounded-xl border px-3 py-2 text-sm font-semibold ${
+                    form.kind === k ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-line text-muted'
+                  }`}
+                >
+                  {k === 'GOODS' ? t('Marchandise') : t('Prestation')}
+                </button>
+              ))}
+            </div>
           </Field>
           <Field label={t('Catégorie')}>
             <input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="field" />

@@ -106,6 +106,19 @@ export interface Product {
   barcode: string;
   category: string;
   brand: string;
+  /**
+   * Marchandise ou prestation. Décide du compte de produits à la vente.
+   *
+   * Relevé le 21/09 par une comptable française qui testait l'application sur
+   * une activité de prothésie ongulaire : ses deux poses d'ongles, pourtant
+   * rangées dans « Prestations », créditaient le 707 « Ventes de
+   * marchandises ». Le 706 existait dans le plan comptable et n'était appelé
+   * nulle part.
+   *
+   * Absent sur les articles créés avant : on retombe sur ce que vend le
+   * métier (`SECTOR_PROFILES[...].sells`).
+   */
+  kind?: RevenueKind;
   /** Prix de vente unitaire HT. */
   price: Minor;
   /** Coût d'achat unitaire (PMP). */
@@ -156,7 +169,20 @@ export interface SaleLine {
   qty: number;
   unitPrice: Minor;
   unitCost: Minor;
+  /**
+   * Marchandise revendue, ou prestation de services ? Les deux ne vont pas au
+   * même compte de produits : 707 pour la marchandise, 706 pour la prestation
+   * (701 et 706 en SYSCOHADA).
+   *
+   * Absent sur toutes les ventes enregistrées avant le 21/09 : la nature est
+   * alors relue de l'article, et à défaut du métier. Le journal ne se réécrit
+   * pas — ces ventes-là restent au compte qu'elles ont reçu ce jour-là.
+   */
+  kind?: RevenueKind;
 }
+
+/** Ce que la ligne vend vraiment : de la marchandise, ou du temps. */
+export type RevenueKind = 'GOODS' | 'SERVICE';
 
 export type SaleStatus = 'QUOTE' | 'CONFIRMED' | 'CANCELLED';
 export type PaymentStatus = 'PAID' | 'PARTIAL' | 'UNPAID';

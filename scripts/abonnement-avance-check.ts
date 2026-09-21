@@ -48,7 +48,13 @@ function abonner(db: DB, mois: number, montant: number): DB {
 // Douze mois encaissés le 5 janvier.
 let db = abonner(espace(), 12, 120000);
 const jusqu = (fin: string) => db.entries.filter((e) => e.date <= fin);
-const caRecu = (fin: string) => balanceOf(accountCode('SYSCOHADA', 'SALES'), jusqu(fin), 'CREDIT');
+// Une salle de sport vend du temps : sa recette est au 706, pas au 701. On
+// additionne les deux comptes de produits, pour que le contrôle mesure « la
+// recette » et non « le compte où elle se trouvait avant le 21/09 ».
+const recette = (entries: ReturnType<typeof jusqu>) =>
+  balanceOf(accountCode('SYSCOHADA', 'SALES'), entries, 'CREDIT') +
+  balanceOf(accountCode('SYSCOHADA', 'SERVICE_REVENUE'), entries, 'CREDIT');
+const caRecu = (fin: string) => recette(jusqu(fin));
 const dette = (fin: string) => balanceOf(accountCode('SYSCOHADA', 'DEFERRED_REVENUE'), jusqu(fin), 'CREDIT');
 
 check(balanceOf(accountCode('SYSCOHADA', 'CASH'), db.entries, 'DEBIT') === 120000, '120 000 sont bien entrés en caisse le jour du paiement');
@@ -62,7 +68,7 @@ check(balanceSheet(db.accounts, db.entries).difference === 0, 'bilan équilibré
 const avant = espace();
 const unMois = abonner(avant, 1, 10000);
 check(unMois.entries.every((e) => !e.id.includes('-pca')), 'un abonnement d’un mois ne crée aucune écriture d’étalement');
-check(balanceOf(accountCode('SYSCOHADA', 'SALES'), unMois.entries, 'CREDIT') === 10000, 'et sa recette est comptée tout de suite');
+check(recette(unMois.entries) === 10000, 'et sa recette est comptée tout de suite');
 
 // Ce que voit la commerçante sur son accueil doit dire la même chose que ses comptes.
 const ecran = dashboard(db, 'MTD', '2026-01-31', 1);

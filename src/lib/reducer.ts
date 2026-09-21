@@ -1,6 +1,6 @@
 import { revenueSchedule } from './subscriptions';
 import { accountCode, buildChart, assetAccounts } from './chart';
-import { tracksStock } from './sector';
+import { tracksStock, revenueKindOf } from './sector';
 import type { AccountKey } from './chart';
 import type {
   Account,
@@ -16,6 +16,7 @@ import type {
   PaymentMethod,
   Product,
   Purchase,
+  RevenueKind,
   Sale,
   Appointment,
   Subscription,
@@ -207,6 +208,43 @@ export function saleTotals(company: Company, lines: Sale['lines'], discount: Min
   return { gross, net, vat, total: net + vat, cost };
 }
 
+/**
+ * Répartit un produit net entre marchandises et prestations, au prorata du
+ * brut de chaque ligne.
+ *
+ * Partagé par la vente et par l'étalement d'un abonnement payé d'avance :
+ * l'écriture qui annule une recette doit débiter EXACTEMENT le compte qui
+ * l'avait créditée, sinon on laisse un solde sur l'un et un solde inverse sur
+ * l'autre, tous deux faux, et le journal est définitif.
+ *
+ * Le reste de la division va aux marchandises, pour que la somme fasse le net
+ * au centime près.
+ */
+export function revenueSplit(
+  db: Pick<DB, 'company' | 'products'>,
+  lines: Sale['lines'],
+  net: Minor,
+): { key: AccountKey; label: string; montant: Minor }[] {
+  const brut = lines.reduce<Record<RevenueKind, Minor>>(
+    (acc, line) => {
+      const nature = revenueKindOf(db.company, line, db.products.find((p) => p.id === line.productId));
+      acc[nature] += line.unitPrice * line.qty;
+      return acc;
+    },
+    { GOODS: 0, SERVICE: 0 },
+  );
+  const total = brut.GOODS + brut.SERVICE;
+  const service = total === 0 ? 0 : Math.round((net * brut.SERVICE) / total);
+  const parts = [
+    { key: 'SALES' as AccountKey, label: "Chiffre d'affaires", montant: net - service },
+    { key: 'SERVICE_REVENUE' as AccountKey, label: 'Prestations de services', montant: service },
+  ].filter((x) => x.montant !== 0);
+  // Une vente à zéro (geste commercial intégral) n'a aucune ligne de produit :
+  // on garde le compte de marchandises à zéro plutôt qu'une écriture sans
+  // contrepartie de produit.
+  return parts.length ? parts : [{ key: 'SALES' as AccountKey, label: "Chiffre d'affaires", montant: 0 }];
+}
+
 function applySale(
   db: DB,
   ev: WorkspaceEvent,
@@ -272,6 +310,20 @@ function applySale(
   });
 
   const unpaid = sale.total - sale.paid;
+
+  // Une pose d'ongles n'est pas un sac de riz.
+  //
+  // Relevé le 21/09 par une comptable française qui a testé l'application sur
+  // une prothésiste ongulaire : ses deux prestations créditaient le 707
+  // « Ventes de marchandises ». Le 706 « Prestations de services » existait
+  // dans le plan comptable et n'était appelé nulle part. En France, cette
+  // confusion se voit au premier regard sur un compte de résultat.
+  //
+  // Le produit net se répartit donc entre les deux comptes, au prorata du
+  // brut de chaque ligne — c'est ce qui fait que la remise et la TVA se
+  // partagent dans la même proportion que les prix.
+  const produits = revenueSplit(db, sale.lines, t.net);
+
   post(db, ev, {
     id: ids.saleEntry,
     date: sale.date,
@@ -283,7 +335,7 @@ function applySale(
     lines: [
       { account: methodAccount(chart, sale.method === 'CREDIT' ? 'CASH' : sale.method), label: 'Encaissement', debit: sale.paid, credit: 0 },
       { account: accountCode(chart, 'CUSTOMERS'), label: sale.customerName, debit: unpaid, credit: 0 },
-      { account: accountCode(chart, 'SALES'), label: "Chiffre d'affaires", debit: 0, credit: t.net },
+      ...produits.map((x) => ({ account: accountCode(chart, x.key), label: x.label, debit: 0, credit: x.montant })),
       { account: accountCode(chart, 'VAT_COLLECTED'), label: 'TVA collectée', debit: 0, credit: t.vat },
     ],
   });
@@ -1158,7 +1210,12 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
           sourceType: 'subscription',
           sourceId: sub.id,
           lines: [
-            { account: accountCode(chart, 'SALES'), label: 'Annulation de la recette immédiate', debit: tranches.reduce((n, x) => n + x.amount, 0), credit: 0 },
+            ...revenueSplit(db, sale.lines, tranches.reduce((n, x) => n + x.amount, 0)).map((x) => ({
+              account: accountCode(chart, x.key),
+              label: 'Annulation de la recette immédiate',
+              debit: x.montant,
+              credit: 0,
+            })),
             { account: accountCode(chart, 'DEFERRED_REVENUE'), label: `Période ${period.from} → ${period.to}`, debit: 0, credit: tranches.reduce((n, x) => n + x.amount, 0) },
           ],
         });
@@ -1173,7 +1230,12 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
             sourceId: sub.id,
             lines: [
               { account: accountCode(chart, 'DEFERRED_REVENUE'), label: 'Mois servi', debit: tranche.amount, credit: 0 },
-              { account: accountCode(chart, 'SALES'), label: "Chiffre d'affaires", debit: 0, credit: tranche.amount },
+              ...revenueSplit(db, sale.lines, tranche.amount).map((x) => ({
+                account: accountCode(chart, x.key),
+                label: x.label,
+                debit: 0,
+                credit: x.montant,
+              })),
             ],
           });
         });

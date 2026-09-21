@@ -3,6 +3,7 @@ import type { Company, Sale } from '../lib/types';
 import { formatMoney } from '../lib/money';
 import { locale, t } from '../lib/i18n';
 import { Modal, Money } from './UI';
+import { tracksStock } from '../lib/sector';
 import { IconCheck, IconDoc } from './Icons';
 
 /**
@@ -80,6 +81,10 @@ export default function Receipt({ sale, company, onClose }: { sale: Sale | null;
   const navigate = useNavigate();
   if (!sale) return null;
   const isQuote = sale.status === 'QUOTE';
+  // Annoncer un stock mis à jour après une prestation n'est pas une petite
+  // imprécision : la personne cherche un mouvement de stock qui n'existe pas.
+  // Relevé le 21/09 par une comptable qui testait une prothésiste ongulaire.
+  const deStock = tracksStock(company) && sale.lines.some((l) => l.productId);
   const remaining = sale.total - sale.paid;
   const wa = `https://wa.me/?text=${encodeURIComponent(receiptText(company, sale))}`;
 
@@ -89,7 +94,9 @@ export default function Receipt({ sale, company, onClose }: { sale: Sale | null;
         <IconCheck className="h-4 w-4" />
         {isQuote
           ? t('Rien n’est encaissé ni déstocké : le devis attend dans « Devis ».')
-          : t('Caisse, stock et comptabilité mis à jour.')}
+          : deStock
+            ? t('Caisse, stock et comptabilité mis à jour.')
+            : t('Caisse et comptabilité mises à jour.')}
       </div>
 
       <div className="mx-auto mt-4 max-w-[340px] rounded-card border border-hairline bg-base px-4 py-4 font-mono text-[12.5px] text-ink">

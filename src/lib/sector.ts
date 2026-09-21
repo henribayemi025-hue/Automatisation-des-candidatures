@@ -1,3 +1,4 @@
+import type { RevenueKind } from './types';
 import type { AccountKey } from './chart';
 
 /**
@@ -31,6 +32,15 @@ export interface SectorProfile {
    * salon qui revend des crèmes peut le remettre dans les paramètres.
    */
   tracksStock: boolean;
+  /**
+   * Ce que ce métier vend d'ordinaire : de la marchandise (707 en PCG, 701 en
+   * SYSCOHADA) ou de la prestation (706 dans les deux).
+   *
+   * Ce n'est qu'un point de départ, proposé à la création d'un article et
+   * modifiable article par article : un garage vend des pièces ET des heures,
+   * un salon vend des soins ET des crèmes.
+   */
+  sells: RevenueKind;
   /** Exemples d'articles proposés au démarrage. */
   examples: { name: string; category: string; unit: string }[];
   /** Postes de dépense les plus fréquents, mis en tête des listes. */
@@ -51,6 +61,7 @@ const RETAIL: SectorProfile = {
   sales: 'Ventes',
   sell: 'Vendre',
   tracksStock: true,
+  sells: 'GOODS',
   examples: [
     { name: 'Sac de riz 25 kg', category: 'Épicerie', unit: 'sac' },
     { name: 'Huile végétale 5 L', category: 'Épicerie', unit: 'bidon' },
@@ -74,6 +85,7 @@ export const SECTOR_PROFILES: Record<string, SectorProfile> = {
     sales: 'Additions',
     sell: 'Encaisser',
     tracksStock: true,
+    sells: 'GOODS',
     examples: [
       { name: 'Poulet DG', category: 'Plats', unit: 'assiette' },
       { name: 'Riz sauté', category: 'Plats', unit: 'assiette' },
@@ -96,6 +108,7 @@ export const SECTOR_PROFILES: Record<string, SectorProfile> = {
     // Un salon vend d'abord du temps. Le stock de crèmes existe, mais il ne
     // doit pas être la colonne vertébrale de l'écran.
     tracksStock: false,
+    sells: 'SERVICE',
     examples: [
       { name: 'Coupe et brushing', category: 'Coiffure', unit: 'prestation' },
       { name: 'Pose d’ongles', category: 'Onglerie', unit: 'prestation' },
@@ -116,6 +129,7 @@ export const SECTOR_PROFILES: Record<string, SectorProfile> = {
     sales: 'Interventions',
     sell: 'Facturer',
     tracksStock: true,
+    sells: 'GOODS',
     examples: [
       { name: 'Vidange complète', category: 'Interventions', unit: 'forfait' },
       { name: 'Plaquettes de frein', category: 'Pièces', unit: 'jeu' },
@@ -136,6 +150,7 @@ export const SECTOR_PROFILES: Record<string, SectorProfile> = {
     sales: 'Chantiers facturés',
     sell: 'Facturer',
     tracksStock: false,
+    sells: 'SERVICE',
     examples: [
       { name: 'Journée de main-d’œuvre', category: 'Main-d’œuvre', unit: 'jour' },
       { name: 'Déplacement', category: 'Forfaits', unit: 'forfait' },
@@ -156,6 +171,7 @@ export const SECTOR_PROFILES: Record<string, SectorProfile> = {
     sales: 'Ventes',
     sell: 'Vendre',
     tracksStock: true,
+    sells: 'GOODS',
     examples: [
       { name: 'Paracétamol 500 mg', category: 'Médicaments', unit: 'boîte' },
       { name: 'Compresses stériles', category: 'Matériel', unit: 'sachet' },
@@ -176,6 +192,7 @@ export const SECTOR_PROFILES: Record<string, SectorProfile> = {
     sales: 'Ventes',
     sell: 'Vendre',
     tracksStock: true,
+    sells: 'GOODS',
     examples: [
       { name: 'Écran de remplacement', category: 'Pièces', unit: 'pièce' },
       { name: 'Chargeur rapide', category: 'Accessoires', unit: 'pièce' },
@@ -196,6 +213,7 @@ export const SECTOR_PROFILES: Record<string, SectorProfile> = {
     sales: 'Ventes',
     sell: 'Vendre',
     tracksStock: true,
+    sells: 'GOODS',
     examples: [
       { name: 'Carton de tuiles 30×30', category: 'Matériaux', unit: 'carton' },
       { name: 'Groupe électrogène 5 kVA', category: 'Équipement', unit: 'pièce' },
@@ -219,4 +237,20 @@ export function sectorProfile(sector: string): SectorProfile {
  */
 export function tracksStock(company: { sector: string; tracksStock?: boolean }): boolean {
   return company.tracksStock ?? sectorProfile(company.sector).tracksStock;
+}
+
+/**
+ * Marchandise ou prestation, pour une ligne de vente.
+ *
+ * Trois sources, dans cet ordre : ce que la ligne dit d'elle-même, ce que dit
+ * l'article vendu, ce que vend le métier. La dernière n'est qu'un filet : une
+ * ligne enregistrée avant le 21/09 n'a pas de nature, et l'article qu'elle
+ * cite peut avoir été archivé depuis.
+ */
+export function revenueKindOf(
+  company: { sector: string },
+  line: { kind?: RevenueKind; productId: string },
+  product?: { kind?: RevenueKind },
+): RevenueKind {
+  return line.kind ?? product?.kind ?? sectorProfile(company.sector).sells;
 }
