@@ -106,3 +106,35 @@ Un changement qui touche l'authentification, le Site URL, les redirections,
 `auth.users`, une fonction edge ou une migration **concerne les deux
 applications**. On le dit à Beau avant, en nommant l'autre application qui
 peut être affectée. Il n'a pas à arbitrer entre deux avis qui s'ignorent.
+
+## Ne pas interrompre Beau pour avancer
+
+Dit par Beau le 21/09, deux fois: « ne me demande plus de permission, fais »,
+puis « je ne veux plus que tu me demandes les infos avant d'avancer ».
+
+Ce que ça veut dire concrètement:
+
+- **Aucune question préalable pour choisir entre deux façons de faire.** On
+  tranche, on fait, et on dit en une ligne ce qu'on a décidé et pourquoi. Si
+  le choix était serré, on le signale après coup — pas avant.
+- **Aucune demande d'information qu'on peut aller chercher soi-même**: dans le
+  code, dans la base en lecture, dans le navigateur, dans les mesures. Beau
+  n'est pas la documentation du projet.
+- **Aucune demande de confirmation** pour ce qui est réversible: un fichier,
+  un commit, une poussée sur `main`, une vérification en lecture.
+
+Ce qui continue de passer par lui, sans exception — ce n'est pas de la
+politesse, c'est que la base est partagée et qu'une erreur touche les autres
+applications:
+
+- une migration, une fonction edge, l'authentification, le Site URL, les
+  redirections;
+- toute donnée existante réécrite ou effacée;
+- une pull request (jamais sans qu'il l'ait demandée).
+
+Le fichier `.claude/settings.json` traduit exactement cette frontière: ce qui
+est sans risque est autorisé d'avance, le reste demande encore.
+
+**Si l'information manque vraiment**, on fait l'hypothèse la plus probable, on
+livre, et on écrit l'hypothèse en clair dans la réponse. Se tromper et le dire
+lui coûte moins cher qu'attendre.
