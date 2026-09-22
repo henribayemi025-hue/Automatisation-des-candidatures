@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useStore } from '../lib/store';
+import { useStore, today } from '../lib/store';
 import { formatMoney, toMinor } from '../lib/money';
 import type { PaymentMethod, Sale, SaleLine } from '../lib/types';
 import Receipt from '../components/Receipt';
@@ -10,6 +10,7 @@ import { t } from '../lib/i18n';
 import { sectorProfile, tracksStock } from '../lib/sector';
 import { availableQty, isComposed, missingFor } from '../lib/recipes';
 import ProjectSelect from '../components/ProjectSelect';
+import { outstanding } from '../lib/metrics';
 
 const METHODS: { value: PaymentMethod; label: string }[] = [
   { value: 'CASH', label: 'Espèces' },
@@ -53,6 +54,29 @@ export default function PointOfSale() {
   const [held, setHeld] = useState<HeldTicket[]>(() => loadHeld());
   const [customerPanel, setCustomerPanel] = useState(false);
   const [customerQuery, setCustomerQuery] = useState('');
+
+  /**
+   * Ce que la cliente choisie doit DÉJÀ, et depuis quand.
+   *
+   * C'est le geste du cahier de crédit qu'aucun écran ne faisait : avant
+   * d'ajouter une ardoise à une ardoise, la commerçante regarde la page de la
+   * personne. L'écran Créances le montre très bien — mais après la vente,
+   * quand il est trop tard pour dire non.
+   *
+   * On ne bloque rien et on ne conseille rien : c'est son commerce et sa
+   * cliente. On met le chiffre sous ses yeux au moment où il sert.
+   */
+  const ardoise = useMemo(() => {
+    if (!customerId) return null;
+    const dus = db.debts.filter((d) => d.party === 'CUSTOMER' && d.partyId === customerId);
+    const total = dus.reduce((s, d) => s + outstanding(d), 0);
+    if (total <= 0) return null;
+    const plusAncienne = dus.filter((d) => outstanding(d) > 0).map((d) => d.date).sort()[0];
+    const jours = plusAncienne
+      ? Math.floor((Date.parse(today()) - Date.parse(plusAncienne)) / 86400000)
+      : 0;
+    return { total, jours };
+  }, [db.debts, customerId]);
   // Les dix premières qui correspondent : au-delà, la liste cesse d'aider.
   const clientsTrouves = useMemo(() => {
     const q = customerQuery.trim().toLowerCase();
@@ -477,12 +501,20 @@ export default function PointOfSale() {
             {customerPanel || customerId || isCredit ? (
               <Field label={t('Client')} hint={t('Nécessaire pour une vente à crédit, un acompte, ou pour suivre les habitudes d’une cliente.')}>
                 {customerId ? (
-                  <div className="flex items-center justify-between rounded-input border border-hairline px-3 py-2">
-                    <span className="font-semibold text-ink">{db.customers.find((c) => c.id === customerId)?.name}</span>
-                    <button type="button" onClick={() => { setCustomerId(''); setCustomerQuery(''); }} className="text-caption font-semibold text-muted">
-                      {t('Changer')}
-                    </button>
-                  </div>
+                  <>
+                    <div className="flex items-center justify-between rounded-input border border-hairline px-3 py-2">
+                      <span className="font-semibold text-ink">{db.customers.find((c) => c.id === customerId)?.name}</span>
+                      <button type="button" onClick={() => { setCustomerId(''); setCustomerQuery(''); }} className="text-caption font-semibold text-muted">
+                        {t('Changer')}
+                      </button>
+                    </div>
+                    {ardoise && (
+                      <div className={`mt-2 rounded-input px-3 py-2 text-caption ${isCredit ? 'bg-[#FDEDED] text-[#A63030]' : 'bg-base text-ink'}`}>
+                        <span className="font-semibold">{t('Doit déjà')} <Money value={ardoise.total} /></span>
+                        {ardoise.jours > 0 && <span className="opacity-80"> — {t('depuis {n} jour(s)', { n: ardoise.jours })}</span>}
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <>
                     <input
