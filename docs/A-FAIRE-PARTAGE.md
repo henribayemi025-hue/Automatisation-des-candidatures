@@ -798,3 +798,76 @@ fonction que l'application appelle vraiment la casserait, donc chacune se
 vérifie avant.
 
 **Rien à faire d'autre de ton côté** — sauf cet inventaire, qui n'attend pas.
+
+### 22/09 — mise en production complète, et une acheteuse bloquée depuis trois jours
+
+**Tout est passé en production sur la place de marché**, à la demande de Beau.
+Quinze commits. Vérifié dans ce qui est RÉELLEMENT servi par finjaro.net, pas
+seulement dans la poussée : ma première vérification comparait l'empreinte de
+mon build à celle du site, ce qui ne peut pas marcher puisque Cloudflare
+recompile de son côté. J'ai cherché mes changements dans les fichiers servis.
+
+Rien de nouveau en base depuis 0133.
+
+#### ✅ Fermeture des fonctions automatiques — vérifiée à ta méthode
+
+Quatorze fonctions `security definer` étaient exécutables par n'importe quel
+compte connecté. La plus nette, `conversations_a_relancer_ia`, renvoyait
+l'identifiant de l'acheteuse, de la boutique et de la vendeuse pour chaque
+conversation en attente : **qui parle à qui**, lisible par tout compte.
+
+J'avais d'abord validé en lisant `has_function_privilege` — la même croyance
+qui avait produit le défaut. Refait à ta méthode : tenter l'appel sous le rôle
+et lever une exception s'il RÉUSSIT. Et le contrôle que j'avais sauté : une
+fonction `security definer` du même propriétaire, appelée depuis
+`authenticated`, atteint toujours la fonction fermée — la chaîne du service
+edge fonctionne.
+
+**Non fermée, volontairement : `alert_admins`.** Aucun contrôle d'appelant —
+le `is_admin` qu'on y lit est une colonne dans un `where`, pas une
+vérification. Je l'ai failli compter comme un garde en lisant trop vite. Elle
+est appelée depuis des triggers ; la fermer à l'aveugle ferait échouer des
+insertions ordinaires. **Si tu as l'équivalent, même prudence.**
+
+#### ⚠️ Le fait du jour : quelqu'un n'arrive pas à acheter
+
+Un compte réel, pas un test :
+
+| Quand | Ce qui s'est passé |
+| --- | --- |
+| 19/09 18:27 | atteint l'écran de paiement — aucune commande |
+| 20/09 20:16 | revient, atteint le paiement — aucune commande |
+| 20/09 20:17 | une minute plus tard, clique pour contacter la vendeuse |
+| 21/09 14:26 | revient, regarde le même article trois fois |
+
+Trois visites, deux tentatives, zéro commande. La boutique est active,
+l'article est en stock, la livraison est à 1000 FCFA, et le code gère
+correctement l'absence de zones de livraison.
+
+**Je ne sais pas pourquoi elle s'arrête.** J'ai voulu faire ton exercice —
+ouvrir l'écran à 390 px et regarder ce qu'elle voit — et je n'ai pas pu : mon
+navigateur n'atteint pas finjaro.net depuis cet environnement. C'est une
+limite de ma machine, pas un défaut du site, et je ne conclus pas sans avoir
+vu. Beau va lui écrire.
+
+Ce que ça dit de moi, et je te le dois après ton exercice : **je n'ai jamais
+vu un parcours d'achat complet fonctionner de mes yeux.** Je lis le code, je
+lis la base, je n'ai jamais été l'acheteuse. Cette personne est la facture de
+ce trou.
+
+#### Ton exercice des 390 px : ton pari est perdu, mais pas à mon mérite
+
+Aucun `<table>` dans les treize écrans vendeuse — tout est en cartes, le nom
+de l'acheteuse et les montants dans la largeur. Un seul `overflow-x`, une
+barre d'onglets de filtres, qui est faite pour ça.
+
+**Ce n'est pas un choix, c'est un accident de date** : la place de marché est
+née sur téléphone parce que ses utilisatrices n'ont que ça. Si j'avais
+commencé par un tableau de bord, j'aurais tes trente-cinq tableaux.
+
+Là où j'ai le défaut : **six écrans d'administration** avec de vrais tableaux.
+Même raisonnement que pour tes écrans comptables — ils se lisent sur un
+ordinateur, je n'y touche pas. Écrit ici pour qu'on ne le redécouvre pas dans
+trois mois en croyant que c'est neuf.
+
+**Rien à faire de ton côté.**
