@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore, today } from '../lib/store';
-import { formatMoney, toMinor } from '../lib/money';
+import { formatMoney, toMajor, toMinor } from '../lib/money';
 import type { PaymentMethod, Sale, SaleLine } from '../lib/types';
 import Receipt from '../components/Receipt';
 import { Badge, Empty, Field, Money, PageHeader } from '../components/UI';
@@ -11,6 +11,7 @@ import { sectorProfile, tracksStock } from '../lib/sector';
 import { availableQty, isComposed, missingFor } from '../lib/recipes';
 import ProjectSelect from '../components/ProjectSelect';
 import { outstanding } from '../lib/metrics';
+import { aRendre, billetsProposes } from '../lib/monnaie';
 
 const METHODS: { value: PaymentMethod; label: string }[] = [
   { value: 'CASH', label: 'Espèces' },
@@ -47,6 +48,11 @@ export default function PointOfSale() {
   const [discountRaw, setDiscountRaw] = useState('');
   const [method, setMethod] = useState<PaymentMethod>('CASH');
   const [paidRaw, setPaidRaw] = useState('');
+  // Ce que le client tend, en espèces. Sert seulement à dire combien rendre :
+  // rien n'en est écrit en comptabilité (voir lib/monnaie.ts).
+  const [recuRaw, setRecuRaw] = useState('');
+  // Le rayon choisi en haut de la caisse. Vide : tous les articles.
+  const [rayon, setRayon] = useState('');
   const [flash, setFlash] = useState('');
   // Le ticket affiché après « Valider » : la preuve que la vente est passée.
   const [receipt, setReceipt] = useState<Sale | null>(null);
@@ -95,10 +101,18 @@ export default function PointOfSale() {
   const withStock = tracksStock(db.company);
   const discount = toMinor(discountRaw || 0, currency);
 
+  // Les rayons, seulement s'il y en a au moins deux : une seule catégorie
+  // n'aide à rien trier et prendrait une ligne pour rien.
+  const rayons = useMemo(() => {
+    const noms = new Set(db.products.filter((p) => !p.archived && p.category.trim()).map((p) => p.category.trim()));
+    return noms.size >= 2 ? [...noms].sort((a, b) => a.localeCompare(b)) : [];
+  }, [db.products]);
+
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const list = db.products.filter((p) => !p.archived);
-    if (!q) return list.slice(0, 12);
+    const list = db.products.filter((p) => !p.archived && (!rayon || p.category.trim() === rayon));
+    // Dans un rayon, on montre tout le rayon : c'est pour ça qu'on l'a choisi.
+    if (!q) return list.slice(0, rayon ? 60 : 12);
     return list
       .filter(
         (p) =>
@@ -107,7 +121,7 @@ export default function PointOfSale() {
           p.barcode.toLowerCase().includes(q),
       )
       .slice(0, 12);
-  }, [db.products, query]);
+  }, [db.products, query, rayon]);
 
   const totals = useMemo(() => {
     const gross = cart.reduce((s, l) => s + l.unitPrice * l.qty, 0);
@@ -250,6 +264,7 @@ export default function PointOfSale() {
     setCart([]);
     setDiscountRaw('');
     setPaidRaw('');
+    setRecuRaw('');
     setCustomerId('');
     setMethod('CASH');
   }
@@ -385,6 +400,21 @@ export default function PointOfSale() {
               {held.map((h) => (
                 <button key={h.id} type="button" onClick={() => resume(h.id)} className="rounded-pill border border-brass/50 bg-white px-2.5 py-1 font-medium hover:border-teal">
                   {new Date(h.at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })} · {h.lines.reduce((n, l) => n + l.qty, 0)} {t('art.')} · {formatMoney(h.lines.reduce((n, l) => n + l.unitPrice * l.qty, 0), currency)}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {rayons.length > 0 && (
+            <div className="-mx-1 mb-3 flex gap-2 overflow-x-auto px-1 pb-1">
+              {['', ...rayons].map((r) => (
+                <button
+                  key={r || 'tous'}
+                  type="button"
+                  onClick={() => setRayon(r)}
+                  className={`shrink-0 rounded-pill border px-3 py-1.5 text-caption font-semibold ${rayon === r ? 'border-teal bg-teal text-white' : 'border-hairline bg-white text-ink hover:border-teal'}`}
+                >
+                  {r || t('Tout')}
                 </button>
               ))}
             </div>
@@ -576,19 +606,61 @@ export default function PointOfSale() {
               />
             </Field>
 
+            {/* Des boutons plutôt qu'une liste déroulante : au comptoir, un
+                geste au lieu de deux, et le choix fait se voit d'un coup d'œil. */}
             <Field label={t('Paiement')}>
-              <select
-                value={method}
-                onChange={(e) => setMethod(e.target.value as PaymentMethod)}
-                className="field"
-              >
+              <div className="flex flex-wrap gap-2">
                 {METHODS.map((m) => (
-                  <option key={m.value} value={m.value}>
+                  <button
+                    key={m.value}
+                    type="button"
+                    aria-pressed={method === m.value}
+                    onClick={() => setMethod(m.value)}
+                    className={`rounded-pill border px-3 py-1.5 text-caption font-semibold ${method === m.value ? 'border-teal bg-teal text-white' : 'border-hairline bg-white text-ink hover:border-teal'}`}
+                  >
                     {t(m.label)}
-                  </option>
+                  </button>
                 ))}
-              </select>
+              </div>
             </Field>
+
+            {method === 'CASH' && cart.length > 0 && totals.total > 0 && (() => {
+              const recu = recuRaw === '' ? 0 : toMinor(recuRaw, currency);
+              const ecart = aRendre(totals.total, recu);
+              return (
+                <div className="rounded-input bg-base px-3 py-3">
+                  <Field label={t('Le client donne')}>
+                    <input
+                      id="pos-recu"
+                      value={recuRaw}
+                      onChange={(e) => setRecuRaw(e.target.value)}
+                      inputMode="decimal"
+                      placeholder={t('Montant du billet')}
+                      className="field num text-right"
+                      autoComplete="off"
+                    />
+                  </Field>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {billetsProposes(totals.total, currency).map((v) => (
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={() => setRecuRaw(String(toMajor(v, currency)))}
+                        className="rounded-pill border border-hairline bg-white px-3 py-1 text-caption font-semibold num text-ink hover:border-teal"
+                      >
+                        {formatMoney(v, currency)}
+                      </button>
+                    ))}
+                  </div>
+                  {recuRaw !== '' && (
+                    <div className={`mt-3 flex items-baseline justify-between font-extrabold ${ecart < 0 ? 'text-[#A63030]' : 'text-ink'}`}>
+                      <span className="text-sm">{ecart < 0 ? t('Il manque') : t('À rendre')}</span>
+                      <span className="text-[22px] num">{formatMoney(Math.abs(ecart), currency)}</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             {isCredit && (
               <Field label={t('Acompte versé')} hint={t('Le reste devient une créance client')}>
