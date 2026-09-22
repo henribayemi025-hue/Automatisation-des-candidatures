@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { today, useStore } from '../lib/store';
 import { toMajor, toMinor } from '../lib/money';
 import {
@@ -6,6 +6,7 @@ import {
   PAY_KIND_LABEL,
   attendanceIn,
   daysWorked,
+  hoursWorked,
   openAdvances,
   payrollPreview,
   periodBounds,
@@ -293,7 +294,7 @@ function Attendances({
             return (
               <li key={e.id} className="flex flex-wrap items-center justify-between gap-2 border-t border-hairline pt-2">
                 <span className="min-w-0 truncate font-semibold">{e.name}</span>
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap items-center gap-1">
                   {STATUSES.map((s) => (
                     <button
                       key={s}
@@ -303,6 +304,20 @@ function Attendances({
                       {t(ATTENDANCE_LABEL[s])}
                     </button>
                   ))}
+                  {/*
+                    Les heures sont posées d'office — huit pour une journée,
+                    quatre pour une demie. C'est une bonne valeur de départ et
+                    une mauvaise vérité : un apprenti qui a fait cinq heures
+                    est payé huit, et celui qui en a fait onze est payé huit
+                    aussi. Le champ n'apparaît que quand il y a des heures à
+                    corriger, c'est-à-dire sur une journée travaillée.
+                  */}
+                  {(current === 'PRESENT' || current === 'HALF') && (
+                    <Heures
+                      value={db.attendance.find((a) => a.employeeId === e.id && a.date === day)?.hours ?? 0}
+                      onCommit={(h) => mark(e.id, day, current, h)}
+                    />
+                  )}
                 </div>
               </li>
             );
@@ -311,7 +326,7 @@ function Attendances({
       </div>
 
       <div className="card p-0">
-        <Table head={[t('Nom'), t('Jours travaillés'), t('Dernier pointage')]}>
+        <Table head={[t('Nom'), t('Jours travaillés'), t('Heures'), t('Dernier pointage')]} phoneHide={[4]} phoneNowrapFirst>
           {people.map((e) => {
             const list = attendanceIn(db.attendance, e.id, period);
             const last = [...list].sort((a, b) => b.date.localeCompare(a.date))[0];
@@ -319,6 +334,7 @@ function Attendances({
               <tr key={e.id} className="row">
                 <td className="td font-semibold">{e.name}</td>
                 <td className="td num">{daysWorked(list)}</td>
+                <td className="td num">{hoursWorked(list) || '—'}</td>
                 <td className="td">
                   {last ? (
                     <>
@@ -798,5 +814,44 @@ function Leaves({
         </div>
       </Modal>
     </>
+  );
+}
+
+/**
+ * Les heures d'une journée, corrigeables.
+ *
+ * On enregistre au repos — à la sortie du champ ou à Entrée — jamais à chaque
+ * frappe : le journal est en écriture seule, et « 8 » tapé par-dessus « 5 »
+ * ne doit pas laisser une trace pour chaque chiffre. C'est la même leçon que
+ * le correctif du 18/09, où une vendeuse écrivait neuf événements définitifs
+ * pour un numéro de téléphone.
+ *
+ * Bornes : de zéro à vingt-quatre. Pas parce que quelqu'un travaillerait
+ * vingt-quatre heures, mais parce qu'un doigt qui glisse sur un téléphone
+ * tape vite « 88 », et qu'une paie à l'heure multiplierait ça par le taux.
+ */
+function Heures({ value, onCommit }: { value: number; onCommit: (h: number) => void }) {
+  const [draft, setDraft] = useState(String(value));
+  useEffect(() => setDraft(String(value)), [value]);
+
+  function save() {
+    const n = Math.max(0, Math.min(24, Number(draft.replace(',', '.')) || 0));
+    setDraft(String(n));
+    if (n !== value) onCommit(n);
+  }
+
+  return (
+    <span className="ml-1 inline-flex items-center gap-1 rounded-input border border-hairline px-2 py-1">
+      <input
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={save}
+        onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
+        inputMode="decimal"
+        aria-label={t('Heures travaillées')}
+        className="w-10 bg-transparent text-right text-[12px] font-semibold text-ink outline-none num"
+      />
+      <span className="text-[11px] text-muted">{t('h')}</span>
+    </span>
   );
 }
