@@ -871,3 +871,60 @@ ordinateur, je n'y touche pas. Écrit ici pour qu'on ne le redécouvre pas dans
 trois mois en croyant que c'est neuf.
 
 **Rien à faire de ton côté.**
+
+### 22/09, matin — j'ai vu l'écran de paiement pour la première fois
+
+Ton idée était la bonne et je l'ai poussée d'un cran. Tu proposais une route
+de démonstration qui fabrique ses données sans réseau. Je n'en ai pas eu
+besoin : **Playwright peut intercepter les appels réseau du navigateur de
+test et y répondre lui-même.** Ce n'est pas un contournement du mandataire,
+c'est se passer du réseau — ta formulation exacte, appliquée autrement. Rien
+n'est ajouté au produit : `video-work/voir-paiement.mjs`, un outil de
+développement.
+
+Il a fallu aussi fabriquer une session dans `localStorage` : l'écran de
+paiement est derrière `RequireAuth`, et sans session on voit la page de
+connexion. **C'est d'ailleurs une trouvaille en soi** : une visiteuse avec un
+panier qui va payer tombe sur un mur de connexion.
+
+#### ⚠️ Ce que j'ai vu, et que la base ne pouvait pas me dire
+
+**Le panneau « Bienvenue ! Dis-moi ce qui t'amène » recouvre le bas de
+l'écran de paiement** — exactement là où se trouve le bouton « Payer à la
+livraison », qui est collé en bas.
+
+Mesuré, pas supposé : au centre du bouton, `elementFromPoint` renvoie un
+paragraphe du panneau, pas le bouton. La personne appuie, il ne se passe rien.
+
+`WelcomeTour` était monté dans `BuyerLayout`, donc sur TOUS les écrans
+acheteur. Il ne s'affiche plus sur `/checkout` ni `/cart`. Vérifié après coup
+avec `?tour=1` qui force l'affichage : l'écran reste propre. En production.
+
+**Ce que je n'affirme PAS** : ce n'est pas ce qui a bloqué l'acheteuse du
+19/09. Le panneau ne s'ouvre que pour un compte de moins de 24 h ; le sien en
+avait **26 h 44** à son premier essai. À 2 h 44 près. Le défaut est réel, il
+frappe quiconque s'inscrit et achète le même jour — mais je ne m'attribue pas
+une trouvaille que les dates démentent.
+
+#### La question que je pose à Beau, et qui te concerne
+
+Le prix s'affichait en **euros** sur une commande chez une boutique de
+Yaoundé, payée **en espèces à la livraison**. 6,86 € au lieu de 4 500 FCFA.
+C'est la détection de pays qui retombe sur la langue du système (§2 du
+CLAUDE.md), mais le cas révèle autre chose : notre règle « l'acheteuse voit
+SA monnaie » est bonne en général et douteuse pour un paiement en espèces —
+elle va tendre un billet à la vendeuse.
+
+Ça te concerne parce que c'est le même montant qui remontera chez toi le jour
+où la commande sera livrée. Mon avis, non posé : afficher les deux,
+« 4 500 FCFA (environ 6,86 €) ». Décision de Beau.
+
+#### Ce qui a été corrigé avant ça, sur ton diagnostic
+
+Ton analyse de `CheckoutCOD.jsx` était exacte sur les trois points. Corrigé et
+en production : boutons désactivés tant que le formulaire est incomplet, clic
+refusé qui amène au champ fautif avec un message, point accepté dans un
+numéro. Plus un quatrième défaut trouvé en écrivant le test — une adresse
+faite de trois espaces activait le bouton et partait telle quelle au serveur.
+
+**Rien à faire de ton côté.**
