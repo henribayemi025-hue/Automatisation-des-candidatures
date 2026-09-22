@@ -54,11 +54,18 @@ interface NavItem {
   icon: ReactNode;
   area: Area;
   expert?: boolean;
+  tint?: string;
 }
 
 interface NavGroup {
   title?: string;
   items: NavItem[];
+  // Une teinte par domaine, empruntée à la palette « vintage » du système de
+  // design (posée dès le début, jamais utilisée) : de quoi repérer un module
+  // au coup d'œil dans une liste de vingt, sans toucher au fond crème ni au
+  // terracotta de l'action principale. Beau parle presque toujours de
+  // détails (icônes, couleurs) — en voici un qui ne coûte rien de plus.
+  tint?: string;
 }
 
 const NAV: NavGroup[] = [
@@ -73,6 +80,7 @@ const NAV: NavGroup[] = [
   },
   {
     title: 'Ma boutique',
+    tint: 'text-vintage-bronze',
     items: [
       { to: '/produits', label: 'Produits', icon: <IconBox />, area: 'stock' },
       { to: '/stock', label: 'Stock', icon: <IconLayers />, area: 'stock' },
@@ -82,6 +90,7 @@ const NAV: NavGroup[] = [
   },
   {
     title: 'Mon argent',
+    tint: 'text-vintage-green',
     items: [
       { to: '/ventes', label: 'Ventes', icon: <IconReceipt />, area: 'sell' },
       { to: '/devis', label: 'Devis', icon: <IconDoc />, area: 'sell' },
@@ -99,6 +108,7 @@ const NAV: NavGroup[] = [
   },
   {
     title: 'Comptabilité',
+    tint: 'text-vintage-plum',
     items: [
       { to: '/journal', label: 'Journal des écritures', icon: <IconReceipt />, area: 'accounting', expert: true },
       { to: '/grand-livre', label: 'Grand livre', icon: <IconBook />, area: 'accounting', expert: true },
@@ -113,10 +123,11 @@ const NAV: NavGroup[] = [
   },
   {
     title: 'Plus',
+    tint: 'text-vintage-slate',
     items: [
       { to: '/equipe', label: 'Équipe', icon: <IconUsers />, area: 'team' },
       { to: '/historique', label: 'Historique', icon: <IconHistory />, area: 'finance' },
-      { to: '/assistant', label: 'Assistant', icon: <IconSparkle />, area: 'sell' },
+      { to: '/assistant', label: 'Assistant', icon: <IconSparkle />, area: 'sell', tint: 'text-vintage-mustard' },
       { to: '/parametres', label: 'Paramètres', icon: <IconSettings />, area: 'settings' },
     ],
   },
@@ -252,21 +263,26 @@ export default function Layout({ children }: { children: ReactNode }) {
             {group.title && (
               <div className="px-3 pb-1.5 pt-2 text-[10px] font-bold uppercase tracking-[0.16em] text-muted">{t(group.title)}</div>
             )}
-            {group.items.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === '/'}
-                className={({ isActive }) =>
-                  `mb-0.5 flex items-center gap-3 rounded-input px-3 py-2.5 text-body transition ${
-                    isActive ? 'bg-teal-light font-semibold text-teal' : 'text-ink hover:bg-base'
-                  }`
-                }
-              >
-                {item.icon}
-                <span className="flex-1">{t(item.label)}</span>
-              </NavLink>
-            ))}
+            {group.items.map((item) => {
+              const tint = item.tint ?? group.tint;
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === '/'}
+                  className={({ isActive }) =>
+                    `mb-0.5 flex items-center gap-3 rounded-input px-3 py-2.5 text-body transition ${
+                      isActive ? 'bg-teal-light font-semibold text-teal' : 'text-ink hover:bg-base'
+                    }`
+                  }
+                >
+                  {/* La teinte du module reste visible même sélectionné : c'est
+                      un repère de rayon, pas un état — l'état, c'est le fond. */}
+                  <span className={tint}>{item.icon}</span>
+                  <span className="flex-1">{t(item.label)}</span>
+                </NavLink>
+              );
+            })}
           </div>
         ))}
       </nav>
