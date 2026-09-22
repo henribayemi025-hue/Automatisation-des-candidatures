@@ -58,10 +58,25 @@ export default function TextSetting({
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
-  function save(next: string) {
+  function save(brut: string) {
     window.clearTimeout(timer.current);
+    // On détoure avant d'enregistrer, jamais pendant la frappe : quelqu'un qui
+    // tape « rue des » et marque une pause ne doit pas voir son espace
+    // disparaître sous ses doigts.
+    //
+    // Signalé par Alpha le 22/09 : chez elle, une adresse faite de trois
+    // espaces passait la validation et partait au serveur, et la vendeuse
+    // recevait une commande sans adresse de livraison. J'avais le même défaut
+    // ici, sur des champs qui s'impriment : le nom de l'entreprise, son
+    // adresse, son numéro d'immatriculation, son numéro de TVA. Un espace de
+    // trop sur une facture, c'est laid ; un nom fait de trois espaces, c'est
+    // une facture anonyme.
+    //
+    // Et comme le journal est en écriture seule, cet espace serait définitif.
+    const next = brut.trim();
     if (next === known.current) return;
     known.current = next;
+    setDraft(next);
     commit.current(next);
   }
 
