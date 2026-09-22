@@ -249,3 +249,48 @@ qui* : nos utilisateurs camerounais, donc la grande majorité. *Valeur* : évite
 de collecter aujourd'hui ce qu'il faudra justifier demain. *Effort* : petit —
 c'est une relecture de ce qu'on enregistre, pas un développement. *Source* :
 article de doctrine, pas un texte officiel ; à confirmer avant toute décision.
+
+## Idées issues de la veille du 22/09/2026 — à décider par Beau
+
+☐ **11. Le reçu normalisé électronique ivoirien, avant le reste.** *Problème* :
+depuis le 1er septembre, la DGI ivoirienne contrôle l'usage de la facture (FNE)
+et du reçu (RNE) normalisés **chez les micro-entreprises et les entrepreneurs**
+— pas seulement chez les grandes. C'est exactement notre public. Une caisse
+Finjaro qui n'émet pas de RNE ne « manque » pas une fonctionnalité : elle met
+la commerçante en infraction pendant qu'elle s'en sert. *Pour qui* : tout
+utilisateur ivoirien, et le pays où Alpha avait déjà une boutique. *Valeur* :
+c'est la différence entre un produit vendable et un produit qu'un comptable
+déconseille. Les commerçants y sont contraints tout en rejetant les solutions
+imposées (Observatoire créé le 5 septembre) — la place est ouverte. *Effort* :
+gros, administratif avant d'être technique. *Réserve honnête* : je n'ai pas
+trouvé la procédure de raccordement à la FNE, ni les montants d'amende (un
+chiffre circule, la page n'a pas pu être ouverte). *Décision demandée* : est-ce
+que la Côte d'Ivoire devient le premier pays où l'on se raccorde pour de vrai,
+avant le Gabon et le Burkina ? C'est le même choix que l'idée n° 8, mais avec
+une échéance déjà passée et un public déjà contrôlé.
+
+☐ **12. Un jeton de déploiement qui ne peut pas toucher la production.**
+*Problème* : le déploiement automatique dispose aujourd'hui d'un accès qui
+couvre tout le compte. Si ce jeton fuit ou si une erreur vise la mauvaise
+cible, il atteint `finjaro.net` — donc les applications Android et iOS, qui
+chargent ce domaine et qui n'ont pas de version de repli. *Ce qui a changé* :
+depuis le 15/09, notre hébergeur permet de restreindre un jeton à un seul
+Worker (source dans `docs/VEILLE.md`). *Pour qui* : personne ne le verra, et
+c'est le but. *Valeur* : ferme une porte qui est ouverte depuis le début.
+*Effort* : petit — c'est un réglage de compte, pas du code. *Réserve* : les
+routes et domaines personnalisés demandent une permission en plus ; à vérifier
+que le déploiement ne casse pas avant de retirer l'ancien jeton.
+
+☐ **13. Cesser de modéliser l'encaissement comme « un portefeuille = une
+intégration ».** *Problème* : notre façon de penser les paiements suppose que
+chaque opérateur se branche séparément. *Ce qui change* : l'échéance de
+raccordement au paiement instantané de la banque centrale ouest-africaine tombe
+le 30 septembre 2026 pour les banques, les établissements de monnaie
+électronique et les établissements de paiement — dans huit jours. Les
+portefeuilles de nos marchands vont devenir interopérables à l'encaissement.
+*Pour qui* : tout marchand en zone UEMOA (Sénégal, Côte d'Ivoire, Bénin, Togo,
+Mali, Burkina, Niger). *Valeur* : une seule façon d'encaisser au lieu de sept.
+*Effort* : moyen, et surtout conceptuel — c'est un choix de modèle avant d'être
+du code. *Réserve honnête* : l'échéance est celle des établissements, pas celle
+de la disponibilité d'une interface pour un logiciel tiers. Rien ne dit qu'on
+pourra s'y brancher le 1er octobre. À reprendre dans un mois avec des faits.

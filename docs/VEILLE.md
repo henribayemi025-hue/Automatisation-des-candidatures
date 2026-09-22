@@ -11,6 +11,183 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 22/09/2026
+
+**Ce qui ressort aujourd'hui : la semaine a été pauvre en nouveautés, et c'est
+un résultat en soi.** Les trois recherches ont cherché dans la fenêtre stricte
+du 15 au 22 septembre et ont écrit « rien trouvé » plutôt que de remplir avec
+du vieux. Deux choses méritent une décision : la Côte d'Ivoire contrôle
+désormais les reçus normalisés chez les micro-entreprises — nos utilisateurs
+exactement — et le Burkina met les **éditeurs de logiciels** dans la première
+vague de certification.
+
+**Et une correction de correction, sur le même sujet que le 19/09.** La
+recherche technologie a conclu que l'annonce de facturation des messages de
+service WhatsApp était fausse, parce que la page tarifaire de Meta dit encore
+que les conversations de service sont gratuites. C'est exactement le piège que
+j'avais documenté il y a trois jours, et un agent y est retombé. J'ai vérifié
+moi-même : la page Meta dédiée dit mot pour mot « Effective October 1, 2026,
+Meta will charge for service messages, which have not been charged since
+November 2024 ». **Ma correction du 19/09 tient.** L'ancienne adresse de la
+page décrit l'état actuel ; la nouvelle décrit le changement.
+
+### Règles et impôts
+
+- **Côte d'Ivoire : les contrôles de la facture et du reçu normalisés
+  électroniques ont commencé, et les micro-entreprises sont dedans.** La DGI
+  contrôle depuis le 1er septembre 2026 l'usage de la FNE (facture) et du RNE
+  (reçu) sur tout le territoire. Quatre régimes visés, dont **le régime des
+  micro-entreprises (RME) et celui de l'entrepreneur** — c'est-à-dire notre
+  public. Les entreprises non régularisées encourent les amendes du Livre de
+  procédures fiscales ; un montant de 10 millions FCFA circule dans les
+  résultats de recherche, la page n'a pas pu être ouverte, **le chiffre n'est
+  donc pas retenu**. Publié le 31/08/2026.
+  [yeclo.com](https://www.yeclo.com/facture-normalisee-electronique-en-cote-divoire-la-dgi-lance-des-controles-le-1er-septembre/)
+  → Une caisse Finjaro qui n'émet pas de reçu normalisé électronique met le
+  commerçant ivoirien en infraction. Ce n'est plus une fonctionnalité qui
+  manque, c'est un risque qu'on lui fait courir.
+
+- **Et les commerçants ivoiriens s'organisent contre.** La FENACCI a d'abord
+  exigé la suspension des contrôles, puis créé le 5 septembre 2026 un
+  Observatoire National de la FNE pour réclamer une concertation. Publié les
+  30/08 et 05/09/2026.
+  [koaci.com](https://www.koaci.com/article/2026/09/05/cote-divoire/economie/cote-divoire-facturation-normalisee-electronique-la-fenacci-lance-lon-fne-et-appelle-a-une-veritable-concertation_200226.html)
+  → Des milliers de commerçants sont contraints d'émettre des factures
+  conformes tout en rejetant les solutions qu'on leur impose. C'est une porte
+  d'entrée, pas seulement une contrainte.
+
+- **Burkina Faso : les éditeurs de logiciels sont dans la PREMIÈRE vague.**
+  Le calendrier de mise en vente des systèmes certifiés était déjà noté le
+  19/09 ; ce qui est nouveau, c'est qui est visé quand. Le 7 septembre 2026
+  concerne les entreprises de la DGE **et les éditeurs de logiciels** ; le
+  2 novembre les DME au régime normal ; le 1er décembre les DME au régime non
+  déterminé. Trente jours de mise en conformité après chaque date. Prix
+  promotionnel de 150 000 FCFA par unité jusqu'au 31/12/2026. Publié le
+  03/09/2026.
+  [burkina24.com](https://burkina24.com/2026/09/03/communique-facture-electronique-certifiee-la-mise-en-vente-des-systemes-de-facturation-demarre-le-7-septembre-2026-au-burkina-faso-2/)
+  → C'est le seul texte trouvé à ce jour qui vise explicitement les éditeurs.
+  Vendre au Burkina demanderait d'acquérir un module de contrôle et de se
+  certifier — pas d'émettre un PDF bien présenté.
+
+- **France : une proposition de loi demande un moratoire sur la facturation
+  électronique des petites structures.** Déposée à l'Assemblée nationale le
+  15 septembre 2026 par La France Insoumise, elle vise à suspendre
+  l'obligation pour les auto-entrepreneurs, PME et exploitants agricoles, et à
+  créer un portail public en alternative aux plateformes privées. Motif
+  invoqué : aucun portail public n'a été mis en place ni accompagnement
+  déployé. Publié le 17/09/2026.
+  [agra.fr](https://www.agra.fr/articles/facturation-electronique-une-proposition-de-loi-lfi-sur-un-moratoire)
+  → Un signal de risque calendaire, pas une règle. Ça ne change rien
+  aujourd'hui ; ça dit de ne pas investir dans une offre d'émission pour
+  micro-entreprises françaises sans suivre ce texte.
+
+- **UEMOA : l'échéance de raccordement au paiement instantané tombe le
+  30 septembre, dans huit jours.** Communiqué BCEAO du 25 juin 2026 : les
+  banques, établissements de monnaie électronique et établissements de
+  paiement doivent être connectés à PI-SPI au 30/09/2026 ; les institutions de
+  microfinance au 30/06/2027. Au 24 juin, 80 participants étaient connectés et
+  74 institutions en tests réels.
+  [bceao.int](https://www.bceao.int/fr/communique-presse/prolongation-du-delai-de-connexion-a-pi-spi)
+  → Les portefeuilles de nos marchands en zone UEMOA vont devenir
+  interopérables à l'encaissement. Notre modèle « un portefeuille = une
+  intégration » va cesser d'être le bon ; il faudra raisonner « un identifiant
+  de paiement instantané ».
+
+### Concurrence
+
+- **Brésil : Bling augmente son entrée de gamme et compte désormais les
+  commandes venues de son API.** Le plan Cobalto est passé de 55 à 60 R$ par
+  mois en août 2026 (jour exact non précisé par la source), et les plans
+  comptent maintenant aussi les commandes importées par API, sur une moyenne
+  mobile de trois mois. L'article décrit des petits détaillants qui cherchent
+  des solutions moins chères. Publié le 10/09/2026.
+  [paranaportal.com](https://www.paranaportal.com/geral/com-o-reajuste-do-bling-pequenos-lojistas-buscam-alternativas-mais-simples-e-baratas-para-vendas-estoque-e-emissao-de-notas-veja-as-opcoes/)
+  → Leçon de tarification, pas menace : facturer au volume de commandes fait
+  fuir les plus petits, ceux qu'on vise. Un prix plat et lisible est un
+  argument, pas une concession.
+
+### Technologie
+
+- **Cloudflare : on peut enfin limiter un jeton à un seul Worker.** Annoncé le
+  15 septembre 2026, disponible immédiatement pour tous les comptes. Quatre
+  rôles (lecture des métadonnées, lecture du contenu, éditeur, administrateur)
+  peuvent être restreints à un Worker précis au lieu du compte entier. Les
+  routes et domaines personnalisés demandent en plus une permission au niveau
+  de la zone.
+  [blog.cloudflare.com](https://blog.cloudflare.com/workers-granular-authorization/)
+  → Le déploiement automatique pourrait recevoir un jeton qui ne peut toucher
+  que `staging-finjaro`. Aujourd'hui, une fuite de ce jeton atteindrait
+  `finjaro.net`, donc les applications Android et iOS qui chargent ce domaine.
+  C'est petit à faire et ça ferme une porte réelle.
+
+- **Capacitor 9 entre en préversion.** La `9.0.0-alpha.7` est sortie le
+  18 septembre 2026. Les nouveautés touchent précisément l'affichage Android :
+  prise en charge du bord-à-bord dans l'outil de migration, marges par défaut
+  des barres système passées à `native`, Cordova devenu optionnel. La branche
+  stable reste 8.5.2, celle qu'on utilise.
+  [github.com/ionic-team/capacitor](https://github.com/ionic-team/capacitor/releases)
+  → Rien à faire maintenant. Quand on migrera, ça touchera les marges et les
+  barres système — exactement l'endroit où un recadrage coupe un visuel sur
+  grand écran. À essayer sur plusieurs largeurs, pas seulement sur 390 px.
+
+- **Cloudflare : Python devient officiellement supporté sur les Workers.**
+  Disponibilité générale le 21 septembre 2026, après deux ans de préversion.
+  Les bibliothèques Python d'images et d'IA tournent nativement, avec accès à
+  D1, R2 et Workers AI.
+  [blog.cloudflare.com](https://blog.cloudflare.com/python-workers-ga/)
+  → Ouvre une porte sans rien casser : un futur traitement de photo de reçu
+  pourrait vivre là plutôt que dans une fonction edge Supabase, qui touche
+  préproduction et production d'un seul coup.
+
+- **WhatsApp — ma correction du 19/09 est confirmée, à la source.** La page
+  Meta dédiée aux messages hors modèle dit : « Effective October 1, 2026, Meta
+  will charge for service messages, which have not been charged since November
+  2024 », et « By market, rates for service messages are the same as the rates
+  for utility and authentication messages ».
+  [developers.facebook.com](https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing/non-template-messages)
+  → Toujours sans effet sur nous aujourd'hui : nos boutons ouvrent des liens
+  `wa.me`, donc des conversations ordinaires, pas l'API Business. Ça
+  compterait le jour où on enverrait des rappels automatiques.
+  **Non retenu, faute de confirmation sur une page Meta :** le millier de
+  messages gratuits par mois et par numéro, et l'arrêt de livraison au
+  1er octobre pour les comptes sans moyen de paiement. Ces deux points ne
+  viennent que de blogs d'intégrateurs.
+
+### Ce qui n'a pas pu être établi
+
+- **Rien de neuf sur le mobile money cette semaine** : ni tarif marchand, ni
+  version d'API, ni dépréciation chez MTN MoMo, Orange Money, Wave, Moov ou
+  Airtel. Les portails développeurs n'exposent pas de journal des changements
+  daté et interrogeable.
+- **Cameroun, Sénégal, Gabon, Bénin, Togo, Mali** : aucune source datée du
+  15–22 septembre. Des chantiers existent (eBilling camerounais, agrément des
+  dispositifs de facturation au Gabon via la loi de finances rectificative,
+  facture certifiée au Togo), mais rien d'ouvrable et de daté. Pour le Gabon
+  en particulier : aucune liste d'éditeurs agréés, aucune procédure publiée,
+  aucune date d'ouverture de guichet. Toujours non trouvé — c'est la troisième
+  note consécutive où ce point reste ouvert.
+- **QR code interopérable CEMAC** : des résultats évoquent un lancement le
+  29 juillet 2026 à Douala, mais les pages renvoient une erreur 403. Non
+  vérifié, donc non retenu.
+- **France, nouvelles mentions obligatoires B2B** : un article non daté évoque
+  quatre mentions supplémentaires au 1er septembre 2026 (SIREN du client,
+  adresse de livraison distincte, nature des opérations, option TVA sur les
+  débits). Cohérent avec la réforme mais **non daté** — à confirmer sur
+  impots.gouv.fr avant d'en faire une règle dans le produit. Ça concerne
+  directement les mentions de facture posées hier.
+- **Aucun concurrent** n'a publié quoi que ce soit de daté dans la fenêtre, ni
+  en Afrique francophone, ni au Nigeria, au Kenya, en Inde ou au Brésil. Odoo
+  20 est annoncé par des blogs pour l'Odoo Experience du 24–26 septembre ; la
+  page officielle des notes de version ne liste que la 19.4 de juillet 2026,
+  donc non retenu.
+- **Lecture de reçus par photo et reconnaissance vocale** : rien de neuf dans
+  la fenêtre qui tourne sur un téléphone Android d'entrée de gamme.
+- **Chrome 154**, annoncé par des sources secondaires pour le 22 septembre
+  avec HTTPS obligatoire par défaut : notes officielles en 404, non confirmé.
+  À revoir la semaine prochaine — ça toucherait tout site public.
+
+---
+
 ## 19/09/2026
 
 **Ce qui ressort aujourd'hui : je me suis trompée hier, et la correction a une
