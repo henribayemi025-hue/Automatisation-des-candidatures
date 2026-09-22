@@ -159,3 +159,27 @@ La règle :
   écrans chacun. Ce qui compte tient en un quart.
 - **Les chiffres restent vérifiés.** Être bref ne veut pas dire affirmer sans
   avoir regardé ; ça veut dire ne pas raconter comment on a regardé.
+
+
+## Le projet de test dort (22/09)
+
+Le projet Supabase de test `qiyvoaljqmbfldephobp` est **en pause depuis le
+22/09**, sur décision de Beau. Le forfait n'autorise que deux projets actifs à
+la fois, et il voulait réveiller Athlo, son application de sport. Alpha a mis
+le test en pause pour libérer la place.
+
+**Conséquence directe, et elle est gênante** : la règle « on essaie d'abord sur
+le projet de test » ne peut plus s'appliquer. Une migration ne peut donc plus
+être répétée avant d'être posée en production.
+
+Tant que ça dure :
+
+- **aucune migration ne part sans que Beau l'ait dite**, et la demande précise
+  qu'elle n'aura pas été répétée ailleurs ;
+- on privilégie ce qui se vérifie **sans toucher à la base** : lecture seule,
+  contrôles, navigateur sur une démonstration locale ;
+- un essai qui a besoin d'écrire se fait dans une transaction qu'on annule,
+  jamais en écrivant pour de bon « pour voir ».
+
+C'est à Beau de choisir laquelle des deux applications dort. Le dire vaut mieux
+que de contourner en silence.
