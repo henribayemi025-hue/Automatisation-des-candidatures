@@ -66,7 +66,7 @@ const SOLDE = /\b(?:nouveau\s+solde|new\s+balance|solde|balance)\b\s*[:=]?\s*([\
 const NOM_APRES = /\b(?:de|from|a|à|to|vers|chez|au\s+point\s+marchand)\s+((?:[A-ZÀ-Ý][\wÀ-ÿ'’-]*(?:\s+[A-ZÀ-Ý][\wÀ-ÿ'’-]*){0,3}))/;
 const NUMERO = /\b(\+?\d{8,15})\b/;
 
-function montant(texte: string, source: string | undefined, devise: string): Minor {
+function montant(source: string | undefined, devise: string): Minor {
   if (!source) return 0;
   const propre = source.replace(/\s/g, '').replace(/,(?=\d{3}\b)/g, '');
   const n = Number(propre.replace(',', '.'));
@@ -83,8 +83,8 @@ export function parseMomoSms(texte: string, devise: string, todayISO: string): M
   const [ligne] = parseStatement(brut.replace(/\r?\n/g, ' '), devise, todayISO);
   if (!ligne) return null;
 
-  const fee = montant(brut, brut.match(FRAIS)?.[1], devise);
-  const balance = montant(brut, brut.match(SOLDE)?.[1], devise);
+  const fee = montant(brut.match(FRAIS)?.[1], devise);
+  const balance = montant(brut.match(SOLDE)?.[1], devise);
   const reference = (brut.match(REFERENCE)?.[1] ?? '').toUpperCase();
 
   // Le nom se cherche APRÈS avoir retiré ce qui n'est pas un nom : les mots de
