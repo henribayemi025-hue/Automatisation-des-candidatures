@@ -349,3 +349,34 @@ faut-il corriger la détection de pays en même temps ? Elle est fausse pour
 une autre raison, et la réparer ne rendrait pas l'affichage en euros plus
 souhaitable pour un paiement en espèces. Les deux sujets se traitent
 séparément.
+
+## Idée issue des faits fiscaux camerounais transmis par Alpha le 22/09
+
+☐ **15. Prévenir avant le franchissement du seuil IGS, pas après.** *Problème* :
+au Cameroun, dépasser le seuil de chiffre d'affaires **une seule fois** fait
+basculer au régime du réel simplifié l'exercice suivant — avec TVA à facturer,
+déclarations, et facture électronique obligatoire. Une commerçante qui ne suit
+pas son cumul se le prend sans l'avoir vu venir. *Ce qu'on a déjà* : le chiffre
+d'affaires cumulé, calculé, à l'écran. Il ne manque qu'une comparaison et un
+avertissement. *Pour qui* : nos utilisateurs camerounais, la majorité. *Valeur* :
+forte — c'est le genre de chose qu'un logiciel de comptabilité doit voir venir
+et qu'un carnet ne voit jamais. *Effort* : petit.
+
+*État de vérification, à lire avant de coder* :
+- **Vérifié par moi** (recherche du 22/09) : seuil de **50 M FCFA** hors taxes
+  pour une activité commerciale, **12 classes**, classe 1 exonérée en dessous
+  de 500 000 FCFA. Et un point qu'Alpha n'avait pas : le seuil est de **30 M
+  FCFA pour les professions libérales** (médecin, avocat, conseil, architecte).
+  La différence compte — plusieurs de nos métiers sont des prestations.
+- **Non vérifié par moi, transmis par Alpha** : la règle du basculement après
+  UN dépassement, le barème classe par classe, l'adhésion à un Centre de
+  Gestion Agréé qui diviserait l'IGS par deux et doublerait l'exonération de
+  patente, et le crédit d'impôt insertion des jeunes de 20 %.
+- **Non résolu** : Alpha cite la Loi N°2025/012 du 17/12/2025 ; ma recherche
+  renvoie la Loi N°2024/020 du 23/12/2024 sur la fiscalité locale, précisée
+  ensuite. Les deux peuvent coexister. **À trancher sur le texte officiel
+  avant d'écrire un seul seuil dans le code.**
+
+*Règle pour cette idée* : aucun de ces chiffres n'entre dans l'application tant
+qu'il n'a pas été lu dans le texte de loi. Un seuil faux ferait manquer un
+basculement à quelqu'un, ou l'affolerait pour rien.
