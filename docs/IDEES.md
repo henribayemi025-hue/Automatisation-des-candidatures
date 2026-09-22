@@ -308,3 +308,44 @@ Mali, Burkina, Niger). *Valeur* : une seule façon d'encaisser au lieu de sept.
 du code. *Réserve honnête* : l'échéance est celle des établissements, pas celle
 de la disponibilité d'une interface pour un logiciel tiers. Rien ne dit qu'on
 pourra s'y brancher le 1er octobre. À reprendre dans un mois avec des faits.
+
+## Idée issue de l'écran de paiement vu le 22/09 — à décider par Beau
+
+☐ **14. Pour un paiement en espèces, le prix s'affiche dans la monnaie qu'on
+va tendre.** *Problème* : Alpha a ouvert l'écran de paiement de la place de
+marché et y a vu **6,86 €** sur une commande chez une boutique de Yaoundé
+payée **en espèces à la livraison**. La cause immédiate est la détection de
+pays, qui retombe sur la langue du système — un téléphone camerounais réglé en
+« fr-FR » annonce la France, défaut déjà connu et écrit dans CLAUDE.md. Mais le
+cas révèle plus que ça.
+
+*Ce qui est en jeu* : notre règle « l'acheteuse voit SA monnaie » est juste
+quand elle paie par carte, où sa banque débitera bien des euros. Elle est
+douteuse quand elle paiera **en espèces, à sa porte, à une vendeuse qui
+attend des FCFA**. Là, la monnaie qu'elle doit lire est celle des billets
+qu'elle va sortir de sa poche. Afficher 6,86 € prépare une dispute au moment
+de la livraison — et c'est la vendeuse qui la subira, pas nous.
+
+*Mon avis, à trancher par Beau* : pour une commande payée à la livraison, le
+montant à payer s'affiche dans la monnaie de la boutique, en gros ; une
+conversion peut l'accompagner en petit (« 4 500 FCFA — environ 6,86 € »),
+jamais l'inverse. Pour un paiement par carte, la règle actuelle reste bonne.
+Ce n'est pas un renoncement au principe des monnaies locales : c'est le même
+principe appliqué à ce que la personne va réellement remettre.
+
+*Vérifié de mon côté, pour qu'on sache ce qui n'est PAS en jeu* : ma
+comptabilité ne dépend pas de ce que l'acheteuse a vu. Le raccordement lit le
+prix en FCFA de la commande et le convertit avec la devise de l'ESPACE de la
+vendeuse (`finia_devise_espace` + `finia_fx_rates`, vérifié en production le
+22/09). Une vendeuse camerounaise verra 4 500 FCFA dans son journal quel que
+soit l'affichage côté acheteuse. **Le défaut est entièrement côté place de
+marché ; mes livres sont justes.** C'est utile à savoir avant de décider :
+personne n'a à corriger une écriture, il s'agit d'une promesse faite à
+l'écran.
+
+*Pour qui* : toute acheteuse en zone FCFA, c'est-à-dire la quasi-totalité
+aujourd'hui. *Effort* : petit côté place de marché. *Ce qui reste ouvert* :
+faut-il corriger la détection de pays en même temps ? Elle est fausse pour
+une autre raison, et la réparer ne rendrait pas l'affichage en euros plus
+souhaitable pour un paiement en espèces. Les deux sujets se traitent
+séparément.
