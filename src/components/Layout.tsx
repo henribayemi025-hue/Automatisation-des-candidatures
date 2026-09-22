@@ -159,11 +159,30 @@ export default function Layout({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  /** Quitter la démonstration : on efface l'exemple et on propose la connexion. */
+  /**
+   * Quitter la démonstration.
+   *
+   * DEUX cas, et les confondre coûtait cher. Signalé par Beau le 22/09 : il
+   * était connecté à SON espace, « Sauvegardé en ligne », avec ses vrais
+   * chiffres — et le bandeau lui proposait « Créer mon compte ».
+   *
+   * Le drapeau de démonstration restait posé dans le navigateur depuis une
+   * visite précédente. Or ce bouton appelait `resetAll()`, qui écrit un
+   * événement `workspace.reset` : sur un espace en ligne, il aurait EFFACÉ
+   * ses données pour de bon, et l'aurait déconnecté par-dessus.
+   *
+   * - Personne connectée : on retire seulement le drapeau. On ne touche à
+   *   aucune donnée, on ne déconnecte personne. Il n'y a rien à créer, le
+   *   compte existe.
+   * - Personne non connectée : comportement d'avant. L'exemple est local, il
+   *   n'appartient à personne, et l'effacer est ce qu'on veut avant de créer
+   *   un compte.
+   */
   function leaveDemo() {
-    resetAll();
     localStorage.removeItem(DEMO_KEY);
     setDemo(false);
+    if (user) return;
+    resetAll();
     void signOut();
   }
   const [signOutNotice, setSignOutNotice] = useState('');
@@ -395,7 +414,10 @@ export default function Layout({ children }: { children: ReactNode }) {
         {demo && (
           <div className="flex flex-wrap items-center gap-3 border-b border-brass/40 bg-[#FBF1DF] px-4 py-2.5 text-caption text-ink sm:px-6">
             <span>
-              <strong>{t('Démonstration')}</strong> — {t('chiffres d’exemple, gardés sur cet appareil. Tout est modifiable.')}
+              <strong>{t('Démonstration')}</strong>{' '}
+              — {user
+                ? t('vous êtes connecté : ce bandeau vient d’une visite précédente, vos données sont les vôtres.')
+                : t('chiffres d’exemple, gardés sur cet appareil. Tout est modifiable.')}
             </span>
             <button onClick={startTour} className="btn-ghost px-3 py-1.5 text-caption">
               {t('Visite guidée')}
@@ -404,7 +426,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               {t('Manuel')}
             </NavLink>
             <button onClick={leaveDemo} className="btn-primary px-3 py-1.5 text-caption">
-              {t('Créer mon compte')}
+              {user ? t('Quitter la démonstration') : t('Créer mon compte')}
             </button>
           </div>
         )}
