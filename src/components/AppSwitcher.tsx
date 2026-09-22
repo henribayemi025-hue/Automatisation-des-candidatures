@@ -112,8 +112,12 @@ export default function AppSwitcher({ align = 'start' }: { align?: 'start' | 'en
                     url={a.url}
                     onDone={() => setOpen(false)}
                   >
-                    <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-input text-xl ${ACCENT[a.accent]}`}>
-                      {a.emoji}
+                    <span className={`grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-input text-xl ${ACCENT[a.accent]}`}>
+                      {a.logo_url ? (
+                        <img src={a.logo_url} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        a.emoji
+                      )}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="flex items-center gap-2 text-body font-semibold text-ink">

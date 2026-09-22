@@ -6,6 +6,9 @@ export interface FinjaroApp {
   tagline: string;
   url: string;
   emoji: string;
+  // Le vrai logo, posé par Alpha dans finjaro_apps.logo_url (colonne
+  // additive). Absent pour la console admin, qui garde l'emoji.
+  logo_url?: string | null;
   accent: 'teal' | 'brass' | 'ink';
   audience: 'tous' | 'vendeuse' | 'admin';
   sort_order: number;
@@ -22,7 +25,7 @@ export const FALLBACK_APPS: FinjaroApp[] = [
 export async function fetchApps(): Promise<FinjaroApp[]> {
   const { data, error } = await supabase
     .from('finjaro_apps')
-    .select('key, name, tagline, url, emoji, accent, audience, sort_order')
+    .select('key, name, tagline, url, emoji, logo_url, accent, audience, sort_order')
     .eq('is_active', true)
     .order('sort_order', { ascending: true });
   if (error || !data?.length) return FALLBACK_APPS;
