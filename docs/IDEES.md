@@ -269,6 +269,20 @@ que la Côte d'Ivoire devient le premier pays où l'on se raccorde pour de vrai,
 avant le Gabon et le Burkina ? C'est le même choix que l'idée n° 8, mais avec
 une échéance déjà passée et un public déjà contrôlé.
 
+*Précisions mesurées par Alpha en production le 22/09, qui changent l'urgence
+sans changer la décision* : la seule boutique ivoirienne de la place de marché
+(ouverte le 10/09) est **vide** — zéro article actif, zéro commande, zéro
+livraison. Rien ne peut donc remonter de Côte d'Ivoire dans la comptabilité
+aujourd'hui, et le compte à rebours ne démarre que le jour où elle publie un
+article et reçoit une commande livrée. **Mais le point le plus important est
+ailleurs** : Alpha a vérifié en base que la place de marché n'a aucune notion
+de client professionnel (pas de colonne entreprise, TVA, SIREN ou RCCM) et
+**n'émet aucun document** — aucune table de facture, de reçu ou de ticket,
+aucun écran vendeur qui imprime. Une commande livrée nous envoie une vente, pas
+une facture à retransmettre. **Le document est donc entièrement le nôtre, et la
+conformité FNE/RNE se joue chez nous seuls.** Il n'y a rien à aligner sur un
+document existant, parce qu'il n'en existe pas.
+
 ☐ **12. Un jeton de déploiement qui ne peut pas toucher la production.**
 *Problème* : le déploiement automatique dispose aujourd'hui d'un accès qui
 couvre tout le compte. Si ce jeton fuit ou si une erreur vise la mauvaise
