@@ -477,6 +477,36 @@ export interface Employee {
 
 export type AttendanceStatus = 'PRESENT' | 'HALF' | 'ABSENT' | 'LEAVE';
 
+export type LeaveStatus = 'PENDING' | 'APPROVED' | 'REFUSED';
+
+/**
+ * Une demande de congé.
+ *
+ * Le statut « congé » existait déjà au pointage, mais il fallait le poser à la
+ * main, jour après jour, en se souvenant de qui avait demandé quoi. Le circuit
+ * manquait : demander, répondre, et que le pointage suive tout seul.
+ *
+ * Un congé n'écrit AUCUNE écriture comptable. Le salaire mensuel le couvre
+ * déjà, et pour une paie au jour ou à l'heure c'est le pointage qui décide —
+ * il compte zéro jour travaillé pour un congé, ce qui est le comportement
+ * voulu et existait avant.
+ */
+export interface LeaveRequest {
+  id: string;
+  employeeId: string;
+  /** Recopié pour que la demande reste lisible si la fiche est archivée. */
+  employeeName: string;
+  from: ISODate;
+  to: ISODate;
+  /** Ce que la personne a dit : « maladie », « voyage au village »… */
+  reason: string;
+  status: LeaveStatus;
+  /** Qui a répondu, et quand. Vide tant que personne n'a répondu. */
+  decidedBy: string;
+  decidedAt: ISODate | '';
+  createdAt: ISODate;
+}
+
 /** Une journée pointée pour une personne. Une seule par personne et par jour. */
 export interface Attendance {
   id: string;
@@ -633,6 +663,7 @@ export interface DB {
   messages: Message[];
   employees: Employee[];
   attendance: Attendance[];
+  leaves: LeaveRequest[];
   advances: StaffAdvance[];
   payrolls: PayrollRun[];
   assets: FixedAsset[];

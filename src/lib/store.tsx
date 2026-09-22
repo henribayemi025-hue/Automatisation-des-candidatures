@@ -30,11 +30,13 @@ import type {
   FixedAsset,
   Employee,
   Attendance,
+  LeaveRequest,
   Payslip,
   PayrollRun,
 } from './types';
 import { depreciationPlan } from './assets';
 import { carryForwardLines, closingPlan, dayAfter } from './closing';
+import { pointagesAPoser } from './leaves';
 
 export function newId(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
@@ -170,6 +172,9 @@ export interface StoreActions {
   saveEmployee: (employee: Omit<Employee, 'id' | 'createdAt'> & { id?: string }) => Employee;
   archiveEmployee: (employeeId: string, archived: boolean) => void;
   markAttendance: (employeeId: string, date: string, status: Attendance['status'], hours?: number) => void;
+  /** Demande de congé. Aucune écriture comptable : voir src/lib/leaves.ts. */
+  requestLeave: (input: { employeeId: string; from: string; to: string; reason: string; id?: string }) => LeaveRequest | null;
+  decideLeave: (leaveId: string, status: 'APPROVED' | 'REFUSED') => void;
   payAdvance: (employeeId: string, amount: Minor, method: PaymentMethod, date: string, note?: string) => void;
   runPayroll: (period: string, date: string, slips: Payslip[], method: PaymentMethod, paid: boolean) => PayrollRun | null;
   settlePayroll: (runId: string, method: PaymentMethod, date: string) => void;
@@ -529,6 +534,36 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (!original) throw new Error('Écriture introuvable');
         if (original.reversedBy) throw new Error('Écriture déjà extournée');
         dispatch('entry.reverse', { entryId, reversalId: newId(), date: today() });
+      },
+
+      requestLeave(input) {
+        const employee = dbRef.current.employees.find((e) => e.id === input.employeeId);
+        if (!employee) return null;
+        const existante = input.id ? dbRef.current.leaves.find((l) => l.id === input.id) : undefined;
+        const leave: LeaveRequest = {
+          id: input.id ?? newId(),
+          employeeId: input.employeeId,
+          // Recopié : la demande doit rester lisible si la fiche est archivée.
+          employeeName: employee.name,
+          from: input.from,
+          to: input.to,
+          reason: input.reason,
+          status: 'PENDING',
+          decidedBy: '',
+          decidedAt: '',
+          createdAt: existante?.createdAt ?? new Date().toISOString(),
+        };
+        dispatch('leave.request', { leave });
+        return leave;
+      },
+
+      decideLeave(leaveId, status) {
+        const demande = dbRef.current.leaves.find((l) => l.id === leaveId);
+        if (!demande) return;
+        // Les identifiants des pointages sont posés ICI, sur l'appareil, pour
+        // que rejouer l'événement ne crée pas de doublons.
+        const ids = pointagesAPoser(demande, dbRef.current.attendance).map(() => newId());
+        dispatch('leave.decide', { leaveId, status, attendanceIds: ids });
       },
 
       saveEmployee(input) {

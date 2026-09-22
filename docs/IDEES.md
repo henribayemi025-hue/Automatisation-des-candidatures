@@ -369,9 +369,13 @@ et qu'un carnet ne voit jamais. *Effort* : petit.
   FCFA pour les professions libérales** (médecin, avocat, conseil, architecte).
   La différence compte — plusieurs de nos métiers sont des prestations.
 - **Non vérifié par moi, transmis par Alpha** : la règle du basculement après
-  UN dépassement, le barème classe par classe, l'adhésion à un Centre de
-  Gestion Agréé qui diviserait l'IGS par deux et doublerait l'exonération de
-  patente, et le crédit d'impôt insertion des jeunes de 20 %.
+  UN dépassement, le barème classe par classe, le crédit d'impôt insertion
+  des jeunes de 20 %.
+- **RETIRÉ le 22/09** : « l'adhésion à un Centre de Gestion Agréé divise l'IGS
+  par deux ». Alpha, qui me l'avait transmis, a cherché sa propre source et
+  n'en a trouvé aucune — elle me l'a dit d'elle-même. Le seul abattement CGA
+  que j'aie lu dans le texte officiel porte sur la **contribution des
+  licences** (article C 37-2), pas sur l'IGS. À ne pas reprendre sans texte.
 - **Non résolu** : Alpha cite la Loi N°2025/012 du 17/12/2025 ; ma recherche
   renvoie la Loi N°2024/020 du 23/12/2024 sur la fiscalité locale, précisée
   ensuite. Les deux peuvent coexister. **À trancher sur le texte officiel

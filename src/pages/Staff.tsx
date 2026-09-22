@@ -10,10 +10,11 @@ import {
   payrollPreview,
   periodBounds,
 } from '../lib/payroll';
-import type { Attendance, Employee, PaymentMethod, PayKind, Payslip } from '../lib/types';
+import type { Attendance, DB, Employee, PaymentMethod, PayKind, Payslip } from '../lib/types';
 import { Badge, Empty, Field, FigureStrip, Modal, Money, PageHeader, Table } from '../components/UI';
 import { IconPlus, IconUsers } from '../components/Icons';
 import { t } from '../lib/i18n';
+import { absencesEnMemeTemps, enAttente, nombreDeJours, pointagesAPoser } from '../lib/leaves';
 
 /**
  * Personnel. Trois choses, dans l'ordre où elles arrivent vraiment : qui
@@ -25,7 +26,7 @@ import { t } from '../lib/i18n';
  * avec : la charge au brut, l'avance en créance, le net en sortie d'argent.
  */
 
-type Tab = 'PEOPLE' | 'ATTENDANCE' | 'PAYROLL';
+type Tab = 'PEOPLE' | 'ATTENDANCE' | 'LEAVES' | 'PAYROLL';
 
 const METHODS: { id: PaymentMethod; label: string }[] = [
   { id: 'CASH', label: 'Espèces' },
@@ -53,9 +54,12 @@ function daysOf(period: string, todayISO: string): string[] {
 }
 
 export default function Staff() {
-  const { db, saveEmployee, archiveEmployee, markAttendance, payAdvance, runPayroll, settlePayroll } = useStore();
+  const { db, saveEmployee, archiveEmployee, markAttendance, payAdvance, runPayroll, settlePayroll, requestLeave, decideLeave } = useStore();
   const [tab, setTab] = useState<Tab>('PEOPLE');
   const [period, setPeriod] = useState(today().slice(0, 7));
+  // Les demandes en attente, pour la pastille de l'onglet : une demande de
+  // congé qu'on ne voit pas est une personne qui attend une réponse.
+  const attente = useMemo(() => enAttente(db.leaves), [db.leaves]);
   const [form, setForm] = useState<Employee | null>(null);
   const [open, setOpen] = useState(false);
   const [advanceFor, setAdvanceFor] = useState<Employee | null>(null);
@@ -110,10 +114,14 @@ export default function Staff() {
         <button onClick={() => setTab('ATTENDANCE')} className={tab === 'ATTENDANCE' ? 'btn-dark' : 'btn-ghost'}>
           {t('Présences')}
         </button>
+        <button onClick={() => setTab('LEAVES')} className={tab === 'LEAVES' ? 'btn-dark' : 'btn-ghost'}>
+          {t('Congés')}
+          {attente.length > 0 && <span className="ml-1.5 rounded-full bg-[#C25E38] px-1.5 text-[11px] font-bold text-white">{attente.length}</span>}
+        </button>
         <button onClick={() => setTab('PAYROLL')} className={tab === 'PAYROLL' ? 'btn-dark' : 'btn-ghost'}>
           {t('Paie')}
         </button>
-        {tab !== 'PEOPLE' && (
+        {tab !== 'PEOPLE' && tab !== 'LEAVES' && (
           <input type="month" value={period} onChange={(e) => setPeriod(e.target.value)} className="field ml-auto w-auto" />
         )}
         {tab === 'PEOPLE' && archivedCount > 0 && (
@@ -189,6 +197,15 @@ export default function Staff() {
           db={db}
           period={period}
           mark={markAttendance}
+        />
+      )}
+
+      {tab === 'LEAVES' && (
+        <Leaves
+          db={db}
+          people={db.employees.filter((e) => !e.archived)}
+          onRequest={requestLeave}
+          onDecide={decideLeave}
         />
       )}
 
@@ -629,5 +646,157 @@ function AdvanceForm({
         </button>
       </div>
     </Modal>
+  );
+}
+
+/**
+ * Les congés : une file de demandes, et deux boutons pour répondre.
+ *
+ * Ce qu'on ne fait PAS, volontairement : compter des droits à congés, des
+ * soldes annuels, des reports. Une boutique de trois personnes ne tient pas ce
+ * genre de compte, et le lui imposer ferait abandonner l'écran. On note ce qui
+ * a été demandé et ce qui a été répondu ; c'est le cahier, pas un logiciel de
+ * ressources humaines.
+ */
+function Leaves({
+  db,
+  people,
+  onRequest,
+  onDecide,
+}: {
+  db: DB;
+  people: Employee[];
+  onRequest: (input: { employeeId: string; from: string; to: string; reason: string }) => unknown;
+  onDecide: (leaveId: string, status: 'APPROVED' | 'REFUSED') => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [employeeId, setEmployeeId] = useState('');
+  const [from, setFrom] = useState(today());
+  const [to, setTo] = useState(today());
+  const [reason, setReason] = useState('');
+  const [error, setError] = useState('');
+
+  const attente = enAttente(db.leaves);
+  const repondues = db.leaves.filter((l) => l.status !== 'PENDING').slice(0, 20);
+
+  function submit() {
+    if (!employeeId) return setError(t('Choisissez la personne.'));
+    if (to < from) return setError(t('La fin du congé est avant son début.'));
+    onRequest({ employeeId, from, to, reason: reason.trim() });
+    setOpen(false);
+    setEmployeeId('');
+    setReason('');
+    setError('');
+  }
+
+  return (
+    <>
+      <div className="mb-4 flex justify-end">
+        <button onClick={() => setOpen(true)} className="btn-primary" disabled={!people.length}>
+          <IconPlus className="h-4 w-4" />
+          {t('Demander un congé')}
+        </button>
+      </div>
+
+      {attente.length === 0 && repondues.length === 0 ? (
+        <Empty
+          title={t('Aucune demande de congé')}
+          hint={t('Quand quelqu’un demande à s’absenter, notez-le ici : le pointage du mois suivra tout seul et la paie en tiendra compte.')}
+        />
+      ) : (
+        <>
+          {attente.length > 0 && (
+            <div className="card mb-4">
+              <h2 className="text-section">{t('En attente de votre réponse')}</h2>
+              <ul className="mt-3 space-y-3">
+                {attente.map((d) => {
+                  const enMemeTemps = absencesEnMemeTemps(db.leaves, d);
+                  const aPoser = pointagesAPoser(d, db.attendance).length;
+                  const jours = nombreDeJours(d.from, d.to);
+                  return (
+                    <li key={d.id} className="rounded-card border border-hairline p-3.5">
+                      <div className="flex flex-wrap items-baseline justify-between gap-2">
+                        <span className="font-semibold text-ink">{d.employeeName}</span>
+                        <span className="text-caption text-muted">
+                          {t('{n} jour(s)', { n: jours })} · {d.from} → {d.to}
+                        </span>
+                      </div>
+                      {d.reason && <p className="mt-1 text-caption text-muted">{d.reason}</p>}
+                      {enMemeTemps.length > 0 && (
+                        <p className="mt-2 rounded-input bg-[#FBF1DF] px-3 py-2 text-caption text-ink">
+                          {t('Déjà absent(e) sur ces jours : {noms}.', { noms: enMemeTemps.map((x) => x.employeeName).join(', ') })}
+                        </p>
+                      )}
+                      {aPoser < jours && (
+                        <p className="mt-2 text-caption text-muted">
+                          {t('{n} de ces jours sont déjà pointés : ils ne seront pas modifiés.', { n: jours - aPoser })}
+                        </p>
+                      )}
+                      <div className="mt-3 flex gap-2">
+                        <button onClick={() => onDecide(d.id, 'APPROVED')} className="btn-primary px-3 py-1.5 text-caption">
+                          {t('Accepter')}
+                        </button>
+                        <button onClick={() => onDecide(d.id, 'REFUSED')} className="btn-ghost px-3 py-1.5 text-caption">
+                          {t('Refuser')}
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+
+          {repondues.length > 0 && (
+            <div className="card p-0">
+              <Table head={[t('Personne'), t('Du'), t('Au'), t('Jours'), t('Réponse')]} phoneHide={[3]} phoneNowrapFirst>
+                {repondues.map((d) => (
+                  <tr key={d.id} className="row">
+                    <td className="td font-semibold">{d.employeeName}</td>
+                    <td className="td">{d.from}</td>
+                    <td className="td">{d.to}</td>
+                    <td className="td num">{nombreDeJours(d.from, d.to)}</td>
+                    <td className="td">
+                      <Badge tone={d.status === 'APPROVED' ? undefined : 'danger'}>
+                        {d.status === 'APPROVED' ? t('Accepté') : t('Refusé')}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))}
+              </Table>
+            </div>
+          )}
+        </>
+      )}
+
+      <Modal open={open} onClose={() => { setOpen(false); setError(''); }} title={t('Demander un congé')}>
+        <div className="space-y-4">
+          <Field label={t('Qui')}>
+            <select value={employeeId} onChange={(e) => setEmployeeId(e.target.value)} className="field">
+              <option value="">{t('— choisir —')}</option>
+              {people.map((e) => (
+                <option key={e.id} value={e.id}>{e.name}</option>
+              ))}
+            </select>
+          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label={t('Du')}>
+              <input type="date" value={from} onChange={(e) => { setFrom(e.target.value); if (to < e.target.value) setTo(e.target.value); }} className="field" />
+            </Field>
+            <Field label={t('Au')}>
+              <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="field" />
+            </Field>
+          </div>
+          <Field label={t('Motif')} hint={t('Facultatif, en vos mots : maladie, voyage, examen…')}>
+            <input value={reason} onChange={(e) => setReason(e.target.value)} className="field" />
+          </Field>
+          {error && <p className="text-caption font-semibold text-[#A63030]">{error}</p>}
+        </div>
+        <div className="mt-5 flex justify-end gap-2">
+          <button onClick={() => { setOpen(false); setError(''); }} className="btn-ghost">{t('Annuler')}</button>
+          <button onClick={submit} className="btn-primary">{t('Enregistrer la demande')}</button>
+        </div>
+      </Modal>
+    </>
   );
 }

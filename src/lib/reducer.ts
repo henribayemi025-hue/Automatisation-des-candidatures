@@ -1,6 +1,7 @@
 import { revenueSchedule } from './subscriptions';
 import { accountCode, buildChart, assetAccounts } from './chart';
 import { tracksStock, revenueKindOf } from './sector';
+import { pointagesAPoser } from './leaves';
 import type { AccountKey } from './chart';
 import type {
   Account,
@@ -17,6 +18,7 @@ import type {
   Product,
   Purchase,
   RevenueKind,
+  LeaveRequest,
   Sale,
   Appointment,
   Subscription,
@@ -71,6 +73,7 @@ export function emptyDB(): DB {
     messages: [],
     employees: [],
     attendance: [],
+    leaves: [],
     advances: [],
     payrolls: [],
     assets: [],
@@ -105,6 +108,7 @@ export function normalizeDB(raw: Partial<DB> | null | undefined): DB {
     messages: raw.messages ?? [],
     employees: raw.employees ?? [],
     attendance: raw.attendance ?? [],
+    leaves: raw.leaves ?? [],
     advances: raw.advances ?? [],
     payrolls: raw.payrolls ?? [],
     assets: raw.assets ?? [],
@@ -858,6 +862,47 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       };
       if (idx >= 0) db.attendance[idx] = { ...db.attendance[idx], ...row, id: db.attendance[idx].id };
       else db.attendance.push(row);
+      break;
+    }
+
+    case 'leave.request': {
+      // Une demande de congé n'écrit AUCUNE écriture : le salaire mensuel la
+      // couvre déjà, et une paie au jour ou à l'heure ne compte simplement pas
+      // ces jours-là. Écrire ici doublerait la charge.
+      const demande = p.leave as LeaveRequest;
+      const i = db.leaves.findIndex((l) => l.id === demande.id);
+      if (i >= 0) db.leaves[i] = { ...db.leaves[i], ...demande };
+      else db.leaves.unshift(demande);
+      audit(db, ev, 'leave', demande.id, i >= 0 ? 'UPDATE' : 'CREATE', `Congé demandé — ${demande.employeeName}, du ${demande.from} au ${demande.to}`);
+      break;
+    }
+
+    case 'leave.decide': {
+      const demande = db.leaves.find((l) => l.id === p.leaveId);
+      if (!demande) break;
+      demande.status = p.status as LeaveRequest['status'];
+      demande.decidedBy = ev.actorName;
+      demande.decidedAt = ev.at;
+
+      // Accepter pose le pointage, ce qui est tout l'intérêt : sinon il faut
+      // s'en souvenir jour après jour. On ne touche PAS aux jours déjà
+      // pointés — quelqu'un marqué présent a travaillé, et un congé accepté
+      // après coup ne réécrit pas le passé.
+      if (demande.status === 'APPROVED') {
+        const ids = (p.attendanceIds as string[]) ?? [];
+        pointagesAPoser(demande, db.attendance).forEach((jour, n) => {
+          db.attendance.push({
+            id: ids[n] ?? `${demande.employeeId}-${jour}`,
+            employeeId: demande.employeeId,
+            date: jour,
+            status: 'LEAVE',
+            hours: 0,
+            note: demande.reason,
+            createdAt: ev.at,
+          });
+        });
+      }
+      audit(db, ev, 'leave', demande.id, 'UPDATE', `Congé ${demande.status === 'APPROVED' ? 'accepté' : 'refusé'} — ${demande.employeeName}`);
       break;
     }
 
