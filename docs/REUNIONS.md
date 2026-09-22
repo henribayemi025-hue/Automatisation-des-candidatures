@@ -7,6 +7,126 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 4 — 22/09/2026 (matin)
+
+Trois jours sans compte rendu, alors qu'il s'est passé beaucoup de choses.
+C'est la deuxième fois que ça arrive et Beau l'avait déjà relevé le 18 : des
+messages échangés ne remplacent pas une réunion écrite.
+
+### Ce qui a bougé depuis le dernier compte rendu
+
+Douze enregistrements, dont huit qui changent ce que les gens voient. En
+ligne sur accounting.finjaro.net, version vérifiée ce matin.
+
+| Ce qui a changé | Pourquoi |
+|---|---|
+| Une prestation va au compte 706, plus au 707 | toutes les ventes, depuis toujours, créditaient « Ventes de marchandises » — une pose d'ongles comptée comme un sac de riz |
+| Les régimes fiscaux suivent le pays | on proposait l'IGS, un régime africain, à une entreprise française, et il manquait la micro-entreprise |
+| La mention « TVA non applicable, art. 293 B » s'imprime | sans elle, la facture d'une micro-entreprise française n'est pas conforme |
+| Le bouton FEC est sur l'écran du journal | il existait, caché dans Rapports ; la comptable l'a cherché là où on regarde le journal |
+| On cherche et on crée une cliente depuis la caisse | une liste déroulante devient inutilisable passé trente clientes |
+| L'adresse et le numéro d'immatriculation s'impriment | la facture ne portait que le nom de l'entreprise |
+| Les comptes auxiliaires du FEC sont remplis | les colonnes « qui est le client » étaient vides depuis le début |
+| Les tableaux montrent enfin l'essentiel sur téléphone | voir plus bas |
+
+Et une correction en base : `finia_devise_espace` était ouverte à n'importe
+qui, même non connecté, et contournait la RLS. Fermée après essai sur le
+projet de test, avec l'accord de Beau.
+
+### Ce qui vient d'Alpha, et que je n'aurais pas su seule
+
+- **Un `revoke` qui ne révoque rien.** Retirer `execute` à `anon` et
+  `authenticated` ne ferme rien, parce que Postgres l'accorde à `public` par
+  défaut. Chez moi c'était pire : je n'avais jamais écrit un seul `revoke`.
+  Sur mes sept fonctions, **cinq auraient été fermées à tort** si j'avais suivi
+  le réflexe — dont quatre qui auraient coupé chaque utilisateur de ses propres
+  données.
+- **Le lien mort.** Mon assistante donnait la bonne adresse et elle restait du
+  texte à recopier. Alpha avait le même défaut et l'a trouvé avant moi.
+- **Le nom.** J'avais appris à mon assistante « place de marché » et « market
+  place », pas le NOM de l'assistante d'en face, Finia. C'est pourtant le mot
+  que les gens emploient.
+- **La place de marché n'émet aucun document.** Vérifié en base par Alpha ce
+  matin : aucune table de facture, de reçu ou de ticket, aucun écran vendeur
+  qui imprime. Une commande livrée nous envoie une VENTE. Le document remis à
+  la cliente est donc **entièrement le nôtre**.
+
+### Ce qui casse, regardé sur téléphone ce matin
+
+**Les tableaux montraient d'abord ce qui ne sert à rien.** Écran Dépenses à
+390 px : une commerçante voyait la date, la catégorie et le **numéro de compte
+comptable**, pendant que « c'était quoi » et « combien » étaient hors de
+l'écran, derrière un défilement latéral. Les dates se coupaient en deux lignes.
+Trente-cinq tableaux dans l'application, tous avec une largeur minimale de
+640 px pensée pour un ordinateur.
+
+Corrigé ce matin, avant d'écrire ces lignes. Les cinq écrans du quotidien
+cachent sur téléphone les colonnes qui ne servent pas ; les écrans comptables
+(journal, grand livre, balance) ne bougent pas, parce qu'on les lit sur un
+ordinateur et que chaque colonne y est la raison d'être de l'écran. Mesuré
+après : Dépenses, Stock et Créances tiennent exactement dans l'écran ; Ventes
+et Achats gardent 35 px de défilement, visible mais qui ne cache plus rien.
+
+Deux essais ratés en chemin, gardés en commentaire parce qu'ils sont
+contre-intuitifs : interdire le retour à la ligne à l'avant-dernière colonne a
+**agrandi** le tableau de 369 à 453 px, et l'interdire à la dernière a coûté
+46 px sur les créances — cette colonne-là porte deux boutons qui doivent
+pouvoir s'empiler.
+
+### L'idée du jour, venue du terrain
+
+Elle ne vient pas de la concurrence mais d'une comptable française qui a testé
+l'application sur une prothésiste ongulaire. Sa méthode vaut plus que ses
+remarques : **elle a listé les neuf sujets qu'elle n'avait PAS testés**, au
+lieu de conclure sur ce qu'elle avait vu. J'ai relu les neuf, y compris ceux
+dont j'étais sûre — et c'est là que j'ai trouvé les deux vrais manques
+(comptes auxiliaires, mentions de facture), pas dans ceux que je soupçonnais.
+
+Sur le verrouillage des périodes, je me suis corrigée moi-même : je le croyais
+absent parce que je cherchais un nom de fonction. Il était en ligne dans
+`post()`, à sa place.
+
+**Ce que j'en retiens comme règle** : demander à quelqu'un ce qu'il n'a pas
+regardé vaut mieux que lui demander ce qu'il en pense.
+
+### Ce que je fais aujourd'hui
+
+1. Reprendre les écrans comptables sur téléphone. Je les ai laissés exprès ce
+   matin, mais un journal illisible sur un téléphone reste un journal
+   illisible ; il faut décider si on assume qu'ils sont faits pour un
+   ordinateur, ou si on les rend lisibles autrement (fiches plutôt que
+   colonnes).
+2. Reprendre la vérification métier par métier là où je l'avais laissée :
+   lots et dates de péremption pour une pharmacie, ordre de réparation pour un
+   garage. À faire en le faisant, pas en l'affirmant.
+
+### Ce que j'attends d'Alpha
+
+Rien de bloquant. Une seule chose utile : elle a le même genre de tableaux
+côté vendeuse, et elle vient de découvrir que « Finou » traînait à six
+endroits visibles alors qu'elle croyait que c'était dans le code. **Le même
+exercice — ouvrir ses écrans à 390 px et regarder ce qui est hors champ à
+droite — trouvera probablement quelque chose chez elle aussi.**
+
+### Ce qui attend une décision de Beau
+
+- Le **reçu normalisé électronique ivoirien**. La DGI contrôle depuis le
+  1er septembre, micro-entreprises comprises. La seule boutique ivoirienne de
+  la place de marché est vide, donc rien ne presse aujourd'hui — mais le
+  compte à rebours démarre le jour où elle publie, et ça ne dépend pas de nous.
+- Le **jeton de déploiement Cloudflare**, qui couvre tout le compte. Formulé
+  par Alpha mieux que par moi : sur un domaine que les applications Android et
+  iOS chargent sans version de repli, une compromission ne casse pas un site,
+  elle casse aussi les téléphones.
+- **Le prénom de l'assistante d'Accounting.** Celle de la place de marché
+  s'appelle Finia ; la nôtre n'a pas de nom. Ce n'est pas à nous deux de la
+  baptiser.
+- **L'amortissement au mois entier** plutôt qu'au prorata en jours depuis la
+  mise en service. C'est une simplification assumée, pas une erreur. À
+  demander à la comptable, pas à trancher entre nous.
+
+---
+
 ## Réunion n° 3 — 18/09/2026 (soir)
 
 Réunion demandée par Beau : « tu n'as pas eu de réunion depuis avec Alpha ».
