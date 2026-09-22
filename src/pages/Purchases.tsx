@@ -179,7 +179,7 @@ export default function Purchases() {
 
       <div className="card mt-4 p-0">
         {filtered.length ? (
-          <Table head={['Référence', 'Fournisseur', 'Date', 'Montant', 'Payé', 'Statut', '']}>
+          <Table head={['Référence', 'Fournisseur', 'Date', 'Montant', 'Payé', 'Statut', '']} phoneHide={[1, 3, 5]} phoneNowrapFirst>
             {filtered.map((p) => (
               <tr key={p.id} className="row">
                 <td className="td font-semibold">{p.number}</td>

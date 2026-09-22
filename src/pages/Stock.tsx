@@ -83,7 +83,7 @@ export default function Stock() {
       <div className="card mt-4 p-0">
         {tab === 'MOVEMENTS' &&
           (movements.length ? (
-            <Table head={['Date', 'Type', 'Produit', 'Quantité', 'Stock résultant', 'Motif / réf', 'Par']}>
+            <Table head={['Date', 'Type', 'Produit', 'Quantité', 'Stock résultant', 'Motif / réf', 'Par']} phoneHide={[2, 6, 7]} phoneNowrapFirst>
               {movements.map((m) => (
                 <tr key={m.id} className="row">
                   <td className="td text-slate-500">{m.date}</td>

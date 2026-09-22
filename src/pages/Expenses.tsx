@@ -113,7 +113,7 @@ export default function Expenses() {
       <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
         <div className="card p-0">
           {filtered.length ? (
-            <Table head={['Date', 'Catégorie', 'Compte', 'Description', 'Montant']}>
+            <Table head={['Date', 'Catégorie', 'Compte', 'Description', 'Montant']} phoneHide={[3]} phoneNowrapFirst>
               {filtered.map((e) => (
                 <tr key={e.id} className="row">
                   <td className="td text-slate-500">{e.date}</td>

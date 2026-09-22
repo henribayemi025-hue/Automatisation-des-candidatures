@@ -75,7 +75,7 @@ export default function Sales() {
 
       <div className="card p-0">
         {sales.length ? (
-          <Table head={['Facture', 'Client', 'Caissier', 'Total', 'Paiement', 'Statut', 'Date', '']}>
+          <Table head={['Facture', 'Client', 'Caissier', 'Total', 'Paiement', 'Statut', 'Date', '']} phoneHide={[3, 5, 7]} phoneNowrapFirst>
             {sales.map((s) => {
               const unpaid = s.total - s.paid;
               return (

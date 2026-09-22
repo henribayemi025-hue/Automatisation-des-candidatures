@@ -81,7 +81,7 @@ export default function Debts() {
 
       <div className="card mt-6 p-0">
         {open.length ? (
-          <Table head={['Tiers', 'Origine', 'Date', 'Montant initial', 'Déjà réglé', 'Reste dû', '']}>
+          <Table head={['Tiers', 'Origine', 'Date', 'Montant initial', 'Déjà réglé', 'Reste dû', '']} phoneHide={[2, 3, 4, 5]} phoneNowrapFirst>
             {open.map((d) => {
               const rest = outstanding(d);
               const paid = d.amount - rest;

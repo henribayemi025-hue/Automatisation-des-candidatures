@@ -101,6 +101,60 @@
   .td {
     @apply px-4 py-3 text-caption text-ink sm:text-body;
   }
+  /*
+    Colonnes masquées sur téléphone.
+    -------------------------------
+    Relevé le 22/09 en regardant l'écran Dépenses à 390 px avec les yeux d'une
+    commerçante : le tableau impose une largeur de 640 px, donc sur un
+    téléphone on voit d'abord la date, la catégorie et le NUMÉRO DE COMPTE —
+    et ce qu'elle cherche vraiment, « c'était quoi » et « combien », est hors
+    de l'écran à droite. L'ordre des colonnes est celui d'un comptable devant
+    un ordinateur.
+
+    Plutôt que de réécrire trente-cinq tableaux, on masque sur téléphone les
+    colonnes qui ne lui servent pas. Le tableau reste entier sur ordinateur,
+    où la place existe et où le comptable veut tout voir.
+
+    Ces classes sont statiques exprès : Tailwind ne sait pas fabriquer un
+    `nth-child` à la volée, et une classe construite dynamiquement disparaît à
+    la compilation.
+  */
+  @media (max-width: 639px) {
+    .ph-1 tr > *:nth-child(1),
+    .ph-2 tr > *:nth-child(2),
+    .ph-3 tr > *:nth-child(3),
+    .ph-4 tr > *:nth-child(4),
+    .ph-5 tr > *:nth-child(5),
+    .ph-6 tr > *:nth-child(6),
+    .ph-7 tr > *:nth-child(7),
+    .ph-8 tr > *:nth-child(8) {
+      display: none;
+    }
+    /* Une date coupée en deux lignes (« 2026-09- / 18 ») se lit mal. */
+    .ph-date tr > *:first-child {
+      white-space: nowrap;
+    }
+    /*
+      Sur un tableau allégé, on resserre aussi les marges intérieures : seize
+      pixels de chaque côté de quatre colonnes, c'est cent vingt-huit pixels
+      perdus sur un écran qui en fait trois cent quatre-vingt-dix.
+    */
+    .ph-serre .th,
+    .ph-serre .td {
+      padding-left: 0.375rem;
+      padding-right: 0.375rem;
+    }
+    /*
+      Le montant est ce qu'elle cherche : il ne se coupe pas. La colonne juste
+      avant, elle, DOIT pouvoir passer à la ligne — un premier essai lui avait
+      aussi interdit le retour à la ligne, et le tableau est passé de 369 à
+      453 pixels. Une description tient sur deux lignes, pas un montant.
+    */
+    .ph-montant tr > *:last-child {
+      white-space: nowrap;
+    }
+  }
+
   .row {
     @apply border-t border-hairline transition hover:bg-base/70;
   }

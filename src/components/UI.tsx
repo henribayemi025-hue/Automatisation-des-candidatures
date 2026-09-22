@@ -167,10 +167,47 @@ export function Badge({ children, tone = 'neutral' }: { children: ReactNode; ton
   return <span className={`chip ${tones[tone]}`}>{children}</span>;
 }
 
-export function Table({ head, children }: { head: string[]; children: ReactNode }) {
+/**
+ * Un tableau.
+ *
+ * `phoneHide` donne les numéros de colonne (1 = la première) à cacher sur
+ * téléphone. À utiliser sur les écrans qu'une commerçante ouvre tous les
+ * jours, pour que ce qu'elle cherche — « c'était quoi », « combien » — tienne
+ * dans l'écran sans défilement latéral. Sur ordinateur, le tableau reste
+ * entier : un comptable veut toutes ses colonnes.
+ *
+ * Ne pas s'en servir sur les écrans comptables (grand livre, balance,
+ * journal) : là, chaque colonne est la raison d'être de l'écran.
+ *
+ * `phoneNowrapFirst` empêche la première colonne de se couper en deux lignes,
+ * ce qui arrive aux dates.
+ */
+export function Table({
+  head,
+  children,
+  phoneHide,
+  phoneNowrapFirst,
+}: {
+  head: string[];
+  children: ReactNode;
+  phoneHide?: number[];
+  phoneNowrapFirst?: boolean;
+}) {
+  const masques = (phoneHide ?? []).map((n) => `ph-${n}`).join(' ') + (phoneHide?.length ? ' ph-serre' : '');
+  // La dernière colonne ne se coupe que si elle porte une donnée. Un intitulé
+  // vide en fin de liste, c'est la colonne des boutons d'action : elle DOIT
+  // pouvoir empiler ses boutons, sinon elle pousse tout le tableau vers la
+  // droite. Mesuré : sur l'écran des créances, lui interdire le retour à la
+  // ligne coûtait quarante-six pixels de largeur.
+  const montant = phoneHide?.length && head[head.length - 1] !== '' ? 'ph-montant' : '';
+  const serre = phoneNowrapFirst ? 'ph-date' : '';
+  // Sans colonne masquée, la largeur minimale reste : c'est ce qui garde un
+  // tableau comptable lisible en le faisant défiler. Avec, on la lève sur
+  // téléphone, sinon on aurait caché des colonnes pour rien.
+  const largeur = phoneHide?.length ? 'sm:min-w-[640px]' : 'min-w-[640px]';
   return (
     <div className="overflow-x-auto scrollbar-thin">
-      <table className="w-full min-w-[640px] border-collapse">
+      <table className={`w-full border-collapse ${largeur} ${masques} ${serre} ${montant}`}>
         <thead>
           <tr className="bg-base/70">
             {head.map((h, i) => (
