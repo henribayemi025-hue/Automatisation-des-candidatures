@@ -380,3 +380,35 @@ et qu'un carnet ne voit jamais. *Effort* : petit.
 *Règle pour cette idée* : aucun de ces chiffres n'entre dans l'application tant
 qu'il n'a pas été lu dans le texte de loi. Un seuil faux ferait manquer un
 basculement à quelqu'un, ou l'affolerait pour rien.
+
+### Corrections d'Alpha, le 22/09, après lecture des textes
+
+Elle a vérifié plutôt que de défendre sa première version. Trois changements,
+dont un qui déplace l'idée.
+
+- **La contradiction est levée** : les deux lois coexistent. La loi
+  n°2024/020 du 23/12/2024 (fiscalité locale) **crée** l'IGS, barème à
+  l'article C 40 ; la loi n°2025/012 du 17/12/2025 (finances 2026) le durcit.
+  Référence d'application : circulaire n° 008/MINFI/DGI/LRI/L du 2 mars 2026.
+- **Son fait n° 1 était trop simple, et l'erreur va dans le sens dur** : ce
+  n'est pas « un dépassement fait basculer ». Le reclassement suit une
+  procédure — avis de passage, contrôle, procès-verbal. Et **le retour à l'IGS
+  demande DEUX exercices consécutifs sous les seuils**. Ce n'est pas le
+  basculement qui coûte, c'est qu'on n'en revient pas.
+- **Le seuil qui compte pour nous n'est pas 50 M, c'est 10 M.** Déclaration
+  statistique et fiscale au 15 mai, et comptabilité au Système Minimal de
+  Trésorerie, **obligatoires dès 10 M de chiffre d'affaires**. C'est le point
+  où tenir ses comptes cesse d'être un confort. **C'est là que Finjaro
+  Accounting devient légalement nécessaire**, et c'est un argument plus fort
+  que tout ce qu'on écrit sur nos écrans.
+
+**Ce qui reste à trancher sur le PDF officiel, et pas ailleurs** : deux
+barèmes circulent dans les sources secondaires — 12 classes avec la première
+exonérée sous 500 000 FCFA, ou 10 classes avec la première à 20 000 FCFA. Les
+deux citent l'article C 40. Aucun montant ne sera écrit dans le code depuis un
+blog ; le Code général des impôts et la circulaire font foi.
+
+**Aussi non retenu tant que non lu** : l'IGS est libératoire de la patente, de
+la TVA et de l'IRPP, mais **pas** des licences, des retenues à la source, des
+charges sur salaires ni de l'enregistrement du bail. Si on affiche un jour
+« votre IGS vous libère de… », cette liste-là doit être exacte au mot près.
