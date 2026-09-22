@@ -138,3 +138,24 @@ est sans risque est autorisé d'avance, le reste demande encore.
 **Si l'information manque vraiment**, on fait l'hypothèse la plus probable, on
 livre, et on écrit l'hypothèse en clair dans la réponse. Se tromper et le dire
 lui coûte moins cher qu'attendre.
+
+## Trois lignes, pas trois écrans
+
+Dit par Beau le 22/09 : « je suis fatigué de vos longues réponses, soyez brefs
+dans vos réponses, ça me fatigue de lire tout ça ».
+
+Il ne code pas, il a un travail à côté, il lit sur un téléphone. Une réponse
+de deux écrans lui coûte du temps qu'il n'a pas — et il finit par ne plus lire,
+ce qui est pire que de ne rien écrire.
+
+La règle :
+
+- **Ce qu'on écrit à Beau** : la décision ou le résultat d'abord, trois lignes.
+  Pas de raisonnement déroulé, pas de justification, pas de liste de ce qui a
+  été vérifié. S'il veut le détail, il demande.
+- **Ce qui a besoin d'être long** va dans le dépôt : le message de commit, la
+  note de veille, le compte rendu de réunion. Il y est s'il le cherche.
+- **Entre Claudinette et Alpha aussi.** Nos échanges du 22/09 faisaient deux
+  écrans chacun. Ce qui compte tient en un quart.
+- **Les chiffres restent vérifiés.** Être bref ne veut pas dire affirmer sans
+  avoir regardé ; ça veut dire ne pas raconter comment on a regardé.
