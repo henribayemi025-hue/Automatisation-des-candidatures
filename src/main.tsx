@@ -8,6 +8,14 @@ import { ThemeProvider } from './lib/theme';
 import { LangProvider } from './lib/i18n';
 import { OfflineProvider } from './lib/offline';
 import './index.css';
+import { capterPartage } from './lib/partage';
+
+// Un message partagé depuis le téléphone arrive dans l'adresse. On le met de
+// côté et on nettoie AVANT le rendu — sinon il reste dans l'historique du
+// navigateur et un rechargement le rejouerait.
+if (capterPartage()) {
+  window.location.hash = '#/rattrapage';
+}
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

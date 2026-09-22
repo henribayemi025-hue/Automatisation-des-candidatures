@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { today, useStore } from '../lib/store';
 import { EXPENSE_KEYS } from '../lib/chart';
 import type { AccountKey } from '../lib/chart';
@@ -18,6 +18,8 @@ import ProjectSelect from '../components/ProjectSelect';
 import { IconCamera, IconPlus, IconSparkle, IconTrash } from '../components/Icons';
 import { t } from '../lib/i18n';
 import { sectorProfile } from '../lib/sector';
+import { libelleMomo, parseMomoSms } from '../lib/momo';
+import { lirePartage } from '../lib/partage';
 
 type Tab = 'days' | 'statement' | 'photo' | 'opening';
 
@@ -147,6 +149,66 @@ export default function CatchUp() {
     );
     setStatementSaved('');
   }
+
+  /**
+   * Un SEUL message mobile money, partagé depuis le téléphone.
+   *
+   * Deux choses qu'un relevé ne donne pas et qu'un message donne :
+   *
+   * - un libellé lisible. « Reçu de Jeanne Mballa » plutôt que « Vous avez
+   *   recu de JEANNE MBALLA. Frais: 0 » ;
+   * - LES FRAIS, en ligne SÉPARÉE. C'est de la comptabilité, pas de la
+   *   présentation : cent francs de frais sur un transfert de cinq mille sont
+   *   une charge, pas un transfert de cinq mille cent. Les fondre fausse le
+   *   compte de tiers ET le résultat.
+   *
+   * Si le texte n'est pas un message mobile money reconnaissable, on retombe
+   * sur la lecture de relevé, qui sait déjà traiter plusieurs lignes.
+   */
+  function readShared(source: string) {
+    const sms = parseMomoSms(source, db.company.currency, today());
+    if (!sms || sms.amount <= 0 || sms.direction === 'UNKNOWN') {
+      readStatement(source);
+      return;
+    }
+    const principal = {
+      date: sms.date,
+      label: libelleMomo(sms),
+      amount: sms.amount,
+      direction: sms.direction,
+      raw: sms.raw,
+      keep: true,
+      category: guessCategory(libelleMomo(sms)) as AccountKey,
+      method: 'MOBILE' as PaymentMethod,
+    };
+    const lignes = [principal];
+    if (sms.fee > 0) {
+      lignes.push({
+        date: sms.date,
+        label: t('Frais mobile money'),
+        amount: sms.fee,
+        direction: 'OUT' as const,
+        raw: sms.raw,
+        keep: true,
+        // Des frais d'opérateur sont un service extérieur, jamais un achat.
+        category: 'SERVICES' as AccountKey,
+        method: 'MOBILE' as PaymentMethod,
+      });
+    }
+    setParsed(lignes);
+    setStatementSaved('');
+  }
+
+  // Un message partagé depuis le téléphone ouvre directement l'onglet relevé,
+  // déjà rempli. La personne n'a plus qu'à confirmer.
+  useEffect(() => {
+    const partage = lirePartage();
+    if (!partage) return;
+    setTab('statement');
+    setText(partage);
+    readShared(partage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function onFile(file: File | undefined) {
     if (!file) return;
