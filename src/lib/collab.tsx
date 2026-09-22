@@ -9,6 +9,7 @@ import { t } from './i18n';
 import { hashState, verifySeal } from './seal';
 import type { SealVerdict } from './seal';
 import { displayIdentity, isPhoneAddress, phoneDigits, toLogin } from './identity';
+import { DEMO_FLAG_KEY, isDemo } from './demo-state';
 
 export type SyncStatus = 'offline' | 'syncing' | 'synced' | 'pending' | 'error';
 
@@ -240,6 +241,14 @@ export function CollabProvider({ children }: { children: ReactNode }) {
       lastSeq.current = events.length ? events[events.length - 1].seq! : snapshotSeq.current;
       const base = normalizeDB(row.data as Partial<DB>);
       store.replaceState(replay(base, events));
+      // Charger un espace remplace l'état local : ce qui était affiché n'était
+      // plus la démonstration de toute façon. On éteint le drapeau, sinon il
+      // survit à la connexion et bloque la synchronisation du vrai travail.
+      try {
+        localStorage.removeItem(DEMO_FLAG_KEY);
+      } catch {
+        /* stockage indisponible : rien à éteindre */
+      }
       setSync('synced');
     },
     [store],
@@ -271,6 +280,9 @@ export function CollabProvider({ children }: { children: ReactNode }) {
   const flushOutbox = useCallback(async () => {
     const ws = workspaceRef.current;
     if (!ws || !userRef.current) return;
+    // Même règle pour la file d'attente : un événement d'exemple mis en file
+    // hors ligne ne doit pas partir au retour du réseau.
+    if (isDemo()) return;
     const queue = readOutbox(ws.id);
     if (!queue.length) {
       setPending(0);
@@ -323,6 +335,22 @@ export function CollabProvider({ children }: { children: ReactNode }) {
     return store.subscribe(async (ev) => {
       const ws = workspaceRef.current;
       if (!ws || !userRef.current) return;
+      // RIEN d'une démonstration ne quitte l'appareil.
+      //
+      // Signalé par Beau le 22/09 : connecté avec Google, il a ouvert la
+      // démonstration du métier « santé » et a retrouvé les chiffres
+      // d'exemple DANS SON ESPACE. « il ne doit pas avoir ».
+      //
+      // C'est ici que ça se jouait : cet abonnement pousse chaque événement
+      // local vers l'espace dès qu'une personne est connectée, sans regarder
+      // si l'événement vient d'un exemple. Trois mois d'activité inventée
+      // partaient donc dans son journal — et le journal est en écriture
+      // seule, donc c'était définitif.
+      //
+      // Le garde est ici, au dernier passage avant le serveur, et pas à
+      // l'écran de démonstration : c'est le seul endroit par lequel tout
+      // passe.
+      if (isDemo()) return;
       // Marqué « appliqué » avant l'envoi : si le canal temps réel renvoie
       // l'insertion avant la réponse du serveur, la vente n'est pas comptée
       // deux fois (ligne 4 du tableau docs/SIMULATION-DECISIONS.md).
