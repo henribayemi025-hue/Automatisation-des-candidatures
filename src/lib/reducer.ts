@@ -1343,19 +1343,26 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       }
       const expected = session.opening + movement;
       const counted = p.counted as Minor;
+      // Le mot qui accompagne l'écart : facultatif, jamais réécrit après coup
+      // (l'événement est en ajout seul), donc c'est la raison donnée SUR LE
+      // MOMENT, pas une justification reconstruite plus tard.
+      const rawNote = p.note as string | undefined;
+      const note = typeof rawNote === 'string' ? rawNote.trim() : '';
       session.closedAt = ev.at;
       session.expected = expected;
       session.counted = counted;
       session.variance = counted - expected;
+      if (note) session.note = note;
       if (session.variance !== 0) {
         const short = session.variance < 0;
         const amount = Math.abs(session.variance);
+        const label = `Écart de caisse à la clôture (${short ? 'manquant' : 'excédent'})${note ? ` — ${note}` : ''}`;
         post(db, ev, {
           id: p.entryId as string,
           date: ev.at.slice(0, 10),
           journal: 'OD',
           ref: `CAISSE-${session.id.slice(0, 5).toUpperCase()}`,
-          label: `Écart de caisse à la clôture (${short ? 'manquant' : 'excédent'})`,
+          label,
           sourceType: 'session',
           sourceId: session.id,
           lines: short
@@ -1369,7 +1376,7 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
               ],
         });
       }
-      audit(db, ev, 'session', session.id, 'CLOSE', `Clôture de caisse — écart ${session.variance}`);
+      audit(db, ev, 'session', session.id, 'CLOSE', `Clôture de caisse — écart ${session.variance}${note ? ` (${note})` : ''}`);
       break;
     }
 

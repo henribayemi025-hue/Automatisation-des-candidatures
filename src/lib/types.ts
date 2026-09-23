@@ -632,6 +632,8 @@ export interface CashSession {
   expected: Minor | null;
   counted: Minor | null;
   variance: Minor | null;
+  /** Pourquoi la caisse ne tombe pas juste, dit par la personne qui compte. Facultatif : un écart nul n'a rien à expliquer. */
+  note?: string;
 }
 
 export interface AuditLog {

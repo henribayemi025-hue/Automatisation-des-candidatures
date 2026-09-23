@@ -185,7 +185,7 @@ export interface StoreActions {
   closeFiscalYear: (range: { from: string; to: string }) => { result: Minor } | null;
   reopenFiscalYear: (closingId: string) => void;
   openSession: (opening: Minor) => void;
-  closeSession: (counted: Minor) => void;
+  closeSession: (counted: Minor, note?: string) => void;
   /** Charge un jeu d'essai complet (trois mois d'activité) et renvoie le nombre d'événements. */
   loadDemo: () => number;
   saveProject: (project: Omit<Project, 'id' | 'createdAt'> & { id?: string }) => Project;
@@ -704,10 +704,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         });
       },
 
-      closeSession(counted) {
+      closeSession(counted, note) {
         const session = dbRef.current.sessions.find((s) => !s.closedAt);
         if (!session) throw new Error('Aucune session ouverte');
-        dispatch('session.close', { sessionId: session.id, counted, entryId: newId() });
+        dispatch('session.close', { sessionId: session.id, counted, note, entryId: newId() });
       },
 
       loadDemo() {

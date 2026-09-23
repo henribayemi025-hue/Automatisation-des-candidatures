@@ -12,6 +12,7 @@ export default function CashRegister() {
   const { db, openSession, closeSession } = useStore();
   const [opening, setOpening] = useState('');
   const [counted, setCounted] = useState('');
+  const [closingNote, setClosingNote] = useState('');
   const [error, setError] = useState('');
   const [q, setQ] = useState('');
 
@@ -126,8 +127,30 @@ export default function CashRegister() {
                   </span>
                 </p>
               )}
+              {/* Seulement si la caisse ne tombe pas juste : on ne demande pas
+                  à quelqu'un de se justifier d'un compte qui tombe pile. */}
+              {counted !== '' && toMinor(counted, currency) - expected !== 0 && (
+                <div className="mt-3">
+                  <Field label={t('Pourquoi cet écart ? (facultatif)')}>
+                    <input
+                      value={closingNote}
+                      onChange={(e) => setClosingNote(e.target.value)}
+                      placeholder={t('Ex : rendu de monnaie erroné, vol, billet non compté…')}
+                      className="field"
+                    />
+                  </Field>
+                </div>
+              )}
               <button
-                onClick={() => run(() => closeSession(toMinor(counted || 0, currency)))}
+                onClick={() =>
+                  run(() => {
+                    closeSession(toMinor(counted || 0, currency), closingNote);
+                    // Sinon le compte et le mot de tout à l'heure réapparaissent
+                    // tout seuls à la prochaine clôture, restés dans le champ.
+                    setCounted('');
+                    setClosingNote('');
+                  })
+                }
                 className="btn-dark mt-4 w-full"
               >
                 {t('Clôturer la caisse')}
@@ -208,7 +231,7 @@ export default function CashRegister() {
       <div className="card mt-6 p-0">
         <h2 className="px-5 pb-3 pt-5 font-bold">{t('Historique des sessions')}</h2>
         {db.sessions.filter((s) => s.closedAt).length ? (
-          <Table head={['Caissier', 'Ouverture', 'Clôture', 'Fond', 'Théorique', 'Compté', 'Écart']}>
+          <Table head={['Caissier', 'Ouverture', 'Clôture', 'Fond', 'Théorique', 'Compté', 'Écart']} phoneHide={[2, 4, 5]} phoneNowrapFirst>
             {db.sessions
               .filter((s) => s.closedAt)
               .map((s) => (
@@ -233,9 +256,12 @@ export default function CashRegister() {
                     {s.variance === 0 ? (
                       <Badge tone="success">{t('Conforme')}</Badge>
                     ) : (
-                      <Badge tone={(s.variance ?? 0) < 0 ? 'danger' : 'warn'}>
-                        <Money value={s.variance ?? 0} />
-                      </Badge>
+                      <>
+                        <Badge tone={(s.variance ?? 0) < 0 ? 'danger' : 'warn'}>
+                          <Money value={s.variance ?? 0} />
+                        </Badge>
+                        {s.note && <div className="mt-1 text-xs font-normal text-slate-400">{s.note}</div>}
+                      </>
                     )}
                   </td>
                 </tr>
