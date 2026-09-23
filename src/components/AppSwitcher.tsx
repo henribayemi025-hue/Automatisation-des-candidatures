@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useCollab } from '../lib/collab';
-import { CURRENT_APP_KEY, FALLBACK_APPS, fetchApps, fetchAudience, visibleApps } from '../lib/apps';
+import { CURRENT_APP_KEY, FALLBACK_APPS, fetchApps, fetchAudience, urlVers, visibleApps } from '../lib/apps';
 import type { FinjaroApp } from '../lib/apps';
 import { IconApps, IconCheck } from './Icons';
 import { t } from '../lib/i18n';
@@ -19,12 +19,14 @@ const ACCENT: Record<FinjaroApp['accent'], string> = {
  */
 function RowTag({
   current,
-  url,
+  app,
+  connecte,
   onDone,
   children,
 }: {
   current: boolean;
-  url: string;
+  app: FinjaroApp;
+  connecte: boolean;
   onDone: () => void;
   children: ReactNode;
 }) {
@@ -37,11 +39,15 @@ function RowTag({
   // revenir. `openFinjaroApp` remplace alors la page : le bouton retour ramène ici.
   return (
     <a
-      href={url}
+      href={app.url}
       onClick={(e) => {
         e.preventDefault();
         onDone();
-        openFinjaroApp(url);
+        // Connectée et l'application d'en face sait recevoir un relais : elle
+        // y arrive déjà identifiée, au lieu de revoir un écran de connexion
+        // qu'elle a déjà passé une fois aujourd'hui. Un relais qui échoue
+        // (compte sans e-mail, réseau) retombe sur l'adresse normale.
+        void urlVers(app, connecte).then(openFinjaroApp);
       }}
       className={className}
     >
@@ -109,7 +115,8 @@ export default function AppSwitcher({ align = 'start' }: { align?: 'start' | 'en
                       l'application est cassée. */}
                   <RowTag
                     current={current}
-                    url={a.url}
+                    app={a}
+                    connecte={!!user}
                     onDone={() => setOpen(false)}
                   >
                     <span className={`grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-input text-xl ${ACCENT[a.accent]}`}>

@@ -9,6 +9,11 @@ export interface FinjaroApp {
   // Le vrai logo, posé par Alpha dans finjaro_apps.logo_url (colonne
   // additive). Absent pour la console admin, qui garde l'emoji.
   logo_url?: string | null;
+  // L'adresse de la page d'arrivée du relais de connexion chez CETTE
+  // application (ex. 'https://finjaro.net/relais') — posée par Alpha,
+  // finjaro_apps.relais. Vide : l'application ne sait pas encore recevoir un
+  // code, on ouvre son adresse normale sans passer par le relais.
+  relais?: string | null;
   accent: 'teal' | 'brass' | 'ink';
   audience: 'tous' | 'vendeuse' | 'admin';
   sort_order: number;
@@ -25,7 +30,7 @@ export const FALLBACK_APPS: FinjaroApp[] = [
 export async function fetchApps(): Promise<FinjaroApp[]> {
   const { data, error } = await supabase
     .from('finjaro_apps')
-    .select('key, name, tagline, url, emoji, logo_url, accent, audience, sort_order')
+    .select('key, name, tagline, url, emoji, logo_url, relais, accent, audience, sort_order')
     .eq('is_active', true)
     .order('sort_order', { ascending: true });
   if (error || !data?.length) return FALLBACK_APPS;
@@ -56,4 +61,39 @@ export function visibleApps(apps: FinjaroApp[], flags: AudienceFlags): FinjaroAp
     if (a.audience === 'vendeuse') return flags.admin || flags.vendor;
     return true;
   });
+}
+
+/**
+ * Demande un code de relais (60 s, usage unique) pour ouvrir une autre
+ * application Finjaro déjà connectée — le sens Accounting → finjaro.net.
+ * Renvoie `null` sans rien casser si la fonction échoue (compte inscrit par
+ * téléphone sans e-mail, réseau coupé…) : l'appelant retombe alors sur
+ * l'adresse normale de l'application, comme avant le relais.
+ */
+export async function creerCodeRelais(cible: string): Promise<string | null> {
+  try {
+    const { data, error } = await supabase.functions.invoke('sso-relais', {
+      body: { action: 'creer', cible },
+    });
+    if (error) return null;
+    const code = (data as { code?: string } | null)?.code;
+    return typeof code === 'string' && code ? code : null;
+  } catch {
+    return null;
+  }
+}
+
+/** L'adresse du relais une fois le code obtenu. Séparée de urlVers pour être
+ * vérifiée sans réseau : c'est là que vivrait un `//` ou un code mal échappé. */
+export function adresseRelais(relais: string, code: string, vers: string): string {
+  return `${relais}?code=${encodeURIComponent(code)}&vers=${encodeURIComponent(vers)}`;
+}
+
+/** L'adresse à ouvrir pour rejoindre `app`, en passant par son relais de
+ * connexion quand il existe et qu'on a une session à lui transmettre. */
+export async function urlVers(app: FinjaroApp, connecte: boolean, vers = '/'): Promise<string> {
+  if (!connecte || !app.relais) return app.url;
+  const code = await creerCodeRelais(app.key);
+  if (!code) return app.url;
+  return adresseRelais(app.relais, code, vers);
 }
