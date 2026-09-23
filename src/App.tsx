@@ -6,6 +6,7 @@ import { useDB } from './lib/store';
 import Auth from './pages/Auth';
 import Onboarding from './pages/Onboarding';
 import Demo from './pages/Demo';
+import Relais from './pages/Relais';
 import Dashboard from './pages/Dashboard';
 import Assistant from './pages/Assistant';
 import PointOfSale from './pages/PointOfSale';
@@ -104,6 +105,10 @@ export default function App() {
       </Routes>
     );
   }
+  // Le relais de connexion depuis une autre application Finjaro : la personne
+  // n'a PAS encore de session ici (c'est justement ce que cette page pose),
+  // donc elle doit passer avant le mur de connexion, comme la démonstration.
+  if (pathname === '/relais') return <Relais />;
   // Une session expirée reprend la main sur le mode local : on propose la connexion plutôt que de basculer sans rien dire.
   if (!user && (!guest || sessionExpired)) return <Auth />;
   if (user && !workspace && sync !== 'error') return <Splash />;
