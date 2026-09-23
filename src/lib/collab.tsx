@@ -578,7 +578,15 @@ export function CollabProvider({ children }: { children: ReactNode }) {
         const { error } = await supabase.auth.signUp({
           email: id.address,
           password,
-          options: { data: { name, app: 'finia', ...(byPhone ? { phone_login: phoneDigits(email) } : {}) } },
+          options: {
+            data: { name, app: 'finia', ...(byPhone ? { phone_login: phoneDigits(email) } : {}) },
+            // Sans ça, le lien de confirmation se construit sur le Site URL
+            // (finjaro.net) : quelqu'un qui s'inscrit ici confirme son adresse
+            // et atterrit sur la place de marché, pas dans sa comptabilité.
+            // Ce réglage est propre à CET appel ; il ne touche ni le Site URL
+            // ni le signUp() de la place de marché. Feu vert de Beau, 23/09.
+            emailRedirectTo: `${window.location.origin}/`,
+          },
         });
         return error ? frenchError(error.message, byPhone) : null;
       },
