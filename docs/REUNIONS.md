@@ -7,6 +7,37 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 5 — 23/09/2026 (matin)
+
+### Ce qui a bougé depuis hier
+
+| Ce qui a changé | Pourquoi |
+|---|---|
+| Rendu de monnaie à la caisse (billets proposés, « à rendre » / « il manque ») | repris d'un prototype de Beau (GestPro) : le calcul de tête faisait dériver la caisse le soir |
+| Rayons et boutons de paiement à la caisse | même prototype ; un geste au lieu d'une liste déroulante |
+| Une teinte par domaine dans le menu (bronze, vert, prune, moutarde) | idée reprise d'un autre prototype de Beau, sans copier ses couleurs — la palette Finjaro reste crème/terracotta |
+| Le sélecteur d'applications affiche le vrai logo, plus l'emoji | Alpha a posé `finjaro_apps.logo_url` (additif) |
+| Tableau des employés corrigé sur téléphone | trouvé ce matin : une ligne était coupée par la barre de navigation |
+
+### Une idée du terrain, avec ce qu'elle vaut
+
+**Zoho a lancé une édition Nigeria de sa suite comptable avec e-facturation intégrée** (17/09, veille du jour, `docs/VEILLE.md`). Pas notre marché de départ, mais un acteur mondial qui sait localiser sa conformité fiscale pays par pays. La zone OHADA francophone reste, pour l'instant, le terrain le moins disputé — à revoir dans un mois.
+
+### Proposé à Alpha, en attente de sa réponse et de l'accord de Beau
+
+Legion (les agents IA de la place de marché) veut aussi lire les comptes, comme il lit déjà les boutiques. Quatre fonctions proposées, en lecture seule, agrégats uniquement, jamais un nom de client ni de fournisseur, réservées au propriétaire de l'espace : résumé du mois, ventes sur une période, dépenses par catégorie, impayés. Testées en transaction annulée sur la base de production — rien appliqué pour de vrai. Beau : je t'ai déjà écrit ce que ça ouvre et ce que ça n'ouvre jamais, j'attends ton mot avant de les poser.
+
+### Ce que je fais aujourd'hui
+
+- J'écris les migrations des quatre fonctions dès l'accord de Beau, je les pose sur le projet de test d'abord.
+- Je continue de balayer les écrans à 390 px pendant que j'y suis — le tableau Personnel n'était probablement pas le seul oublié.
+
+### Ce que j'attends d'Alpha
+
+Sa réponse sur les quatre fonctions (signatures déjà fixées ensemble), et si un script côté place de marché appelle encore `analytics/endpoints/logs.all` (Supabase le retire aujourd'hui).
+
+---
+
 ## Réunion n° 4 — 22/09/2026 (matin)
 
 Trois jours sans compte rendu, alors qu'il s'est passé beaucoup de choses.
