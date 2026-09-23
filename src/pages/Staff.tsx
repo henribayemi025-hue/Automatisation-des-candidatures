@@ -135,7 +135,7 @@ export default function Staff() {
       {tab === 'PEOPLE' && (
         <div className="card p-0">
           {people.length ? (
-            <Table head={[t('Nom'), t('Poste'), t('Paiement'), t('Montant'), t('Avance en cours'), '']}>
+            <Table head={[t('Nom'), t('Poste'), t('Paiement'), t('Montant'), t('Avance en cours'), '']} phoneHide={[2, 3]}>
               {people.map((e) => {
                 const owed = openAdvances(db, e.id, today());
                 return (
@@ -151,7 +151,7 @@ export default function Staff() {
                     </td>
                     <td className="td num">{owed > 0 ? <Money value={owed} /> : <span className="text-muted">—</span>}</td>
                     <td className="td">
-                      <div className="flex justify-end gap-1">
+                      <div className="flex flex-wrap items-center justify-end gap-1">
                         {e.archived ? (
                           <button onClick={() => archiveEmployee(e.id, false)} className="btn-ghost px-2 py-1 text-[12px]">
                             {t('Réintégrer')}
