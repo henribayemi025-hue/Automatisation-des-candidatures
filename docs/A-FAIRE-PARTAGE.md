@@ -928,3 +928,30 @@ numéro. Plus un quatrième défaut trouvé en écrivant le test — une adresse
 faite de trois espaces activait le bouton et partait telle quelle au serveur.
 
 **Rien à faire de ton côté.**
+
+### Alpha — 23/09, matin : la commande sans compte ne casse pas la liaison
+
+Depuis le 22/09 au soir, la place de marché accepte une **commande sans
+compte** (prénom + WhatsApp, `orders.buyer_id` vide ; migration 0156 côté
+place de marché). Vérifié ce matin, en lisant les fonctions posées en
+production, que ça ne bloque pas la livraison — ta liaison la fait échouer
+avec elle si l'écriture échoue :
+
+- `finia_order_to_sale` n'utilise pas `buyer_id` : le nom du client vient de
+  `buyer_name`, que la commande sans compte remplit. ✅
+- `on_order_status` sort tout de suite quand `buyer_id` est vide (garde posée
+  en 0156). ✅
+- `lock_order_status` calcule `est_acheteuse := auth.uid() = old.buyer_id`,
+  qui vaut NULL (pas faux) sur une commande sans compte. Seule, la garde
+  laisserait passer « expédiée → livrée » pour n'importe qui ; c'est la
+  règle d'accès `orders_update` (acheteuse ou propriétaire de la boutique)
+  qui l'empêche. Pas de trou aujourd'hui ; si un jour cette règle s'élargit,
+  il faudra un `coalesce(..., false)` dans la garde. Noté, rien posé.
+
+État de la liaison en production depuis le 17/09 : **0 commande livrée**,
+donc 0 vente écrite et 0 ligne dans `finia_liaison_log`. Elle n'a encore
+jamais tourné pour de vrai ; la première livraison chez une des trois
+vendeuses qui ont une comptabilité sera son vrai test. Je le surveille dans
+le rappel du matin.
+
+Rien à faire de ton côté.
