@@ -11,6 +11,91 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 23/09/2026
+
+**La semaine a de nouveau été pauvre dans la fenêtre stricte (16-23/09) — et
+la découverte la plus utile aujourd'hui n'est ni fiscale ni concurrentielle,
+c'est technique et interne.** Les trois agents ont écarté beaucoup de contenu
+« 2026 » non daté précisément plutôt que de le garder par défaut : c'est ce
+qu'on leur demande. Un seul fait mérite vraiment l'attention : **Zoho a lancé
+une édition Nigeria de sa suite comptable avec e-facturation intégrée** — un
+acteur mondial pose enfin un pied en Afrique de l'Ouest anglophone avec de la
+conformité fiscale locale, pas seulement une traduction. La zone OHADA
+francophone reste, pour l'instant, le terrain le moins disputé.
+
+Côté technique : Supabase supprime aujourd'hui même (23/09) l'ancien point
+d'entrée de ses journaux (`logs.all`) au profit d'un nouveau. **Vérifié dans
+le code : Finjaro Accounting ne l'utilise nulle part.** Rien à corriger, mais
+ça valait la peine de regarder un jour de bascule.
+
+### Concurrence
+
+- **Zoho Books arrive au Nigeria avec e-facturation et retenue à la source
+  intégrées.** Édition Nigeria de Zoho Books (et de sa suite Billing,
+  Invoice, Commerce, Inventory, Spend, Expense, Procurement, Practice) :
+  calcul automatique de la TVA, gestion de la retenue à la source, barème TVA
+  pour le portail TaxProMax, soumission directe des e-factures au portail de
+  la Nigeria Revenue Service. Publié le 17/09/2026.
+  [techeconomy.ng](https://techeconomy.ng/zoho-books-launches-nigeria-edition-to-help-businesses-manage-vat-and-e-invoicing),
+  [brandspurng.com](https://brandspurng.com/2026/09/17/zoho-launches-nigeria-edition-of-zoho-books/)
+  → Un acteur avec une force de frappe produit et marketing très supérieure
+  entre en Afrique de l'Ouest avec de la conformité fiscale locale poussée. À
+  surveiller : s'il étend cette localisation à la zone OHADA francophone.
+- Rien trouvé dans la fenêtre stricte pour le Cameroun, la Côte d'Ivoire, le
+  Sénégal, le Gabon, le Kenya, l'Inde ou le Brésil (les événements identifiés
+  sur ces marchés datent tous d'avant le 16/09 et avaient déjà été notés, ou
+  n'ont pas pu être datés avec certitude). Aucune levée de fonds ni
+  changement de prix vérifié pour Sage, QuickBooks, Wave, Bumpa, Kippa,
+  Khatabook, Vyapar ou OkCredit.
+
+### Règles, impôts et paiements
+
+- **France : premier bilan de la facturation électronique entre
+  entreprises, deux semaines après son entrée en vigueur.** Aucun blocage
+  d'entreprise signalé, mais trois frictions concrètes : factures rejetées
+  pour données manquantes, erreurs d'adressage dans l'annuaire national,
+  problèmes côté plateformes agréées. Publié le 15/09/2026.
+  [yad.fr](https://www.yad.fr/facturation-electronique-bilan-15-jours/)
+  (des chiffres de fréquentation cités dans cet article n'étaient pas
+  sourcés par son auteur ; non retenus ici.)
+  → Si Finjaro sert un jour un client français en émission obligatoire, il
+  faudra valider les champs obligatoires et l'identifiant de destinataire
+  avant transmission — pas après un rejet.
+- Rien trouvé de vérifiable dans la fenêtre stricte pour le Cameroun, le
+  Gabon, le Sénégal, le Burkina Faso, ni pour les API ou frais de MTN MoMo,
+  Orange Money ou Wave. Plusieurs chiffres circulaient dans des extraits de
+  recherche (promotion Burkina Faso, taxe mobile money Cameroun) sans page
+  source lisible pour les confirmer : **non retenus**, conformément à la
+  règle du haut de ce document.
+
+### Technologie et IA
+
+- **Claude Opus 5.5** : multimodal, lecture de documents denses et de
+  photos pour l'extraction, prix en baisse d'environ 20 % par rapport à
+  Opus 5. Publié le 22/09/2026.
+  [anthropic.com](https://www.anthropic.com/claude-opus-5-5)
+  → Rendrait moins coûteuse une fonctionnalité « photographier un reçu →
+  écriture préremplie » si elle passe par cette API.
+- **GPT-6 Sol et GPT-6 Luna** (OpenAI) : deux modèles moins chers que leurs
+  prédécesseurs, fenêtre de contexte de 1,05 million de tokens. Publié le
+  22/09/2026.
+  [techcrunch.com](https://techcrunch.com/2026/09/22/openai-launches-gpt-6-sol-and-luna/)
+  → Alternative à comparer si un futur assistant texte (catégorisation de
+  dépenses, aide comptable) cherche à réduire son coût.
+- **Supabase ajoute des « Health Check Advisors »** : surveillance des taux
+  d'erreur sur Auth, Storage, Edge Functions et Data API, avec sévérité et
+  lien direct vers le problème. Publié le 18/09/2026.
+  [supabase.com/changelog](https://supabase.com/changelog)
+  → Détecterait une panne d'auth ou de fonction edge partagée avant qu'une
+  vendeuse ne signale un problème de caisse. Voir idée n° 9, déjà notée.
+- **Supabase retire l'ancien point d'entrée `analytics/endpoints/logs.all`
+  aujourd'hui même, 23/09/2026**, au profit de `analytics/endpoints/logs`.
+  [byteiota.com](https://byteiota.com/supabase-september-2026-scoped-tokens-trace-context-and-the-logs-all-deadline/)
+  → Vérifié dans le code de Finjaro Accounting : `logs.all` n'y est appelé
+  nulle part. Rien à corriger.
+
+---
+
 ## 22/09/2026
 
 **Ce qui ressort aujourd'hui : la semaine a été pauvre en nouveautés, et c'est

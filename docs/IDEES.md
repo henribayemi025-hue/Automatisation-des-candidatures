@@ -385,6 +385,35 @@ et qu'un carnet ne voit jamais. *Effort* : petit.
 qu'il n'a pas été lu dans le texte de loi. Un seuil faux ferait manquer un
 basculement à quelqu'un, ou l'affolerait pour rien.
 
+☐ **16. Valider une facture France avant de l'envoyer, pas après un rejet.**
+*Problème* : le premier bilan public de la facturation électronique
+obligatoire entre entreprises (deux semaines après son entrée en vigueur le
+1er septembre 2026) montre que les rejets viennent surtout de données
+manquantes et d'erreurs d'adressage dans l'annuaire national — pas de
+mauvaise volonté, d'oublis de champ. *Pour qui* : nos futurs clients
+français en émission obligatoire (aujourd'hui grandes entreprises et ETI,
+demain plus large). *Valeur* : évite une facture rejetée et un aller-retour
+avec une plateforme agréée. *Effort* : petit à moyen — une liste de champs
+obligatoires à contrôler avant l'envoi, pas un connecteur à construire tout
+de suite (on n'a pas encore de client concerné). *Source* : bilan du
+15/09/2026, [yad.fr](https://www.yad.fr/facturation-electronique-bilan-15-jours/).
+*Pas pressé* : aucun client France en émission obligatoire identifié à ce
+jour ; à ressortir le jour où l'un d'eux existe.
+
+☐ **17. Zoho arrive au Nigeria avec e-facturation intégrée — surveiller,
+sans réagir tout de suite.** *Problème* : le 17/09/2026, Zoho a lancé une
+édition Nigeria de sa suite comptable avec TVA automatique, retenue à la
+source et soumission directe des e-factures au portail fiscal nigérian. Ce
+n'est pas notre marché de départ, mais c'est un acteur mondial qui montre
+qu'il sait localiser sa conformité fiscale pays par pays — la zone OHADA
+francophone est le terrain naturel suivant pour lui. *Pour qui* : personne
+pour l'instant ; c'est une alerte, pas une demande. *Valeur* : savoir avant
+que ça arrive plutôt que le découvrir dans une revue de presse. *Effort* :
+nul aujourd'hui — juste une entrée à revisiter. *Source* :
+[techeconomy.ng](https://techeconomy.ng/zoho-books-launches-nigeria-edition-to-help-businesses-manage-vat-and-e-invoicing),
+17/09/2026. *À refaire dans un mois* : vérifier si Zoho a annoncé une
+localisation OHADA francophone.
+
 ### Corrections d'Alpha, le 22/09, après lecture des textes
 
 Elle a vérifié plutôt que de défendre sa première version. Trois changements,
