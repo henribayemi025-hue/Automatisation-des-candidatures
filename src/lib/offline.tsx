@@ -115,6 +115,15 @@ export function OfflineProvider({ children }: { children: ReactNode }) {
     if (!('serviceWorker' in navigator) || import.meta.env.DEV) return;
 
     let cancelled = false;
+    // Le tout premier onglet d'un appareil neuf n'a pas encore de contrôleur :
+    // sw.js s'installe, s'active, et `self.clients.claim()` en prend le
+    // contrôle — ce qui déclenche `controllerchange` MÊME sans mise à jour.
+    // Recharger dans ce cas grille en silence tout ce que l'adresse portait
+    // ce jour-là (trouvé le 23/09 : un code de relais à usage unique consommé
+    // deux fois par ce rechargement fantôme, avant même qu'on ait pu le voir
+    // depuis l'appli). On ne recharge que quand un contrôleur existait déjà
+    // et vient d'être remplacé par une vraie mise à jour.
+    const controleeAvant = !!navigator.serviceWorker.controller;
 
     const watch = (reg: ServiceWorkerRegistration) => {
       if (reg.active) setInstalledOffline(true);
@@ -152,7 +161,7 @@ export function OfflineProvider({ children }: { children: ReactNode }) {
     // Le remplacement du contrôleur signifie que la nouvelle version tourne.
     let reloading = false;
     const onControllerChange = () => {
-      if (reloading) return;
+      if (reloading || !controleeAvant) return;
       reloading = true;
       window.location.reload();
     };
