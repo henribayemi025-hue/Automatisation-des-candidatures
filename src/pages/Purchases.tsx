@@ -219,7 +219,11 @@ export default function Purchases() {
                 </td>
                 <td className="td text-right">
                   {p.status === 'PENDING' && (
-                    <button onClick={() => receive(p.id)} className="text-sm font-semibold text-brand-600">
+                    // Vu le 24/09 : « Réceptionner » dépassait de l'écran sur
+                    // téléphone (35 px de trop), coupé en « Réceptio… » sans
+                    // qu'on devine qu'il fallait faire glisser le tableau.
+                    // max-w le force à passer sur deux lignes à la place.
+                    <button onClick={() => receive(p.id)} className="max-w-[76px] break-words text-sm font-semibold leading-tight text-brand-600 whitespace-normal sm:max-w-none sm:whitespace-nowrap">
                       {t('Réceptionner')}
                     </button>
                   )}
