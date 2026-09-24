@@ -1227,7 +1227,7 @@ export const EN: Record<string, string> = {
   '{n} opération(s) enregistrée(s), à leur date.': '{n} operation(s) recorded, on their own dates.',
   'Collez votre relevé': 'Paste your statement',
   'Les messages de votre opérateur mobile money, un export de votre banque, ou une liste écrite à la main. Une ligne par opération.': 'Messages from your mobile money operator, an export from your bank, or a handwritten list. One line per operation.',
-  'Ex. Vous avez reçu 25000 de MARIE NGO le 12/09/2026': 'E.g. You received 25000 from MARIE NGO on 12/09/2026',
+  'Ex. Vous avez reçu 25000 de CLIENT le 12/09/2026': 'E.g. You received 25000 from CLIENT on 12/09/2026',
   'Lire le relevé': 'Read the statement',
   'Importer un fichier (CSV, TXT)': 'Import a file (CSV, TXT)',
   '{n} ligne(s) reconnue(s)': '{n} line(s) recognised',

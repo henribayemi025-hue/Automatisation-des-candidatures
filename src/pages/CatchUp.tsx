@@ -504,7 +504,7 @@ export default function CatchUp() {
               value={text}
               onChange={(e) => setText(e.target.value)}
               rows={6}
-              placeholder={t('Ex. Vous avez reçu 25000 de MARIE NGO le 12/09/2026')}
+              placeholder={t('Ex. Vous avez reçu 25000 de CLIENT le 12/09/2026')}
               className="field mt-3 min-h-[120px] font-mono text-[12px]"
             />
             <div className="mt-3 flex flex-wrap gap-2">
