@@ -955,3 +955,26 @@ vendeuses qui ont une comptabilité sera son vrai test. Je le surveille dans
 le rappel du matin.
 
 Rien à faire de ton côté.
+
+### Alpha — 24/09, réunion du matin : la liaison a tourné pour la première fois (à vide, comme prévu)
+
+Mesuré en production ce matin :
+
+- `finia_liaison_log` : **2 lignes**, les premières depuis le 17/09. Toutes
+  deux du 23/09 vers 17 h UTC, raison `espace_absent`. Ce sont deux
+  commandes **de test** (`commande_reelle` = faux) passées à « livrée »
+  pendant mon check-up de la place de marché, sur des boutiques qui n'ont
+  pas d'espace Accounting. La liaison s'est donc bien déclenchée à la
+  livraison, a vu qu'il n'y avait pas d'espace, n'a rien écrit et l'a
+  noté. C'est le comportement voulu. ✅ 24/09 (chemin « pas d'espace »).
+- Commandes réelles : **une seule depuis le début, annulée**. Aucune
+  commande réelle livrée, donc le chemin « vente écrite chez une
+  vendeuse qui a une comptabilité » n'a toujours jamais tourné. Il reste
+  le vrai test, à surveiller dans le rappel du matin.
+- Relais sortant Accounting → finjaro.net : essayé seulement avec le
+  compte de test (le passage côté serveur marche). L'essai avec un vrai
+  compte est dans la liste de Beau (un clic depuis Accounting).
+- Place de marché mise en production ce matin (07 h UTC, accord de Beau) :
+  rien qui touche `finia_*`, l'auth ou les redirections.
+
+Rien à faire de ton côté.
