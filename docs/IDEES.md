@@ -135,6 +135,42 @@ tirent l'une l'autre. *Effort* : petit côté code, surtout du temps de
 démarche. *Ce qu'on demande à Beau* : oui / non, et qui envoie les
 messages.
 
+### Concurrence et le trou « je regarde → je contacte » (Alpha, revue du jeudi 24/09)
+
+**Ce qui sort ailleurs.** Le mouvement de fond, c'est de faire la vente
+**dans la conversation** au lieu de renvoyer vers un site :
+- Flowcart (Nairobi) met le catalogue, la commande, le paiement M-Pesa et
+  le suivi client **à l'intérieur de WhatsApp**, avec commande groupée
+  ([AVODA Group, 03/07/2026](https://avodagroup.org/conversational-commerce-stack-east-africa/)).
+- Jumia investit dans des assistants et des canaux de vente par WhatsApp
+  ([synthèse Yahoo Finance / Research and Markets](https://uk.finance.yahoo.com/news/africa-social-commerce-market-databook-094100110.html)
+  — source secondaire, à prendre comme tendance, pas comme chiffre).
+- Les grands généralistes (Jumia, Kilimall) mettent en avant la livraison
+  et le paiement intégrés ([Waredock](https://www.waredock.com/magazine/online-marketplaces-in-africa/)).
+Je n'ai trouvé aucun taux de conversion publié par l'un d'eux : je n'en
+cite donc pas.
+
+**La piste sérieuse de la semaine sur notre trou** (6 clics de contact en
+30 jours pour 1 171 fiches vues, tous comptes confondus) : chez nous, le
+contact est une **sortie** du parcours ; chez ceux qui vendent, c'est **le
+parcours**. Concrètement, sur la fiche :
+1. un seul bouton principal « Commander sur WhatsApp » (au lieu de
+   plusieurs choix), qui ouvre la conversation avec un message déjà écrit :
+   l'article, le prix dans la monnaie de l'acheteuse, la taille choisie, le
+   lien — elle n'a plus rien à taper ;
+2. ce clic crée en même temps la « commande sans compte » qui existe déjà
+   (prénom + WhatsApp), pour que la vendeuse la retrouve dans ses
+   commandes et que la liaison vers Accounting puisse suivre ;
+3. on mesure le clic, puis la réponse de la vendeuse.
+*Effort* : petit à moyen (les briques existent). *À vérifier avant* : ce
+que la fiche montre aujourd'hui sur téléphone, bouton par bouton — je le
+fais avant de proposer le moindre code. *Ce qu'on demande à Beau* : oui /
+non. Ça complète l'idée 23 (demander pourquoi on ne commande pas) : l'une
+retire la friction, l'autre nous dit si c'était la bonne.
+
+Les trois idées de la semaine côté place de marché sont les 22, 23 et 24
+ci-dessus (écrites ce matin).
+
 ### L'idée « wow » pour une démo
 
 ☐ **21. Montrer un SMS Mobile Money devenir une écriture comptable, en
