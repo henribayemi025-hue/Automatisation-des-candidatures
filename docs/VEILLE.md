@@ -11,6 +11,46 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 24/09/2026
+
+**La semaine la plus pauvre depuis le début de cette veille.** Fenêtre stricte
+17-24/09 : les trois agents ont chacun passé en revue leur périmètre et
+écarté tout ce qui datait d'avant le 17/09 (déjà noté) ou n'était pas
+vérifiable par lecture directe de la source. Résultat : **aucun fait
+concurrentiel, aucun fait réglementaire retenu cette semaine.** Deux petites
+notes techniques internes, et un point de veille adjacent sur le paiement.
+
+### Concurrence, règles et paiements
+
+Rien retenu. Beaucoup de contenu circulait sur la Côte d'Ivoire, le Gabon,
+le Sénégal et le Burkina Faso, mais tout datait d'avant le 17/09 (déjà noté
+les jours précédents) ou portait des chiffres non vérifiables par lecture de
+la source — écartés conformément à la règle du haut de ce document.
+
+- **Point de veille adjacent, pas une nouveauté logicielle** : Konoom, une
+  fintech tchadienne, a communiqué le 17/09/2026 sur un agrément
+  d'établissement de paiement mobile au Cameroun (décret officiel du
+  21/07/2026, vérifié). Ce n'est ni un logiciel de caisse ni de
+  comptabilité — c'est un acteur mobile money de plus aux côtés d'Orange
+  Money et MTN MoMo. Noté ici, sans idée associée : à ressortir seulement
+  si Finjaro envisage un jour une intégration de paiement mobile
+  supplémentaire.
+
+### Technologie et IA
+
+- **Supabase ajoute des « Health Check Advisors »** : surveillance des taux
+  d'erreur sur Auth, Storage, Edge Functions et Data API, avec sévérité et
+  lien direct vers le problème. Publié le 18/09/2026.
+  [supabase.com/changelog](https://supabase.com/changelog)
+  → Utile en interne pour être alerté d'une panne du backend partagé avant
+  qu'une commerçante ne la découvre en premier. Aucun changement pour
+  l'application elle-même.
+- Rien retenu ailleurs (OCR de reçus, voix en langues africaines,
+  PWA/Capacitor, WhatsApp Business) : soit hors de la fenêtre stricte, soit
+  déjà noté les jours précédents (Opus 5.5, GPT-6 Sol/Luna).
+
+---
+
 ## 23/09/2026
 
 **La semaine a de nouveau été pauvre dans la fenêtre stricte (16-23/09) — et
