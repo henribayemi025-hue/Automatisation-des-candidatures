@@ -7,6 +7,55 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 6 — 24/09/2026 (matin)
+
+### Ce qui a bougé depuis hier
+
+Grosse journée : la connexion unique entre finjaro.net et Accounting tourne
+maintenant dans les deux sens, en production.
+
+| Ce qui a changé | Pourquoi |
+|---|---|
+| Page `#/relais` : arrivée depuis finjaro.net sans se reconnecter | demande de Beau, plan écrit à quatre mains avec Alpha |
+| Le tout premier onglet d'un appareil neuf ne se recharge plus tout seul | trouvé par le test réel d'Alpha : ce rechargement grillait le code de connexion avant qu'il serve |
+| Le sélecteur d'applications sait aussi partir vers finjaro.net avec le relais | sens inverse, symétrique |
+| Écart de caisse : un mot d'explication, facultatif | idée 64 de Beau |
+| Inscription depuis Accounting : le lien de confirmation reste chez soi | signalé le 15/09, couvert par le feu vert du 23/09 |
+| Quatre fonctions de lecture pour Legion (résumé du mois, ventes, dépenses, impayés) | agrégats seulement, propriétaire seulement, en production |
+| Bouton « Réceptionner » (Achats) qui débordait de l'écran | vu ce matin, voir plus bas |
+
+### Ce qui casse, regardé sur téléphone ce matin
+
+**Achats & approvisionnements, une commande « En attente ».** Le bouton
+« Réceptionner » — celui qui fait entrer la marchandise en stock — se
+coupait en « Réceptio… » à 390 px, sans rien qui indique qu'il fallait
+faire glisser le tableau pour lire la suite. Corrigé : il passe sur deux
+lignes, entier, sans rien faire glisser.
+
+### Une idée du terrain, avec ce qu'elle vaut
+
+Rien cette semaine : la veille du 24/09 est la plus pauvre depuis le début
+(fenêtre stricte 17-24/09, tout écarté — hors fenêtre ou non vérifiable).
+Un seul point noté sans idée associée : Konoom, une fintech tchadienne, a un
+agrément mobile money au Cameroun — un acteur de plus à côté d'Orange
+Money/MTN MoMo, à ressortir seulement si une intégration paiement
+s'envisage un jour.
+
+### Ce que je fais aujourd'hui
+
+- Je continue le balayage à 390 px pendant que j'y suis.
+- J'attends la réponse d'Alpha sur le relais sortant (elle avait posé
+  `finjaro_apps.relais` pour la ligne marketplace hier soir — à confirmer
+  que ça tourne en vrai).
+
+### Ce que j'attends d'Alpha
+
+Rien d'urgent : la journée d'hier a répondu à presque tout. Juste une
+confirmation si elle a pu tester le relais sortant (Accounting →
+finjaro.net) depuis un vrai compte, ce que je ne peux pas faire d'ici.
+
+---
+
 ## Réunion n° 5 — 23/09/2026 (matin)
 
 ### Ce qui a bougé depuis hier
