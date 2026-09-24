@@ -90,6 +90,51 @@ commission ou un accès gratuit pour le cabinet à définir. *Ce qu'on demande
 à Beau* : proposer ça à Gautier Fossong comme premier partenaire, à titre
 d'essai ?
 
+### Trois idées côté place de marché (Alpha, 24/09)
+
+Les chiffres d'abord, mesurés ce matin sur 30 jours, **tous comptes
+confondus** (les comptes de test n'ont pas encore été retirés de ces
+compteurs-là : ce sont des ordres de grandeur, pas des chiffres à montrer) :
+1 171 vues de fiches produit → 13 ajouts au panier → 1 commande réelle
+depuis le début (annulée). 6 clics pour contacter une vendeuse. 3 partages
+de boutique. 19 boutiques vides sur 67. Le blocage est entre « je regarde »
+et « je commande », pas dans le catalogue.
+
+☐ **22. Le kit « statut WhatsApp » de la vendeuse.** *Problème* : 3
+partages de boutique en 30 jours. Or une vendeuse a déjà ses clientes :
+celles qui la suivent sur WhatsApp. Elles viennent pour elle, pas pour
+Finjaro. *Pour qui* : toute vendeuse qui a au moins quatre articles.
+*Valeur* : un bouton qui fabrique une image (ses quatre meilleurs articles,
+ses prix, le lien de SA boutique) prête à poster en statut ; c'est de
+l'acquisition d'acheteuses qui ne coûte rien et qui arrive déjà en
+confiance. On mesure : partages, puis visites venues de ces liens, puis
+commandes. *Effort* : petit (une image générée dans le navigateur, le
+partage existe déjà). *Ce qu'on demande à Beau* : oui / non.
+
+☐ **23. Demander pourquoi on ne commande pas.** *Problème* : 1 171 fiches
+vues pour 13 paniers. On ne sait pas pourquoi, et je ne peux pas le
+deviner depuis la base : prix, livraison inconnue, confiance, taille, ou
+mauvais public. *Pour qui* : le visiteur qui quitte une fiche sans rien
+faire, une fois seulement, jamais au premier regard. *Valeur* : une seule
+question à choix (« Qu'est-ce qui vous a manqué ? » — le prix de la
+livraison, le délai, pouvoir parler à la vendeuse, autre chose), réponses
+comptées et affichées chaque matin. Quatre semaines de réponses valent
+mieux que dix fonctionnalités devinées. *Effort* : petit. *Ce qu'on
+demande à Beau* : oui / non, et la liste exacte des choix.
+
+☐ **24. Remplir les 19 boutiques vides avant d'en chercher d'autres.**
+*Problème* : 19 boutiques sur 67 n'ont aucun article. Une vendeuse inscrite
+a déjà dit oui une fois ; la faire publier coûte moins cher que convaincre
+une inconnue. *Pour qui* : ces 19 boutiques. *Valeur* : l'écran « Publier »
+de la console et la fiche faite à partir d'une photo existent déjà ; il
+manque la démarche : un message à chacune (« envoyez-nous 5 photos, on
+s'occupe de la fiche »), rien ne part sans l'accord de Beau. *Partenariat
+avec Accounting* : une boutique qui passe de 0 à 10 articles pourrait
+recevoir le mois d'Accounting de l'idée 19 — les deux applications se
+tirent l'une l'autre. *Effort* : petit côté code, surtout du temps de
+démarche. *Ce qu'on demande à Beau* : oui / non, et qui envoie les
+messages.
+
 ### L'idée « wow » pour une démo
 
 ☐ **21. Montrer un SMS Mobile Money devenir une écriture comptable, en
