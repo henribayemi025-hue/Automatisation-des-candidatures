@@ -2,6 +2,111 @@
 
 Chaque idée : le problème, pour qui, ce que ça vaut, l'effort, ce qu'on demande à Beau. Beau coche ☐ → ☑ quand il décide. Les idées viennent des deux sessions, de la concurrence, du terrain. Rien n'est promis : c'est une liste de choix.
 
+## Revue hebdomadaire — 24/09/2026 (Claudinette)
+
+### Ce que font les concurrents cette semaine
+
+Un fait pèse plus que les autres : **Bumpa (Nigeria) a lancé « Bumpa Capital »
+avec Vendorcredit** (mai 2026, hors fenêtre stricte mais seul fait
+vérifiable) — un concurrent direct (caisse + facturation + paiement) donne
+maintenant à ses marchandes un accès à du crédit de trésorerie calculé sur
+leurs propres données de vente, sans dossier papier.
+[techcabal.com](https://techcabal.com/2026/05/08/bumpa-and-vendorcredit-partner-to-launch-bumpa-capital/)
+→ Idée 18 ci-dessous en tire la conséquence pour nous.
+
+Rien de nouveau chez Zoho, Sage, QuickBooks, Wave, Khatabook, Vyapar ou
+OkCredit cette semaine. Un fait mobile money à connaître sans lien produit
+direct : MTN annonce MoMo à 70 millions d'utilisateurs actifs mensuels sur
+14 marchés (01/09/2026,
+[techcabal.com](https://techcabal.com/2026/09/01/mtn-momo-south-africa/)) et
+vise désormais le crédit et les services financiers, pas seulement le
+paiement — le mobile money devient un concurrent de comptabilité, pas
+seulement un rail d'encaissement.
+
+### Une obligation qui touche nos commerçantes
+
+**Confirmé cette semaine** : les contrôles ivoiriens de la facture et du
+reçu normalisés (FNE/RNE) ont bien démarré le 1er septembre 2026, et visent
+nommément le régime des micro-entreprises — exactement notre public. C'est
+déjà l'idée n° 11 de ce document ; rien de nouveau à ajouter, seulement une
+confirmation datée.
+[koaci.com](https://www.koaci.com/article/2026/08/26/cote-divoire/economie/cote-divoire-operation-de-controle-de-la-facturation-normalisee-electronique-a-partir-du-1er-septembre-voici-les-entreprises-visees_199883.html)
+
+**Fait adjacent, pas encore une obligation pour les PME** : le Cameroun
+prévoit de connecter en temps réel les systèmes de facturation de plusieurs
+secteurs (télécoms, jeux, brasseries, cimenteries) aux serveurs de la DGI
+dès 2026 — pas encore les petits commerces, mais c'est le même modèle que
+la Côte d'Ivoire, et le Cameroun est notre marché de départ.
+[ecomatin.net](https://ecomatin.net/cameroun-letat-vise-40-milliards-fcfa-des-2026-grace-a-la-taxation-en-temps-reel-des-telecoms-des-jeux-de-la-biere-et-du-ciment)
+→ Pas une idée pour l'instant : rien ne dit que ça s'étendra aux
+micro-entreprises. À surveiller, comme la Côte d'Ivoire avant le 1er
+septembre.
+
+### Trois idées nouvelles
+
+☐ **18. Une ardoise qui devient une ligne de crédit, pas seulement un
+carnet.** *Problème* : Bumpa donne déjà à ses marchandes du crédit calculé
+sur leurs propres ventes. Finjaro Accounting connaît exactement la même
+donnée (le chiffre d'affaires réel, jour par jour, depuis le début) et n'en
+fait rien. *Pour qui* : une commerçante avec plusieurs mois d'historique
+réel — pas une promesse à tout le monde. *Valeur* : c'est un service que
+seule une vraie comptabilité peut offrir de façon honnête (un chiffre
+d'affaires déclaré à la légère serait un mauvais calcul de risque) — un
+argument de vente que ni un cahier ni un tableur ne peuvent égaler.
+*Effort* : gros, et ce n'est pas un effort produit d'abord — c'est un
+partenaire financier ou un établissement de microfinance qui prête, nous
+fournissons la donnée et l'historique vérifié. *Ce qu'on demande à Beau* :
+est-ce un axe à explorer (chercher un partenaire prêteur), ou hors sujet
+tant que Finjaro n'a pas d'utilisatrices actives avec assez d'historique ?
+*Réserve honnête* : avec 1 espace sur 8 ayant une vente et 0 revenu à J+7
+(mesuré le 22/09), on n'a aujourd'hui aucune donnée à vendre à un prêteur —
+c'est une idée pour dans un an, pas pour octobre.
+
+☐ **19. Une commerçante qui en amène une autre gagne un mois, pas une
+récompense en argent.** *Problème* : le plan d'octobre de Beau mise sur 80 %
+d'efforts acheteurs et une prospection LinkedIn — rien du côté du
+bouche-à-oreille entre commerçantes, qui est pourtant comment un marché de
+quartier se parle. *Pour qui* : nos utilisatrices actuelles, à qui on
+demande de convaincre une collègue. *Valeur* : un coût d'acquisition proche
+de zéro comparé à une prospection LinkedIn un par un. *Effort* : petit —
+un code de parrainage (le mécanisme existe déjà pour la place de marché,
+`referrals` d'après les migrations d'Alpha), un mois de plus pour les deux
+si la filleule ouvre sa comptabilité. *Ce qu'on demande à Beau* : d'accord
+pour le principe, et pour la forme (un mois gratuit chacune, ou autre chose)
+?
+
+☐ **20. Un comptable qui recommande Finjaro à ses clientes TPE plutôt que
+l'inverse.** *Problème* : Beau vise les entreprises via LinkedIn — mais un
+expert-comptable a déjà dix clientes TPE qui tiennent leurs comptes sur un
+cahier ou un tableur, et un intérêt direct à ce qu'elles utilisent un outil
+qui produit un FEC propre (on l'a déjà) plutôt que de ressaisir leurs
+chiffres chaque mois. *Pour qui* : les cabinets comptables camerounais et
+ivoiriens d'abord — celui déjà cité dans ce document (Gautier Fossong) est
+un premier contact possible. *Valeur* : un seul comptable convaincu peut
+amener dix commerçantes d'un coup, avec une confiance que Finjaro seul ne
+générerait jamais. *Effort* : moyen — un mode « vue comptable » qui
+existe presque déjà (export FEC, plan comptable, plusieurs espaces), et une
+commission ou un accès gratuit pour le cabinet à définir. *Ce qu'on demande
+à Beau* : proposer ça à Gautier Fossong comme premier partenaire, à titre
+d'essai ?
+
+### L'idée « wow » pour une démo
+
+☐ **21. Montrer un SMS Mobile Money devenir une écriture comptable, en
+direct, pendant la démo.** Ce n'est pas à construire : `lib/momo.ts` et le
+partage web (`lib/partage.ts`) existent déjà et tournent en production
+depuis le 22/09. *Ce que ça demande* : rien de nouveau côté code — un
+scénario de démonstration où quelqu'un partage un vrai SMS Mobile Money
+depuis son téléphone pendant qu'on la regarde, et voit la dépense
+apparaître déjà remplie avant d'avoir tapé un chiffre. *Pour qui* : les
+démonstrations en personne et les vidéos de prospection LinkedIn — c'est
+exactement le genre de moment qu'un client B2B partage à son équipe après
+coup. *Effort* : petit, purement mise en scène. *Ce qu'on demande à Beau* :
+en faire un moment fixe de toute démonstration, filmé une fois pour la
+prospection LinkedIn ?
+
+---
+
 ## Le problème numéro un, au-dessus de la liste (posé par Alpha, 17/09 — chiffre corrigé le soir même)
 
 **Ce n'est pas que les gens ne veulent pas parler aux vendeuses : c'est qu'on leur demande de créer un compte pour poser une question.**
