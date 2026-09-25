@@ -11,6 +11,59 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 25/09/2026
+
+**Encore une semaine pauvre dans la fenêtre stricte (18-25/09) : aucun fait
+concurrentiel retenu, un seul fait réglementaire (un rappel d'échéance, pas
+une nouveauté), deux notes techniques mineures.** Les trois agents ont
+écarté beaucoup de contenu daté juste avant la fenêtre (FNE Côte d'Ivoire
+fin août-début septembre, tarification WhatsApp Business du 01/09) plutôt
+que de le compter comme neuf.
+
+### Concurrence
+
+Rien retenu. Aucun fait daté du 18 au 25/09 trouvé et vérifié pour Wave,
+Bumpa, Kippa, Flowcart, Khatabook, Vyapar, OkCredit, Sage, QuickBooks, Zoho
+Books ou Jumia, sur aucun des marchés suivis (OHADA, Nigeria, Kenya, Inde,
+Brésil).
+
+### Règles, impôts et paiements
+
+- **UEMOA : rappel du délai BCEAO pour l'interopérabilité des paiements
+  instantanés (PI-SPI).** La BCEAO a fixé au 30/09/2026 la date limite pour
+  que les banques et établissements de monnaie électronique des 8 pays
+  UEMOA (dont Côte d'Ivoire, Sénégal, Burkina Faso) ouvrent le service
+  PI-SPI : transferts entre particuliers gratuits, en moins de 10 secondes,
+  24/7, QR code standardisé inter-opérateurs. L'article ne nomme pas MTN
+  MoMo, Orange Money ou Wave spécifiquement. Publié le 23/09/2026.
+  [benin-news.com](https://benin-news.com/2026/09/23/pi-spi-benin-paiement-instantane/)
+  → Rien d'actionnable maintenant (pas de changement d'API/frais chez un
+  opérateur nommé), mais à surveiller pour une future intégration mobile
+  money multi-opérateurs dans les pays OHADA francophones.
+- Rien de nouveau et vérifiable dans la fenêtre pour le Cameroun, le Gabon,
+  le Sénégal, le Burkina Faso, la France, MTN MoMo ou Orange Money (les
+  faits pertinents trouvés — FNE Côte d'Ivoire, tarification WhatsApp
+  Business — datent d'avant le 18/09 et avaient déjà été notés ou écartés).
+
+### Technologie et IA
+
+- **Supabase renomme « Database > Replication » en « Database > Pipelines »
+  dans le tableau de bord.** Les anciennes URL redirigent, aucun
+  comportement d'API ne change. Publié le 21/09/2026.
+  [supabase.com/changelog](https://supabase.com/changelog)
+  → Rien à corriger dans le code ; à retenir seulement si une documentation
+  interne Finjaro montre encore l'ancien libellé.
+- **Capacitor publie la version 9.0.0-alpha.7** (corrections Android/iOS,
+  améliorations CLI). Publié le 18/09/2026.
+  [github.com/ionic-team/capacitor](https://github.com/ionic-team/capacitor/releases)
+  → Une alpha, pas une version pour la production ; à garder en tête pour
+  une future migration majeure.
+- Rien retenu ailleurs (OCR de reçus, voix en langues africaines,
+  PWA/offline, WhatsApp Business) : soit hors fenêtre stricte, soit déjà
+  noté les jours précédents.
+
+---
+
 ## 24/09/2026
 
 **La semaine la plus pauvre depuis le début de cette veille.** Fenêtre stricte
