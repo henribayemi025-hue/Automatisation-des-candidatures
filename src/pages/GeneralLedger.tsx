@@ -70,7 +70,7 @@ export default function GeneralLedger() {
 
           <div className="card mt-6 p-0">
             {rows.length ? (
-              <Table head={['Date', 'Journal', 'Pièce', 'Libellé', 'Débit', 'Crédit', 'Solde']}>
+              <Table head={['Date', 'Journal', 'Pièce', 'Libellé', 'Débit', 'Crédit', 'Solde']} phoneHide={[2, 3]}>
                 {rows.map((r, i) => (
                   <tr key={`${r.entry.id}-${i}`} className="row">
                     <td className="td text-slate-500">{r.entry.date}</td>

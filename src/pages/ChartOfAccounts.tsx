@@ -48,7 +48,7 @@ export default function ChartOfAccounts() {
               <h2 className="font-bold">{t(CLASS_LABELS[cls])}</h2>
               <Badge>{accounts.length} {t('comptes')}</Badge>
             </div>
-            <Table head={['Numéro', 'Intitulé', 'Nature', 'Sens', 'Solde actuel']}>
+            <Table head={['Numéro', 'Intitulé', 'Nature', 'Sens', 'Solde actuel']} phoneHide={[3, 4]}>
               {accounts.map((a) => (
                 <tr key={a.code} className="row">
                   <td className="td num font-semibold">{a.code}</td>

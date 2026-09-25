@@ -128,7 +128,7 @@ export default function CashBook() {
           {t('Journal des transactions (')}{from} → {to})
         </h2>
         {rows.length ? (
-          <Table head={['Date', 'Journal', 'Compte', 'Libellé', 'Entrée (+)', 'Sortie (−)']}>
+          <Table head={['Date', 'Journal', 'Compte', 'Libellé', 'Entrée (+)', 'Sortie (−)']} phoneHide={[2, 3]}>
             {rows.map((r) => (
               <tr key={r.id} className="row">
                 <td className="td text-slate-500">{r.date}</td>
