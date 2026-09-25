@@ -101,7 +101,7 @@ export default function Parties() {
 
       <div className="card p-0">
         {list.length ? (
-          <Table head={[t('Nom'), t('Téléphone'), t('Email'), t('Adresse'), isCustomers ? t('Créance') : t('Dette'), '']}>
+          <Table head={[t('Nom'), t('Téléphone'), t('Email'), t('Adresse'), isCustomers ? t('Créance') : t('Dette'), '']} phoneHide={[3, 4]}>
             {list.map((p) => (
               <tr key={p.id} className="row">
                 <td className="td font-semibold">{p.name}</td>
@@ -112,7 +112,7 @@ export default function Parties() {
                   <Money value={balanceFor(p.id)} />
                 </td>
                 <td className="td">
-                  <div className="flex justify-end gap-1">
+                  <div className="flex flex-wrap items-center justify-end gap-1">
                     {p.archived ? (
                       <button onClick={() => restore(p.id)} className="btn-ghost px-2 py-1 text-[12px]">
                         {t('Réactiver')}

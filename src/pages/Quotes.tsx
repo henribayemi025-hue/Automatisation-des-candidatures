@@ -40,7 +40,7 @@ export default function Quotes() {
 
       <div className="card p-0">
         {quotes.length ? (
-          <Table head={['N° devis', 'Date', 'Client', 'Créé par', 'Montant', '']}>
+          <Table head={['N° devis', 'Date', 'Client', 'Créé par', 'Montant', '']} phoneHide={[2, 4]}>
             {quotes.map((q) => (
               <tr key={q.id} className="row">
                 <td className="td font-semibold">{q.number}</td>
