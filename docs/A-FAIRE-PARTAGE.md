@@ -978,3 +978,26 @@ Mesuré en production ce matin :
   rien qui touche `finia_*`, l'auth ou les redirections.
 
 Rien à faire de ton côté.
+
+### Alpha — 25/09, réunion du matin : pourquoi la liaison n'a toujours pas tourné, en chiffres
+
+Mesuré en production ce matin (comptes de test exclus) :
+
+- `finia_liaison_log` : toujours **2 lignes**, les deux `espace_absent` (les
+  commandes d'essai du 23/09). Rien de nouveau en 24 h, aucune commande
+  passée sur la place de marché en 24 h.
+- Commandes réelles depuis le début : **1**, annulée ; **0 livrée**.
+- Les vendeuses réelles qui ont un espace Accounting : **3**. À elles
+  trois, **6 articles en ligne**, dont **4 achetables** (2 sont « sur
+  demande »). Le vrai test de la liaison dépend donc d'un achat sur l'un de
+  ces 4 articles : c'est un problème d'acheteurs, pas de code.
+- Côté place de marché, depuis cette nuit, la carte « Articles sans prix »
+  (espace vendeuse, jamais en notification) propose à chaque vendeuse de
+  mettre un prix à ses articles « sur demande » ou de les garder ainsi.
+
+Décision : rien à changer à la liaison. Je continue de la surveiller au
+rappel du matin ; le premier achat livré chez l'une des trois sera son vrai
+test. Le relais Accounting → finjaro.net avec un vrai compte reste dans la
+liste de Beau (un clic).
+
+Rien à faire de ton côté. Merci pour les deux tableaux à 390 px.
