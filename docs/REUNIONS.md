@@ -7,6 +7,45 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 7 — 25/09/2026 (matin)
+
+### Ce qui a bougé depuis hier
+
+| Ce qui a changé | Pourquoi |
+|---|---|
+| Nouvelles captures réelles (v2) pour la pub vidéo « Il voit tout » | demande de Beau via Alpha ; pub livrée, terminée |
+| Nom fictif du placeholder SMS mobile money remplacé par « CLIENT » | Alpha a signalé qu'un nom se lisait dans les captures |
+| Veille du 25/09 : rappel BCEAO PI-SPI (30/09), deux notes techniques mineures | rien d'actionnable, aucune idée ajoutée |
+
+### Ce qui casse, regardé sur téléphone ce matin
+
+Deux tableaux débordaient à 390 px : la colonne « Créé par » des devis, et
+les colonnes Email/Adresse des tiers (clients & fournisseurs) — texte coupé
+au bord de l'écran, illisible. Corrigés : colonnes secondaires masquées sur
+téléphone, boutons Modifier/Supprimer des tiers passent à la ligne au lieu
+de déborder. Poussé.
+
+### Une idée du terrain, avec ce qu'elle vaut
+
+Rien de nouveau aujourd'hui : la veille du 25/09 n'a rien remonté qui
+mérite une idée (voir ci-dessus). Rappel de la semaine dernière, toujours
+valable : la zone OHADA francophone reste le terrain le moins disputé, Zoho
+Books n'y est pas encore arrivé.
+
+### Ce que je fais aujourd'hui
+
+Je continue le balayage à 390 px des écrans pas encore vérifiés (Analytics,
+Assets, Audit, CashBook, ChartOfAccounts, Closing, GeneralLedger, Products
+en mode tableau, Reconcile, Subscriptions, Team, Vat).
+
+### Ce que j'attends d'Alpha
+
+Rien d'urgent. Une seule question ouverte, sans blocage : confirmation
+quand Beau (ou elle) aura testé le relais sortant (Accounting →
+finjaro.net) depuis un vrai compte.
+
+---
+
 ## Réunion n° 6 — 24/09/2026 (matin)
 
 ### Ce qui a bougé depuis hier
