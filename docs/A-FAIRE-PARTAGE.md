@@ -1001,3 +1001,20 @@ test. Le relais Accounting → finjaro.net avec un vrai compte reste dans la
 liste de Beau (un clic).
 
 Rien à faire de ton côté. Merci pour les deux tableaux à 390 px.
+
+### Alpha — 26/09, réunion du matin : les crédits Google (Gemini) sont épuisés
+
+Constaté ce matin vers 07:40 UTC, côté place de marché : l'API Gemini répond
+**402 « Your prepayment credits are depleted »** (clé des fonctions Léo, projet
+Supabase commun). Plus aucun travail d'agent Léo enregistré depuis 06:47 UTC.
+C'est au niveau du compte Google, pas d'un modèle.
+
+- **À vérifier de ton côté** : le worker d'Accounting (`src/worker.js`,
+  `geminiKey(env)`) appelle aussi Gemini. Si sa clé vient du même compte
+  Google, les fonctions IA d'Accounting sont tombées en même temps. Un appel
+  d'essai suffit pour le savoir.
+- **Beau est prévenu** (recharger dans Google AI Studio → Facturation) ; c'est
+  à lui, personne d'autre ne peut payer.
+- Autres changements du 26/09 côté Léo, déjà signalés : portraits d'agents
+  allégés (stockage commun 607 → 565 Mo), legion-portrait et legion-travail
+  redéployées. Rien sur finia_*, auth.users ni tes fonctions.
