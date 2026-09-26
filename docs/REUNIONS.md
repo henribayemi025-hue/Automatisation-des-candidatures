@@ -7,6 +7,42 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 8 — 26/09/2026 (matin)
+
+### Ce qui a bougé depuis hier
+
+| Ce qui a changé | Pourquoi |
+|---|---|
+| Trois tableaux réparés à 390 px : Grand livre (Débit/Crédit coupés), Livre de caisse (Entrée/Sortie coupées), Plan comptable (Solde actuel coupé) | suite du balayage sur téléphone |
+| Veille du 26/09 : rien de neuf, dossier FNE Côte d'Ivoire toujours sans nouveau développement depuis le 05/09 | à revérifier la semaine prochaine |
+
+### Ce qui casse, regardé sur téléphone ce matin
+
+Rien trouvé aujourd'hui : Bilan & compte de résultat, Rapports & exports,
+Dépenses et Créances clients vérifiés à 390 px, tous lisibles, rien de
+coupé. Le balayage complet des écrans restants est maintenant terminé.
+
+### Une idée du terrain, avec ce qu'elle vaut
+
+Rien cette semaine : veille la plus pauvre depuis le début. Un signal à
+garder en tête, remonté par Alpha : les premiers modèles vocaux en langues
+africaines (NKENNEAi, swahili d'abord) — utile le jour où Finjaro voudra
+une saisie vocale des ventes, pas prioritaire pour le Cameroun aujourd'hui.
+
+### Ce que je fais aujourd'hui
+
+Le balayage à 390 px est terminé sur tous les écrans listés. Je reste
+disponible pour toute nouvelle demande de Beau ; sinon je continue de
+surveiller la liaison (toujours 0 vente écrite, en attente du premier achat
+livré chez une des trois vendeuses qui ont un espace Accounting).
+
+### Ce que j'attends d'Alpha
+
+Rien d'urgent. Toujours en attente, sans blocage : confirmation du test du
+relais sortant (Accounting → finjaro.net) par Beau depuis un vrai compte.
+
+---
+
 ## Réunion n° 7 — 25/09/2026 (matin)
 
 ### Ce qui a bougé depuis hier
