@@ -12,7 +12,7 @@ import { displayIdentity, looksLikePhone } from '../lib/identity';
 const PILLARS = [
   { icon: <IconMonitor />, title: 'Vendre en 3 clics', text: 'Un comptoir simple, le stock et la caisse suivent tout seuls.' },
   { icon: <IconUsers />, title: 'Travailler à plusieurs', text: 'Caissier, gérant, comptable sur le même espace, en direct.' },
-  { icon: <IconBook />, title: 'Une vraie comptabilité', text: 'Journal, bilan, audit — visibles seulement si vous le voulez.' },
+  { icon: <IconBook />, title: 'Une comptabilité automatique', text: 'Journal, bilan, audit se tiennent tout seuls — visibles quand vous le voulez.' },
   { icon: <IconSparkle />, title: 'Un assistant partout', text: 'Il explique chaque écran et répond avec vos vrais chiffres.' },
 ];
 
@@ -85,9 +85,9 @@ export default function Auth() {
           </div>
 
           <h1 className="mt-8 font-display text-[38px] font-bold leading-[1.08] text-ink sm:text-[52px]">
-            {t('Votre boutique,')}
+            {t('Toute votre boutique,')}
             <br />
-            <span className="text-teal">{t('tenue au propre.')}</span>
+            <span className="text-teal">{t('en un seul endroit.')}</span>
           </h1>
           <p className="mt-5 max-w-lg text-body leading-relaxed text-muted sm:text-[17px]">
             {t('Ventes, caisse, stock, dettes — et derrière chaque opération, une comptabilité juste, sans avoir besoin d’être comptable.')}
