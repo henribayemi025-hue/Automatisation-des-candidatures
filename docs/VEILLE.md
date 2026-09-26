@@ -11,6 +11,54 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 26/09/2026
+
+**Semaine la plus pauvre depuis longtemps : rien côté concurrence, rien côté
+réglementation/paiements, deux faits techniques mineurs seulement.** Fenêtre
+stricte 19-26/09. Point de suivi particulier : le dossier de tension entre
+la FENACCI et la DGI ivoirienne sur la Facture Normalisée Électronique
+(contrôles automatisés démarrés le 01/09) n'a produit aucun développement
+daté dans la fenêtre — dernier fait connu toujours le 05/09 (création de
+l'Observatoire national de la FNE par la FENACCI). À revérifier la semaine
+prochaine.
+
+### Concurrence
+
+Rien retenu. Aucun fait daté du 19 au 26/09 trouvé et vérifié pour Wave,
+Bumpa, Kippa, Flowcart, Khatabook, Vyapar, OkCredit, Sage, QuickBooks, Zoho
+Books ou Jumia, sur aucun des marchés suivis (OHADA, Nigeria, Kenya, Inde,
+Brésil).
+
+### Règles, impôts et paiements
+
+Rien de nouveau et vérifiable dans la fenêtre. Vérifié spécifiquement et
+écarté (hors fenêtre) : le dossier FNE/RNE Côte d'Ivoire (dernier fait le
+05/09), le refus de Wave de rejoindre PI-SPI (articles du 13/07 et du
+24/08), les nouveautés MTN MoMo/Orange Money/Sénégal/Gabon/Burkina/France.
+
+### Technologie et IA
+
+- **Supabase CLI 2.118.0 : génération de types sans Docker**, et nouvelle
+  commande `supabase pull` pour reconstituer un environnement local
+  complet. Publié le 25/09/2026.
+  [github.com/supabase/cli](https://github.com/supabase/cli/releases)
+  → Simplifie l'outillage de développement local ; ne touche pas le projet
+  Supabase partagé.
+- **NKENNEAi lance ses premiers modèles vocaux africains (swahili),
+  entraînés sur plus de 65 000 heures d'audio** ; yoruba, igbo, pidgin
+  nigérian et somali annoncés à venir, démo publique le 29/09/2026. Publié
+  le 25/09/2026.
+  [techcabal.com](https://techcabal.com/2026/09/25/nkenneai-launches-its-first-african-language-speech-models-starting-with-swahili/)
+  → Le swahili n'est pas prioritaire pour le Cameroun, mais signale que
+  l'écosystème de reconnaissance vocale en langues africaines avance ; à
+  surveiller pour d'éventuelles langues locales (rien trouvé sur
+  wolof/douala/ewondo cette semaine).
+- Rien retenu ailleurs (extraction de reçus/factures, WhatsApp Business —
+  la hausse de tarif annoncée par des blogs tiers n'apparaît dans aucune
+  entrée datée du changelog officiel Meta cette semaine, donc non retenue).
+
+---
+
 ## 25/09/2026
 
 **Encore une semaine pauvre dans la fenêtre stricte (18-25/09) : aucun fait
