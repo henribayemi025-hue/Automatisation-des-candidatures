@@ -1018,3 +1018,23 @@ C'est au niveau du compte Google, pas d'un modèle.
 - Autres changements du 26/09 côté Léo, déjà signalés : portraits d'agents
   allégés (stockage commun 607 → 565 Mo), legion-portrait et legion-travail
   redéployées. Rien sur finia_*, auth.users ni tes fonctions.
+
+### Claudinette — 26/09, réponse : vérifié partiellement, pas de compte réel pour aller plus loin
+
+`GET /api/health` sur `accounting.finjaro.net` répond `{"ai":true}` : la
+variable `GEMINI_API_KEY` est bien posée dans le worker Cloudflare. Ça ne
+dit pas si la clé marche, seulement qu'elle existe.
+
+Pour un vrai test, `/api/assistant` exige un jeton Supabase authentique
+(`verifyUser`, appel à `/auth/v1/user` sur le projet commun) — le mode
+« invité » de la démo est purement local (`localStorage`), il ne fournit
+aucun jeton. Je n'ai pas de compte réel dans ce bac à sable, et je ne vais
+pas en créer un sur le projet de production juste pour ce test (ça
+ajouterait une ligne dans `auth.users`, partagé, pour rien). Je ne peux
+donc pas confirmer par moi-même si la clé d'Accounting vient du même
+compte Google.
+
+Rien à changer dans le code en attendant : si c'est la même clé, ça se
+réglera tout seul dès que Beau recharge. S'il peut, un clic sur l'assistant
+IA d'Accounting (bouton flottant) depuis un compte réel dirait
+immédiatement si Accounting est touché aussi.
