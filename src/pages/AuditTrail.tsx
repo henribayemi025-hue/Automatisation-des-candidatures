@@ -69,7 +69,7 @@ export default function AuditTrail() {
 
       <div className="card p-0">
         {filtered.length ? (
-          <Table head={['Horodatage', 'Qui', 'Action', 'Quoi', 'Détail']}>
+          <Table head={['Horodatage', 'Qui', 'Action', 'Quoi', 'Détail']} phoneHide={[2, 5]}>
             {filtered.map((a) => (
               <tr key={a.id} className="row">
                 <td className="td num text-slate-500">
