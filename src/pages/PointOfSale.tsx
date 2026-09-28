@@ -13,6 +13,7 @@ import ProjectSelect from '../components/ProjectSelect';
 import { outstanding } from '../lib/metrics';
 import { aRendre, billetsProposes } from '../lib/monnaie';
 import { maybeAskNotificationPermission } from '../lib/reminders';
+import { articlesSuggeres } from '../lib/suggestions';
 
 const METHODS: { value: PaymentMethod; label: string }[] = [
   { value: 'CASH', label: 'Espèces' },
@@ -31,6 +32,16 @@ interface HeldTicket {
 }
 
 const HELD_KEY = 'finia.pos.held';
+// Libellés pour lesquels elle a répondu « Non merci » : on ne les repropose pas.
+const IGNORES_KEY = 'finia.pos.suggestions.ignorees';
+
+function loadIgnores(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(IGNORES_KEY) ?? '[]') as string[];
+  } catch {
+    return [];
+  }
+}
 
 function loadHeld(): HeldTicket[] {
   try {
@@ -41,7 +52,7 @@ function loadHeld(): HeldTicket[] {
 }
 
 export default function PointOfSale() {
-  const { db, recordSale, saveCustomer } = useStore();
+  const { db, recordSale, saveCustomer, saveProduct } = useStore();
   const [query, setQuery] = useState('');
   const [cart, setCart] = useState<SaleLine[]>([]);
   const [customerId, setCustomerId] = useState('');
@@ -96,6 +107,15 @@ export default function PointOfSale() {
   const [quickAmount, setQuickAmount] = useState('');
   const [quickLabel, setQuickLabel] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
+  // « Vous avez vendu huile trois fois » — voir lib/suggestions.ts.
+  const [ignores, setIgnores] = useState<string[]>(() => loadIgnores());
+  const suggestion = useMemo(
+    () => articlesSuggeres(db.sales, db.products, ignores)[0] ?? null,
+    [db.sales, db.products, ignores],
+  );
+  const [sugPrix, setSugPrix] = useState('');
+  const [sugStock, setSugStock] = useState('');
+  const [sugCout, setSugCout] = useState('');
 
   const currency = db.company.currency;
   // Un métier sans stock (salon, artisan) encaisse des prestations : rien à épuiser.
@@ -203,6 +223,46 @@ export default function PointOfSale() {
     ]);
     setQuickAmount('');
     setQuickLabel('');
+  }
+
+  /**
+   * Créer l'article proposé, en un geste. Le prix habituel est pré-rempli ;
+   * en mode stock, la quantité et le prix d'achat restent facultatifs — elle
+   * les complètera dans Stock si elle veut. Les ventes passées ne sont pas
+   * réécrites : le journal ne se réécrit pas.
+   */
+  function creerSuggestion() {
+    if (!suggestion) return;
+    const prix = sugPrix.trim() === '' ? suggestion.prixHabituel : toMinor(sugPrix, currency);
+    saveProduct({
+      name: suggestion.nom,
+      sku: '',
+      barcode: '',
+      category: '',
+      brand: '',
+      kind: sectorProfile(db.company.sector).sells,
+      price: prix,
+      cost: withStock ? toMinor(sugCout || 0, currency) : 0,
+      stock: withStock ? Number(sugStock) || 0 : 0,
+      reorderPoint: 0,
+      unit: 'pièce',
+    });
+    setSugPrix('');
+    setSugStock('');
+    setSugCout('');
+    setFlash(t('« {name} » est maintenant un article : touchez-le dans la liste pour l’encaisser.', { name: suggestion.nom }));
+    setTimeout(() => setFlash(''), 5000);
+  }
+
+  function ignorerSuggestion() {
+    if (!suggestion) return;
+    const next = [...ignores, suggestion.cle];
+    setIgnores(next);
+    try {
+      localStorage.setItem(IGNORES_KEY, JSON.stringify(next));
+    } catch {
+      /* stockage indisponible : la proposition reviendra, rien de grave */
+    }
   }
 
   /** Un code scanné ou tapé puis Entrée : correspondance exacte sur le code-barres ou la référence. */
@@ -398,6 +458,53 @@ export default function PointOfSale() {
               </button>
             </form>
           </div>
+
+          {suggestion && (
+            <div id="pos-suggestion" className="mb-4 rounded-card border border-brass/50 bg-[#FBF1DF] px-4 py-3">
+              <p className="text-sm text-ink">
+                {t('Vous avez vendu')} <strong>{suggestion.nom}</strong> {t('{n} fois. En faire un article ? Vous le toucherez au lieu de retaper le montant.', { n: suggestion.fois })}
+              </p>
+              <form
+                className="mt-3 flex flex-wrap items-end gap-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  creerSuggestion();
+                }}
+              >
+                <label className="min-w-[7rem] flex-1">
+                  <span className="mb-1 block text-caption font-semibold text-muted">{t('Prix')}</span>
+                  <input
+                    value={sugPrix}
+                    onChange={(e) => setSugPrix(e.target.value)}
+                    inputMode="decimal"
+                    placeholder={String(toMajor(suggestion.prixHabituel, currency))}
+                    className="field num text-right"
+                    autoComplete="off"
+                  />
+                </label>
+                {withStock && (
+                  <>
+                    <label className="min-w-[6rem] flex-1">
+                      <span className="mb-1 block text-caption font-semibold text-muted">{t('En stock (facultatif)')}</span>
+                      <input value={sugStock} onChange={(e) => setSugStock(e.target.value)} inputMode="numeric" placeholder="0" className="field num text-right" autoComplete="off" />
+                    </label>
+                    <label className="min-w-[6rem] flex-1">
+                      <span className="mb-1 block text-caption font-semibold text-muted">{t('Prix d’achat (facultatif)')}</span>
+                      <input value={sugCout} onChange={(e) => setSugCout(e.target.value)} inputMode="decimal" placeholder="0" className="field num text-right" autoComplete="off" />
+                    </label>
+                  </>
+                )}
+                <div className="flex gap-2">
+                  <button type="button" onClick={ignorerSuggestion} className="btn-ghost">
+                    {t('Non merci')}
+                  </button>
+                  <button type="submit" className="btn-primary">
+                    {t('Créer l’article')}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
 
           {held.length > 0 && (
             <div className="mb-4 flex flex-wrap items-center gap-2 rounded-input bg-[#FBF1DF] px-3 py-2 text-caption">

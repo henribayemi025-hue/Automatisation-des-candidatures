@@ -2047,4 +2047,12 @@ export const EN: Record<string, string> = {
   'Code oublié ? Il se retire depuis un autre appareil connecté au même compte, ou en réinstallant l’application — ce qui efface les données locales.': 'Forgot the code? It can be removed from another device signed in to the same account, or by reinstalling the app, which erases local data.',
   'Sans compte, il n’y a pas de journal en ligne': 'Without an account there is no online journal',
   'Ces contrôles portent sur les écritures gardées dans cet appareil. Créez un compte pour que le journal serve de registre, conservé hors de ce téléphone.': 'These checks cover the entries kept on this device. Create an account so the journal acts as a register, kept off this phone.',
+  // ---- Caisse : « vous avez vendu huile trois fois » ----
+  'Vous avez vendu': 'You sold',
+  '{n} fois. En faire un article ? Vous le toucherez au lieu de retaper le montant.': '{n} times. Make it an item? You will tap it instead of typing the amount again.',
+  'En stock (facultatif)': 'In stock (optional)',
+  'Prix d’achat (facultatif)': 'Purchase price (optional)',
+  'Non merci': 'No thanks',
+  'Créer l’article': 'Create item',
+  '« {name} » est maintenant un article : touchez-le dans la liste pour l’encaisser.': '“{name}” is now an item: tap it in the list to ring it up.',
 };
