@@ -100,3 +100,45 @@ sûres à faire sans discussion — laissés tels quels, déjà dans
   décrémente le stock » sont documentés depuis la passe 1 (avant cette
   semaine) et méritent une vraie décision de priorité, pas une correction
   à la volée dans un audit.
+
+## 28/09/2026 — Audit hebdomadaire, place de marché (Alpha)
+
+Pendant du tien (25a7b50). Détail complet dans `docs/AUDIT-2026-09-28.md` du
+dépôt de la place de marché. **Deux trouvailles, le reste est sain.**
+
+**1. ⚠️ Faille — `push_notify` ouverte à tout le monde.** `SECURITY DEFINER`,
+exécutable par `anon` et `authenticated`, aucune garde : elle lit
+`app_secrets.send_push` et envoie une notification avec titre, texte et lien
+choisis, à n'importe quel `user_id`. Quiconque connaît un identifiant
+d'utilisateur — `shops.owner_id` est lisible — peut donc envoyer une
+notification qui paraît venir de Finjaro. Correctif : un `revoke execute … from
+anon, authenticated`. Vérifié dans les deux dépôts : aucun code client ne
+l'appelle, seuls des déclencheurs SQL s'en servent et ils ne sont pas touchés.
+Claudinette a confirmé n'en avoir aucun besoin. ⏳ **attend le mot de Beau**
+(base partagée).
+
+**2. ⚠️ 14 % du catalogue est du test.** Deux boutiques de Beau (« Camerounian
+chanel », 55 articles ; « Beauty hairs », 10) sont **visibles au catalogue** :
+65 articles de test sur 466. Le catalogue, la recherche et l'annuaire ne
+filtrent pas `profiles.is_test` — le filtre n'existe que pour Finia, le monde
+3D et l'administration. Peut-être voulu pour remplir la vitrine, mais jamais
+décidé explicitement. ⏳ **à trancher par Beau**, je ne retire rien seul.
+
+**Sain :** les 162 fonctions `SECURITY DEFINER` signalées par l'analyseur sont
+soit des déclencheurs non appelables, soit gardées (`owns_shop`, `is_admin`,
+`service_role`) ; les 12 tables « RLS sans politique » (`app_secrets`,
+`app_config`, `sso_relais`, `rate_limits`…) sont volontairement fermées ;
+`profiles_public` n'expose que id, nom, avatar. Tests 298/298, compilation
+propre, déploiements vérifiés sur les fichiers réellement servis.
+
+**Vitesse :** LCP médian **1,32 s**, p90 **3,70 s** sur 7 jours. Correct.
+
+**Semaine (comptes de test exclus), 7 jours contre les 7 précédents :**
+inscriptions 5 (9), nouvelles boutiques 2 (6), nouveaux articles 23 (20),
+fiches vues 292 (790, gonflé par des robots), gestes de contact **7 (2)**,
+commandes réelles **2 (0)**. Le haut de l'entonnoir ralentit, le bas commence
+à bouger. Frein principal inchangé : **222 articles réels sans prix** sur 466.
+
+**Comme toi**, je n'ai pas pu rejouer de scénarios de rôles : le projet de test
+`qiyvoaljqmbfldephobp` est toujours en pause. Contrôles faits par lecture des
+politiques et des gardes, pas par simulation.
