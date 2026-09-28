@@ -11,6 +11,53 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 28/09/2026
+
+**Semaine toujours pauvre : rien côté concurrence, un point de contexte sur
+l'échéance BCEAO qui approche (sans confirmation d'aucun opérateur), deux
+faits techniques mineurs déjà vérifiés sans impact.**
+
+### Concurrence
+
+Rien retenu. Aucun fait daté du 21 au 28/09 trouvé et vérifié pour les
+concurrents suivis. Point hors périmètre, à titre indicatif seulement :
+Remita (Nigeria, paiements — pas caisse/compta) a présenté une nouvelle
+application le 23/09 au Nigeria Fintech Week ; aucun chiffre vérifiable,
+impact quasi nul pour Finjaro.
+
+### Règles, impôts et paiements
+
+- **UEMOA : l'échéance BCEAO du 30/09 (PI-SPI) est une généralisation, pas
+  un nouveau lancement** — le service existe depuis 09/2025, le 30/09 est
+  la date à laquelle banques et établissements de paiement doivent l'avoir
+  ouvert à leurs clients (transferts gratuits entre particuliers, alias par
+  numéro de téléphone, QR code marchand standardisé). Publié le 23/09/2026.
+  [benin-news.com](https://benin-news.com/2026/09/23/pi-spi-benin-paiement-instantane/)
+  → Toujours rien d'actionnable : aucune source datée ne confirme ni
+  n'infirme la conformité de MTN MoMo, Orange Money ou Wave à cette
+  échéance. Dossier FNE Côte d'Ivoire toujours gelé depuis le 05/09.
+
+### Technologie et IA
+
+- **Supabase Logs passe à une facturation à l'usage**, période de grâce
+  jusqu'à début 2027 (« 90 %+ des projets restent dans les limites
+  incluses »). Publié le 25/09/2026.
+  [supabase.com/changelog](https://supabase.com/changelog)
+  → Le projet partagé `bokwivwizghdlaedczbw` répartit cette facturation
+  entre toutes les applications ; à surveiller sans urgence vu la période
+  de grâce.
+- **Chrome 154 : Background Fetch exige désormais la permission « accès
+  réseau local » et applique CORS comme un fetch classique.** Publié le
+  22/09/2026.
+  [developer.chrome.com](https://developer.chrome.com/release-notes/154)
+  → **Vérifié : Accounting n'utilise pas l'API Background Fetch.** Rien à
+  faire.
+- Rien de nouveau ailleurs (extraction de reçus/factures, reconnaissance
+  vocale, WhatsApp Business, Capacitor) : soit hors fenêtre stricte, soit
+  déjà noté.
+
+---
+
 ## 27/09/2026
 
 **Semaine encore pauvre : rien côté concurrence, un seul fait réglementaire
