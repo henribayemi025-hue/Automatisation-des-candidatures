@@ -1,5 +1,8 @@
+import { useEffect, type ReactNode } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
+import CookieConsent from './components/CookieConsent';
+import { trackPageView } from './lib/pixel';
 import LockScreen from './components/LockScreen';
 import { useCollab } from './lib/collab';
 import { useDB } from './lib/store';
@@ -91,11 +94,23 @@ export default function App() {
   const { user, guest, loading, workspace, sync, sessionExpired } = useCollab();
   const db = useDB();
   const { pathname } = useLocation();
+  // La démonstration n'a rien à voir avec un vrai visiteur (données
+  // d'exemple, aucun appel réseau garanti par scripts/demo-etanche-check.ts) :
+  // pas de pixel là-dessus, ça polluerait les vraies mesures de Beau.
+  const isDemo = pathname === '/demo' || pathname.startsWith('/demo/');
+
+  // Un « PageView » par écran : application à une seule page (routeur par
+  // dièse), l'extrait de base de Meta ne verrait sinon jamais que le tout
+  // premier écran. Sans effet tant que personne n'a accepté le pixel
+  // (trackPageView() ne fait rien si `fbq` n'existe pas encore).
+  useEffect(() => {
+    if (!isDemo) trackPageView();
+  }, [pathname, isDemo]);
 
   if (loading) return <Splash />;
   // Lien de démonstration : un seul clic, sans compte. Une personne déjà
   // connectée garde ses données — elle passe par les paramètres si elle veut l'exemple.
-  if (pathname === '/demo' || pathname.startsWith('/demo/')) {
+  if (isDemo) {
     return user ? <Navigate to="/" replace /> : (
       <Routes>
         <Route path="/demo" element={<Demo />} />
@@ -109,15 +124,20 @@ export default function App() {
   // n'a PAS encore de session ici (c'est justement ce que cette page pose),
   // donc elle doit passer avant le mur de connexion, comme la démonstration.
   if (pathname === '/relais') return <Relais />;
+
+  let content: ReactNode;
+  // Le bandeau du pixel se cache pendant l'installation : sur téléphone, sa
+  // barre fixe en bas chevauche « Continuer » (trouvé au test Playwright du
+  // 28/09). Rien n'est perdu : le bandeau reprend sur l'écran de connexion
+  // et dans l'application, qui restent bien plus longtemps ouverts.
+  let showConsent = true;
   // Une session expirée reprend la main sur le mode local : on propose la connexion plutôt que de basculer sans rien dire.
-  if (!user && (!guest || sessionExpired)) return <Auth />;
-  if (user && !workspace && sync !== 'error') return <Splash />;
-
-  const needsOnboarding = !db.company.onboarded && (!workspace || workspace.role === 'owner');
-  if (needsOnboarding) return <Onboarding />;
-
-
-  return (
+  if (!user && (!guest || sessionExpired)) content = <Auth />;
+  else if (user && !workspace && sync !== 'error') content = <Splash />;
+  else if (!db.company.onboarded && (!workspace || workspace.role === 'owner')) {
+    content = <Onboarding />;
+    showConsent = false;
+  } else content = (
     <>
       <LockScreen />
       <LocalConflict />
@@ -163,6 +183,13 @@ export default function App() {
           <Route path="*" element={<Dashboard />} />
         </Routes>
       </Layout>
+    </>
+  );
+
+  return (
+    <>
+      {content}
+      {showConsent && <CookieConsent country={db.company.country} />}
     </>
   );
 }
