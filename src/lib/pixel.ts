@@ -1,3 +1,5 @@
+import { inNativeApp } from './shell';
+
 /**
  * Pixel Meta (Facebook/Instagram) de Beau, pour mesurer ses campagnes de
  * publicité. Identifiant public — il apparaît dans le code de n'importe
@@ -51,7 +53,11 @@ let loaded = false;
 
 /** Charge le pixel Meta une seule fois par session de navigation. */
 export function loadPixel() {
-  if (loaded || typeof window === 'undefined') return;
+  // Jamais dans la fenêtre de l'application Finjaro des magasins (voir
+  // shell.ts) : un pixel publicitaire DANS une app native relève du pistage
+  // inter-app au sens d'Apple (App Tracking Transparency) et expose l'app à
+  // un refus en revue. Même garde-fou que la place de marché.
+  if (loaded || typeof window === 'undefined' || inNativeApp()) return;
   loaded = true;
   const w = window as unknown as { fbq?: any; _fbq?: any };
   if (!w.fbq) {
@@ -71,10 +77,26 @@ export function loadPixel() {
   }
   w.fbq('init', PIXEL_ID);
   w.fbq('track', 'PageView');
+  lastView = currentPath();
+}
+
+// L'écran dont la page vue est déjà comptée. Au premier affichage, le
+// bandeau (enfant d'App) charge le pixel et compte la page, PUIS l'effet
+// d'App appelle trackPageView pour le même écran : sans ce repère, la
+// première page partait deux fois chez Meta.
+let lastView: string | null = null;
+
+function currentPath(): string {
+  // Routeur par dièse : l'écran est dans `#/…`, pas dans le chemin.
+  return window.location.hash.replace(/^#/, '').split('?')[0] || '/';
 }
 
 /** Un PageView par écran — sans effet tant que le pixel n'est pas chargé. */
 export function trackPageView() {
   const w = window as unknown as { fbq?: (...args: unknown[]) => void };
-  w.fbq?.('track', 'PageView');
+  if (!loaded || !w.fbq) return;
+  const path = currentPath();
+  if (path === lastView) return;
+  lastView = path;
+  w.fbq('track', 'PageView');
 }
