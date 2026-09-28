@@ -1,5 +1,10 @@
 import { inNativeApp } from './shell';
 
+/** Faux dans la fenêtre de l'application Finjaro des magasins : le pixel n'y tourne jamais, le réglage n'a pas lieu d'être. */
+export function pixelAvailable(): boolean {
+  return !inNativeApp();
+}
+
 /**
  * Pixel Meta (Facebook/Instagram) de Beau, pour mesurer ses campagnes de
  * publicité. Identifiant public — il apparaît dans le code de n'importe
@@ -99,4 +104,24 @@ export function trackPageView() {
   if (path === lastView) return;
   lastView = path;
   w.fbq('track', 'PageView');
+}
+
+/**
+ * Hors Europe, le pixel se charge sans bandeau (décision de Beau) : il faut
+ * donc un moyen de dire non APRÈS coup — sinon la politique de
+ * confidentialité mentirait en promettant un refus possible. « Refuser »
+ * coupe l'envoi tout de suite (`consent revoke` de Meta), le choix est gardé
+ * pour les visites suivantes. Même mécanique que la place de marché
+ * (`reglerAccordPixel`, 28/09).
+ */
+export function updateConsent(accepted: boolean) {
+  setConsent(accepted ? 'accepted' : 'declined');
+  if (typeof window === 'undefined') return;
+  const w = window as unknown as { fbq?: (...args: unknown[]) => void };
+  if (accepted) {
+    if (loaded && w.fbq) w.fbq('consent', 'grant');
+    else loadPixel();
+  } else if (loaded && w.fbq) {
+    w.fbq('consent', 'revoke');
+  }
 }

@@ -20,6 +20,7 @@ import { COUNTRIES, countryProfile, profileToCompany } from '../lib/countries';
 import { IconLogout, IconUsers } from '../components/Icons';
 import { t } from '../lib/i18n';
 import TextSetting from '../components/TextSetting';
+import { getConsent, pixelAvailable, requiresConsent, updateConsent } from '../lib/pixel';
 
 const CHARTS: { value: Company['chart']; label: string; hint: string }[] = [
   { value: 'SYSCOHADA', label: 'SYSCOHADA', hint: 'Zone OHADA (Afrique de l’Ouest et centrale)' },
@@ -38,6 +39,13 @@ export default function Settings() {
   const [demoDone, setDemoDone] = useState('');
   const c = db.company;
   const canEdit = !workspace || workspace.role === 'owner' || workspace.role === 'manager';
+  // Hors zone RGPD, le pixel démarre actif sans qu'on ait rien demandé
+  // (décision de Beau) : `getConsent() === null` veut alors dire « actif »,
+  // pas « en attente ».
+  const [adConsent, setAdConsent] = useState(() => {
+    const v = getConsent();
+    return v === 'accepted' || (v === null && !requiresConsent(db.company.country));
+  });
 
   return (
     <>
@@ -111,6 +119,30 @@ export default function Settings() {
             ))}
           </div>
         </div>
+
+        {pixelAvailable() && (
+          <div className="card flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="text-section">{t('Publicité')}</h2>
+              <p className="text-caption text-muted">{t('Mesure de l’effet des campagnes publicitaires (Meta). Vous pouvez refuser à tout moment.')}</p>
+            </div>
+            <div className="inline-flex rounded-[8px] border border-hairline bg-surface p-0.5">
+              {([true, false] as const).map((v) => (
+                <button
+                  key={String(v)}
+                  type="button"
+                  onClick={() => {
+                    updateConsent(v);
+                    setAdConsent(v);
+                  }}
+                  className={`rounded-[6px] px-3 py-1.5 text-caption font-semibold transition ${adConsent === v ? 'bg-ink text-surface' : 'text-muted hover:text-ink'}`}
+                >
+                  {t(v ? 'Accepter' : 'Refuser')}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="card lg:col-span-2">
           <h2 className="text-section">{t('Comment voulez-vous voir l’application ?')}</h2>
