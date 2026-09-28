@@ -20,6 +20,18 @@ export default function ImportProducts({ open, onClose, autoFinjaro }: { open: b
   const [done, setDone] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
   const currency = db.company.currency;
+  // « Photo ou dictée » passe par l'assistant (Gemini) : caché tant que ce
+  // moteur ne répond pas, plutôt qu'un bouton qui échoue pour la personne
+  // pressée qui tente l'option la plus facile. DeepSeek (le moteur de
+  // secours texte) ne lit pas les photos, donc /api/health (ai_gemini) est
+  // le seul signal fiable. Trouvé par Alpha, 28/09.
+  const [visionOk, setVisionOk] = useState(false);
+  useEffect(() => {
+    fetch('/api/health')
+      .then((r) => r.json())
+      .then((j) => setVisionOk(!!j.ai_gemini))
+      .catch(() => setVisionOk(false));
+  }, []);
 
   // Ouvert depuis « Reprendre les articles de ma boutique Finjaro » (Products.tsx,
   // écran vide) : on saute directement au résultat, la personne a déjà cliqué une fois.
@@ -123,7 +135,7 @@ export default function ImportProducts({ open, onClose, autoFinjaro }: { open: b
       {error && <div className="mb-4 rounded-input bg-[#FDEDED] px-4 py-3 text-caption text-[#A63030]">{error}</div>}
 
       {!rows && (
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className={`grid gap-3 ${visionOk ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
           <button onClick={() => void fromFinjaro()} disabled={busy} className="tile items-start text-left">
             <span className="text-2xl">🛍️</span>
             <span className="text-body font-semibold">{t('Depuis ma boutique Finjaro')}</span>
@@ -135,11 +147,13 @@ export default function ImportProducts({ open, onClose, autoFinjaro }: { open: b
             <span className="text-caption text-muted">{t('Colonnes : Nom, Prix, Coût, Stock, Catégorie — dans n’importe quel ordre.')}</span>
             <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={(e) => void fromFile(e.target.files?.[0])} />
           </button>
-          <div className="tile items-start text-left">
-            <span className="text-2xl">📷</span>
-            <span className="text-body font-semibold">{t('Photo ou dictée')}</span>
-            <span className="text-caption text-muted">{t('Ouvrez l’assistant (bouton en bas à droite), photographiez votre cahier ou dictez la liste.')}</span>
-          </div>
+          {visionOk && (
+            <div className="tile items-start text-left">
+              <span className="text-2xl">📷</span>
+              <span className="text-body font-semibold">{t('Photo ou dictée')}</span>
+              <span className="text-caption text-muted">{t('Ouvrez l’assistant (bouton en bas à droite), photographiez votre cahier ou dictez la liste.')}</span>
+            </div>
+          )}
         </div>
       )}
 
