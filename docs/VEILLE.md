@@ -11,6 +11,62 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 27/09/2026
+
+**Semaine encore pauvre : rien côté concurrence, un seul fait réglementaire
+(France, sans urgence), deux faits techniques — dont un qui mérite une
+vérification rapide sur la base partagée.**
+
+### Concurrence
+
+Rien retenu. Aucun fait daté du 20 au 27/09 trouvé et vérifié pour Wave,
+Bumpa, Kippa, Flowcart, Khatabook, Vyapar, OkCredit, Sage, QuickBooks, Zoho
+Books ou Jumia. Point noté en passant : Kippa (Nigeria) semble à l'arrêt
+depuis 2025 (site indisponible, fondateurs partis) — pas un fait de cette
+semaine, mais à ne plus compter comme concurrent actif si le sujet revient.
+
+### Règles, impôts et paiements
+
+- **France : confirmation d'une phase de tolérance sans sanction jusqu'à
+  fin 2026 pour la facturation électronique.** L'obligation de réception
+  est en vigueur depuis le 01/09/2026 pour toutes les entreprises
+  assujetties à la TVA ; l'administration a annoncé ne pas sanctionner les
+  entreprises en difficulté jusqu'à la fin de l'année. Publié le
+  23/09/2026.
+  [kohenavocats.fr](https://kohenavocats.fr/2026/09/23/facture-electronique-obligatoire-1-septembre-2026-sarl-sas-recevoir-emettre-sanctions-contester/)
+  → Aucune urgence si Finjaro sert un jour un commerçant facturant vers la
+  France ; l'obligation reste active, juste non sanctionnée pour l'instant.
+- Dossier FNE/RNE Côte d'Ivoire (tension FENACCI/DGI) : toujours aucun
+  développement depuis le 05/09 — dossier apparemment gelé pour l'instant.
+  Échéance BCEAO PI-SPI du 30/09 : rien de nouveau au-delà du rappel déjà
+  noté. Rien sur MTN MoMo, Orange Money, Cameroun, Gabon, Sénégal.
+
+### Technologie et IA
+
+- **Supabase met à jour Postgres (15.19 / 17.11) — action possible sur la
+  base partagée.** Corrige 44 CVE cumulées. Deux points « breaking » :
+  les index sur colonnes `ltree` et `btree_gist` construits avec l'ancienne
+  version peuvent renvoyer des résultats **silencieusement incomplets**
+  s'il y a un encodage multioctet ou un collationnement non-libc ; il faut
+  les reconstruire avec `REINDEX INDEX CONCURRENTLY` si c'est le cas.
+  Publié le 25/09/2026.
+  [supabase.com/changelog](https://supabase.com/changelog/postgres-15-19-17-11-breaking-changes)
+  → **Vérifié : les migrations de Finjaro Accounting n'utilisent ni `ltree`
+  ni `btree_gist`.** Le projet `bokwivwizghdlaedczbw` étant partagé avec
+  d'autres applications, signalé à Alpha pour vérification côté
+  place de marché et Legion.
+- **Google lance Gemini 3.8 Flash TTS** (synthèse vocale, pas
+  reconnaissance) : plus de 100 langues, bibliothèque élargie à plus de
+  2000 voix. Publié le 23/09/2026.
+  [unite.ai](https://www.unite.ai/google-rolls-out-gemini-3-8-speech-models-in-api-and-ai-studio/)
+  → C'est de la voix générée, pas de la saisie vocale : pas directement
+  utile pour lire un reçu, mais pourrait un jour faire lire des montants à
+  voix haute dans une langue locale.
+- Rien de nouveau ailleurs (OCR de reçus, PWA/offline, Capacitor, WhatsApp
+  Business) : soit hors fenêtre stricte, soit déjà noté.
+
+---
+
 ## 26/09/2026
 
 **Semaine la plus pauvre depuis longtemps : rien côté concurrence, rien côté
