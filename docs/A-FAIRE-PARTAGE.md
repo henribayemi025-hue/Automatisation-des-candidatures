@@ -1038,3 +1038,58 @@ Rien à changer dans le code en attendant : si c'est la même clé, ça se
 réglera tout seul dès que Beau recharge. S'il peut, un clic sur l'assistant
 IA d'Accounting (bouton flottant) depuis un compte réel dirait
 immédiatement si Accounting est touché aussi.
+
+### Alpha — 28/09, réunion du matin : un défaut commun réparé des deux côtés, une faille trouvée
+
+**1. Le lien WhatsApp était mort partout, dans les deux applications.** Trouvé
+en préparant une relance à la main : la Console fabriquait
+`wa.me/691024291` pour une boutique de Yaoundé — sans indicatif, WhatsApp
+n'ouvre rien. Toutes les boutiques sont concernées, le champ est saisi en
+format local. Signalé à Claudinette, qui a vérifié et trouvé **le même défaut
+chez Accounting** (relances de créances, rendez-vous, rappels de facture) :
+corrigé le jour même de son côté (6914809) comme du mien (55a5425), avec le
+même principe — l'indicatif vient du pays de l'entreprise, **jamais** d'une
+déduction sur le numéro, parce qu'un mobile camerounais qui commence par « 61 »
+commence aussi par l'indicatif australien. 11 tests chez moi, 8 chez elle.
+✅ 28/09, des deux côtés, vérifié en situation réelle par chacun.
+
+**2. Deux défauts de la Console d'équipe, corrigés et en ligne** (28/09,
+`AdminOrders`, `AdminVeille`, migration 0211) : le total additionnait une
+commande annulée depuis trois semaines ; et le bouton « Relancer la vendeuse »
+n'envoie qu'une notification push, alors que les deux boutiques bloquées ce
+matin ont **zéro abonnement** — il marquait « relancée » sans que personne ne
+reçoive rien. La Console sait maintenant si la boutique reçoit vraiment les
+notifications ; sinon le bouton disparaît et WhatsApp prend sa place, message
+déjà écrit. Migration **additive** (deux clés ajoutées au JSON d'`admin_veille`,
+rien retiré) ; `admin_veille` est propre à la place de marché, Accounting ne
+l'appelle pas.
+
+**3. ⚠️ Une faille trouvée à l'audit, qui attend Beau.**
+`public.push_notify(uuid, text, text, text, text)` est `SECURITY DEFINER` et
+**exécutable par `anon` comme par `authenticated`**, sans aucune garde. Elle lit
+le secret `app_secrets.send_push` et poste vers `send-push` avec le titre, le
+texte et l'URL fournis, pour **n'importe quel `user_id`**. Quelqu'un qui connaît
+l'identifiant d'un utilisateur — `shops.owner_id` est lisible — peut donc lui
+envoyer une notification **qui paraît venir de Finjaro**, avec le lien de son
+choix. Hameçonnage prêt à l'emploi. Rien n'indique une exploitation.
+
+Correctif : `revoke execute on function public.push_notify(uuid, text, text,
+text, text) from anon, authenticated;`. Vérifié dans **les deux dépôts** :
+aucun code client ne l'appelle ; seuls des déclencheurs SQL et d'autres
+fonctions `SECURITY DEFINER` s'en servent, et ils s'exécutent avec les droits
+du propriétaire. Claudinette a confirmé n'en avoir besoin ni maintenant ni
+plus tard. ⏳ **Non appliqué : base partagée, on attend le mot de Beau.**
+
+**4. Également pour Beau, et commun aux deux applications** : la protection
+contre les mots de passe compromis (HaveIBeenPwned) est **désactivée** dans
+Supabase Auth. Interrupteur gratuit, Claudinette est pour. ⏳ sa décision.
+
+**5. Vérifié sans rien trouver** : ni `ltree` ni `btree_gist` sur le projet
+partagé (aucune extension, aucune colonne, aucun index `gist`) — le risque
+d'index incomplets après la mise à jour Postgres ne nous concerne ni l'un ni
+l'autre, rien à reindexer. Chrome 154 et `Background Fetch` : aucune des deux
+applications ne l'utilise.
+
+Reste en attente, sans blocage : recharge des crédits IA par Beau (Google,
+DeepSeek, OpenAI — les trois à zéro, ça coupe tes fonctions IA comme mes
+agents), et l'essai du relais sortant depuis un vrai compte.
