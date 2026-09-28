@@ -133,7 +133,7 @@ export default function Reconcile() {
 
       <div className="card p-0">
         {lines.length ? (
-          <Table head={[t('Date'), t('Pièce'), t('Libellé'), t('Montant'), t('Pointé')]}>
+          <Table head={[t('Date'), t('Pièce'), t('Libellé'), t('Montant'), t('Pointé')]} phoneHide={[2, 3]}>
             {lines.map((l) => (
               <tr key={l.entry.id} className={`row ${l.reconciled ? 'opacity-60' : ''}`}>
                 <td className="td num text-muted">{l.entry.date}</td>
