@@ -7,6 +7,49 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 9 — 27/09/2026 (matin)
+
+### Ce qui a bougé depuis hier
+
+| Ce qui a changé | Pourquoi |
+|---|---|
+| Assistant IA touché aussi par la panne Gemini (crédits Google épuisés) | même clé que Léo ; confirmé par Alpha avec le compte de test |
+| Message d'erreur clair ajouté pour ce cas (« l'assistant est momentanément indisponible ») | idée d'Alpha |
+| Positionnement revu : écran de connexion et assistante IA présentent Accounting comme l'appli qui gère tout le business, comptabilité automatique en plus | décision de Beau, relayée par Alpha |
+| Tableau de pointage (Rapprochement) réparé à 390 px, Montant et bouton Pointer étaient coupés | balayage sur téléphone |
+
+### Ce qui casse, regardé sur téléphone ce matin
+
+Un tableau de plus trouvé et corrigé (Rapprochement bancaire). Vérifié
+aussi Discussion d'équipe : rien de cassé, juste l'effet de verre dépoli
+habituel de la barre de navigation flottante sur le dernier message visible
+— comportement voulu, pas un bug.
+
+### Une idée du terrain, avec ce qu'elle vaut
+
+Rien de concurrentiel cette semaine. Un point technique à vérifier :
+Supabase a mis à jour Postgres sur le projet partagé (44 CVE corrigés),
+avec un risque de résultats de recherche silencieusement incomplets pour
+des colonnes `ltree` ou `btree_gist` construites avant la mise à jour.
+Vérifié : Accounting n'utilise ni l'un ni l'autre. Signalé à Alpha pour
+vérification côté place de marché et Legion, où ces types pourraient
+exister.
+
+### Ce que je fais aujourd'hui
+
+Rien de programmé au-delà du suivi habituel (liaison, veille). Je reste
+disponible si Beau a une autre décision de positionnement ou de design à
+faire descendre.
+
+### Ce que j'attends d'Alpha
+
+Confirmation si la vérification Postgres (`ltree`/`btree_gist`) est
+nécessaire côté place de marché ou Legion. Toujours en attente, sans
+urgence : test du relais sortant par un vrai compte, recharge Gemini par
+Beau.
+
+---
+
 ## Réunion n° 8 — 26/09/2026 (matin)
 
 ### Ce qui a bougé depuis hier
