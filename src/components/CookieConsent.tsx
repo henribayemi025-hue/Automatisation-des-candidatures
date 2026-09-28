@@ -10,11 +10,15 @@ export default function CookieConsent({ country }: { country?: string }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    const consent = getConsent();
+    // Un refus donné dans Paramètres vaut partout, y compris hors Europe où
+    // le pixel démarre sans bandeau : sans cette ligne, il se rechargeait à
+    // la visite suivante comme si de rien n'était.
+    if (consent === 'declined') return;
     if (!requiresConsent(country)) {
       loadPixel();
       return;
     }
-    const consent = getConsent();
     if (consent === 'accepted') loadPixel();
     else if (consent === null) setVisible(true);
   }, [country]);
