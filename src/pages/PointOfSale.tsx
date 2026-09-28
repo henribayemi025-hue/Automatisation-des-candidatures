@@ -12,6 +12,7 @@ import { availableQty, isComposed, missingFor } from '../lib/recipes';
 import ProjectSelect from '../components/ProjectSelect';
 import { outstanding } from '../lib/metrics';
 import { aRendre, billetsProposes } from '../lib/monnaie';
+import { maybeAskNotificationPermission } from '../lib/reminders';
 
 const METHODS: { value: PaymentMethod; label: string }[] = [
   { value: 'CASH', label: 'Espèces' },
@@ -288,6 +289,10 @@ export default function PointOfSale() {
     });
     reset();
     setReceipt(sale);
+    // Demander la permission de notification juste après un encaissement
+    // réussi, quand la personne vient de voir que l'application lui sert —
+    // jamais à l'ouverture. Sans effet pour un devis (rien n'est encaissé).
+    if (!asQuote) maybeAskNotificationPermission();
   }
 
   return (

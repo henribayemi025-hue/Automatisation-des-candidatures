@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
 import { dedupe, fetchFinjaroProducts, parseSpreadsheet } from '../lib/importers';
@@ -9,7 +9,7 @@ import { IconDownload } from './Icons';
 import { t } from '../lib/i18n';
 
 /** Trois façons de ne pas tout retaper : boutique Finjaro, fichier Excel/CSV, ou l'assistant (photo/dictée). */
-export default function ImportProducts({ open, onClose }: { open: boolean; onClose: () => void }) {
+export default function ImportProducts({ open, onClose, autoFinjaro }: { open: boolean; onClose: () => void; autoFinjaro?: boolean }) {
   const { db, saveProduct } = useStore();
   const { user } = useCollab();
   const [rows, setRows] = useState<ImportRow[] | null>(null);
@@ -20,6 +20,13 @@ export default function ImportProducts({ open, onClose }: { open: boolean; onClo
   const [done, setDone] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
   const currency = db.company.currency;
+
+  // Ouvert depuis « Reprendre les articles de ma boutique Finjaro » (Products.tsx,
+  // écran vide) : on saute directement au résultat, la personne a déjà cliqué une fois.
+  useEffect(() => {
+    if (open && autoFinjaro) void fromFinjaro();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, autoFinjaro]);
 
   function reset() {
     setRows(null);

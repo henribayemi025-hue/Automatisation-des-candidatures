@@ -111,12 +111,13 @@ export function ShareBar({ value, total, tone = 'accent' }: { value: number; tot
   );
 }
 
-export function Empty({ title, hint, icon }: { title: string; hint?: string; icon?: ReactNode }) {
+export function Empty({ title, hint, icon, action }: { title: string; hint?: string; icon?: ReactNode; action?: ReactNode }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
       {icon && <div className="text-hairline">{icon}</div>}
       <p className="text-body font-semibold text-ink">{title}</p>
       {hint && <p className="max-w-sm text-caption text-muted">{hint}</p>}
+      {action && <div className="mt-2 flex flex-wrap items-center justify-center gap-2">{action}</div>}
     </div>
   );
 }

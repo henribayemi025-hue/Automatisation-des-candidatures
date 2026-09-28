@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useStore } from '../lib/store';
+import { useCollab } from '../lib/collab';
 import { formatMoney, toMajor, toMinor } from '../lib/money';
 import type { Product, RevenueKind } from '../lib/types';
 import { Badge, Empty, Field, Modal, PageHeader, Table } from '../components/UI';
 import { IconBox, IconDownload, IconPlus, IconSearch } from '../components/Icons';
 import ImportProducts from '../components/ImportProducts';
+import { fetchFinjaroProducts } from '../lib/importers';
 import { exportXlsx } from '../lib/xlsx';
 import { Link } from 'react-router-dom';
 import { t } from '../lib/i18n';
@@ -45,6 +47,33 @@ export default function Products() {
   const [form, setForm] = useState(BLANK);
   const [grid, setGrid] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [importAutoFinjaro, setImportAutoFinjaro] = useState(false);
+  const { user } = useCollab();
+  const isEmpty = db.products.length === 0;
+  // Catalogue vide : on regarde une fois si la personne a déjà une boutique
+  // Finjaro avec des articles, pour lui proposer de les reprendre en un clic
+  // plutôt que de les retaper. Trouvé le 28/09 par Alpha : 3 des 8 inscrits
+  // Accounting cette quinzaine sont aussi vendeuses sur la place de marché.
+  const [finjaroCount, setFinjaroCount] = useState<number | null>(null);
+  useEffect(() => {
+    if (!isEmpty || !user) return;
+    let cancelled = false;
+    fetchFinjaroProducts(user.id, currency)
+      .then(({ rows }) => {
+        if (!cancelled) setFinjaroCount(rows.length);
+      })
+      .catch(() => {
+        if (!cancelled) setFinjaroCount(0);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isEmpty, user, currency]);
+
+  function openImport(autoFinjaro = false) {
+    setImportAutoFinjaro(autoFinjaro);
+    setImportOpen(true);
+  }
 
   function exportExcel() {
     exportXlsx(
@@ -202,7 +231,7 @@ export default function Products() {
             <button onClick={() => setGrid((g) => !g)} className={grid ? 'btn-dark' : 'btn-ghost'} title={t('Modifier les prix directement dans le tableau, comme dans un tableur')}>
               {grid ? t('Quitter le mode tableau') : t('Mode tableau')}
             </button>
-            <button onClick={() => setImportOpen(true)} className="btn-ghost">
+            <button onClick={() => openImport(false)} className={isEmpty ? 'btn-primary' : 'btn-ghost'}>
               <IconDownload className="h-4 w-4" />
               {t('Importer')}
             </button>
@@ -212,7 +241,7 @@ export default function Products() {
             <button onClick={exportCsv} className="btn-ghost">
               {t('CSV')}
             </button>
-            <button onClick={openNew} className="btn-primary">
+            <button onClick={openNew} className={isEmpty ? 'btn-ghost' : 'btn-primary'}>
               <IconPlus className="h-4 w-4" />
               {t('Nouveau {item}', { item: t(trade.item).toLowerCase() })}
             </button>
@@ -308,20 +337,37 @@ export default function Products() {
           </Table>
         ) : (
           <Empty
-            title={db.products.length === 0 ? t('Rien dans « {items} » pour l’instant', { items: t(trade.itemsTitle) }) : t('Rien trouvé')}
+            title={isEmpty ? t('Rien dans « {items} » pour l’instant', { items: t(trade.itemsTitle) }) : t('Rien trouvé')}
             hint={
-              db.products.length === 0
-                ? t('Par exemple : {examples}. Vous pouvez aussi importer un fichier Excel ou photographier une liste.', {
-                    examples: trade.examples.map((e) => e.name).join(', '),
-                  })
+              isEmpty
+                ? t('Par exemple : {examples}.', { examples: trade.examples.map((e) => e.name).join(', ') })
                 : t('Essayez un autre mot, ou retirez le filtre de catégorie.')
             }
             icon={<IconBox className="h-10 w-10" />}
+            action={
+              isEmpty ? (
+                <>
+                  {!!finjaroCount && (
+                    <button onClick={() => openImport(true)} className="btn-primary">
+                      <IconDownload className="h-4 w-4" />
+                      {t('Reprendre les {n} article(s) de ma boutique Finjaro', { n: finjaroCount })}
+                    </button>
+                  )}
+                  <button onClick={() => openImport(false)} className={finjaroCount ? 'btn-ghost' : 'btn-primary'}>
+                    <IconDownload className="h-4 w-4" />
+                    {t('Importer (Excel, boutique Finjaro, photo…)')}
+                  </button>
+                  <button onClick={openNew} className="btn-ghost">
+                    {t('Ou saisir {item} par {item}', { item: t(trade.item).toLowerCase() })}
+                  </button>
+                </>
+              ) : undefined
+            }
           />
         )}
       </div>
 
-      <ImportProducts open={importOpen} onClose={() => setImportOpen(false)} />
+      <ImportProducts open={importOpen} onClose={() => setImportOpen(false)} autoFinjaro={importAutoFinjaro} />
 
       <Modal open={open} onClose={() => setOpen(false)} title={editing ? t('Modifier') : t('Nouveau {item}', { item: t(trade.item).toLowerCase() })} wide>
         <div className="grid gap-4 sm:grid-cols-2">

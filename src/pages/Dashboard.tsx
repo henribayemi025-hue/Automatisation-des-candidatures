@@ -7,6 +7,7 @@ import { summarize } from '../lib/subscriptions';
 import { salesWithoutCost } from '../lib/liaison';
 import type { Period } from '../lib/kpi';
 import { productPerformance } from '../lib/metrics';
+import { missingRecentDays } from '../lib/reminders';
 import { factor, formatMoney, formatNumber } from '../lib/money';
 import { Money, PageHeader } from '../components/UI';
 import StartGuide from '../components/StartGuide';
@@ -106,6 +107,7 @@ export default function Dashboard() {
   const k = useMemo(() => dashboard(db, period, todayISO, divisor), [db, period, todayISO, divisor]);
   const subs = useMemo(() => summarize(db, todayISO), [db, todayISO]);
   const noCost = useMemo(() => salesWithoutCost(db), [db]);
+  const missingDays = useMemo(() => missingRecentDays(db), [db]);
   const top = useMemo(() => productPerformance(db, k.series.dates[0], todayISO).slice(0, 6), [db, k.series.dates, todayISO]);
   const topMax = top[0]?.revenue ?? 1;
   const hasData = k.series.revenue.some((v) => v > 0) || k.series.expenses.some((v) => v > 0);
@@ -366,6 +368,20 @@ export default function Dashboard() {
                 {t('À traiter')}
               </h2>
               <ul className="space-y-1.5 text-caption">
+                {missingDays.length > 0 && (
+                  <li>
+                    <Link to="/rattrapage" className="flex justify-between hover:text-teal">
+                      <span>
+                        {t('Il manque les écritures de {days}', {
+                          days: missingDays
+                            .map((d) => new Date(`${d}T12:00:00.000Z`).toLocaleDateString(locale(), { weekday: 'long' }))
+                            .join(', '),
+                        })}
+                      </span>
+                      <IconChevronRight className="h-4 w-4" />
+                    </Link>
+                  </li>
+                )}
                 {noCost.sales.length > 0 && (
                   <li>
                     <Link to="/ventes" className="flex justify-between hover:text-teal">
@@ -422,7 +438,7 @@ export default function Dashboard() {
                     </Link>
                   </li>
                 )}
-                {!(k.outOfStock > 0 || k.lowStock > 0 || k.receivablesOverdue > 0 || k.openSession) && (
+                {!(missingDays.length > 0 || k.outOfStock > 0 || k.lowStock > 0 || k.receivablesOverdue > 0 || k.openSession) && (
                   <li className="py-4 text-center text-muted">{t('Rien à traiter : stock, créances et caisse sont en ordre.')}</li>
                 )}
               </ul>
