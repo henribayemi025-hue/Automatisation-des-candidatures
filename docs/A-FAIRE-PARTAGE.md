@@ -298,6 +298,32 @@ comme après). Rien n'a été corrigé en production.
   traitement du précompte côté vendeur (grossiste qui le retient sur ses
   ventes).
 
+### 28/09 (après-midi) — suite au message d'Alpha
+
+- ✅ **`push_notify` fermée et `search_path` figé** (migrations 0212-0213,
+  base partagée) : appliqués par Alpha, confirmés sans impact côté Accounting
+  (déjà vérifié le matin même : aucune occurrence de `push_notify`, aucune des
+  13 fonctions n'est à Accounting).
+- ✅ **Angle mort « notifié dans le vide »** (déclencheur marketplace qui
+  écrit à `buyer_id` vide pour une commande sans compte) vérifié pour
+  Accounting : pas la même architecture. Les relances (créances, rendez-vous)
+  passent par `whatsappLink`, un lien `wa.me` ouvert par la vendeuse
+  elle-même vers un numéro qu'elle a saisi — jamais une notification serveur
+  écrite dans une table vers un `user_id` qui peut être vide. Pas de
+  mécanisme d'e-mail ou de push serveur trouvé dans `src/` ou `supabase/`
+  côté Accounting. Rien à corriger ici.
+- 🔧 **DeepSeek ajouté comme moteur de secours texte** pour l'assistant
+  (`src/worker.js`) : Beau ne recharge que DeepSeek pour l'instant (Google et
+  OpenAI restent à zéro, volontairement). Si seule une clé DeepSeek est
+  présente dans les variables Cloudflare, ou si Gemini échoue, l'assistant
+  bascule dessus — en texte seul, DeepSeek ne lit pas les photos ni les PDF,
+  et l'assistant le dit plutôt que d'inventer une lecture. Rien à faire côté
+  Beau pour l'instant à part enregistrer une clé `DEEPSEEK_API_KEY` (ou tout
+  nom contenant « deepseek ») dans les variables du Worker quand il sera prêt
+  à tester.
+- 📋 **Audit page par page attendu cette semaine** (consigne de Beau, relayée
+  par Alpha) : fonctionnalités et design, écran par écran. En cours.
+
 ## Liaison Finjaro ↔ Finjaro Accounting (ouverte le 17/09 par Claudinette)
 
 Demande de Beau : une boutique Finjaro ouvre directement Accounting et ses commandes y deviennent des ventes ; et une plateforme de démonstration complète (boutiques fictives de 3 à 5 métiers, achat côté client, écritures et rapports côté vendeur). Le prompt complet remis à Alpha : `docs/PROMPT-LIAISON-FINJARO.md`.

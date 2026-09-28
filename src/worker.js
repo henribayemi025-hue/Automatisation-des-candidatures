@@ -26,6 +26,15 @@ function geminiKey(env) {
   return null;
 }
 
+function deepseekKey(env) {
+  if (env.DEEPSEEK_API_KEY) return env.DEEPSEEK_API_KEY;
+  for (const [k, v] of Object.entries(env)) {
+    if (typeof v !== 'string' || v.length < 20) continue;
+    if (/deepseek/i.test(k)) return v;
+  }
+  return null;
+}
+
 const ROUTES = [
   ['/', 'Accueil : chiffres du jour, guide de démarrage'],
   ['/pos', 'Vendre : le comptoir, enregistrer une vente ou un devis'],
@@ -196,6 +205,33 @@ async function callGemini(apiKey, body) {
   throw new Error(lastError);
 }
 
+const DEEPSEEK_TIMEOUT_MS = 30_000;
+
+// DeepSeek : moteur de secours texte seul (pas de lecture de photo/PDF, l'API
+// DeepSeek ne prend pas d'image en entrée). N'est utilisé que si Google n'a
+// pas de clé, ou si Google a échoué et que le dernier message n'a pas de
+// pièce jointe.
+async function callDeepSeek(apiKey, systemPromptText, messages) {
+  const chat = [
+    { role: 'system', content: systemPromptText },
+    ...messages.map((m) => ({
+      role: m.role === 'assistant' ? 'assistant' : 'user',
+      content: String(m.text ?? '').slice(0, 4000),
+    })),
+  ];
+  const res = await fetch('https://api.deepseek.com/chat/completions', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({ model: 'deepseek-chat', messages: chat, temperature: 0.4, max_tokens: 1024 }),
+    signal: AbortSignal.timeout(DEEPSEEK_TIMEOUT_MS),
+  });
+  if (!res.ok) throw new Error(`deepseek ${res.status}`);
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content ?? '';
+  if (!text.trim()) throw new Error('deepseek empty');
+  return { text, model: 'deepseek-chat' };
+}
+
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -206,7 +242,8 @@ function json(data, status = 200) {
 async function handleAssistant(req, env) {
   if (req.method !== 'POST') return json({ error: 'method' }, 405);
   const apiKey = geminiKey(env);
-  if (!apiKey) return json({ error: 'missing_api_key' }, 503);
+  const dsKey = deepseekKey(env);
+  if (!apiKey && !dsKey) return json({ error: 'missing_api_key' }, 503);
 
   const user = await verifyUser(req);
   if (!user) return json({ error: 'unauthorized' }, 401);
@@ -220,6 +257,27 @@ async function handleAssistant(req, env) {
   }
   const messages = Array.isArray(payload.messages) ? payload.messages.slice(-MAX_MESSAGES) : [];
   if (!messages.length) return json({ error: 'empty' }, 400);
+
+  const lastMessage = messages[messages.length - 1];
+  const hasFiles = Array.isArray(lastMessage?.files) ? lastMessage.files.length > 0 : !!lastMessage?.image;
+
+  // Ni Google, ni un dernier message sans photo/PDF pour DeepSeek : on ne
+  // fait pas semblant de lire un document qu'on ne peut pas voir.
+  if (!apiKey && hasFiles) {
+    return json({
+      text: "Je ne peux pas encore lire les photos ni les PDF avec le moteur disponible en ce moment. Décrivez-moi le contenu en texte, ou réessayez plus tard.",
+      model: 'deepseek-chat',
+    });
+  }
+
+  if (!apiKey) {
+    try {
+      const { text, model } = await callDeepSeek(dsKey, systemPrompt(payload.context), messages);
+      return json({ text, model });
+    } catch (e) {
+      return json({ error: 'gemini_unavailable', detail: String(e?.message ?? e) }, 502);
+    }
+  }
 
   const contents = messages.map((m, i) => {
     const parts = [{ text: String(m.text ?? '').slice(0, 4000) }];
@@ -245,6 +303,14 @@ async function handleAssistant(req, env) {
     const { text, model } = await callGemini(apiKey, body);
     return json({ text, model });
   } catch (e) {
+    if (dsKey && !hasFiles) {
+      try {
+        const { text, model } = await callDeepSeek(dsKey, systemPrompt(payload.context), messages);
+        return json({ text, model });
+      } catch (e2) {
+        return json({ error: 'gemini_unavailable', detail: String(e2?.message ?? e2) }, 502);
+      }
+    }
     return json({ error: 'gemini_unavailable', detail: String(e?.message ?? e) }, 502);
   }
 }
@@ -265,7 +331,7 @@ export default {
     if (url.pathname === '/api/health') {
       // Noms des variables vues par le worker (jamais les valeurs), pour diagnostiquer.
       const vars = Object.keys(env).filter((k) => k !== 'ASSETS');
-      return json({ ok: true, ai: !!geminiKey(env), variables: vars });
+      return json({ ok: true, ai: !!geminiKey(env) || !!deepseekKey(env), ai_gemini: !!geminiKey(env), ai_deepseek: !!deepseekKey(env), variables: vars });
     }
     return env.ASSETS.fetch(req);
   },
