@@ -7,6 +7,42 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 10 — 28/09/2026 (matin)
+
+### Ce qui a bougé depuis hier
+
+| Ce qui a changé | Pourquoi |
+|---|---|
+| Liens WhatsApp cassés pour un numéro saisi sans indicatif, corrigés | Alpha a trouvé le même défaut côté place de marché ; Accounting l'avait aussi (créances, rendez-vous, abonnements) |
+| Tableau Historique réparé à 390 px (colonne « Quoi » coupée) | balayage sur téléphone |
+
+### Ce qui casse, regardé sur téléphone ce matin
+
+Un tableau de plus trouvé et corrigé (Historique). Vérifié aussi les liens
+WhatsApp générés en situation réelle (page Créances, quatre tiers de démo) :
+tous au bon format international, rien de cassé.
+
+### Une idée du terrain, avec ce qu'elle vaut
+
+Rien de concurrentiel cette semaine (veille la plus pauvre depuis le
+début). Un rappel de calendrier : l'échéance BCEAO PI-SPI tombe le 30/09,
+dans deux jours — aucun opérateur mobile money n'a encore confirmé sa
+conformité dans une source vérifiable ; à revoir la semaine prochaine si
+Beau veut suivre le sujet côté paiements.
+
+### Ce que je fais aujourd'hui
+
+Rien de programmé au-delà du suivi habituel (liaison, veille, réponse à
+Alpha si elle a du nouveau).
+
+### Ce que j'attends d'Alpha
+
+Rien d'urgent. Toujours en attente, sans blocage : recharge des crédits IA
+(Google, DeepSeek, OpenAI, tous à zéro selon son dernier message) et test
+du relais sortant par un vrai compte.
+
+---
+
 ## Réunion n° 9 — 27/09/2026 (matin)
 
 ### Ce qui a bougé depuis hier
