@@ -5,6 +5,7 @@ import { useCollab } from '../lib/collab';
 import { CURRENCIES, currencyLabel } from '../lib/money';
 import { GOALS, SECTORS } from '../lib/guide';
 import { COUNTRIES, countryProfile, profileToCompany, taxRegimesFor, taxRegime } from '../lib/countries';
+import { sectorProfile } from '../lib/sector';
 import { LanguageSwitch, t } from '../lib/i18n';
 import { Field } from '../components/UI';
 import { IconCheck, IconChevronRight } from '../components/Icons';
@@ -21,8 +22,14 @@ export default function Onboarding() {
   const [currency, setCurrency] = useState(db.company.currency);
   const [regime, setRegime] = useState<TaxRegime>(taxRegime(db.company));
   const [goals, setGoals] = useState<string[]>(db.company.goals ?? []);
+  // Choix explicite, distinct du mode SIMPLE/EXPERT : quelqu'un peut vendre
+  // « c'est tout » en mode expert, ou tenir son stock en mode simple. Sans
+  // ce choix, la personne qui n'a jamais l'intention de remplir un stock
+  // butait sur un catalogue vide sans échappatoire (trouvé par Alpha, 28/09,
+  // sur l'entonnoir réel : 2 des 8 comptes ont vendu, les deux sans article).
+  const [sellMode, setSellMode] = useState<'stock' | 'simple' | null>(null);
 
-  const steps = ['Votre activité', 'Votre entreprise', 'Ce que vous voulez faire'];
+  const steps = ['Votre activité', 'Votre entreprise', 'Ce que vous voulez faire', 'Comment vous vendez'];
   const profile = countryProfile(country);
   // Les régimes suivent le pays : pas d'IGS en France, pas de micro-entreprise
   // au Cameroun. Voir `taxRegimesFor`.
@@ -41,6 +48,10 @@ export default function Onboarding() {
     // aucune raison de rester. La caisse en donne une : encaisser.
     // Avec des données d'exemple, le tableau de bord a du sens : on l'y laisse.
     const expert = goals.includes('accounting') || withDemo;
+    // Avec la démo, on garde le comportement d'avant (le stock suit le
+    // métier de démonstration) : le choix explicite ne s'applique qu'à une
+    // vraie installation.
+    const chosenStock = withDemo ? undefined : sellMode === 'stock';
     setCompany({
       ...(profile ? profileToCompany(profile) : {}),
       taxRegime: regime,
@@ -51,6 +62,7 @@ export default function Onboarding() {
       currency,
       goals,
       mode: expert ? 'EXPERT' : 'SIMPLE',
+      ...(chosenStock !== undefined ? { tracksStock: chosenStock } : {}),
       onboarded: true,
     });
     // Découverte : trois mois d'activité déjà saisis, dans la devise choisie.
@@ -69,7 +81,7 @@ export default function Onboarding() {
     else window.location.hash = '#/pos';
   }
 
-  const canNext = step === 0 ? !!sector : step === 1 ? name.trim().length > 0 && !!currency : goals.length > 0;
+  const canNext = step === 0 ? !!sector : step === 1 ? name.trim().length > 0 && !!currency : step === 2 ? goals.length > 0 : !!sellMode;
 
   return (
     <div className="min-h-screen bg-base px-4 py-8 sm:px-8">
@@ -235,11 +247,43 @@ export default function Onboarding() {
             </>
           )}
 
+          {step === 3 && (
+            <>
+              <h1 className="font-display text-[28px] font-bold text-ink">{t('Comment voulez-vous vendre ?')}</h1>
+              <p className="mt-1 text-body text-muted">{t('Vous pourrez changer plus tard. Rien ne sera perdu.')}</p>
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => setSellMode('simple')}
+                  className={`flex flex-col items-start gap-1 rounded-card border-2 p-4 text-left transition ${sellMode === 'simple' ? 'border-teal bg-teal-light' : 'border-hairline bg-white hover:border-teal/50'}`}
+                >
+                  <span className="text-2xl">🧾</span>
+                  <span className="text-body font-semibold text-ink">{t('Je vends, c’est tout')}</span>
+                  <span className="text-caption text-muted">{t('J’encaisse des montants. Pas de liste d’articles à remplir.')}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSellMode('stock')}
+                  className={`flex flex-col items-start gap-1 rounded-card border-2 p-4 text-left transition ${sellMode === 'stock' ? 'border-teal bg-teal-light' : 'border-hairline bg-white hover:border-teal/50'}`}
+                >
+                  <span className="text-2xl">📦</span>
+                  <span className="text-body font-semibold text-ink">{t('Je gère mon stock')}</span>
+                  <span className="text-caption text-muted">{t('Je veux savoir ce qui me reste et ce que je gagne sur chaque article.')}</span>
+                </button>
+              </div>
+              {sellMode === 'simple' && sectorProfile(sector).tracksStock && (
+                <p className="mt-4 rounded-input bg-[#FBF1DF] px-3.5 py-2.5 text-caption text-ink">
+                  {t('D’ordinaire, ce métier tient un stock. Aucun souci : vous encaisserez des montants libres, et pourrez ajouter des articles quand vous voudrez, depuis les Paramètres.')}
+                </p>
+              )}
+            </>
+          )}
+
           <div className="mt-8 flex items-center justify-between">
             <button type="button" onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0} className="btn-ghost">
               {t('Retour')}
             </button>
-            {step < 2 ? (
+            {step < 3 ? (
               <button type="button" onClick={() => setStep((s) => s + 1)} disabled={!canNext} className="btn-primary">
                 {t('Continuer')}
                 <IconChevronRight className="h-4 w-4" />

@@ -14,7 +14,7 @@ import StartGuide from '../components/StartGuide';
 import Sparkline, { Ticker } from '../components/Sparkline';
 import { IconAlert, IconCamera, IconChevronRight, IconSparkle } from '../components/Icons';
 import { locale, t } from '../lib/i18n';
-import { sectorProfile } from '../lib/sector';
+import { sectorProfile, tracksStock } from '../lib/sector';
 
 const PERIODS: { value: Period; label: string; hint: string }[] = [
   { value: 'MTD', label: 'MTD', hint: 'Depuis le 1er du mois' },
@@ -113,6 +113,13 @@ export default function Dashboard() {
   const hasData = k.series.revenue.some((v) => v > 0) || k.series.expenses.some((v) => v > 0);
   const expert = db.company.mode === 'EXPERT';
   const trade = sectorProfile(db.company.sector);
+  // Sans stock, le coût des articles vendus est toujours à 0 (rien à
+  // rapprocher) : « Marge brute » afficherait ~100 % en permanence, un
+  // chiffre faux plutôt qu'un vrai zéro. Trouvé le 28/09 (Alpha, entonnoir
+  // mesuré) : les deux seules personnes ayant vendu sans catalogue voyaient
+  // exactement ça. Le Résultat, lui, reste juste tant que les achats sont
+  // notés en Dépenses : ventes − 0 − dépenses = ventes − dépenses.
+  const stocked = tracksStock(db.company);
 
   const chartData = k.series.dates.map((d, i) => ({
     date: d,
@@ -190,21 +197,23 @@ export default function Dashboard() {
           spark={k.series.revenue}
           to="/ventes"
         />
-        <KpiCard
-          label={t('Marge brute')}
-          code={expert ? 'SIG' : undefined}
-          value={k.current.marginRate === null ? '—' : `${(k.current.marginRate * 100).toFixed(1).replace('.', ',')} %`}
-          chip={<DeltaChip value={delta(k.current.grossMargin, k.previous.grossMargin)} label={t(k.compareLabel)} absolute={`${k.current.grossMargin - k.previous.grossMargin >= 0 ? '+' : '−'}${money(Math.abs(k.current.grossMargin - k.previous.grossMargin))}`} />}
-          foot={t('{amount} après coût des marchandises', { amount: money(k.current.grossMargin) })}
-          to="/analyse"
-          tone={k.current.marginRate !== null && k.current.marginRate < 0 ? 'negative' : undefined}
-        />
+        {stocked && (
+          <KpiCard
+            label={t('Marge brute')}
+            code={expert ? 'SIG' : undefined}
+            value={k.current.marginRate === null ? '—' : `${(k.current.marginRate * 100).toFixed(1).replace('.', ',')} %`}
+            chip={<DeltaChip value={delta(k.current.grossMargin, k.previous.grossMargin)} label={t(k.compareLabel)} absolute={`${k.current.grossMargin - k.previous.grossMargin >= 0 ? '+' : '−'}${money(Math.abs(k.current.grossMargin - k.previous.grossMargin))}`} />}
+            foot={t('{amount} après coût des marchandises', { amount: money(k.current.grossMargin) })}
+            to="/analyse"
+            tone={k.current.marginRate !== null && k.current.marginRate < 0 ? 'negative' : undefined}
+          />
+        )}
         <KpiCard
           label={t('Résultat')}
           code={expert ? '13' : undefined}
           value={<Money value={k.current.net} />}
           chip={<DeltaChip value={delta(k.current.net, k.previous.net)} label={t(k.compareLabel)} absolute={`${k.current.net - k.previous.net >= 0 ? '+' : '−'}${money(Math.abs(k.current.net - k.previous.net))}`} />}
-          foot={t('Marge − charges {amount}', { amount: money(k.current.expenses) })}
+          foot={stocked ? t('Marge − charges {amount}', { amount: money(k.current.expenses) }) : t('Rentré − dépensé {amount}', { amount: money(k.current.expenses) })}
           to="/etats"
           tone={k.current.net >= 0 ? 'positive' : 'negative'}
         />
@@ -349,7 +358,7 @@ export default function Dashboard() {
                         <span className="block h-1 rounded-full bg-teal" style={{ width: `${Math.max(4, (p.revenue / topMax) * 100)}%` }} />
                       </span>
                       <span className="shrink-0 whitespace-nowrap text-right text-[11px] tabular-nums text-muted">
-                        {p.qty} × · {p.revenue > 0 ? `${Math.round((p.margin / p.revenue) * 100)} %` : '—'}
+                        {stocked ? `${p.qty} × · ${p.revenue > 0 ? `${Math.round((p.margin / p.revenue) * 100)} %` : '—'}` : `${p.qty} ×`}
                       </span>
                     </div>
                   </li>
