@@ -117,6 +117,7 @@ export default function Debts() {
                               amount: formatMoney(rest, db.company.currency),
                               origin: d.origin,
                             }),
+                            db.company.country,
                           )}
                           target="_blank"
                           rel="noreferrer"

@@ -177,10 +177,10 @@ export default function Subscriptions() {
         <button onClick={() => setRenewing(sub)} className="text-sm font-semibold text-brand-600">{t('Encaisser une période')}</button>
       )}
       {sub.phone && sub.periods.length > 0 && (
-        <a href={whatsappLink(sub.phone, invoiceText(sub))} target="_blank" rel="noreferrer" className="text-sm font-semibold text-[#1F6F65]">{t('Facture WhatsApp')}</a>
+        <a href={whatsappLink(sub.phone, invoiceText(sub), db.company.country)} target="_blank" rel="noreferrer" className="text-sm font-semibold text-[#1F6F65]">{t('Facture WhatsApp')}</a>
       )}
       {sub.phone && (state === 'SOON' || state === 'EXPIRED') && (
-        <a href={whatsappLink(sub.phone, reminderText(sub, state))} target="_blank" rel="noreferrer" className="text-sm font-semibold text-[#1F6F65]">{t('Rappel WhatsApp')}</a>
+        <a href={whatsappLink(sub.phone, reminderText(sub, state), db.company.country)} target="_blank" rel="noreferrer" className="text-sm font-semibold text-[#1F6F65]">{t('Rappel WhatsApp')}</a>
       )}
       {sub.periods.length > 0 && (
         <button onClick={() => showInvoice(sub)} className="text-sm font-semibold text-muted">{t('Voir la facture')}</button>

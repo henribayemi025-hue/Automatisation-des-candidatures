@@ -102,7 +102,7 @@ export default function Appointments() {
     const texte = t('Bonjour {name}, petit rappel : votre rendez-vous {label} est prévu le {date} à {time}. À bientôt.', {
       name: a.customerName, label: a.label, date: a.date, time: a.time,
     });
-    window.open(whatsappLink(a.phone, texte), '_blank');
+    window.open(whatsappLink(a.phone, texte, db.company.country), '_blank');
   }
 
   return (

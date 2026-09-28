@@ -81,6 +81,44 @@ export function countryProfile(name: string): CountryProfile | undefined {
   return COUNTRIES.find((c) => c.name === name);
 }
 
+/**
+ * Indicatif téléphonique international par pays — pour fabriquer un lien
+ * WhatsApp valide (wa.me exige le format international) à partir d'un
+ * numéro saisi localement, sans indicatif. Trouvé le 28/09 : le même défaut
+ * existait côté place de marché (wa.me/691024291 au lieu de
+ * wa.me/237691024291), corrigé là-bas via le pays de la boutique — jamais
+ * en devinant depuis le numéro (un mobile camerounais qui commence par
+ * « 61 » commence aussi par l'indicatif australien).
+ */
+const DIAL_CODES: Record<string, string> = {
+  Cameroun: '237', Gabon: '241', Congo: '242', Tchad: '235', 'République centrafricaine': '236',
+  'Guinée équatoriale': '240', 'RD Congo': '243', Sénégal: '221', 'Côte d’Ivoire': '225', Bénin: '229',
+  Togo: '228', Mali: '223', 'Burkina Faso': '226', Niger: '227', Guinée: '224', Comores: '269',
+  Maroc: '212', Algérie: '213', Tunisie: '216', Nigeria: '234', Ghana: '233', Kenya: '254',
+  'Afrique du Sud': '27', Rwanda: '250', Éthiopie: '251', France: '33', Belgique: '32', Suisse: '41',
+  Luxembourg: '352', 'Royaume-Uni': '44', Irlande: '353', Allemagne: '49', Espagne: '34', Italie: '39',
+  Portugal: '351', 'Pays-Bas': '31', Canada: '1', 'États-Unis': '1', 'Émirats arabes unis': '971',
+  'Arabie saoudite': '966', Turquie: '90', Inde: '91', Chine: '86', Japon: '81', Australie: '61',
+  Brésil: '55', Mexique: '52', Haïti: '509',
+};
+
+/**
+ * Numéro au format international attendu par wa.me, à partir d'un numéro
+ * saisi librement et du pays de l'entreprise. Un numéro qui commence déjà
+ * par « + » ou « 00 » garde son indicatif tel quel ; sinon, l'indicatif du
+ * pays est ajouté (après avoir retiré un éventuel 0 initial, écrit par
+ * réflexe local — ex. France « 06 12 34 56 78 »).
+ */
+export function whatsappNumber(phone: string, country?: string): string {
+  const trimmed = phone.trim();
+  if (trimmed.startsWith('+')) return trimmed.replace(/[^\d]/g, '');
+  const digits = trimmed.replace(/[^\d]/g, '');
+  if (trimmed.startsWith('00')) return digits.slice(2);
+  const code = country ? DIAL_CODES[country] : undefined;
+  if (!code) return digits;
+  return code + digits.replace(/^0+/, '');
+}
+
 /** Régime d'imposition effectif : l'ancien réglage « taxe activée » vaut réel. */
 export function taxRegime(c: { taxRegime?: Company['taxRegime']; vatEnabled: boolean }): NonNullable<Company['taxRegime']> {
   return c.taxRegime ?? (c.vatEnabled ? 'REEL' : 'NONE');

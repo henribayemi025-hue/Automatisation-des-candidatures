@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { whatsappNumber } from './countries';
 
 /**
  * Photos du fil de discussion : hébergées dans le bucket privé « finia-chat »,
@@ -31,10 +32,13 @@ export async function chatImageUrl(path: string): Promise<string | null> {
   return data.signedUrl;
 }
 
-/** Lien WhatsApp « clic pour écrire », avec le message déjà rédigé. */
-export function whatsappLink(phone: string, text: string): string {
-  const digits = phone.replace(/[^\d]/g, '');
-  return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`;
+/**
+ * Lien WhatsApp « clic pour écrire », avec le message déjà rédigé. wa.me
+ * exige le format international ; `country` (celui de l'entreprise) sert à
+ * compléter un numéro saisi localement, sans indicatif.
+ */
+export function whatsappLink(phone: string, text: string, country?: string): string {
+  return `https://wa.me/${whatsappNumber(phone, country)}?text=${encodeURIComponent(text)}`;
 }
 
 /** Le message mentionne-t-il l'assistant ? (@assistant, @ia, @ai) */
