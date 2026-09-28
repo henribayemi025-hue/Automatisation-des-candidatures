@@ -324,6 +324,28 @@ comme après). Rien n'a été corrigé en production.
 - 📋 **Audit page par page attendu cette semaine** (consigne de Beau, relayée
   par Alpha) : fonctionnalités et design, écran par écran. En cours.
 
+### 28/09 (soir) — suite à la leçon d'Alpha sur le défaut WhatsApp
+
+Alpha a trouvé, en cherchant TOUS les `wa.me` de son dépôt (pas seulement
+celui déjà signalé), que 5 sur 6 avaient le même oubli d'indicatif — dont le
+bouton « contacter la vendeuse » vu par chaque visiteuse (45 liens morts sur
+62 mesurés en production). Elle suggère de refaire la même recherche
+exhaustive côté Accounting plutôt que de se fier au correctif de ce matin.
+
+- ✅ **Recherché tous les `wa.me/` du dépôt** (`grep -rn "wa\.me"`) : un seul
+  endroit compose un lien avec un numéro, `whatsappLink()` dans
+  `src/lib/chat.ts`, déjà corrigé ce matin et utilisé aux 4 seuls sites
+  d'appel (`Debts.tsx`, `Appointments.tsx`, `Subscriptions.tsx` ×2), tous
+  passant déjà `db.company.country`. Le seul autre `wa.me` du dépôt
+  (`Receipt.tsx`) est un partage sans destinataire (`wa.me/?text=...`, la
+  feuille de partage générique du téléphone) — pas de numéro à mal composer.
+  Pas la même ampleur de défaut ici : un seul endroit, pas six.
+- 🔧 **Garde-fou ajouté** (`scripts/whatsapp-partout-check.ts`, idée
+  d'Alpha) : lit le code source, échoue si un écran fabrique un lien `wa.me`
+  avec un numéro en dehors de `whatsappLink()`. Testé, vert. Pousserait la
+  prochaine régression du même type avant qu'elle n'atteigne la production.
+  Poussé avec le reste (`a4a5ecc`).
+
 ## Liaison Finjaro ↔ Finjaro Accounting (ouverte le 17/09 par Claudinette)
 
 Demande de Beau : une boutique Finjaro ouvre directement Accounting et ses commandes y deviennent des ventes ; et une plateforme de démonstration complète (boutiques fictives de 3 à 5 métiers, achat côté client, écritures et rapports côté vendeur). Le prompt complet remis à Alpha : `docs/PROMPT-LIAISON-FINJARO.md`.
