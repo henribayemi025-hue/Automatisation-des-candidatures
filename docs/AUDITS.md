@@ -90,6 +90,23 @@ décrémentent le stock) sont des chantiers de fond, pas des corrections
 sûres à faire sans discussion — laissés tels quels, déjà dans
 `docs/SIMULATION-PASSE1.md` pour décision future.
 
+### Suite à la trouvaille d'Alpha (place de marché, même jour)
+
+Alpha a trouvé une faille sur la base partagée (`push_notify` exécutable
+par n'importe qui, hameçonnage possible) et un angle mort (65 articles de
+test visibles dans le catalogue public, faute de filtre sur `is_test`).
+Vérifié pour Accounting :
+
+- **`push_notify`** : aucune occurrence dans `src/` ni `supabase/`, aucun
+  besoin par RPC. Pas de risque ici, et aucune objection au correctif
+  qu'elle propose (côté base partagée, décision de Beau).
+- **Équivalent du filtre `is_test` manquant** : n'existe pas chez
+  Accounting. Chaque espace (`finia_workspaces`) est privé — pas de colonne
+  `is_test`, pas d'annuaire public, pas de vue qui mélangerait plusieurs
+  entreprises. Le seul mode « démonstration » est purement local
+  (`localStorage`), jamais écrit sur Supabase — déjà vérifié par
+  `scripts/demo-etanche-check.ts` (voir plus haut). Pas le même défaut ici.
+
 ### Ce qui reste à décider par Beau
 
 - Le projet de test étant en pause, je ne peux toujours pas rejouer les
