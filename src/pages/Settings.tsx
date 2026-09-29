@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
 import { Link } from 'react-router-dom';
 import { hasContent, useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
@@ -44,6 +45,24 @@ export default function Settings() {
   // (décision de Beau) : `getConsent() === null` veut alors dire « actif »,
   // pas « en attente ».
   const [contact, setContact] = useState<ContactGenre | null>(null);
+  // Choix de recevoir les e-mails de Finjaro (rappels, nouveautés) : le même
+  // réglage que sur la place de marché, un seul compte pour les deux.
+  const [emails, setEmails] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (!user) return;
+    void supabase
+      .from('profiles')
+      .select('email_notifications')
+      .eq('id', user.id)
+      .maybeSingle()
+      .then(({ data }) => setEmails(data ? data.email_notifications !== false : null));
+  }, [user]);
+  async function changeEmails(v: boolean) {
+    if (!user) return;
+    setEmails(v);
+    const { error } = await supabase.from('profiles').update({ email_notifications: v }).eq('id', user.id);
+    if (error) setEmails(!v);
+  }
   const [adConsent, setAdConsent] = useState(() => {
     const v = getConsent();
     return v === 'accepted' || (v === null && !requiresConsent(db.company.country));
@@ -137,6 +156,27 @@ export default function Settings() {
           </div>
           <ContactModal open={contact !== null} genre={contact ?? 'contact'} onClose={() => setContact(null)} />
         </div>
+
+        {user && emails !== null && (
+          <div className="card flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="text-section">{t('E-mails de Finjaro')}</h2>
+              <p className="text-caption text-muted">{t('Un rappel le soir si rien n’est noté, et les nouveautés une fois par semaine.')}</p>
+            </div>
+            <div className="inline-flex rounded-[8px] border border-hairline bg-surface p-0.5">
+              {([true, false] as const).map((v) => (
+                <button
+                  key={String(v)}
+                  type="button"
+                  onClick={() => void changeEmails(v)}
+                  className={`rounded-[6px] px-3 py-1.5 text-caption font-semibold transition ${emails === v ? 'bg-ink text-surface' : 'text-muted hover:text-ink'}`}
+                >
+                  {t(v ? 'Recevoir' : 'Ne plus recevoir')}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {pixelAvailable() && (
           <div className="card flex flex-wrap items-center justify-between gap-4">

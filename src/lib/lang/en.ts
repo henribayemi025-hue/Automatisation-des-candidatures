@@ -3,6 +3,10 @@
  * A missing key simply shows the French text.
  */
 export const EN: Record<string, string> = {
+  'E-mails de Finjaro': 'Emails from Finjaro',
+  'Un rappel le soir si rien n’est noté, et les nouveautés une fois par semaine.': "An evening reminder if nothing was recorded, and what's new once a week.",
+  'Recevoir': 'Receive',
+  'Ne plus recevoir': 'Stop',
   'Votre adresse n’est pas encore confirmée : ouvrez le lien reçu par e-mail, puis reconnectez-vous.': 'Your address is not confirmed yet: open the link we emailed you, then sign in again.',
   'L’inscription par numéro de téléphone n’est pas disponible pour le moment. Utilisez une adresse e-mail, ou « Continuer avec Google ».': 'Signing up with a phone number is not available right now. Use an email address, or “Continue with Google”.',
   'Un numéro de téléphone ne reçoit pas d’e-mail de confirmation.': 'A phone number does not receive confirmation emails.',
