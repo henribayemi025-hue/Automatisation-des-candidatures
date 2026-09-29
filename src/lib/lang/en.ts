@@ -3,6 +3,19 @@
  * A missing key simply shows the French text.
  */
 export const EN: Record<string, string> = {
+  'Nous contacter': 'Contact us',
+  'Une suggestion': 'A suggestion',
+  'Écrivez quelques mots.': 'Write a few words.',
+  'Envoi impossible pour le moment. Réessayez, ou écrivez-nous à {email}.': 'Could not send right now. Try again, or write to us at {email}.',
+  'Pas de connexion. Réessayez, ou écrivez-nous à {email}.': 'No connection. Try again, or write to us at {email}.',
+  'Message envoyé. L’équipe Finjaro vous répond par e-mail.': 'Message sent. The Finjaro team will reply by email.',
+  'Merci ! Votre idée est arrivée chez l’équipe Finjaro.': 'Thank you! Your idea has reached the Finjaro team.',
+  'Une question, un problème, un besoin ? L’équipe Finjaro lit chaque message et vous répond par e-mail.': 'A question, a problem, a need? The Finjaro team reads every message and replies by email.',
+  'Une idée pour rendre l’application plus utile ? Dites-la avec vos mots.': 'An idea to make the app more useful? Tell us in your own words.',
+  'Votre message…': 'Your message…',
+  'Votre idée…': 'Your idea…',
+  'Pour nous écrire d’ici, il faut un compte Finjaro. Sinon, écrivez-nous directement :': 'To write to us from here you need a Finjaro account. Otherwise, email us directly:',
+  'Une question, un problème ou une idée ? L’équipe Finjaro vous répond par e-mail.': 'A question, a problem or an idea? The Finjaro team replies by email.',
   // ---- Liaison Finjaro : coût inconnu ----
   'Vente venue de Finjaro : coût d’achat inconnu': 'Sale from Finjaro: purchase cost unknown',
   'La place de marché ne connaît pas ce que vous ont coûté ces articles. Sans le coût, votre résultat est surestimé de {amount}. Indiquez le coût d’achat de chaque ligne, ou dites que c’est une prestation.': 'The marketplace does not know what these items cost you. Without it, your profit is overstated by {amount}. Enter the purchase cost of each line, or say it is a service.',

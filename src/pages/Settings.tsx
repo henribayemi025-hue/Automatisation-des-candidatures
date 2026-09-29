@@ -20,6 +20,7 @@ import { COUNTRIES, countryProfile, profileToCompany } from '../lib/countries';
 import { IconLogout, IconUsers } from '../components/Icons';
 import { t } from '../lib/i18n';
 import TextSetting from '../components/TextSetting';
+import ContactModal, { type ContactGenre } from '../components/ContactModal';
 import { getConsent, pixelAvailable, requiresConsent, updateConsent } from '../lib/pixel';
 
 const CHARTS: { value: Company['chart']; label: string; hint: string }[] = [
@@ -42,6 +43,7 @@ export default function Settings() {
   // Hors zone RGPD, le pixel démarre actif sans qu'on ait rien demandé
   // (décision de Beau) : `getConsent() === null` veut alors dire « actif »,
   // pas « en attente ».
+  const [contact, setContact] = useState<ContactGenre | null>(null);
   const [adConsent, setAdConsent] = useState(() => {
     const v = getConsent();
     return v === 'accepted' || (v === null && !requiresConsent(db.company.country));
@@ -118,6 +120,22 @@ export default function Settings() {
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="card flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="text-section">{t('Nous contacter')}</h2>
+            <p className="text-caption text-muted">{t('Une question, un problème ou une idée ? L’équipe Finjaro vous répond par e-mail.')}</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={() => setContact('contact')} className="btn-primary py-1.5 text-caption">
+              {t('Nous contacter')}
+            </button>
+            <button type="button" onClick={() => setContact('suggestion')} className="btn-ghost py-1.5 text-caption">
+              {t('Une suggestion')}
+            </button>
+          </div>
+          <ContactModal open={contact !== null} genre={contact ?? 'contact'} onClose={() => setContact(null)} />
         </div>
 
         {pixelAvailable() && (

@@ -17,6 +17,7 @@ import { useBackToClose } from '../lib/backclose';
 import OfflineBar from './OfflineBar';
 import PresenceAvatars, { Avatar } from './PresenceAvatars';
 import TabBar, { TAB_BAR_SPACE } from './TabBar';
+import ContactModal, { type ContactGenre } from './ContactModal';
 import {
   IconBook,
   IconBox,
@@ -43,6 +44,7 @@ import {
   IconFolder,
   IconChat,
   IconSearch,
+  IconSend,
 } from './Icons';
 import { t } from '../lib/i18n';
 
@@ -151,6 +153,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   const [demo, setDemo] = useState(() => localStorage.getItem(DEMO_KEY) === '1');
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
+  const [contact, setContact] = useState<ContactGenre | null>(null);
 
   // Sur téléphone, le bouton retour referme le menu et la recherche au lieu de
   // quitter l'écran — ou, dans l'application Finjaro, de sortir d'Accounting.
@@ -402,6 +405,20 @@ export default function Layout({ children }: { children: ReactNode }) {
                   <IconBook />
                   {t('Manuel d’utilisation')}
                 </NavLink>
+                {(['contact', 'suggestion'] as const).map((g) => (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => {
+                      setMenu(false);
+                      setContact(g);
+                    }}
+                    className="flex w-full items-center gap-3 rounded-input px-3 py-2 text-left text-body hover:bg-base"
+                  >
+                    {g === 'contact' ? <IconSend /> : <IconSparkle />}
+                    {g === 'contact' ? t('Nous contacter') : t('Une suggestion')}
+                  </button>
+                ))}
                 <NavLink to="/parametres" className="flex items-center gap-3 rounded-input px-3 py-2 text-body hover:bg-base">
                   <IconSettings />
                   {t('Paramètres')}
@@ -424,6 +441,8 @@ export default function Layout({ children }: { children: ReactNode }) {
             )}
           </div>
         </header>
+
+        <ContactModal open={contact !== null} genre={contact ?? 'contact'} onClose={() => setContact(null)} />
 
         <OfflineBar />
 
