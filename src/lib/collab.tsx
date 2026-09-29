@@ -590,13 +590,23 @@ export function CollabProvider({ children }: { children: ReactNode }) {
         const byPhone = isPhoneAddress(id.address);
         // Depuis le 29/09 le projet exige la confirmation de l'adresse. Un
         // numéro est une adresse interne qui ne reçoit aucun courrier : le
-        // compte créé ne pourrait jamais se connecter, et l'e-mail rebondirait.
-        // On s'arrête donc AVANT de créer quoi que ce soit.
+        // compte est donc créé côté serveur, déjà confirmé (fonction
+        // accounting-inscription-tel, limitée par IP), puis on se connecte.
         if (byPhone) {
-          return {
-            error: t('L’inscription par numéro de téléphone n’est pas disponible pour le moment. Utilisez une adresse e-mail, ou « Continuer avec Google ».'),
-            needsConfirmation: false,
-          };
+          const { data, error } = await supabase.functions.invoke('accounting-inscription-tel', {
+            body: { telephone: phoneDigits(email), mot_de_passe: password, nom: name },
+          });
+          if (error) {
+            let message = t('Inscription impossible pour le moment. Réessayez.');
+            try {
+              const corps = await (error as { context?: Response }).context?.json();
+              if (corps?.erreur) message = t(corps.erreur);
+            } catch { /* réponse illisible : message générique */ }
+            return { error: message, needsConfirmation: false };
+          }
+          if (!data?.ok) return { error: t('Inscription impossible pour le moment. Réessayez.'), needsConfirmation: false };
+          const { error: errConnexion } = await supabase.auth.signInWithPassword({ email: id.address, password });
+          return { error: errConnexion ? frenchError(errConnexion.message, true) : null, needsConfirmation: false };
         }
         const { data, error } = await supabase.auth.signUp({
           email: id.address,
