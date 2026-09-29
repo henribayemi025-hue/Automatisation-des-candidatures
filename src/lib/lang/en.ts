@@ -3,6 +3,12 @@
  * A missing key simply shows the French text.
  */
 export const EN: Record<string, string> = {
+  'Votre adresse n’est pas encore confirmée : ouvrez le lien reçu par e-mail, puis reconnectez-vous.': 'Your address is not confirmed yet: open the link we emailed you, then sign in again.',
+  'L’inscription par numéro de téléphone n’est pas disponible pour le moment. Utilisez une adresse e-mail, ou « Continuer avec Google ».': 'Signing up with a phone number is not available right now. Use an email address, or “Continue with Google”.',
+  'Un numéro de téléphone ne reçoit pas d’e-mail de confirmation.': 'A phone number does not receive confirmation emails.',
+  'Presque fini : un lien de confirmation vient d’être envoyé à {email}. Ouvrez-le (pensez aux courriers indésirables), puis connectez-vous.': 'Almost done: a confirmation link was just sent to {email}. Open it (check your spam folder too), then sign in.',
+  'Nouveau lien envoyé à {email}.': 'New link sent to {email}.',
+  'Je n’ai rien reçu : renvoyer le lien': 'I didn’t get anything: resend the link',
   'Nous contacter': 'Contact us',
   'Une suggestion': 'A suggestion',
   'Écrivez quelques mots.': 'Write a few words.',

@@ -31,7 +31,10 @@ interface CollabValue {
   displayName: string;
   avatarUrl: string | null;
   signIn: (email: string, password: string) => Promise<string | null>;
-  signUp: (email: string, password: string, name: string) => Promise<string | null>;
+  /** `needsConfirmation` : le compte existe mais attend le lien reçu par e-mail (aucune session ouverte). */
+  signUp: (email: string, password: string, name: string) => Promise<{ error: string | null; needsConfirmation: boolean }>;
+  /** Renvoie le lien de confirmation d'inscription ; message d'erreur ou null. */
+  resendConfirmation: (email: string) => Promise<string | null>;
   signInWithGoogle: () => Promise<void>;
   /** Renvoie un message si la déconnexion est refusée (opérations non envoyées), sinon null. */
   signOut: () => Promise<string | null>;
@@ -70,6 +73,15 @@ const LAST_WS_KEY = 'finia.workspace';
 const OUTBOX_PREFIX = 'finia.outbox.';
 const COMPACT_AFTER = 300;
 
+function unconfirmedMessage(): string {
+  return t('Votre adresse n’est pas encore confirmée : ouvrez le lien reçu par e-mail, puis reconnectez-vous.');
+}
+
+/** Vrai si l'erreur de connexion vient d'une adresse pas encore confirmée (on propose alors de renvoyer le lien). */
+export function isUnconfirmedError(message: string | null): boolean {
+  return !!message && message === unconfirmedMessage();
+}
+
 function frenchError(message: string, byPhone = false): string {
   const m = message.toLowerCase();
   if (m.includes('invalid login credentials'))
@@ -81,6 +93,7 @@ function frenchError(message: string, byPhone = false): string {
   if (m.includes('password should be at least')) return t('Mot de passe trop court (6 caractères minimum).');
   if (m.includes('invalid email') || m.includes('validate email'))
     return byPhone ? t('Ce numéro n’est pas accepté. Vérifiez l’indicatif du pays.') : t('Adresse email invalide.');
+  if (m.includes('email not confirmed')) return unconfirmedMessage();
   if (m.includes('rate limit')) return t('Trop de tentatives, réessayez dans quelques minutes.');
   if (m.includes('network') || m.includes('fetch')) return t('Connexion impossible : vérifiez votre réseau.');
   return message;
@@ -573,9 +586,9 @@ export function CollabProvider({ children }: { children: ReactNode }) {
       },
       async signUp(email, password, name) {
         const id = toLogin(email);
-        if (!id.address) return id.error;
+        if (!id.address) return { error: id.error, needsConfirmation: false };
         const byPhone = isPhoneAddress(id.address);
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: id.address,
           password,
           options: {
@@ -588,7 +601,29 @@ export function CollabProvider({ children }: { children: ReactNode }) {
             emailRedirectTo: `${window.location.origin}/`,
           },
         });
-        return error ? frenchError(error.message, byPhone) : null;
+        if (error) return { error: frenchError(error.message, byPhone), needsConfirmation: false };
+        // Quand le projet exige la confirmation de l'adresse, signUp ne
+        // renvoie aucune session : la personne doit d'abord ouvrir le lien.
+        // Un numéro de téléphone est une adresse interne qui ne reçoit aucun
+        // courrier : il ne pourrait jamais être confirmé par e-mail.
+        if (!data.session && byPhone) {
+          return {
+            error: t('L’inscription par numéro de téléphone n’est pas disponible pour le moment. Utilisez une adresse e-mail, ou « Continuer avec Google ».'),
+            needsConfirmation: false,
+          };
+        }
+        return { error: null, needsConfirmation: !data.session };
+      },
+      async resendConfirmation(email) {
+        const id = toLogin(email);
+        if (!id.address) return id.error;
+        if (isPhoneAddress(id.address)) return t('Un numéro de téléphone ne reçoit pas d’e-mail de confirmation.');
+        const { error } = await supabase.auth.resend({
+          type: 'signup',
+          email: id.address,
+          options: { emailRedirectTo: `${window.location.origin}/` },
+        });
+        return error ? frenchError(error.message) : null;
       },
       async signInWithGoogle() {
         await supabase.auth.signInWithOAuth({

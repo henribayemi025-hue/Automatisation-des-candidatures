@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { useCollab } from '../lib/collab';
+import { isUnconfirmedError, useCollab } from '../lib/collab';
 import { saveCache } from '../lib/store';
 import { BackupError, readBackup } from '../lib/backup';
 import { Field } from '../components/UI';
@@ -17,7 +17,7 @@ const PILLARS = [
 ];
 
 export default function Auth() {
-  const { signIn, signUp, signInWithGoogle, continueAsGuest, sessionExpired, authError, lastEmail } = useCollab();
+  const { signIn, signUp, resendConfirmation, signInWithGoogle, continueAsGuest, sessionExpired, authError, lastEmail } = useCollab();
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState(displayIdentity(lastEmail));
@@ -32,6 +32,8 @@ export default function Auth() {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
+  // Adresse qui attend son lien de confirmation : on propose de le renvoyer.
+  const [awaiting, setAwaiting] = useState('');
   const byPhone = looksLikePhone(email);
 
   async function submit(e: React.FormEvent) {
@@ -43,10 +45,37 @@ export default function Auth() {
       return;
     }
     setBusy(true);
-    const err = mode === 'login' ? await signIn(email.trim(), password) : await signUp(email.trim(), password, name.trim());
+    setAwaiting('');
+    if (mode === 'login') {
+      const err = await signIn(email.trim(), password);
+      setBusy(false);
+      if (err) setError(err);
+      if (isUnconfirmedError(err)) setAwaiting(email.trim());
+      return;
+    }
+    const { error: err, needsConfirmation } = await signUp(email.trim(), password, name.trim());
     setBusy(false);
-    if (err) setError(err);
-    else if (mode === 'signup') setNotice(t('Compte créé. Si un email de confirmation vous est envoyé, ouvrez-le puis connectez-vous.'));
+    if (err) {
+      setError(err);
+      return;
+    }
+    if (needsConfirmation) {
+      setAwaiting(email.trim());
+      setNotice(t('Presque fini : un lien de confirmation vient d’être envoyé à {email}. Ouvrez-le (pensez aux courriers indésirables), puis connectez-vous.', { email: email.trim() }));
+      setMode('login');
+    }
+  }
+
+  async function renvoyer() {
+    setBusy(true);
+    const err = await resendConfirmation(awaiting);
+    setBusy(false);
+    if (err) {
+      setError(err);
+      return;
+    }
+    setError('');
+    setNotice(t('Nouveau lien envoyé à {email}.', { email: awaiting }));
   }
 
   function rechargerSauvegarde(file: File | undefined) {
@@ -144,6 +173,11 @@ export default function Auth() {
           )}
           {error && <div className="mb-4 rounded-input border border-[#D14343]/30 bg-[#FDEDED] px-4 py-3 text-caption text-[#A63030]">{error}</div>}
           {notice && <div className="mb-4 rounded-input border border-[#2A9D8F]/30 bg-[#EAF6EA] px-4 py-3 text-caption text-[#1F6F65]">{notice}</div>}
+          {awaiting && (
+            <button type="button" onClick={() => void renvoyer()} disabled={busy} className="btn-ghost mb-4 w-full justify-center py-2 text-caption">
+              {t('Je n’ai rien reçu : renvoyer le lien')}
+            </button>
+          )}
 
           <form onSubmit={submit} className="space-y-4">
             {mode === 'signup' && (
