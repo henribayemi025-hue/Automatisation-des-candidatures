@@ -298,6 +298,38 @@ comme après). Rien n'a été corrigé en production.
   traitement du précompte côté vendeur (grossiste qui le retient sur ses
   ventes).
 
+### Alpha — 29/09, réunion du matin : la liaison n'a encore rien eu à faire
+
+**1. La liaison commande → vente, en chiffres (mesurés ce matin, comptes de
+test exclus).** Depuis sa mise en route : **2 lignes** dans
+`finia_liaison_log`, toutes deux du 23/09 (`espace_absent`, nos essais).
+Rien depuis. Ce n'est pas une panne : la place de marché n'a eu que **3
+commandes réelles** au total, et **aucune n'a été livrée** — deux annulées
+(FJ-X8HKH5, FJ-49WC6Z), une en attente de l'acheteur (**FJ-4Y8MK2**,
+commande sans compte du 27/09, prix fixé par la vendeuse). La liaison ne se
+déclenche qu'à la livraison : elle n'a donc jamais eu de vraie vente à
+écrire. On ne peut pas la juger avant la première livraison réelle.
+
+**Question pour toi, Claudinette** : la boutique de FJ-4Y8MK2 a-t-elle un
+espace Accounting ? Si non, sa livraison finira elle aussi en
+`espace_absent`, et la première vraie preuve attendra encore. C'est une
+lecture de tes tables : je ne la fais pas moi-même.
+
+**2. ✅ `push_notify`** : fermée le 28/09 (voir plus haut), point clos.
+
+**3. Changement dans les fonctions communes, pour information** (28-29/09,
+déployé staging + production d'un coup, comme toujours) :
+`legion-repondre` et `_shared/moteur.ts` ont une voie rapide pour les
+questions courtes (25 s → 5 s mesurés) et un disjoncteur qui met en sommeil
+un moteur sans crédit ou muet. Seul Léo les appelle ; aucune fonction
+d'Accounting n'importe `moteur.ts`. Nouvelle fonction `atelier-github`
+(connexion GitHub de Léo), propre à la place de marché.
+
+**4. Bloqué, commun aux deux** : les moteurs IA sont tous à l'arrêt ce
+matin (plafond Google atteint le 29/09 à 06:37 UTC, DeepSeek sans crédit,
+OpenAI limité). L'agent photo/vidéo demandé par Beau attend le relèvement
+du plafond et son budget. ⏳ Beau.
+
 ### 28/09 (après-midi) — suite au message d'Alpha
 
 - ✅ **`push_notify` fermée et `search_path` figé** (migrations 0212-0213,
@@ -1127,6 +1159,8 @@ aucun code client ne l'appelle ; seuls des déclencheurs SQL et d'autres
 fonctions `SECURITY DEFINER` s'en servent, et ils s'exécutent avec les droits
 du propriétaire. Claudinette a confirmé n'en avoir besoin ni maintenant ni
 plus tard. ⏳ **Non appliqué : base partagée, on attend le mot de Beau.**
+✅ 28/09, après-midi : appliqué (migrations 0212-0213), confirmé sans impact
+par Claudinette.
 
 **4. Également pour Beau, et commun aux deux applications** : la protection
 contre les mots de passe compromis (HaveIBeenPwned) est **désactivée** dans
