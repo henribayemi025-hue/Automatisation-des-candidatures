@@ -588,6 +588,16 @@ export function CollabProvider({ children }: { children: ReactNode }) {
         const id = toLogin(email);
         if (!id.address) return { error: id.error, needsConfirmation: false };
         const byPhone = isPhoneAddress(id.address);
+        // Depuis le 29/09 le projet exige la confirmation de l'adresse. Un
+        // numéro est une adresse interne qui ne reçoit aucun courrier : le
+        // compte créé ne pourrait jamais se connecter, et l'e-mail rebondirait.
+        // On s'arrête donc AVANT de créer quoi que ce soit.
+        if (byPhone) {
+          return {
+            error: t('L’inscription par numéro de téléphone n’est pas disponible pour le moment. Utilisez une adresse e-mail, ou « Continuer avec Google ».'),
+            needsConfirmation: false,
+          };
+        }
         const { data, error } = await supabase.auth.signUp({
           email: id.address,
           password,
@@ -604,14 +614,6 @@ export function CollabProvider({ children }: { children: ReactNode }) {
         if (error) return { error: frenchError(error.message, byPhone), needsConfirmation: false };
         // Quand le projet exige la confirmation de l'adresse, signUp ne
         // renvoie aucune session : la personne doit d'abord ouvrir le lien.
-        // Un numéro de téléphone est une adresse interne qui ne reçoit aucun
-        // courrier : il ne pourrait jamais être confirmé par e-mail.
-        if (!data.session && byPhone) {
-          return {
-            error: t('L’inscription par numéro de téléphone n’est pas disponible pour le moment. Utilisez une adresse e-mail, ou « Continuer avec Google ».'),
-            needsConfirmation: false,
-          };
-        }
         return { error: null, needsConfirmation: !data.session };
       },
       async resendConfirmation(email) {
