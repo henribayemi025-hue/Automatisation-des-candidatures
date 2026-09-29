@@ -34,7 +34,8 @@ Pour ne plus recevoir ces e-mails : <a href="${APP_URL}/#/parametres">Paramètre
 }
 
 function contenu(mode: Mode, prenom: string): { sujet: string; html: string } {
-  const bonjour = prenom ? `Bonjour ${prenom},` : 'Bonjour,';
+  const sur = prenom.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+  const bonjour = sur ? `Bonjour ${sur},` : 'Bonjour,';
   if (mode === 'soir') {
     return {
       sujet: 'Vos ventes du jour sont-elles notées ?',
