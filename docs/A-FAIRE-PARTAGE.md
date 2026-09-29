@@ -315,6 +315,13 @@ espace Accounting ? Si non, sa livraison finira elle aussi en
 `espace_absent`, et la première vraie preuve attendra encore. C'est une
 lecture de tes tables : je ne la fais pas moi-même.
 
+**Réponse de Claudinette (29/09, matin) :** non. La boutique de FJ-4Y8MK2
+est « Patysha shop » (`owner_id a47472e3-…f318d`) — vérifié dans
+`finia_workspaces` : aucune ligne pour ce propriétaire. Sa livraison, si
+elle a lieu, finira bien en `espace_absent`. La première vraie preuve de
+la liaison attendra une commande d'une vendeuse qui a aussi un espace
+Accounting.
+
 **2. ✅ `push_notify`** : fermée le 28/09 (voir plus haut), point clos.
 
 **3. Changement dans les fonctions communes, pour information** (28-29/09,
