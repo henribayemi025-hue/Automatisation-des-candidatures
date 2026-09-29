@@ -11,6 +11,71 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 29/09/2026
+
+**Semaine toujours pauvre côté concurrence. Deux faits utiles côté
+règles/paiements (une précision sur PI-SPI, un point France sans urgence
+pour nous). Côté technologie, rien de nouveau à faire : un fait déjà noté
+le 27/09 revient (Postgres), un autre ne concerne pas notre usage de
+WhatsApp.**
+
+### Concurrence
+
+Rien retenu. Aucun fait produit daté du 22 au 29/09 trouvé et vérifié pour
+Wave, Bumpa, Kippa, Flowcart, Moniepoint, PalmPay, Khatabook, Vyapar,
+OkCredit, Zoho Books, Sage, QuickBooks ou les solutions brésiliennes (Bling,
+Omie, Conta Azul). Point hors périmètre, à titre indicatif : la Nigeria
+Fintech Week s'est tenue à Lagos les 22-23/09, sans annonce produit
+vérifiable pour un concurrent direct.
+
+### Règles, impôts et paiements
+
+- **UEMOA/PI-SPI : Wave n'est pas dans la liste des participants
+  autorisés** au 31/07/2026 (dernier point de situation trouvé, hors
+  fenêtre stricte mais éclaire l'échéance du 30/09 déjà notée) — tension
+  entre son modèle à frais et la gratuité imposée par PI-SPI pour les
+  particuliers.
+  [dakaractu.com](https://www.dakaractu.com/Wave-face-a-la-plateforme-PI-SPI-et-l-interoperabilite-Refus-ou-dilemme-strategique-pour-ne-pas-se-saborder_a275313.html)
+  → Ne pas supposer une interopérabilité universelle des mobile money dès
+  le 30/09 : Wave pourrait rester à part. À vérifier avant toute mention
+  aux vendeuses UEMOA.
+- **France : 31 incidents vérifiés sur 12 plateformes agréées de
+  facturation électronique entre le 01/09 et le 26/09/2026**, dont 9
+  affectant directement les flux de factures. Publié le 27/09/2026.
+  [kohenavocats.fr](https://kohenavocats.fr/2026/09/27/panne-plateformes-agreees-facturation-entreprises-fournisseurs-decisions-2026/)
+  → Une facture bloquée par une panne de plateforme n'efface pas les
+  délais de paiement. Sans urgence pour Finjaro (pas d'intégration à une
+  Plateforme Agréée), mais à garder en tête pour les deux comptes français
+  déjà inscrits, s'ils facturent en B2B.
+
+### Technologie et IA
+
+- Mise à jour de sécurité Postgres 15.19/17.11 (Supabase) : même fait que
+  le 27/09, revient cette semaine sans élément nouveau. Toujours vérifié :
+  Accounting n'utilise ni `ltree` ni `btree_gist`. Rien à refaire.
+- **WhatsApp Business Platform : les messages de service au-delà de 1000
+  par mois et par numéro deviennent payants à partir du 01/10/2026.**
+  Publié le 28/09/2026.
+  [techweez.com](https://techweez.com/2026/09/28/whatsapp-business-pricing-october-2026/)
+  → **Ne concerne pas Finjaro aujourd'hui** : les relances WhatsApp
+  d'Accounting sont des liens `wa.me` ouverts dans l'app WhatsApp de la
+  vendeuse elle-même, jamais l'API Business officielle. À revoir seulement
+  si un envoi programmatique était un jour envisagé.
+- Reconnaissance vocale en langues africaines peu dotées (lingala,
+  shona) : un défi Google Research/Zindi a publié ses résultats le
+  22/09/2026 — travaux de recherche, aucun modèle prêt à intégrer pour le
+  wolof, le lingala ou le pidgin cette semaine.
+  [blog.google](https://blog.google/intl/en-africa/company-news/outreach-and-initiatives/meet-the-winners-of-the-waxal-speech-recognition-challenge/)
+  → Rien d'actionnable maintenant, à surveiller.
+- Gemini 4 : Google confirme un lancement « dès que possible », sans date
+  ferme. Publié le 24/09/2026.
+  [9to5google.com](https://9to5google.com/2026/09/24/google-says-gemini-4-release-is-coming-as-soon-as-possible/)
+  → Rien à changer : l'assistant reste sur les modèles Gemini actuels
+  (et DeepSeek en secours depuis le 28/09) tant qu'aucune version stable
+  n'est publiée.
+
+---
+
 ## 28/09/2026
 
 **Semaine toujours pauvre : rien côté concurrence, un point de contexte sur
