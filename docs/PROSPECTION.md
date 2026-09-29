@@ -191,6 +191,75 @@ signaux vus ; « lu » = page ouverte directement, sinon lien déduit) :
 | 34 | Fishrell | Douala + Yaoundé | aliments poisson | facebook.com/103917458611969 | 3 | vente au kilo |
 | 35 | Quincaillerie Ecobuild | Douala | quincaillerie | facebook.com/Ecobuild.Sarl (lu) | 2 | peu active |
 
+### 4 ter. Douala et Yaoundé, autres secteurs (29/09)
+
+Même méthode, mêmes limites : liens surtout **lus sur des sites miroirs**
+(foodbevg, equipment10, businesses10…) ; ouvrir la vraie page Facebook
+avant d'écrire. Grandes chaînes écartées (sûrement déjà équipées). Déjà
+listés plus haut, donc non répétés : Todjom Automobile, Quin Vicko Plus
+(que cette recherche note 5/5 : page officielle lancée le 07/07/2026),
+Maison DG.
+
+| # | Entreprise | Quartier | Secteur | Lien (miroir ou site) | Note | Signal principal |
+|---|---|---|---|---|---|---|
+| 1 | Verhojust – Épicerie et Supérette | Yaoundé, Mfoundi Mall | épices gros/détail | foodbevg.com/CM/Yaoundé/106878174959228 | 5 | 2 boutiques, revendeurs, post 29/08/2026 |
+| 2 | KENZA Market | Yaoundé, Biyem-Assi | alimentation gros | foodbevg.com/CM/Yaoundé/1773908676154544 | 4 | revendeurs, post 02/09/2026 |
+| 3 | Chopit | Douala, Bonamoussadi | alimentation | foodbevg.com/CM/Douala/126466758751411 | 4 | « pack revendeur » |
+| 4 | Mamie Poulet | Yaoundé | volaille | foodbevg.com/CM/Yaoundé/697164183477419 | 3 | plusieurs boutiques, groupe |
+| 5 | MaMamarket | Douala, marché Sanaga | courses | foodbevg.com/CM/Douala/107629349098173 | 3 | peu de stock propre |
+| 6 | Grossiste Cameroun Elig-Essono | Yaoundé | gros alimentaire | ayilaa.com/fr/commerces/14300 | 4 | gros (non vérifié) |
+| 7 | Supermarché Christy | Douala, Village | supérette | ayilaa.com/fr/supermarche/13429 | 3 | non vérifié |
+| 8 | OneClick Blooms Foods | Douala, Logpom | traiteur | foodbevg.com/CM/Douala/352994364552837 | 4 | clients entreprises à facturer |
+| 9 | Le Bon Coin Food Delivery | Yaoundé | repas | foodbevg.com/CM/Yaoundé/1523677990995502 | 3 | menu avec prix |
+| 10 | Mange D'abord | Yaoundé | repas en ligne | foodbevg.com/CM/Yaoundé/101459499382936 | 3 | commandes WhatsApp |
+| 11 | Les Saveurs d'Étondi | Douala, Bali | traiteur | foodbevg.com/CM/Douala/1219957087861830 | 3 | ouvert en 05/2026 |
+| 12 | Kel'z Foods | Douala | repas | foodbevg.com/CM/Douala/1078567218666015 | 3 | livraison |
+| 13 | Crêperie de ma'a thé | Douala | crêperie | foodbevg.com/CM/Douala/100388288757211 | 3 | packs à prix |
+| 14 | Boulangerie Elysée One | Yaoundé | boulangerie | elyseeone.net | 3 | produits en ligne |
+| 15 | Laura Cakes | Douala, Village | pâtisserie | foodbevg.com/CM/Douala/119821361214623 | 3 | acomptes à suivre |
+| 16 | M.M Pâtisserie | Douala, Ndokoti | pâtisserie | foodbevg.com/CM/Douala/108540498830889 | 3 | grille de prix |
+| 17 | Pâtisserie St Paul | Douala, Deido | pâtisserie | foodbevg.com/CM/Douala/107084824191839 | 3 | pertes sur commandes non retirées |
+| 18 | Myb's cake | Yaoundé | pâtisserie | foodbevg.com/CM/Yaoundé/106262834089714 | 3 | plusieurs activités |
+| 19 | Parapharmacie des Nations | Yaoundé | parapharmacie | parapharmadesnations.com | 3 | 3 points, sans doute équipée |
+| 20 | ALMAYE Beauty Parapharmacie | Yaoundé | parapharmacie | almaye.com | 3 | boutique en ligne |
+| 21 | Parapharmacie Magelya | Yaoundé | parapharmacie | parapharmacie-magelya.com | 3 | catalogue en ligne |
+| 22 | Global Beauty | Douala, Makepe | salon + vente | beautynailhairsalons.com/CM/Douala/125866227162895 | 4 | prestations + produits |
+| 23 | NBS Shop / Salon Nappy | Douala | salon + boutique | ayilaa.com/fr/modes-et-beaute/6236 | 4 | gros pour pros (non vérifié) |
+| 24 | Essila | Douala, Bonapriso | produits capillaires | essilabeauty.com | 3 | marque + salon |
+| 25 | Vaness Beauty | Douala, Bepanda | institut | ayilaa.com/fr/modes-et-beaute/3213 | 3 | non vérifié |
+| 26 | GAB'S Shop | Yaoundé | salon + cosmétiques | ayilaa.com/fr/modes-et-beaute/12567 | 3 | non vérifié |
+| 27 | GSAP CAM Automobile | Douala, Camp Yabassi | pièces auto | equipment10.com/CM/Douala/929453756911476 | 5 | 2 points, gros, post 04/08/2026 |
+| 28 | L.I.S Motors | Douala | pièces moto | autoyas.com/CM/Douala/104792835447630 | 4 | livraison nationale |
+| 29 | JLD Auto & Parts | Douala, Makepe | pièces auto | jld-auto.com | 3 | stock + location |
+| 30 | Inauto | Douala | atelier + pièces | inauto.fr | 3 | panier en ligne |
+| 31 | Kamer Constructions | Douala, Ndogpassi | quincaillerie | equipment10.com/CM/Douala/999546036573736 | 4 | livraison |
+| 32 | Société MAFFO Sarl | Douala | quincaillerie | equipment10.com/CM/Douala/532207689969182 | 3 | tôles |
+| 33 | META Distribution | Douala, PK12 | matériaux | findglocal.com/CM/Douala/106448642463005 | 3 | non daté |
+| 34 | Rayane Tech 237 | Yaoundé, Ngoa-Ekellé | téléphones | globuya.com/CM/Yaoundé/416834254856432 | 5 | listes de prix, garanties à suivre |
+| 35 | Francky Store | Yaoundé, Mfoundi Mall | téléphones, info | equipment10.com/CM/Yaoundé/111523293594111 | 4 | catalogue + site |
+| 36 | i tech+237 | Yaoundé | téléphones | equipment10.com/CM/Yaoundé/171716346034823 | 4 | prix gros et détail |
+| 37 | Innovation All in One | Douala, Akwa | électronique | facebook.com/profile.php?id=61573068009466 | 4 | stock chiffré, post 19/07/2026 |
+| 38 | TETCH Distributions | Douala, Mboppi | électroménager | businesses10.com/CM/Duala/107445038374906 | 4 | prix sous les images |
+| 39 | Douala Prime Market | Douala, Deido | électroménager | ayilaa.com/fr/boutique/12114 | 4 | gros (non vérifié) |
+| 40 | Shamsa Électroménager | Douala | électroménager | ayilaa.com/fr/commerces/9508 | 3 | non vérifié |
+| 41 | PACHI SARL | Yaoundé + Douala | papeterie gros | equipment10.com/CM/Yaoundé/102023254897983 | 4 | crédit revendeurs, peut-être équipée |
+| 42 | PEMBO | Douala, Akwa | papeterie | businesses10.com/CM/Douala/104910267888847 | 4 | MoMo + Orange Money |
+| 43 | TAL Computer Group | Yaoundé + Douala | informatique | talcomputer.com | 3 | 4 agences, peut-être équipée |
+| 44 | Allo Pressing Express | Douala, Bonapriso | pressing | linkedin.com/company/allo-pressing-express | 4 | impayés clients pros |
+| 45 | United Express Pressing | Yaoundé | pressing | unitedpressing.com | 4 | 3 agences, hôtels |
+
+### Par où commencer parmi les entreprises extérieures
+
+Les notées 5/5, toutes sources confondues : **MV Cosmétiques, Carilux,
+KenRos, JumboFood, GaBelle** (Douala/Yaoundé, beauté et alimentation) ;
+**Verhojust, GSAP CAM Automobile, Todjom Automobile, Quin Vicko Plus,
+Rayane Tech 237** (Douala/Yaoundé, gros et stock chiffré) ; **Dane
+Boutique** (Abidjan) ; **Ndiaye Diatta Boutique, Bkr Boutique** (Dakar).
+13 messages écrits à la main (message 4), en commençant par Douala et
+Yaoundé. Les secteurs qui ressortent le plus : pièces auto, quincaillerie,
+téléphones en gros, grossistes alimentaires, cosmétiques — tous ont un
+stock chiffré et vendent à crédit à des revendeurs.
+
 ### 4 bis. Abidjan, Dakar, boutiques afro en France et au Canada (29/09)
 
 Mêmes limites : liens Facebook **déduits de sites miroirs, non ouverts** ;
