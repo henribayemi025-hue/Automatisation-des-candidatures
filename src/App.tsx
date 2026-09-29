@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import CookieConsent from './components/CookieConsent';
 import { trackPageView } from './lib/pixel';
+import { isDemo } from './lib/demo-state';
 import LockScreen from './components/LockScreen';
 import { useCollab } from './lib/collab';
 import { useDB } from './lib/store';
@@ -94,23 +95,28 @@ export default function App() {
   const { user, guest, loading, workspace, sync, sessionExpired } = useCollab();
   const db = useDB();
   const { pathname } = useLocation();
-  // La démonstration n'a rien à voir avec un vrai visiteur (données
-  // d'exemple, aucun appel réseau garanti par scripts/demo-etanche-check.ts) :
-  // pas de pixel là-dessus, ça polluerait les vraies mesures de Beau.
-  const isDemo = pathname === '/demo' || pathname.startsWith('/demo/');
+  // Gate d'ADRESSE : seulement vrai sur /demo/… lui-même, pour choisir quel
+  // arbre de routes rendre (voir plus bas).
+  const isDemoRoute = pathname === '/demo' || pathname.startsWith('/demo/');
+  // Gate de SESSION : reste vrai après que la démo a redirigé vers /pos ou /
+  // avec des données d'exemple en mémoire (voir Demo.tsx). Trouvé au test du
+  // 29/09 : en ne regardant que l'adresse, le bandeau du pixel et les
+  // PageView revenaient dès le premier écran visité depuis la démo — un
+  // appel réseau que scripts/demo-etanche-check.ts est censé exclure.
+  const inDemoSession = isDemoRoute || isDemo();
 
   // Un « PageView » par écran : application à une seule page (routeur par
   // dièse), l'extrait de base de Meta ne verrait sinon jamais que le tout
   // premier écran. Sans effet tant que personne n'a accepté le pixel
   // (trackPageView() ne fait rien si `fbq` n'existe pas encore).
   useEffect(() => {
-    if (!isDemo) trackPageView();
-  }, [pathname, isDemo]);
+    if (!inDemoSession) trackPageView();
+  }, [pathname, inDemoSession]);
 
   if (loading) return <Splash />;
   // Lien de démonstration : un seul clic, sans compte. Une personne déjà
   // connectée garde ses données — elle passe par les paramètres si elle veut l'exemple.
-  if (isDemo) {
+  if (isDemoRoute) {
     return user ? <Navigate to="/" replace /> : (
       <Routes>
         <Route path="/demo" element={<Demo />} />
@@ -129,8 +135,9 @@ export default function App() {
   // Le bandeau du pixel se cache pendant l'installation : sur téléphone, sa
   // barre fixe en bas chevauche « Continuer » (trouvé au test Playwright du
   // 28/09). Rien n'est perdu : le bandeau reprend sur l'écran de connexion
-  // et dans l'application, qui restent bien plus longtemps ouverts.
-  let showConsent = true;
+  // et dans l'application, qui restent bien plus longtemps ouverts. Jamais
+  // non plus dans la démonstration, même après qu'elle a redirigé ailleurs.
+  let showConsent = !inDemoSession;
   // Une session expirée reprend la main sur le mode local : on propose la connexion plutôt que de basculer sans rien dire.
   if (!user && (!guest || sessionExpired)) content = <Auth />;
   else if (user && !workspace && sync !== 'error') content = <Splash />;
