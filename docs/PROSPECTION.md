@@ -148,9 +148,48 @@ gros. Les 5 notés 5/5 :
 
 Limites à connaître : Facebook et Instagram bloquent la lecture directe ;
 la plupart des liens ont été déduits de sites qui recopient les pages et
-**n'ont pas été ouverts**. À vérifier en ouvrant la page avant d'écrire. La
-liste complète (35 lignes, liens, signaux, notes) est dans la réponse de
-recherche du 29/09 ; je la remets ici sur demande.
+**n'ont pas été ouverts**. À vérifier en ouvrant la page avant d'écrire.
+
+Liste complète (note de 1 à 5 = probabilité d'usage estimée sur les
+signaux vus ; « lu » = page ouverte directement, sinon lien déduit) :
+
+| # | Entreprise | Ville | Secteur | Lien | Note | Signal principal |
+|---|---|---|---|---|---|---|
+| 1 | MV Cosmétiques | Douala | cosmétiques | facebook.com/101972252222030 | 5 | 2 boutiques, prix affichés, post 23/08/2026 |
+| 2 | Carilux Cosmetics 2 | Douala + Yaoundé | cosmétiques gros/détail | facebook.com/333052063227172 | 5 | 3 boutiques, revendeuses à crédit |
+| 3 | KenRos Cosmétique | Douala | soins | facebook.com/348896094981258 | 5 | 8+ produits avec prix, post 11/09/2026 |
+| 4 | JumboFood | Douala + Yaoundé | fruits, épicerie | facebook.com/101450712752103 | 5 | 30+ articles au kilo, prix hebdo |
+| 5 | GaBelle | Yaoundé | cosmétiques | facebook.com/103335287057902 | 5 | 2 boutiques, arrivages réguliers |
+| 6 | Queen's Store | Douala | cosmétiques | facebook.com/105134405718273 | 4 | prix à chaque post, achats groupés |
+| 7 | L&E Cosmétics | Yaoundé + Douala | fabrique cosmétiques | facebook.com/101921059315166 | 4 | 2 boutiques, code marchand |
+| 8 | Nat Vivi bio cosmétiques | Douala | cosmétiques | facebook.com/109787211503627 | 4 | packs avec prix |
+| 9 | Renaitre Belle By Tati MK | Douala | cosmétiques | facebook.com/342814105588996 | 4 | acomptes et commandes notés à la main |
+| 10 | Audrey wigs | Douala | perruques | facebook.com/793480260521399 | 4 | grille de prix |
+| 11 | LADY JENNA | Douala | perruques, pose | facebook.com/105515905233889 | 4 | produits + services, gros |
+| 12 | Espace HERVÉ Mèches | Douala (marché Dakar) | mèches gros/détail | facebook.com/101316445342924 | 4 | grossiste au marché |
+| 13 | Todjom Automobile | Douala | pièces auto, atelier | facebook.com/104609767994724 | 4 | ouvert le 08/06/2026, pas encore équipé |
+| 14 | L'univers de bri | Yaoundé | friperie | facebook.com/100083464563893 | 4 | pièces uniques à suivre |
+| 15 | Le Tara Business+ | Yaoundé | chaussures en ligne | facebook.com/290364164165753 | 4 | stock par pointure |
+| 16 | La Marque | Douala (Akwa) | prêt-à-porter | facebook.com/Since2000LaMarque (lu) | 3 | établie, post 29/09/2026, pas de prix |
+| 17 | Good Phone Cameroun | Yaoundé | téléphones | facebook.com/GoodPhoneCameroun (lu) | 3 | stock de valeur |
+| 18 | GL Store | Douala | téléphones | facebook.com/109607278478900 | 3 | WhatsApp Business |
+| 19 | Eden beauty cosmetics | Douala | sacs, cosmétiques | facebook.com/346202781900479 | 3 | active, pas de prix |
+| 20 | Mme K by SkinCare | Douala | soins | facebook.com/1145768095283511 | 3 | petit catalogue |
+| 21 | Mireille Beauty | Douala | perruques | facebook.com/187993041837734 | 3 | active, pas de prix |
+| 22 | Madame P Wigs | Douala | perruques | facebook.com/1077277828800153 | 3 | petite activité |
+| 23 | Laceora Wigs | Douala | perruques | facebook.com/996990353486954 | 3 | gamme étroite |
+| 24 | Sosso Hair.237 | Douala (marché Congo) | mèches gros | facebook.com/102845994957748 | 3 | grossiste, peu active |
+| 25 | Lifestyle shop by joy's | Yaoundé | vêtements | facebook.com/109396238050210 | 3 | catalogue par prix |
+| 26 | Quin Vicko Plus | Douala (Mboppi) | quincaillerie | facebook.com/1027760837088332 | 3 | beaucoup de références |
+| 27 | H&D Quincaillerie | Douala (Akwa) | quincaillerie | facebook.com/604045392798400 | 3 | catalogue WhatsApp |
+| 28 | DECAM | Douala (Akwa) | pneus poids lourds | facebook.com/976487738876886 | 3 | stock lourd |
+| 29 | MAISON DG SARL | Yaoundé, Douala, Garoua | outillage | linkedin.com/company/maison-dg | 3 | déjà grande, sans doute équipée |
+| 30 | Grossiste Hair & Perruques Beauty | Douala (Ndokoti) | perruques gros | ayilaa.com/fr/commerces/15766 | 4 | gros + envoi en province |
+| 31 | Boutique Alice Hair | Yaoundé (Mimboman) | perruques | ayilaa.com/fr/commerces/12874 | 4 | « tontine des mèches » = paiements échelonnés |
+| 32 | Perruques À Bas Prix | Yaoundé (Mendong) | perruques | ayilaa.com/fr/commerces/6708 | 3 | boutique au marché |
+| 33 | Outfit Store | Douala (Bonamoussadi) | vêtements | ayilaa.com/fr/commerces/10727 | 3 | livraison en province |
+| 34 | Fishrell | Douala + Yaoundé | aliments poisson | facebook.com/103917458611969 | 3 | vente au kilo |
+| 35 | Quincaillerie Ecobuild | Douala | quincaillerie | facebook.com/Ecobuild.Sarl (lu) | 2 | peu active |
 
 ---
 
@@ -229,9 +268,55 @@ on ne relance pas.
 
 ---
 
-## 7. Ce qui reste à décider par Beau
+## 7. Envoi de la liste A — décidé par Beau le 29/09, à faire cette semaine
 
-- ☐ Lancer la liste A cette semaine, en deux versions (messages 1 et 2) ?
+Tirage au sort (graine 20260929) pour savoir quel message marche le mieux.
+C'est Beau qui envoie, depuis le numéro WhatsApp de Finjaro (les numéros
+sont dans la Console de la place de marché) : ces vendeuses ont donné leur
+numéro à Finjaro, c'est une relation existante.
+
+**Version 1 — « catalogue »**
+
+| Boutique | Message prêt à copier |
+|---|---|
+| Décoration évents | Bonjour, c'est Beau, de Finjaro. Votre boutique Décoration évents a déjà 40 articles avec leurs prix sur Finjaro. Finjaro Accounting, gratuit, les reprend en un clic : vous encaissez, et le stock, les dettes clients et vos comptes se tiennent tout seuls. Je peux vous montrer en 5 minutes si vous voulez : accounting.finjaro.net — Si ça ne vous intéresse pas, dites-le-moi simplement et je ne vous en reparlerai pas. |
+| SAMUEL TMC | (même message, « Votre boutique SAMUEL TMC a déjà 5 articles… ») |
+| Yak store | (même message, « Votre boutique Yak store a déjà 2 articles… ») |
+| TANA Shop | (même message, « Votre boutique TANA Shop a déjà 10 articles… ») |
+| Lmp sarl | (même message, « Votre boutique Lmp sarl a déjà 52 articles, dont 28 avec leurs prix… ») |
+
+**Version 2 — « cahier »**
+
+| Boutique | Message prêt à copier |
+|---|---|
+| claferShop&perfum | Bonjour, c'est Beau, de Finjaro. Vous notez encore vos ventes et ce que vos clientes vous doivent dans un cahier ? Finjaro Accounting (gratuit) fait ça sur le téléphone, et reprend en un clic les articles de votre boutique claferShop&perfum. Voulez-vous essayer ? accounting.finjaro.net — Si ce n'est pas pour vous, dites-le-moi et je ne vous relancerai pas. |
+| Nnal Beauty | (même message, « …les articles de votre boutique Nnal Beauty… ») |
+| Mon Confort Plus | (même message, « …les articles de votre boutique Mon Confort Plus… ») |
+| Luxus Beauty | (même message, « …les articles de votre boutique Luxus Beauty… ») |
+
+**Suivi** (je le remplis moi-même le 06/10 à partir de la base : espace
+Accounting créé et première vente ; Beau me dit seulement qui a répondu) :
+
+| Boutique | Version | Envoyé le | A répondu | Espace créé | Vente ≤ 7 j |
+|---|---|---|---|---|---|
+| Décoration évents | 1 | | | | |
+| SAMUEL TMC | 1 | | | | |
+| Yak store | 1 | | | | |
+| TANA Shop | 1 | | | | |
+| Lmp sarl | 1 | | | | |
+| claferShop&perfum | 2 | | | | |
+| Nnal Beauty | 2 | | | | |
+| Mon Confort Plus | 2 | | | | |
+| Luxus Beauty | 2 | | | | |
+
+Avec 9 boutiques, le résultat donnera une tendance, pas une preuve : on
+garde la version gagnante pour la liste B et on continue de compter.
+
+---
+
+## 8. Ce qui reste à décider par Beau
+
+- ☑ Lancer la liste A cette semaine (oui, 29/09).
 - ☐ Écrire au CGA de la CCIMA et à l'Association des femmes commerçantes ?
 - ☐ Pages publiques : oui, à la main et en petit nombre, ou attendre les
   résultats de la liste A ?
