@@ -7,6 +7,57 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 11 — 29/09/2026 (matin)
+
+### Ce qui a bougé depuis hier
+
+Grosse journée, à la demande de Beau (« codez à deux », pixel Meta,
+audit page par page). En résumé :
+
+| Ce qui a changé | Pourquoi |
+|---|---|
+| Catalogue vide : import mis en avant, reprise en un clic du catalogue Finjaro existant | mur du catalogue signalé par Beau |
+| Rappel des jours sans écriture dans « À traiter » | rappel du soir demandé par Beau ; pas de canal push/e-mail disponible |
+| Écran « Comment voulez-vous vendre ? » à l'installation, deux modes (avec/sans stock) | décision de Beau, maquette relue avec Alpha |
+| Bénéfice corrigé pour les entreprises sans stock (« Marge brute » disparaît, Résultat dit « Rentré − dépensé ») | la marge affichait ~100 % à coût zéro |
+| DeepSeek ajouté en secours texte de l'assistant | Google/OpenAI à zéro, décision de Beau |
+| Pixel Meta posé (bandeau RGPD, refus possible dans Paramètres, jamais en app native ni en démo) | mesure des campagnes publicitaires de Beau |
+| Suggestion « vous avez vendu *huile* 3 fois, en faire un article ? » | Alpha, sa part du chantier commun |
+
+### Ce qui casse, regardé sur téléphone ce matin
+
+Un vrai défaut trouvé et corrigé ce matin même : en quittant l'écran de
+démonstration vers `/pos`, le bandeau du pixel (et le pixel lui-même si
+accepté) réapparaissait sur des données d'exemple — la démo n'était plus
+étanche pour ce point précis. Le drapeau qui gardait ça (adresse `/demo/…`
+seulement) ne suivait pas la session une fois redirigée. Corrigé (deux
+drapeaux séparés : l'adresse pour le choix de route, la session pour tout
+ce qui touche au réseau), revérifié : plus de bandeau ni d'appel depuis la
+démo.
+
+### Une idée du terrain, avec ce qu'elle vaut
+
+Rien de concurrentiel cette semaine (veille toujours pauvre). Un point de
+la veille du jour mérite d'être gardé en tête : en France, 31 incidents
+sur les plateformes agréées de facturation électronique entre le 01/09 et
+le 26/09 — une panne de plateforme n'efface pas les délais de paiement.
+Deux comptes Accounting sont en France ; pas d'action aujourd'hui (pas
+d'intégration à une plateforme agréée chez nous), juste à surveiller si
+l'un d'eux facture en B2B.
+
+### Ce que je fais aujourd'hui
+
+En attente du nom légal et de l'adresse de Beau pour écrire la politique
+de confidentialité (obligatoire depuis que le pixel tourne). Sinon, suite
+de l'audit page par page demandé par Beau si rien d'autre n'arrive.
+
+### Ce que j'attends d'Alpha
+
+Rien de bloquant. Le nom légal/adresse est une question posée à Beau, pas
+à elle.
+
+---
+
 ## Réunion n° 10 — 28/09/2026 (matin)
 
 ### Ce qui a bougé depuis hier
