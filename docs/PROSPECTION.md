@@ -191,6 +191,66 @@ signaux vus ; « lu » = page ouverte directement, sinon lien déduit) :
 | 34 | Fishrell | Douala + Yaoundé | aliments poisson | facebook.com/103917458611969 | 3 | vente au kilo |
 | 35 | Quincaillerie Ecobuild | Douala | quincaillerie | facebook.com/Ecobuild.Sarl (lu) | 2 | peu active |
 
+### 4 bis. Abidjan, Dakar, boutiques afro en France et au Canada (29/09)
+
+Mêmes limites : liens Facebook **déduits de sites miroirs, non ouverts** ;
+les sites web marqués « vu » ont été lus. À vérifier avant d'écrire. En
+France, le démarchage d'une entreprise est permis si l'offre concerne son
+métier et qu'elle peut refuser (CNIL, section 1). Aucune page d'Abidjan ne
+parle de la facture électronique (FNE) : ce signal n'a pas pu servir.
+
+| # | Entreprise | Zone | Secteur | Lien | Note | Signal principal |
+|---|---|---|---|---|---|---|
+| 1 | Dane Boutique (Angré) | Abidjan | prêt-à-porter | facebook.com/815566858811919 | 5 | plusieurs boutiques, recrute pour gérer « commandes, stocks » (20/05/2026) |
+| 2 | Belle Nubian CI | Abidjan | cosmétiques | facebook.com/563959983764387 | 4 | 3 points de vente |
+| 3 | Magnanle Store | Abidjan (Adjamé) | pagnes, mode | magnanlestore.ci (vu) | 4 | 3 magasins, catalogue |
+| 4 | Kenora Boutique | Abidjan (Yopougon) | pagnes en gros | facebook.com/335166286347512 | 4 | prix par palier |
+| 5 | Les nanas fripées | Abidjan (Yopougon) | friperie gros/détail | facebook.com/715132775018775 | 4 | arrivages hebdo, prix sur photos |
+| 6 | La Maison D'Apoutchous | Abidjan | mode en ligne | facebook.com/100704559247151 | 4 | post 10/08/2026 |
+| 7 | Sira Cosmétique | Abidjan | cosmétiques | facebook.com/980171481854695 | 4 | kits à prix fixes |
+| 8 | Abeille Nature Cosmétiques | Abidjan | fabrique cosmétiques | facebook.com/894047647121881 | 4 | 2 sites |
+| 9 | Keita et Don | Abidjan (Yopougon) | outillage | facebook.com/1048746564983295 | 4 | post 31/07/2026 |
+| 10 | Sodis-Mad CI | Abidjan (Yopougon) | matériaux | facebook.com/948959371627125 | 4 | « stock disponible » |
+| 11 | Marche-Africa | Abidjan (Cocody) | vivriers en ligne | facebook.com/102252694785389 | 4 | stock périssable |
+| 12 | KAO Cosmétique | Abidjan | cosmétiques | facebook.com/893725940482116 | 3 | petit catalogue |
+| 13 | YVI Cosmetics BIO | Abidjan | cosmétiques | facebook.com/738576566010612 | 3 | 2 points de vente |
+| 14 | Carreaux plus | Abidjan | carrelage | facebook.com/107081825077406 | 3 | stock par format |
+| 15 | Iman tech | Abidjan (Adjamé) | accessoires auto | facebook.com/595051533691310 | 3 | prix sous chaque article |
+| 16 | Ndiaye Diatta Boutique | Dakar | tissus, cosmétiques gros | facebook.com/107184278360032 | 5 | post 03/09/2026 |
+| 17 | Bkr Boutique | Dakar | téléphones | bkrboutique.com (vu) | 5 | 3 boutiques, stock par article |
+| 18 | Friperie Sénégal by CATEX | Dakar (Colobane) | friperie gros | facebook.com/491608117379451 | 4 | vend à des revendeurs |
+| 19 | Grossiste Maodo | Dakar | gros divers | facebook.com/505955085934154 | 4 | prix par palier |
+| 20 | FOUTA TECH services | Dakar | accessoires tél. gros | facebook.com/661111507075028 | 4 | post 04/08/2026 |
+| 21 | Enera Beauty | Dakar | perruques, salon | enera-beauty.com (vu) | 4 | produits + prestations |
+| 22 | Makenva | Dakar | café gros/détail | makenva.com (vu) | 4 | tarif dégressif, factures |
+| 23 | Tall Et Frère | Dakar (Grand Yoff) | bagagerie | facebook.com/257168000809831 | 3 | gros et détail |
+| 24 | Tissu sagnsé | Dakar (Sandaga) | tissus | facebook.com/951446041388969 | 3 | peu actif en ligne |
+| 25 | Allo Dakar | Dakar | téléphones | allodakar.shop (vu) | 3 | stock à numéros de série |
+| 26 | Slayzone | Dakar | perruques | slayzoneofficial.com (vu) | 3 | acomptes à suivre |
+| 27 | Renwar Beauty | Dakar | cosmétiques | take.app/renwarbeauty (vu) | 3 | catalogue avec prix |
+| 28 | Solaat | Dakar | friperie en ligne | solaat.com (vu) | 3 | pièces uniques |
+| 29 | Yody Boutique | Dakar | cosmétiques | boutique-yody.com (vu) | 3 | déjà outillée |
+| 30 | Locks Dakar | Dakar | salon | locksdakar.com (vu) | 3 | services plus que stock |
+| 31 | TEGA Afro Store | Bordeaux | épicerie africaine | boutiqueafricainetega.fr (vu) | 4 | 145 produits |
+| 32 | Afro-Exotique | L'Aigle | épicerie, soins | afro-exotique.com (vu) | 4 | boutique + site |
+| 33 | Chateau Rouge Exotique | Mantes-la-Ville | épicerie | chateau-rouge-exotique.fr (vu) | 4 | expédie vers 7 pays |
+| 34 | H-Exotique | Pontoise | épicerie | h-exotique.fr (vu) | 4 | magasin + en ligne |
+| 35 | Passerelle | Boulogne-sur-Mer | produits camerounais | passerelle62.fr (vu) | 4 | importe du Cameroun |
+| 36 | Afrochic Cosmetics | Lille | cosmétiques, mèches | afrocosmetic.fr (vu) | 4 | beaucoup de références |
+| 37 | Exo Boutik Market | Épinal | épicerie | exoboutikmarket.com (vu) | 3 | petite structure |
+| 38 | Maison Michigan | Villeurbanne | salon + gamme | maisonmichigan.fr (vu) | 3 | plus structurée |
+| 39 | Distribution Armel | Repentigny (QC) | épicerie | distributionarmel.com (vu) | 4 | vend aussi aux pros |
+| 40 | Ti Marché Tropical | Québec | épicerie | timarchetropical.com (vu) | 4 | 2 magasins, gros |
+| 41 | Marché LT Eben-Ezer | Montréal | épicerie africaine | marchelteben-ezer.com (vu) | 4 | commandes WhatsApp |
+| 42 | Épicerie Ébènezer | Montréal | épicerie | epicerieebenezer.com (vu) | 4 | 139 produits en ligne |
+| 43 | Épicerie Éden Ka | Gatineau | épicerie | epiceriedenka.ca (vu) | 3 | déjà un outil de fidélité |
+| 44 | Marché Gouroh | Longueuil | épicerie | marchegouroh.ca (vu) | 3 | activité non vue |
+| 45 | Le Baobab | Montréal, Repentigny | épicerie | lebaobab.store (vu) | 3 | 2 sites |
+
+Attention hors Cameroun : la comptabilité proposée doit suivre le pays
+(SYSCOHADA en Côte d'Ivoire et au Sénégal, PCG en France, générique au
+Canada) — c'est déjà le cas à l'installation.
+
 ---
 
 ## 5. Organisations qui touchent beaucoup de commerçants
