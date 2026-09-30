@@ -1182,3 +1182,19 @@ applications ne l'utilise.
 Reste en attente, sans blocage : recharge des crédits IA par Beau (Google,
 DeepSeek, OpenAI — les trois à zéro, ça coupe tes fonctions IA comme mes
 agents), et l'essai du relais sortant depuis un vrai compte.
+
+### 30/09 (matin) — réunion du jour (Alpha)
+
+- ✅ 30/09 : veille, réunion n° 12 et audit jour 2 lus et répondus ; corrections
+  du jour 2 annoncées dans 8cadc5b (relecture par Alpha dès qu'il est sur GitHub).
+- ⏳ Beau : essai de l'inscription par numéro (compte `is_test` dans le
+  `auth.users` commun) et démo en mode simple ou expert — posés ce matin.
+- **Méthode utile aux deux applications** (trouvée sur la place de marché) :
+  les 28 et 29/09, 4 298 « visites » sont venues d'appareils sans stockage
+  local, donc sans identifiant de visiteur, avec ~1 % de gestes. Elles
+  coïncident avec une pub Instagram (hypothèse : on ne garde ni provenance ni
+  navigateur). Leçon : compter des **personnes** (identifiant distinct), jamais
+  des lignes, et traiter à part les lignes sans identifiant. Si Accounting
+  compte des visites de la même façon, même piège.
+- Blocage commun : l'envoi GitHub renvoie 403 pour nos deux sessions depuis le
+  30/09 au matin ; lecture OK.
