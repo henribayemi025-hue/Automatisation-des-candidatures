@@ -471,11 +471,19 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
     for (const pick of picks) {
       const product = products[pick.productIndex];
       const wanted = pick.qty * volume(pick.productIndex);
-      const available = stocked ? (stock.get(product.id) ?? 0) : wanted;
+      // Une main-d'œuvre (coût nul) ne se stocke pas : elle se vend toujours.
+      const service = catalogue[pick.productIndex].cost === 0;
+      // Article épuisé : la commerçante se réapprovisionne la veille, comme
+      // dans la vraie vie. Sans ça, le dernier mois de la démo manquait de
+      // marchandise et affichait « −30 à −43 % » en rouge (relu par Alpha).
+      if (stocked && !service && !asQuote && (stock.get(product.id) ?? 0) < wanted) {
+        purchase(dayOffset - 1, 0, [{ productIndex: pick.productIndex, qty: pick.qty * 8, unitCost: PRODUCTS[pick.productIndex].cost }], 1, true);
+      }
+      const available = stocked && !service ? (stock.get(product.id) ?? 0) : wanted;
       const qty = Math.min(wanted, Math.max(0, available));
       if (qty <= 0) continue;
       lines.push({ productId: product.id, name: product.name, qty, unitPrice: product.price, unitCost: cost.get(product.id) ?? product.cost });
-      if (!asQuote && stocked) stock.set(product.id, available - qty);
+      if (!asQuote && stocked && !service) stock.set(product.id, available - qty);
     }
     if (lines.length === 0) return;
     const totals = saleTotals(company, lines, 0);
