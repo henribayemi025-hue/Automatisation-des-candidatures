@@ -115,7 +115,25 @@ Accounting sans que personne ne tape quoi que ce soit.
 4. Retirer ou requalifier « Travailler à plusieurs » tant que personne ne
    l'utilise.
 
-### À faire demain (jour 2)
+---
 
-`Dashboard.tsx` et `PointOfSale.tsx` — le premier écran après l'entrée, et
-celui que les deux seules personnes actives ont réellement utilisé.
+## Jour 2 — `Dashboard.tsx` (Accueil) et `PointOfSale.tsx` (caisse), 30/09
+
+Audit fait par Alpha en production, sur la démo (`/#/demo/<pays>/<métier>`),
+sans compte, à 390 px et 1440 px. Corrections et mesures par Claudinette.
+
+| # | Constat (Alpha) | Gravité | Ce qui a été fait |
+|---|---|---|---|
+| 1 | Dans la démo, le restaurant perd de l'argent (marge brute −92 %, résultat −725 847 FCFA), la pharmacie aussi (−15 %) ; garage 71 % et import-export 84 %, trop beaux. | Grave : la démo est le lien de prospection. | Cause confirmée dans `demo.ts` : les coûts d'achat étaient ceux de l'épicerie, appliqués au catalogue de chaque métier. Corrigé : on garde seulement l'écart au coût de référence ; les quantités achetées et vendues suivent le prix de l'article (au plus ×5) ; la facture en dollars est réservée à l'épicerie et à l'import-export ; stock de départ de la pharmacie doublé. **Mesuré après correction** (Cameroun, France, Canada, 8 métiers, sur l'exercice et sur le mois) : tous les résultats sont positifs ; marges brutes au Cameroun : boutique 26 %, restaurant 49 %, garage 32 %, pharmacie 31 %, électronique 44 %, import-export 18 %. Aucun événement de la démo refusé, avant comme après. |
+| 3 | À la caisse, la taxe s'ajoute au prix affiché (22 500 → 26 831). | **Plus grave que prévu** : c'était un défaut, pas un choix. | Le réglage « Mes prix affichés incluent déjà la taxe » existe (Paramètres) et vaut « oui » par défaut, mais l'écran de caisse faisait son propre calcul et ajoutait toujours la taxe. L'écriture comptable, elle, était juste (le montant enregistré est plafonné au bon total). Corrigé : la caisse utilise le même calcul que la comptabilité (`saleTotals`). Vérifié : Poulet DG + café = 5 000 FCFA, dont TVA 807. **Aucun espace réel (hors comptes de test) n'a la TVA activée** : personne n'a été touché. |
+| 2 | Caisse sur téléphone : rien ne montre qu'un article est entré dans le panier. | Moyen | Barre fixe au-dessus du menu du bas : « 2 article(s) · 5 000 FCFA — Encaisser », qui descend au panier ; elle laisse la place du bouton de l'assistant. Vérifié à 390 px. |
+| 4 | Accueil : le premier chiffre de l'axe du graphique est coupé. | Petit | Axes en notation courte (« 200 k », « 1,5 M »). |
+| 5 | Accueil : sigles « MTD / YTD ». | Petit | Remplacés par « Mois / Année / 30 j » (traduits en anglais). |
+| 6 | Codes comptables (70, SIG, 411…) sur les cartes de l'Accueil. | À vérifier | Vérifié dans le code : ils ne s'affichent qu'en mode expert. La démo s'ouvre en mode expert ; à Beau de dire si elle doit s'ouvrir en mode simple pour les commerçants. |
+
+Vérifié et correct selon Alpha : graphique, aucune erreur JavaScript, devise
+selon le pays, astuce propre au restaurant.
+
+### À faire demain (jour 3)
+
+`Sales.tsx` (ventes) et `Stock.tsx`.

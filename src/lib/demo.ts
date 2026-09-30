@@ -114,14 +114,14 @@ const CATALOGUES: Record<string, ProductDef[]> = {
     { name: 'Heure de conseil', sku: 'HCONS', barcode: '', category: 'Conseil', price: 10000, cost: 0, stock: 0, reorder: 0, unit: 'heure' },
   ],
   health: [
-    { name: 'Paracétamol 500 mg (boîte)', sku: 'PARA', barcode: '', category: 'Médicaments', price: 1200, cost: 700, stock: 120, reorder: 30, unit: 'boîte' },
-    { name: 'Amoxicilline 500 mg', sku: 'AMOX', barcode: '', category: 'Médicaments', price: 3500, cost: 2100, stock: 60, reorder: 15, unit: 'boîte' },
-    { name: 'Compresses stériles', sku: 'COMP', barcode: '', category: 'Matériel', price: 1500, cost: 800, stock: 80, reorder: 20, unit: 'sachet' },
-    { name: 'Sirop antitussif', sku: 'SIRO', barcode: '', category: 'Médicaments', price: 2800, cost: 1600, stock: 40, reorder: 10, unit: 'flacon' },
-    { name: 'Thermomètre digital', sku: 'THER', barcode: '', category: 'Matériel', price: 4500, cost: 2500, stock: 15, reorder: 5, unit: 'pièce' },
-    { name: 'Lait infantile 400 g', sku: 'LAITI', barcode: '', category: 'Parapharmacie', price: 6500, cost: 4200, stock: 25, reorder: 8, unit: 'boîte' },
-    { name: 'Crème solaire', sku: 'SOL', barcode: '', category: 'Parapharmacie', price: 5500, cost: 3200, stock: 12, reorder: 5, unit: 'tube' },
-    { name: 'Sérum physiologique', sku: 'SERU', barcode: '', category: 'Médicaments', price: 900, cost: 450, stock: 18, reorder: 12, unit: 'boîte' },
+    { name: 'Paracétamol 500 mg (boîte)', sku: 'PARA', barcode: '', category: 'Médicaments', price: 1200, cost: 700, stock: 240, reorder: 30, unit: 'boîte' },
+    { name: 'Amoxicilline 500 mg', sku: 'AMOX', barcode: '', category: 'Médicaments', price: 3500, cost: 2100, stock: 120, reorder: 15, unit: 'boîte' },
+    { name: 'Compresses stériles', sku: 'COMP', barcode: '', category: 'Matériel', price: 1500, cost: 800, stock: 160, reorder: 20, unit: 'sachet' },
+    { name: 'Sirop antitussif', sku: 'SIRO', barcode: '', category: 'Médicaments', price: 2800, cost: 1600, stock: 80, reorder: 10, unit: 'flacon' },
+    { name: 'Thermomètre digital', sku: 'THER', barcode: '', category: 'Matériel', price: 4500, cost: 2500, stock: 30, reorder: 5, unit: 'pièce' },
+    { name: 'Lait infantile 400 g', sku: 'LAITI', barcode: '', category: 'Parapharmacie', price: 6500, cost: 4200, stock: 50, reorder: 8, unit: 'boîte' },
+    { name: 'Crème solaire', sku: 'SOL', barcode: '', category: 'Parapharmacie', price: 5500, cost: 3200, stock: 24, reorder: 5, unit: 'tube' },
+    { name: 'Sérum physiologique', sku: 'SERU', barcode: '', category: 'Médicaments', price: 900, cost: 450, stock: 36, reorder: 12, unit: 'boîte' },
   ],
   tech: [
     { name: 'Écran de remplacement', sku: 'ECR', barcode: '', category: 'Pièces', price: 25000, cost: 14000, stock: 20, reorder: 5, unit: 'pièce' },
@@ -333,6 +333,12 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
   });
 
   // ---- Achats : un reçu et payé, un reçu et payé à moitié, un encore en attente ----
+  // Les quantités écrites plus bas sont celles de l'épicerie. Un plat à 500 F
+  // vendu au rythme d'un sac de riz à 22 500 F laissait le restaurant sans
+  // chiffre d'affaires face aux mêmes charges fixes : on achète et on vend
+  // plus d'unités quand l'article coûte moins cher (au plus cinq fois plus).
+  const volume = (i: number) => Math.min(5, Math.max(1, Math.round(PRODUCTS[i].price / catalogue[i].price)));
+
   function purchase(dayOffset: number, supplierIndex: number, lines: { productIndex: number; qty: number; unitCost: number }[], paidRatio: number, receive: boolean) {
     if (!stocked) return;
     const date = dayISO(base, dayOffset);
@@ -340,8 +346,12 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
     const purchaseLines = lines.map((l) => ({
       productId: products[l.productIndex].id,
       name: products[l.productIndex].name,
-      qty: l.qty,
-      unitCost: money(l.unitCost),
+      qty: l.qty * volume(l.productIndex),
+      // Les coûts écrits plus bas sont ceux de l'épicerie (PRODUCTS). Appliqués
+      // tels quels au catalogue d'un autre métier, ils achetaient le Poulet DG
+      // au prix d'un sac de riz : restaurant en perte, garage trop beau (audit
+      // d'Alpha, 30/09). On n'en garde que l'écart au coût de référence.
+      unitCost: Math.round(products[l.productIndex].cost * (l.unitCost / PRODUCTS[l.productIndex].cost)),
     }));
     const total = purchaseLines.reduce((s, l) => s + l.unitCost * l.qty, 0);
     const vat = company.vatEnabled ? Math.round((total * company.vatRateBp) / 10000) : 0;
@@ -384,26 +394,37 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
   // Pour qu'un fiscaliste ou un import-export voie tout de suite le coût rendu
   // magasin et la TVA de douane. Les ampoules LED (index 6) et le sucre
   // (index 3) arrivent d'un fournisseur étranger.
-  if (stocked) {
+  // Seulement pour l'épicerie et l'import-export : ailleurs, une facture en
+  // dollars de « Shenzhen Light Export » n'a pas de sens.
+  if (stocked && (!CATALOGUES[company.sector] || company.sector === 'trade')) {
     const date = dayISO(base, -44);
     const fxRate = currency(company.currency).decimals === 0 ? 600 : 1; // 1 $ = 600 F ; en devise à centimes, on reste 1:1 pour garder des chiffres lisibles
-    const cents = (usd: number) => usd * 100;
     const toLocal = (c: number) => Math.round((c * fxRate) / (currency(company.currency).decimals === 0 ? 100 : 1));
-    const importLines = [
+    // Prix en dollars déduit du coût du catalogue (même écart que l'épicerie
+    // d'origine : 1,20 $ l'ampoule, 0,90 $ le sucre), pour rester cohérent
+    // quel que soit le métier.
+    const zeroDecimals = currency(company.currency).decimals === 0;
+    const foreignLines = [
       { productIndex: 6, qty: 300, usd: 1.2 },
       { productIndex: 3, qty: 200, usd: 0.9 },
-    ].map((l) => ({
+    ].map((l) => {
+      const local = products[l.productIndex].cost * ((l.usd * 600) / PRODUCTS[l.productIndex].cost);
+      return { ...l, cents: Math.max(1, Math.round(zeroDecimals ? (local * 100) / fxRate : local)) };
+    });
+    const importLines = foreignLines.map((l) => ({
       productId: products[l.productIndex].id,
       name: products[l.productIndex].name,
       qty: l.qty,
-      unitCost: toLocal(cents(l.usd)),
+      unitCost: toLocal(l.cents),
     }));
-    const foreignTotal = [300 * cents(1.2), 200 * cents(0.9)].reduce((s, x) => s + x, 0);
+    const foreignTotal = foreignLines.reduce((s, l) => s + l.qty * l.cents, 0);
     const total = importLines.reduce((s, l) => s + l.unitCost * l.qty, 0);
+    // Frais d'approche dans les mêmes proportions que l'exemple d'origine
+    // (96 000 / 48 000 / 24 000 pour 324 000 de marchandise).
     const landed = [
-      { kind: 'CUSTOMS' as const, label: 'Droits de douane', amount: money(96_000) },
-      { kind: 'FREIGHT' as const, label: 'Fret', amount: money(48_000) },
-      { kind: 'FORWARDING' as const, label: 'Transitaire', amount: money(24_000) },
+      { kind: 'CUSTOMS' as const, label: 'Droits de douane', amount: Math.round((total * 96) / 324) },
+      { kind: 'FREIGHT' as const, label: 'Fret', amount: Math.round((total * 48) / 324) },
+      { kind: 'FORWARDING' as const, label: 'Transitaire', amount: Math.round((total * 24) / 324) },
     ];
     const landedTotal = landed.reduce((s, c) => s + c.amount, 0);
     const importVat = company.vatEnabled ? Math.round(((total + landed[0].amount) * company.vatRateBp) / 10000) : 0;
@@ -449,8 +470,9 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
     const lines: SaleLine[] = [];
     for (const pick of picks) {
       const product = products[pick.productIndex];
-      const available = stocked ? (stock.get(product.id) ?? 0) : pick.qty;
-      const qty = Math.min(pick.qty, Math.max(0, available));
+      const wanted = pick.qty * volume(pick.productIndex);
+      const available = stocked ? (stock.get(product.id) ?? 0) : wanted;
+      const qty = Math.min(wanted, Math.max(0, available));
       if (qty <= 0) continue;
       lines.push({ productId: product.id, name: product.name, qty, unitPrice: product.price, unitCost: cost.get(product.id) ?? product.cost });
       if (!asQuote && stocked) stock.set(product.id, available - qty);

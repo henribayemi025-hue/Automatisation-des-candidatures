@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore, today } from '../lib/store';
+import { saleTotals } from '../lib/reducer';
 import { formatMoney, toMajor, toMinor } from '../lib/money';
 import type { PaymentMethod, Sale, SaleLine } from '../lib/types';
 import Receipt from '../components/Receipt';
@@ -144,12 +145,10 @@ export default function PointOfSale() {
       .slice(0, 12);
   }, [db.products, query, rayon]);
 
-  const totals = useMemo(() => {
-    const gross = cart.reduce((s, l) => s + l.unitPrice * l.qty, 0);
-    const net = Math.max(0, gross - discount);
-    const vat = db.company.vatEnabled ? Math.round((net * db.company.vatRateBp) / 10000) : 0;
-    return { gross, net, vat, total: net + vat };
-  }, [cart, discount, db.company.vatEnabled, db.company.vatRateBp]);
+  // Le même calcul que l'écriture comptable (saleTotals) : avant le 30/09 la
+  // caisse ajoutait toujours la taxe, même quand les prix l'incluaient déjà —
+  // le client payait 26 831 pour une étiquette à 22 500 (audit d'Alpha).
+  const totals = useMemo(() => saleTotals(db.company, cart, discount), [cart, discount, db.company]);
 
   const paid = paidRaw === '' ? totals.total : toMinor(paidRaw, currency);
   const isCredit = method === 'CREDIT';
@@ -381,7 +380,7 @@ export default function PointOfSale() {
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_380px]">
+      <div className={`grid gap-4 lg:grid-cols-[1fr_380px] ${cart.length ? 'pb-16 lg:pb-0' : ''}`}>
         <div className="card">
           <form
             className="relative mb-2"
@@ -570,7 +569,7 @@ export default function PointOfSale() {
           )}
         </div>
 
-        <div className="card flex h-fit flex-col gap-4 lg:sticky lg:top-24">
+        <div id="pos-panier" className="card flex h-fit scroll-mt-4 flex-col gap-4 lg:sticky lg:top-24">
           <h2 className="flex items-center gap-2 font-bold">
             <IconCart className="h-[18px] w-[18px] text-brand-600" />
             {t('Panier')}
@@ -833,6 +832,25 @@ export default function PointOfSale() {
           </div>
         </div>
       </div>
+
+      {/* Sur téléphone, le panier est sous toute la liste : sans cette barre,
+          rien ne montrait qu'un article venait d'y entrer (audit, 30/09).
+          Elle laisse la place du bouton de l'assistant, à droite. */}
+      {cart.length > 0 && (
+        <button
+          type="button"
+          onClick={() => document.getElementById('pos-panier')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+          className="safe-fab fixed left-3 right-[76px] z-30 flex items-center justify-between gap-3 rounded-pill bg-ink px-4 py-3 text-white shadow-[0_12px_30px_rgba(23,27,38,0.3)] active:scale-[0.98] lg:hidden"
+        >
+          <span className="flex min-w-0 items-center gap-2 text-caption font-semibold">
+            <IconCart className="h-[18px] w-[18px] shrink-0" />
+            <span className="truncate">
+              {t('{n} article(s)', { n: cart.reduce((s, l) => s + l.qty, 0) })} · <span className="num">{formatMoney(totals.total, currency)}</span>
+            </span>
+          </span>
+          <span className="shrink-0 text-caption font-bold">{t('Encaisser')}</span>
+        </button>
+      )}
     </>
   );
 }

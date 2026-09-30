@@ -17,12 +17,18 @@ import { locale, t } from '../lib/i18n';
 import { sectorProfile, tracksStock } from '../lib/sector';
 
 const PERIODS: { value: Period; label: string; hint: string }[] = [
-  { value: 'MTD', label: 'MTD', hint: 'Depuis le 1er du mois' },
-  { value: 'YTD', label: 'YTD', hint: 'Depuis le début de l’exercice' },
+  { value: 'MTD', label: 'Mois', hint: 'Depuis le 1er du mois' },
+  { value: 'YTD', label: 'Année', hint: 'Depuis le début de l’exercice' },
   { value: '30D', label: '30 j', hint: 'Trente derniers jours' },
 ];
 
 const PERIOD_KEY = 'finia.dashboard.period';
+
+// Axe des graphiques : « 200 k », « 2 M ». En toutes lettres, « 2 000 000 »
+// dépassait la largeur de l'axe et perdait ses premiers chiffres (audit, 30/09).
+function axisNumber(v: number): string {
+  return new Intl.NumberFormat(locale(), { notation: 'compact', maximumFractionDigits: 1 }).format(v);
+}
 
 function DeltaChip({ value, label, absolute }: { value: number | null; label: string; absolute?: string }) {
   // Une base nulle ou minuscule rend le pourcentage trompeur : on montre alors la variation en montant.
@@ -167,7 +173,7 @@ export default function Dashboard() {
                 onClick={() => choosePeriod(p.value)}
                 className={`rounded-[6px] px-3 py-1.5 text-[12px] font-bold tabular-nums transition ${period === p.value ? 'bg-ink text-white' : 'text-muted hover:text-ink'}`}
               >
-                {p.label}
+                {t(p.label)}
               </button>
             ))}
           </div>
@@ -315,8 +321,8 @@ export default function Dashboard() {
                   </defs>
                   <CartesianGrid vertical={false} stroke="#E8DFD1" />
                   <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#6B6660' }} axisLine={false} tickLine={false} interval="preserveStartEnd" minTickGap={24} />
-                  <YAxis yAxisId="flow" tick={{ fontSize: 11, fill: '#6B6660' }} axisLine={false} tickLine={false} width={56} tickFormatter={(v: number) => formatNumber(v, 0)} />
-                  <YAxis yAxisId="cash" orientation="right" tick={{ fontSize: 11, fill: '#1F6F65' }} axisLine={false} tickLine={false} width={56} tickFormatter={(v: number) => formatNumber(v, 0)} />
+                  <YAxis yAxisId="flow" tick={{ fontSize: 11, fill: '#6B6660' }} axisLine={false} tickLine={false} width={56} tickFormatter={axisNumber} />
+                  <YAxis yAxisId="cash" orientation="right" tick={{ fontSize: 11, fill: '#1F6F65' }} axisLine={false} tickLine={false} width={56} tickFormatter={axisNumber} />
                   <Tooltip
                     formatter={(v: number, name: string) => [formatNumber(v, 0), name]}
                     labelClassName="text-xs"
