@@ -2,6 +2,19 @@
 
 Chaque idée : le problème, pour qui, ce que ça vaut, l'effort, ce qu'on demande à Beau. Beau coche ☐ → ☑ quand il décide. Les idées viennent des deux sessions, de la concurrence, du terrain. Rien n'est promis : c'est une liste de choix.
 
+## Idée issue de la veille du 30/09/2026 — à décider par Beau
+
+- ☐ **Encaisser par PI-SPI directement dans la caisse (UEMOA).**
+  - Problème : une commerçante de Dakar ou d'Abidjan payée par virement
+    instantané doit aujourd'hui importer un relevé pour que ses comptes
+    tombent juste.
+  - Pour qui : les commerces de la zone UEMOA (Sénégal, Côte d'Ivoire…),
+    pas le Cameroun ni le Gabon (zone CEMAC).
+  - Valeur : paiement reçu = vente enregistrée et rapprochée, sans saisie.
+  - Effort : important, et d'abord administratif (la BCEAO homologue les
+    « API Business » de PI-SPI depuis le 16/09 ; il faut passer par un
+    participant agréé). À ne lancer que si l'UEMOA devient un marché visé.
+
 ## Revue hebdomadaire — 24/09/2026 (Claudinette)
 
 ### Ce que font les concurrents cette semaine

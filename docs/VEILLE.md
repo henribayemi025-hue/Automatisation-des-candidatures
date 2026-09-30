@@ -11,6 +11,67 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 30/09/2026
+
+**Un fait concurrent qui compte : QuickBooks relance les impayés depuis
+l'assistant de Meta. Côté règles, rien de publié cette semaine, mais une
+homologation BCEAO du 16/09 que nous n'avions pas notée. Côté technique,
+un outil Cloudflare utile pour savoir quelle poussée a cassé quoi.**
+
+### Concurrence
+
+- **QuickBooks se branche sur Muse, l'assistant de Meta** : depuis une
+  conversation, créer et envoyer des factures payables en ligne, suivre les
+  impayés, envoyer des relances, consulter résultat et trésorerie. Pays
+  couverts et lien avec WhatsApp : non précisés. Publié le 29/09/2026.
+  [intuit.com](https://www.intuit.com/blog/innovative-thinking/tech-innovation/intuit-quickbooks-joins-muse-for-small-business/)
+  → La relance d'impayés depuis une messagerie devient la norme chez les
+  grands : notre bouton « Relancer sur WhatsApp » reste utile mais n'est
+  plus un avantage exclusif. Ne pas le présenter comme une exclusivité.
+- Moniepoint (Nigeria) utilise son réseau de terminaux pour vendre en agence
+  des actions de l'introduction en bourse de Dangote Refinery. Publié le
+  25/09/2026. [techcabal.com](https://techcabal.com/2026/09/25/moniepoint-pos-network-investment-network/)
+  → Contexte seulement : au Nigeria, le terminal de paiement devient une
+  porte vers d'autres services ; un commerçant Moniepoint y est très attaché.
+- Rien trouvé et daté pour l'Afrique francophone, Wave, Bumpa, l'Inde, le
+  Brésil ou Sage. (Zoho Books Nigeria du 17/09 : déjà noté.)
+
+### Règles, impôts et paiements
+
+- **Rien de publié du 23 au 30/09** sur la facture électronique, le fisc ou
+  le mobile money au-delà de ce qui est déjà noté. Aucune annonce trouvée
+  de la connexion de Wave à PI-SPI avant l'échéance du 30/09.
+- **Pas encore noté ici : le 16/09/2026, la BCEAO a annoncé l'homologation
+  des « API Business » de PI-SPI**, qui permettent aux logiciels
+  d'entreprise de se brancher directement sur la plateforme de paiement
+  instantané de l'UEMOA. [bceao.int](https://www.bceao.int/) (annonce vue
+  en page d'accueil ; le communiqué lui-même n'a pas été ouvert, le nombre
+  de solutions homologuées n'est donc pas repris).
+  → C'est la voie officielle pour encaisser et rapprocher les paiements
+  UEMOA directement dans la caisse, au lieu d'importer des relevés. Voir
+  IDEES.md.
+- **Mise en garde** : des résumés de recherche attribuent au Sénégal un
+  « décret 2026-101 / SFEC au 01/08/2026 ». Il concerne en réalité le
+  **Congo-Brazzaville** (sfec.gouv.cg). Ne pas l'attribuer au Sénégal.
+
+### Technologie et IA
+
+- **Cloudflare Workers Metrics affiche désormais chaque mise en ligne sur
+  les graphiques**, pour dater le début d'une régression. Publié le
+  25/09/2026.
+  [developers.cloudflare.com](https://developers.cloudflare.com/changelog/post/2026-09-25-release-flows-workers-metrics/)
+  → Utile chez nous : Cloudflare déploie seul à chaque poussée et la CI
+  verte ne prouve pas la mise en ligne ; ce graphique relie une panne à une
+  poussée précise. Aucune action requise.
+- NKENNEAi lance des modèles de reconnaissance et de synthèse vocales, en
+  swahili d'abord (article sponsorisé). Publié le 25/09/2026.
+  [techcabal.com](https://techcabal.com/2026/09/25/nkenneai-launches-its-first-african-language-speech-models-starting-with-swahili/)
+  → Rien d'utilisable : aucune langue parlée au Cameroun pour l'instant.
+- Rien de nouveau et daté pour Supabase, Gemini, DeepSeek, Capacitor, les
+  PWA ou la lecture de reçus.
+
+---
+
 ## 29/09/2026
 
 **Semaine toujours pauvre côté concurrence. Deux faits utiles côté
