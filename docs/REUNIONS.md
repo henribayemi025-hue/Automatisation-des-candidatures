@@ -7,6 +7,51 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 12 — 30/09/2026 (matin)
+
+### Ce qui a bougé depuis hier
+
+| Ce qui a changé | État |
+|---|---|
+| E-mails automatiques : rappel du soir (18:00 UTC) et nouvelles du lundi, signés « L'équipe Finjaro », désinscription dans Paramètres | **En service.** Premier envoi hier soir : l'appel a répondu 200, aucune erreur d'envoi dans les journaux |
+| Inscription par numéro de téléphone rouverte (compte créé côté serveur, déjà confirmé ; 5 par heure par connexion) | En ligne (ce1a0c1), **pas encore essayée en vrai** : Alpha attend l'accord de Beau, l'essai crée un compte partagé |
+| Liste vérifiée de ce que fait Accounting, pour la vidéo | Envoyée à Alpha. « Gratuit » seul, jamais « pour toujours » ; la relance des impayés est un geste manuel |
+| Veille du 30/09 | Écrite (e525cbd) |
+| Audit jour 2 (Accueil + caisse, fait par Alpha) | Corrigé (8cadc5b) : démo rentable pour chaque métier, taxe à la caisse, barre panier sur téléphone, axes, « Mois / Année / 30 j » |
+
+### Ce qui casse
+
+- **GitHub refuse tout envoi depuis ce matin (403)**, chez moi comme chez
+  Alpha. Les deux derniers commits (veille, audit jour 2) ne sont donc **pas
+  en ligne**. D'après Alpha, le compte de Beau n'est pas en cause. Nouvel
+  essai toutes les heures.
+- Trouvé par l'audit et plus grave qu'annoncé : la caisse ajoutait la taxe
+  au prix affiché alors que les prix sont « taxe comprise » (26 831 demandés
+  pour 22 500). La comptabilité était juste, et aucun espace réel n'a la
+  TVA : personne n'a été touché. Corrigé, en attente de mise en ligne.
+
+### Une idée venue de la concurrence
+
+QuickBooks relance les impayés depuis l'assistant de Meta (29/09). Relancer
+depuis une messagerie devient la norme : notre bouton WhatsApp reste utile
+mais n'est plus une exclusivité. Ce qui peut encore nous distinguer : la
+relance qui part toute seule, sur un message que la commerçante a validé une
+fois. À réfléchir, pas à faire maintenant.
+
+### Ce que je fais aujourd'hui
+
+Remettre les deux commits en ligne dès que GitHub l'accepte, puis vérifier
+sur accounting.finjaro.net que la caisse et la démo ont bien changé.
+L'audit du jour 3 (Ventes et Stock) est prévu demain.
+
+### Ce que j'attends d'Alpha
+
+- Essayer l'inscription par numéro dès que Beau dit oui.
+- Poser à Beau la question de la démo : faut-il l'ouvrir en mode simple,
+  sans les numéros de comptes, pour les commerçants ?
+
+---
+
 ## Réunion n° 11 — 29/09/2026 (matin)
 
 ### Ce qui a bougé depuis hier
