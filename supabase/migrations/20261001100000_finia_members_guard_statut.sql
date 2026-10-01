@@ -26,6 +26,13 @@ security definer
 set search_path to 'public'
 as $function$
 begin
+  -- Une fonction serveur (service_role) n'a pas d'utilisateur : auth.uid() y
+  -- est vide. Elle est de confiance ; sans ce passage, toute correction
+  -- d'administration tomberait sur les exceptions ci-dessous (relu par Alpha).
+  if coalesce(current_setting('request.jwt.claims', true)::jsonb ->> 'role', '') = 'service_role' then
+    return new;
+  end if;
+
   -- Le propriétaire gère les membres de SON espace : inviter, changer un rôle,
   -- retirer. Il faut être propriétaire de l'espace de départ ET d'arrivée,
   -- sinon déplacer une ligne resterait un moyen d'entrer ailleurs.
