@@ -2,6 +2,57 @@
 
 Chaque idée : le problème, pour qui, ce que ça vaut, l'effort, ce qu'on demande à Beau. Beau coche ☐ → ☑ quand il décide. Les idées viennent des deux sessions, de la concurrence, du terrain. Rien n'est promis : c'est une liste de choix.
 
+## Revue hebdomadaire — 01/10/2026 (Claudinette)
+
+**Le fait de la semaine n'est pas chez les concurrents, il est chez nous :
+aucune action d'un vrai compte dans Accounting le 29/09 ni les 24 h
+suivantes (mesuré sur finia_events, comptes de test exclus).** L'application
+a beaucoup avancé ; personne ne s'en sert encore. Les idées ci-dessous
+visent d'abord ce problème.
+
+### Ce que font les concurrents cette semaine
+
+- **QuickBooks se branche sur Muse, l'assistant de Meta (29/09)** : factures,
+  suivi des impayés et relances depuis une conversation.
+  [intuit.com](https://www.intuit.com/blog/innovative-thinking/tech-innovation/intuit-quickbooks-joins-muse-for-small-business/)
+  Relancer depuis une messagerie devient la norme : notre relance WhatsApp
+  reste utile mais n'est plus une exclusivité.
+- Rien de daté en Afrique francophone, au Nigeria, au Kenya, en Inde ou au
+  Brésil du 23/09 au 01/10 (veilles des 30/09 et 01/10).
+
+### Une obligation qui touche nos commerçantes
+
+- **PI-SPI (UEMOA)** : l'échéance de généralisation était le 30/09 ; aucun
+  communiqué ni bilan publié depuis. La BCEAO a homologué le 16/09 des « API
+  Business » qui permettent à un logiciel de se brancher sur le paiement
+  instantané. [bceao.int](https://www.bceao.int/) — idée déjà notée plus bas
+  (veille du 30/09).
+- France : la réception des factures électroniques est obligatoire depuis
+  le 01/09/2026, sanctions suspendues jusqu'à fin 2026 (veille du 27/09).
+
+### Trois idées nouvelles
+
+| | Idée | Problème | Pour qui | Ce que ça vaut | Effort | Ce qu'on demande à Beau |
+|---|---|---|---|---|---|---|
+| ☐ | **1. Le premier jour accompagné.** Chaque personne qui crée un espace reçoit dans les 24 h un message WhatsApp de Beau (ou de l'équipe) : « Je suis Beau, de Finjaro. Voulez-vous que je vous aide à noter votre première vente ? » | Zéro action réelle depuis deux jours : les gens s'inscrivent puis ne reviennent pas. Un rappel par e-mail n'a rien déclenché. | Chaque nouvel inscrit (peu nombreux aujourd'hui, c'est le moment où c'est faisable) | Au démarrage, une conversation humaine apprend plus que n'importe quel écran, et c'est elle qui fait revenir. C'est un message de service à quelqu'un qui vient de s'inscrire, pas de la prospection. | Nul en code : je fournis chaque matin la liste des nouveaux espaces (lecture seule). Le temps de Beau : quelques minutes par inscrit. | Accepter de le faire lui-même, ou désigner qui ; valider le texte du message. |
+| ☐ | **2. La relance avec le relevé en ligne.** Le message « Relancer sur WhatsApp » contient un lien vers une page simple : ce que je dois, depuis quand, payé en partie, au nom de la boutique, avec « Tenu avec Finjaro Accounting ». | Le client relancé ne voit qu'un montant ; il conteste ou oublie. Et Accounting ne se fait connaître de personne. | Les commerçantes qui vendent à crédit ; leurs clients, qui sont souvent eux-mêmes commerçants | Une relance plus claire paie mieux, et chaque relance montre l'outil à un autre commerçant (c'est ainsi que les carnets de crédit indiens se sont diffusés). | Moyen : une page publique en lecture seule protégée par un lien secret, donc une petite table et une fonction côté serveur. | Son accord, car il faut une migration et une fonction (base partagée) ; puis le choix de la mention « Tenu avec Finjaro Accounting ». |
+| ☐ | **3. La relance planifiée, sans robot.** Au lieu d'envoyer tout seul, l'application rappelle à la commerçante, le jour qu'elle a choisi : « Aujourd'hui : relancer Mama Nicole, 5 000 FCFA » — un appui ouvre WhatsApp avec le message prêt. | Les impayés se suivent mais personne ne pense à relancer au bon moment. | Toutes celles qui vendent à crédit | Rend vraie la promesse « relancés en un geste » de la vidéo, sans envoi automatique au nom de quelqu'un ni API payante. | Faible : une date de relance sur la créance et une ligne dans « À traiter » ; aucun changement en base. | Rien d'obligatoire ; dire si on le fait avant l'audit des Créances (jour 4) ou en même temps. |
+
+### L'idée « wow » pour une démo
+
+☐ **La photo du cahier.** La commerçante photographie une page de son
+cahier de ventes ; l'assistant la lit et propose les ventes et les dettes
+de la page, qu'elle relit et valide en un appui. Ses comptes démarrent avec
+son passé au lieu d'une page vide. C'est exactement la cible de la version
+« cahier » du message de prospection (PROSPECTION.md, section 7).
+*Effort* : moyen, l'assistant sait déjà lire une photo de reçu et un PDF ;
+reste l'écran de relecture (le Rattrapage existe déjà et peut servir).
+*Règle* : rien n'est enregistré sans relecture, comme pour la voix (idée
+n° 4 du 17/09). *Ce qu'on demande à Beau* : une vraie page de cahier
+(anonymisée) pour tester, et son accord pour le montrer en démo.
+
+---
+
 ## Idée issue de la veille du 30/09/2026 — à décider par Beau
 
 - ☐ **Encaisser par PI-SPI directement dans la caisse (UEMOA).**
