@@ -18,6 +18,19 @@ import { revenueKindOf } from './sector';
  * main-d'œuvre » en rupture, la tuile de caisse était grisée, et l'Accueil
  * comptait une alerte de stock qui n'en était pas une (audit jour 3).
  */
+/**
+ * Un nom qui ressemble à du travail facturé plutôt qu'à une marchandise. Sert
+ * à proposer « Prestation » d'emblée : un garagiste qui crée « Heure de
+ * main-d'œuvre » sans toucher au sélecteur obtenait une marchandise, donc un
+ * stock à zéro et une tuile de caisse grisée (relevé par Alpha, 01/10).
+ * Ce n'est qu'une proposition : la personne peut toujours changer.
+ */
+const SERVICE_WORDS = /main[\s-]*d['’]?\s*(œ|oe)uvre|\bheures?\b|diagnostic|r[ée]paration|installation|\bpose\b|vidange|r[ée]vision|\bcoupe\b|brushing|tresses?|d[ée]frisage|manucure|p[ée]dicure|soin du visage|consultation|s[ée]ance|d[ée]placement|forfait|prestation|livraison|conseil|formation|cours\b|location|nettoyage|retouche/i;
+
+export function looksLikeService(name: string): boolean {
+  return SERVICE_WORDS.test(name);
+}
+
 export function holdsStock(company: { sector: string }, product: { id: string; kind?: RevenueKind }): boolean {
   return revenueKindOf(company, { productId: product.id }, product) !== 'SERVICE';
 }

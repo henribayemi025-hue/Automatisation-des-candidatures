@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { looksLikeService } from './recipes';
 import type { ReactNode } from 'react';
 import { accountCode } from './chart';
 import type { AccountKey } from './chart';
@@ -278,6 +279,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
       saveProduct(input) {
         const existing = input.id ? dbRef.current.products.find((p) => p.id === input.id) : undefined;
+        // Article créé sans nature (import d'un catalogue, assistant) : un nom
+        // de travail facturé devient une prestation, sans stock.
+        if (!existing && !input.kind && looksLikeService(input.name)) input = { ...input, kind: 'SERVICE' };
         const product: Product = {
           ...(existing ?? { id: newId(), createdAt: new Date().toISOString() }),
           ...input,

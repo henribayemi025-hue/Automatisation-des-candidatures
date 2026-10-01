@@ -2,14 +2,14 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore, today } from '../lib/store';
 import { saleTotals } from '../lib/reducer';
 import { formatMoney, toMajor, toMinor } from '../lib/money';
-import type { PaymentMethod, Sale, SaleLine } from '../lib/types';
+import type { PaymentMethod, Product, Sale, SaleLine } from '../lib/types';
 import Receipt from '../components/Receipt';
 import { Badge, Empty, Field, Money, PageHeader } from '../components/UI';
 import { IconBox, IconCart, IconCheck, IconDoc, IconSearch, IconX } from '../components/Icons';
 import { scanFeedback, useBarcodeScanner } from '../lib/scanner';
 import { t } from '../lib/i18n';
 import { sectorProfile, tracksStock } from '../lib/sector';
-import { availableQty, holdsStock, isComposed, missingFor } from '../lib/recipes';
+import { availableQty, holdsStock, isComposed, looksLikeService, missingFor } from '../lib/recipes';
 import ProjectSelect from '../components/ProjectSelect';
 import { outstanding } from '../lib/metrics';
 import { aRendre, billetsProposes } from '../lib/monnaie';
@@ -155,13 +155,27 @@ export default function PointOfSale() {
   const effectivePaid = isCredit ? Math.min(paid, totals.total) : totals.total;
   const remaining = totals.total - effectivePaid;
 
+  const maybeService = (p: Product) => !isComposed(p) && (p.cost === 0 || looksLikeService(p.name));
+
   function addToCart(productId: string) {
     const product = db.products.find((p) => p.id === productId);
     if (!product) return;
     // Plancher de stock (ligne 3 du tableau docs/SIMULATION-DECISIONS.md) :
     // on ne vend pas en silence ce que l'appareil ne voit plus en rayon. La
     // caissière peut passer outre, en le sachant ; rien n'est refusé de force.
-    if (withStock && holdsStock(db.company, product)) {
+    // Un article sans stock qui ressemble à du travail facturé (« Heure de
+    // main-d'œuvre », coût nul) : c'est sans doute une prestation créée comme
+    // marchandise. On demande au lieu de bloquer, et la réponse vaut pour la
+    // suite (relevé par Alpha, 01/10 : un garage neuf retombait sinon sur le
+    // défaut corrigé au jour 3).
+    let service = !holdsStock(db.company, product);
+    if (withStock && !service && maybeService(product) && availableQty(db, product) <= 0) {
+      if (window.confirm(t('« {name} » n’a pas de stock. Est-ce une prestation (main-d’œuvre, service) ? Si oui, on ne lui comptera plus de stock.', { name: product.name }))) {
+        saveProduct({ ...product, kind: 'SERVICE' });
+        service = true;
+      }
+    }
+    if (withStock && !service) {
       const inCart = cart.find((l) => l.productId === productId)?.qty ?? 0;
       // Un plat préparé n'a pas de stock à lui : ce qu'on peut encore servir
       // dépend de son ingrédient le plus rare.
@@ -537,7 +551,7 @@ export default function PointOfSale() {
                 <button
                   key={p.id}
                   onClick={() => addToCart(p.id)}
-                  disabled={withStock && holdsStock(db.company, p) && availableQty(db, p) <= 0}
+                  disabled={withStock && holdsStock(db.company, p) && !maybeService(p) && availableQty(db, p) <= 0}
                   className="group rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-400 hover:shadow-md disabled:opacity-40 dark:border-white/10"
                 >
                   <div className="mb-2 flex items-start justify-between gap-2">

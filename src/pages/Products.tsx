@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useStore } from '../lib/store';
+import { looksLikeService } from '../lib/recipes';
 import { useCollab } from '../lib/collab';
 import { formatMoney, toMajor, toMinor } from '../lib/money';
 import type { Product, RevenueKind } from '../lib/types';
@@ -45,6 +46,7 @@ export default function Products() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(BLANK);
+  const [kindTouched, setKindTouched] = useState(false);
   const [grid, setGrid] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [importAutoFinjaro, setImportAutoFinjaro] = useState(false);
@@ -151,12 +153,14 @@ export default function Products() {
 
   function openNew() {
     setEditing(null);
+    setKindTouched(false);
     setForm(vierge);
     setOpen(true);
   }
 
   function openEdit(p: Product) {
     setEditing(p);
+    setKindTouched(true);
     setForm({
       name: p.name,
       sku: p.sku,
@@ -373,7 +377,17 @@ export default function Products() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <Field label={t('Nom du produit')}>
-              <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="field" />
+              <input
+                value={form.name}
+                onChange={(e) => {
+                  const name = e.target.value;
+                  // Tant que la personne n'a pas choisi la nature elle-même, un
+                  // nom de travail facturé propose « Prestation ».
+                  const kind = kindTouched ? form.kind : looksLikeService(name) ? 'SERVICE' : vierge.kind;
+                  setForm({ ...form, name, kind });
+                }}
+                className="field"
+              />
             </Field>
           </div>
           <Field label={t('Référence (SKU)')}>
@@ -391,7 +405,10 @@ export default function Products() {
                 <button
                   key={k}
                   type="button"
-                  onClick={() => setForm({ ...form, kind: k })}
+                  onClick={() => {
+                    setKindTouched(true);
+                    setForm({ ...form, kind: k });
+                  }}
                   className={`flex-1 rounded-xl border px-3 py-2 text-sm font-semibold ${
                     form.kind === k ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-line text-muted'
                   }`}
