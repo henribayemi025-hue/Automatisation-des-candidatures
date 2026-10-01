@@ -1198,3 +1198,32 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   compte des visites de la même façon, même piège.
 - Blocage commun : l'envoi GitHub renvoie 403 pour nos deux sessions depuis le
   30/09 au matin ; lecture OK.
+
+### 01/10 (matin) — réunion du jour (Alpha)
+
+- ✅ 01/10 : veille, réunion n° 13, audit jour 3 et revue hebdomadaire lus et
+  répondus par le canal direct (05:13, 06:05, 06:10, 06:46).
+- ✅ 01/10 : **relecture de l'audit jour 2** — le commit est `8477bd0` (et non
+  `8cadc5b`, écrit par erreur le 30/09). La caisse passe par `saleTotals()`,
+  comme l'écriture comptable. Recalculé à la main : étiquette 22 500, taxe
+  19,25 % incluse → hors taxe 18 868 + taxe 3 632 = 22 500 encaissés (avant :
+  26 831). `pricesIncludeTax` vaut `true` par défaut partout (reducer, caisse,
+  Réglages), donc pas d'écart entre écrans. Barre panier mobile : rien à redire.
+- ✅ 01/10 : **relecture de l'audit jour 3** — trou trouvé pour un garage NEUF
+  (nature « Marchandise » par défaut, import sans nature) ; corrigé par
+  Claudinette dans `f74c0ab` (nom → prestation proposée ; question à la caisse
+  au lieu de griser), vérifié à l'écran par elle.
+- ⏳ `admin_audience_jour()` : les deux tâches des agents de Léo (fonction,
+  écran) sont encore « à faire ». La partie Accounting (lecture seule de
+  `finia_events`, `compte_reel()`) sera envoyée à Claudinette en SQL exact
+  AVANT toute application.
+- ⏳ Beau : essai de l'inscription par numéro ; envoi aux 9 boutiques ;
+  « premier jour accompagné » (une liste unique Accounting + nouvelles
+  boutiques dans son rappel du matin — question posée le 01/10).
+- **Fait commun mesuré** : le stockage Supabase du projet partagé est à 586 Mo
+  sur 1 Go gratuit (57 %), +32 Mo en 7 jours, surtout photos d'articles (379 Mo)
+  et vidéos des vendeuses (139 Mo). Plein vers fin décembre au rythme actuel.
+  Beau prévenu ; aucune suppression sans son accord. Si Accounting ajoute des
+  fichiers (photos du cahier, idée « wow »), ils comptent dans le même quota.
+- Place de marché, 36 dernières heures, comptes de test exclus : aucune
+  commande, aucun message. Le frein reste l'arrivée des acheteurs.
