@@ -11,6 +11,58 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 01/10/2026
+
+**Semaine calme. Rien côté concurrence. Côté règles, aucune nouvelle de
+PI-SPI après l'échéance du 30/09, et un point d'étape français. Côté
+technique, un outil Supabase qui pourrait simplifier nos fonctions edge.**
+
+### Concurrence
+
+Rien retenu. Aucune annonce datée du 24/09 au 01/10 pour les concurrents
+suivis (Afrique francophone, Nigeria, Kenya, Inde, Brésil, Zoho, Sage,
+QuickBooks, Xero). Seules apparaissent des mises à jour d'applications sans
+contenu décrit (OkCredit, Paytm for Business), sans valeur pour nous.
+
+### Règles, impôts et paiements
+
+- **PI-SPI (UEMOA) : rien de publié après l'échéance du 30/09.** Aucun
+  communiqué de la BCEAO, aucun bilan des raccordements, aucune annonce de
+  report ou de sanction trouvés ; on ne sait toujours pas si Wave s'est
+  raccordé. À revérifier la semaine prochaine.
+- **France, facture électronique : point d'étape de l'administration.**
+  Selon un webinaire de l'Ordre des experts-comptables Paris Île-de-France
+  rapporté par Compta-Online, 43 % de l'ensemble des entités avaient choisi
+  une plateforme agréée au 20/09/2026 (71,4 % du « cœur de cible »). Les
+  dates de l'article sont incohérentes (mis à jour le 24/09 pour un webinaire
+  annoncé le 29/09) : chiffres à prendre avec prudence.
+  [compta-online.com](https://www.compta-online.com/facturation-electronique-ao5562)
+  → Confirme que beaucoup de petites entreprises françaises ne sont pas
+  prêtes à recevoir leurs factures électroniques. Sans urgence pour
+  Finjaro (déjà noté le 27/09 : obligation active, sanctions suspendues).
+- Rien de nouveau et daté pour le Cameroun, le Sénégal, le Gabon, la Côte
+  d'Ivoire, MTN MoMo, Orange Money ou Wave.
+
+### Technologie et IA
+
+- **Supabase Middleware 1.0** : une petite bibliothèque libre (MIT) pour
+  enchaîner avant chaque requête la vérification de session, le CORS et
+  d'autres contrôles, utilisable dans les fonctions edge comme dans
+  Cloudflare Workers. Publié le 30/09/2026.
+  [supabase.com/changelog](https://supabase.com/changelog/supabase-middleware-1-0)
+  → Pourrait regrouper les contrôles de CORS et de jeton de nos fonctions
+  (accounting-rappels, accounting-inscription-tel). Pas urgent : ces
+  fonctions sont communes à staging et à la production, toute migration
+  se ferait une par une et avec l'accord de Beau.
+- Cloudflare : appel de Workflows via `ctx.exports` (27/09) et algorithmes
+  post-quantiques dans Web Crypto (01/10).
+  [developers.cloudflare.com](https://developers.cloudflare.com/changelog/)
+  → Aucun effet pour nous aujourd'hui.
+- Rien de nouveau et daté pour Gemini, DeepSeek, Capacitor, Resend, les PWA
+  ou la reconnaissance vocale en langues africaines.
+
+---
+
 ## 30/09/2026
 
 **Un fait concurrent qui compte : QuickBooks relance les impayés depuis
