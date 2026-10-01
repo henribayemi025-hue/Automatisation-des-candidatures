@@ -12,6 +12,7 @@ import Onboarding from './pages/Onboarding';
 import Demo from './pages/Demo';
 import Relais from './pages/Relais';
 import Dashboard from './pages/Dashboard';
+import NotFound from './pages/NotFound';
 import Assistant from './pages/Assistant';
 import PointOfSale from './pages/PointOfSale';
 import CashRegister from './pages/CashRegister';
@@ -187,7 +188,7 @@ export default function App() {
           <Route path="/equipe" element={<Team />} />
           <Route path="/parametres" element={<Settings />} />
           <Route path="/manuel" element={<Manual />} />
-          <Route path="*" element={<Dashboard />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
     </>

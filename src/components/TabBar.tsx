@@ -25,6 +25,7 @@ export default function TabBar({ onMenu }: { onMenu: () => void }) {
             key={tab.to}
             to={tab.to}
             end={tab.end}
+            aria-label={t(tab.label)}
             className={({ isActive }) =>
               `relative flex min-w-0 items-center justify-center gap-1.5 rounded-pill py-2.5 transition-all duration-200 ${
                 isActive ? 'flex-[1.7] bg-white shadow-sm' : 'flex-1 active:scale-90'

@@ -689,6 +689,10 @@ export function CollabProvider({ children }: { children: ReactNode }) {
         if (!workspace) return t('Aucun espace actif.');
         const clean = email.trim().toLowerCase();
         if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(clean)) return t('Adresse email invalide.');
+        // Pas d'invitation par numéro tant que le numéro n'est pas vérifié par
+        // SMS : n'importe qui pourrait réserver le numéro d'autrui et recevoir
+        // l'invitation à sa place (audit d'Alpha du 01/10, A3).
+        if (isPhoneAddress(clean)) return t('On ne peut pas encore inviter par numéro de téléphone. Invitez une adresse e-mail.');
         const { error } = await supabase.from('finia_members').upsert(
           {
             workspace_id: workspace.id,

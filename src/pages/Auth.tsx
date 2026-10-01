@@ -232,6 +232,16 @@ export default function Auth() {
             </button>
           </form>
 
+          {mode === 'signup' && (
+            <p className="mt-3 text-center text-[12px] text-muted">
+              {t('En créant un compte, vous acceptez notre')}{' '}
+              <a href="https://finjaro.net/legal/confidentialite" target="_blank" rel="noreferrer" className="font-semibold underline underline-offset-2">
+                {t('politique de confidentialité')}
+              </a>
+              .
+            </p>
+          )}
+
           {/* Toute la phrase bascule le formulaire : avant, seuls les deux
               derniers mots étaient cliquables et on croyait que rien ne se
               passait. */}

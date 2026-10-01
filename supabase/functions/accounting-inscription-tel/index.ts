@@ -25,7 +25,9 @@ const ORIGINES = [
 ];
 
 function cors(origin: string | null): Record<string, string> {
-  const ok = !!origin && (ORIGINES.includes(origin) || /^https:\/\/[a-z0-9-]+\.workers\.dev$/.test(origin));
+  // Seulement les adresses Finjaro (audit d'Alpha du 01/10, A3) : avant,
+  // n'importe quel *.workers.dev était accepté.
+  const ok = !!origin && (ORIGINES.includes(origin) || /^https:\/\/[a-z0-9-]+\.finjaro\.workers\.dev$/.test(origin));
   return {
     'Access-Control-Allow-Origin': ok ? origin! : ORIGINES[0],
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',

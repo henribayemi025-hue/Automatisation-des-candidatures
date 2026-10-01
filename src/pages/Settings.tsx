@@ -157,6 +157,24 @@ export default function Settings() {
           <ContactModal open={contact !== null} genre={contact ?? 'contact'} onClose={() => setContact(null)} />
         </div>
 
+        {/* Audit d'Alpha du 01/10 (A3) : la politique de confidentialité et la
+            suppression du compte doivent se trouver sans chercher. Ce sont les
+            pages communes de Finjaro : un seul compte pour toutes les apps. */}
+        <div className="card flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="text-section">{t('Vos données')}</h2>
+            <p className="text-caption text-muted">{t('Ce que Finjaro garde, et comment supprimer votre compte.')}</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <a href="https://finjaro.net/legal/confidentialite" target="_blank" rel="noreferrer" className="btn-ghost py-1.5 text-caption">
+              {t('Politique de confidentialité')}
+            </a>
+            <a href="https://finjaro.net/suppression-compte" target="_blank" rel="noreferrer" className="btn-ghost py-1.5 text-caption">
+              {t('Supprimer mon compte')}
+            </a>
+          </div>
+        </div>
+
         {user && emails !== null && (
           <div className="card flex flex-wrap items-center justify-between gap-4">
             <div>
