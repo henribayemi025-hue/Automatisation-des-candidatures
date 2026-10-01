@@ -80,6 +80,28 @@ liste chaque matin. C'est Beau qui envoie, de son téléphone.
 
 ---
 
+### Concurrence et le trou « je regarde → je contacte » (Alpha, revue du jeudi 01/10)
+
+**Ce qui sort ailleurs** (chiffres = ceux annoncés par les entreprises elles-mêmes, non vérifiés) :
+- **Yelen** (Côte d'Ivoire, depuis juin 2025) : « Shopify pour les vendeuses des réseaux sociaux » en Afrique francophone, Cameroun compris. Boutique en trois minutes, **import des publications Instagram dans la boutique**, mobile money, argent bloqué jusqu'à la livraison puis reversé moins la commission. Annonce 5 000 boutiques actives et environ 50 000 $ traités. ([Techpoint Africa, 26/03/2026](https://techpoint.africa/feature/yelen-commerce-platform-francophone-africa/), [Techparley](https://techparley.com/ivorian-startup-yelen-is-building-an-all-in-one-social-commerce-platform-for-sellers-in-francophone-africa/))
+- **Ndaya** (Côte d'Ivoire) : place de marché, outils de vente et livraison intégrée ; ouvre aussi l'achat aux boutiques, hôtels et restaurants (commandes professionnelles récurrentes). ([TechGriot, 27/08/2026](https://techgriot.co/english/african-tech/2026/08/ndaya-wants-to-turn-africas-small-sellers-into-e-commerce-players/))
+- **KwikMo** (Ghana) : la vendeuse s'inscrit et publie **entièrement depuis WhatsApp**, l'acheteuse commande et paie en mobile money dans WhatsApp ; 5 % de commission sur les commandes payées. ([Disrupt Africa, 20/03/2026](https://disruptafrica.com/2026/03/20/ghanas-kwikmo-is-a-whatsapp-based-marketplace-for-local-vendors/))
+- **Flowcart × Mastercard** (Kenya, 07/09/2026) : paiement par carte **dans la conversation** (lien, QR code), extension annoncée vers la Côte d'Ivoire et le Nigeria. ([TechAfrica News](https://techafricanews.com/2026/09/07/mastercard-flowcart-chat-to-pay-commerce-east-africa/))
+- **Jiji** (Nigeria, petites annonces) : boutons « Appeler » / « Écrire » sur chaque annonce. En pratique, les acheteurs basculent sur WhatsApp dès le premier contact ([BossBot, guide vendeurs](https://bossbot.uk/blog/olx-seller-tools-nigeria) — source commerciale, à prendre comme description, pas comme mesure).
+- **Facebook Marketplace** : « Message au vendeur » arrive **pré-rempli** (« Est-ce toujours disponible ? ») ; un seul appui suffit pour envoyer. Les vendeurs s'en plaignent, mais c'est précisément ce qui fait partir le premier message ([AOL](https://www.aol.com/articles/facebook-marketplace-getting-updates-mdash-170001495.html), [forum](https://forums.welltrainedmind.com/topic/729963-is-this-still-available/)).
+
+Le mouvement de fond ne change pas depuis le 24/09 : la vente se fait **dans la conversation**, et le premier message doit coûter zéro effort.
+
+**La piste sérieuse de la semaine sur notre trou : il était en partie chez nous, et il est mesuré.** Depuis le 01/09, comptes de test exclus : 1 097 personnes ont une « fiche vue », 4 ont un clic de contact WhatsApp de la fiche (`contact_intent`), 2 ont un `whatsapp_click`, 8 ont mis au panier, 2 ont commandé. Or la présentation du premier lancement couvrait **tout l'écran, y compris sur un lien vers un article**. Depuis le 24/09, 452 visiteurs l'ont eue et 15 l'ont fermée. La fiche se chargeait (et comptait une « vue ») **sous** ce voile : une bonne part des « vues sans contact » étaient des gens qui n'ont jamais vu la fiche. Corrigé sur staging le 01/10 (2cd4c93) : sur le site, la présentation ne s'ouvre plus qu'à l'accueil ; dans l'application, rien ne change. La visite note maintenant la page d'arrivée et le site d'origine. Mesure avant/après confiée à Boussole (agent de Léo, tâche difficile). Conséquence pour tous nos chiffres : la « vue de fiche » d'avant le 01/10 surestime l'intérêt réel.
+
+#### Trois idées (Alpha, 01/10)
+
+- ☐ **4. « Encore disponible ? » en un appui, sur la fiche.** *Problème* : la cliente doit écrire elle-même son premier message, c'est le moment où l'on renonce. *Pour qui* : les acheteuses sans compte (la quasi-totalité des visiteurs). *Ce que ça vaut* : c'est le geste qui fait partir le premier message chez Facebook Marketplace ; chez nous, chaque contact compte (4 en un mois). *Effort* : petit, rien en base : deux ou trois questions toutes prêtes au-dessus du bouton WhatsApp (« Encore disponible ? », « Livraison possible ? », « Autres tailles ? »), qui ouvrent WhatsApp avec l'article, son prix et son lien déjà écrits. *À Beau* : oui / non.
+- ☐ **5. Importer ses publications Instagram / Facebook dans sa boutique.** *Problème* : les vendeuses publient chaque jour sur leurs réseaux et rarement sur Finjaro (les boutiques vides ou figées freinent tout). *Pour qui* : les vendeuses déjà actives sur Instagram. *Ce que ça vaut* : des articles frais sans double saisie ; c'est un argument mis en avant par Yelen. *Effort* : moyen ; dépend de l'application Meta que Beau doit créer (déjà en attente pour WhatsApp Business). *À Beau* : créer l'application Meta, puis oui / non.
+- ☐ **6. Paiement mobile money avec argent bloqué jusqu'à la livraison.** *Problème* : la confiance (« je paie et je ne reçois rien ») et le paiement à la livraison qui fait annuler. *Pour qui* : acheteuses à distance et vendeuses qui livrent. *Ce que ça vaut* : c'est le standard que Yelen et KwikMo mettent en avant ; c'est aussi une source de revenu (commission). *Effort* : gros (prestataire de paiement, contrat, conformité, comptes par pays) et il **coûte de l'argent**. *À Beau* : une décision de principe et un budget ; rien n'est engagé sans lui.
+
+---
+
 ## Idée issue de la veille du 30/09/2026 — à décider par Beau
 
 - ☐ **Encaisser par PI-SPI directement dans la caisse (UEMOA).**
