@@ -134,6 +134,23 @@ sans compte, à 390 px et 1440 px. Corrections et mesures par Claudinette.
 Vérifié et correct selon Alpha : graphique, aucune erreur JavaScript, devise
 selon le pays, astuce propre au restaurant.
 
-### À faire demain (jour 3)
+---
 
-`Sales.tsx` (ventes) et `Stock.tsx`.
+## Jour 3 — `Sales.tsx` (ventes) et `Stock.tsx`, 01/10
+
+Fait par Claudinette sur la démo (boutique et garage, Cameroun), 390 px et
+1440 px, sans compte.
+
+| # | Constat | Gravité | Ce qui a été fait |
+|---|---|---|---|
+| 1 | Ventes : « Encaissé » (7 445 720) **plus grand** que « Chiffre d'affaires » (6 421 291). Le chiffre d'affaires était hors taxe, l'encaissé taxe comprise ; les ventes annulées comptaient. | Moyen : une commerçante croit à une erreur. | Cartes « Total facturé » (taxe comprise, avec « dont … hors taxe ») et « Encaissé » (avec « Reste à encaisser »). Ventes annulées exclues. Vérifié sur le garage : facturé 28 474 000, encaissé 27 568 600, reste 905 400. |
+| 2 | Une prestation (main-d'œuvre, diagnostic) sortait du stock à chaque vente : stock à zéro, alerte « Rupture », et **tuile de caisse grisée** — un garage ne pouvait pas encaisser son heure de main-d'œuvre. | **Grave pour les métiers mixtes** (garage, réparation). | Règle unique `holdsStock()` : un article de nature « prestation » n'a pas de stock. Appliquée à l'écriture des ventes, à la caisse, à l'écran Stock, à l'Accueil et à l'assistant. Vérifié : la tuile s'encaisse sans avertissement, le Stock compte 6 références au lieu de 8. Les articles existants gardent leur nature : seuls ceux marqués « prestation » changent. |
+| 3 | Démo ouverte le 1er du mois : aucune vente du jour, donc « −100 % vs M-1 » en rouge. | Petit | La démo vend aussi le jour même. Le 1er du mois, la comparaison porte sur un seul jour et reste forcément irrégulière. |
+| 4 | Sur téléphone, les cartes de chiffres prennent tout le premier écran avant la liste. | Petit | Noté, pas corrigé : en deux colonnes, les montants en FCFA ne tiennent pas à 390 px. |
+
+Aucune erreur JavaScript (seules erreurs : polices bloquées par le réseau
+de l'environnement de test).
+
+### À faire demain (jour 4)
+
+`Expenses.tsx` (dépenses) et `Debts.tsx` (créances et dettes).

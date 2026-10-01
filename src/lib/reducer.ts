@@ -1,6 +1,7 @@
 import { revenueSchedule } from './subscriptions';
 import { accountCode, buildChart, assetAccounts } from './chart';
 import { tracksStock, revenueKindOf } from './sector';
+import { holdsStock } from './recipes';
 import { pointagesAPoser } from './leaves';
 import type { AccountKey } from './chart';
 import type {
@@ -289,7 +290,7 @@ function applySale(
   let mouvement = 0;
   sale.lines.forEach((line) => {
     const product = db.products.find((p) => p.id === line.productId);
-    if (!product || !stocked) return;
+    if (!product || !stocked || !holdsStock(db.company, product)) return;
     const sorties = product.components?.length
       ? product.components.map((c) => ({ id: c.productId, qty: c.qty * line.qty, pour: product.name }))
       : [{ id: product.id, qty: line.qty, pour: '' }];

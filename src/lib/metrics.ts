@@ -1,4 +1,5 @@
 import { accountCode } from './chart';
+import { holdsStock } from './recipes';
 import { balanceOf, incomeStatement } from './ledger';
 import type { DB, Minor, Sale } from './types';
 
@@ -60,7 +61,8 @@ export function snapshot(db: DB): Snapshot {
     balanceOf(accountCode(db.company.chart, 'MOBILE_MONEY'), db.entries, 'DEBIT') +
     balanceOf(accountCode(db.company.chart, 'BANK'), db.entries, 'DEBIT');
 
-  const active = db.products.filter((p) => !p.archived);
+  // Une prestation n'a pas de stock : ni rupture, ni valeur en rayon.
+  const active = db.products.filter((p) => !p.archived && holdsStock(db.company, p));
 
   return {
     revenueToday: todaySales.reduce((s, x) => s + saleRevenue(x), 0),

@@ -1,4 +1,5 @@
 import { accountCode } from './chart';
+import { holdsStock } from './recipes';
 import { balanceOf } from './ledger';
 import { outstanding, saleCost, saleRevenue } from './metrics';
 import type { DB, Minor } from './types';
@@ -202,7 +203,8 @@ export function dashboard(db: DB, period: Period, todayISO: string, divisor: num
   const customerDebts = db.debts.filter((d) => d.party === 'CUSTOMER' && outstanding(d) > 0);
   const supplierDebts = db.debts.filter((d) => d.party === 'SUPPLIER' && outstanding(d) > 0);
   const overdueLimit = shiftDays(todayISO, -30);
-  const active = db.products.filter((p) => !p.archived);
+  // Une prestation n'a pas de stock : ni rupture, ni valeur en rayon.
+  const active = db.products.filter((p) => !p.archived && holdsStock(db.company, p));
   return {
     period,
     compareLabel,

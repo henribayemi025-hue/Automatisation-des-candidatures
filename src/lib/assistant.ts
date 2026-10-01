@@ -1,4 +1,5 @@
 import { accountCode } from './chart';
+import { holdsStock } from './recipes';
 import { balanceSheet, incomeStatement, runAuditChecks } from './ledger';
 import { monthStart, outstanding, productPerformance, saleRevenue, snapshot } from './metrics';
 import { formatMoney, formatPercent } from './money';
@@ -180,7 +181,7 @@ export function answer(db: DB, question: string): Answer {
   }
 
   if (/stock|rupture|inventaire|r[ée]appro|inventory|out of stock/.test(q)) {
-    const active = db.products.filter((p) => !p.archived);
+    const active = db.products.filter((p) => !p.archived && holdsStock(db.company, p));
     const out = active.filter((p) => p.stock <= 0);
     const low = active.filter((p) => p.stock > 0 && p.stock <= p.reorderPoint);
     return {

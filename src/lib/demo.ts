@@ -211,6 +211,8 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
     barcode: p.barcode,
     category: p.category,
     brand: '',
+    // Main-d'œuvre, diagnostic, coupe : une prestation, sans stock (706).
+    ...(p.cost === 0 ? { kind: 'SERVICE' as const } : {}),
     price: money(p.price),
     cost: money(p.cost),
     stock: p.stock,
@@ -522,10 +524,12 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
   const schoolSale2 = sale(-22, 10, [{ productIndex: 5, qty: 12 }], 'MOBILE', 1, 1);
 
   const methods: PaymentMethod[] = ['CASH', 'CASH', 'MOBILE', 'CASH', 'CARD', 'MOBILE'];
-  for (let day = -89; day <= -1; day += 1) {
+  // Jusqu'à aujourd'hui inclus : sans vente du jour, la démo ouverte le 1er
+  // du mois affichait « −100 % vs M-1 » en rouge (audit jour 3, 01/10).
+  for (let day = -89; day <= 0; day += 1) {
     const weekday = new Date(`${dayISO(base, day)}T12:00:00.000Z`).getUTCDay();
-    if (weekday === 0) continue; // boutique fermée le dimanche
-    const count = 2 + Math.floor(rnd() * 4);
+    if (weekday === 0 && day !== 0) continue; // boutique fermée le dimanche
+    const count = day === 0 ? 5 : 2 + Math.floor(rnd() * 4);
     for (let k = 0; k < count; k += 1) {
       const picks = [
         { productIndex: Math.floor(rnd() * catalogue.length), qty: 1 + Math.floor(rnd() * 4) },

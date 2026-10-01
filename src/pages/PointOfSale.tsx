@@ -9,7 +9,7 @@ import { IconBox, IconCart, IconCheck, IconDoc, IconSearch, IconX } from '../com
 import { scanFeedback, useBarcodeScanner } from '../lib/scanner';
 import { t } from '../lib/i18n';
 import { sectorProfile, tracksStock } from '../lib/sector';
-import { availableQty, isComposed, missingFor } from '../lib/recipes';
+import { availableQty, holdsStock, isComposed, missingFor } from '../lib/recipes';
 import ProjectSelect from '../components/ProjectSelect';
 import { outstanding } from '../lib/metrics';
 import { aRendre, billetsProposes } from '../lib/monnaie';
@@ -161,7 +161,7 @@ export default function PointOfSale() {
     // Plancher de stock (ligne 3 du tableau docs/SIMULATION-DECISIONS.md) :
     // on ne vend pas en silence ce que l'appareil ne voit plus en rayon. La
     // caissière peut passer outre, en le sachant ; rien n'est refusé de force.
-    if (withStock) {
+    if (withStock && holdsStock(db.company, product)) {
       const inCart = cart.find((l) => l.productId === productId)?.qty ?? 0;
       // Un plat préparé n'a pas de stock à lui : ce qu'on peut encore servir
       // dépend de son ingrédient le plus rare.
@@ -537,14 +537,14 @@ export default function PointOfSale() {
                 <button
                   key={p.id}
                   onClick={() => addToCart(p.id)}
-                  disabled={withStock && availableQty(db, p) <= 0}
+                  disabled={withStock && holdsStock(db.company, p) && availableQty(db, p) <= 0}
                   className="group rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-400 hover:shadow-md disabled:opacity-40 dark:border-white/10"
                 >
                   <div className="mb-2 flex items-start justify-between gap-2">
                     <span className="line-clamp-3 text-sm font-semibold leading-snug">{p.name}</span>
                     {/* Un salon ou un artisan ne compte pas de quantités : une
                         prestation n'est jamais « en rupture ». */}
-                    {!withStock ? null : (() => {
+                    {!withStock || !holdsStock(db.company, p) ? null : (() => {
                       // Pour un plat, le badge annonce ce qu'on peut encore
                       // servir, pas un stock qui vaudrait toujours zéro.
                       const dispo = availableQty(db, p);

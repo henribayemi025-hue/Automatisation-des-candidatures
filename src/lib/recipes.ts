@@ -9,7 +9,18 @@
  * passe par ici, pour que la caisse, la fiche article et le moteur disent la
  * même chose.
  */
-import type { DB, Product } from './types';
+import type { DB, Product, RevenueKind } from './types';
+import { revenueKindOf } from './sector';
+
+/**
+ * Une prestation (main-d'œuvre, diagnostic, coupe…) ne se stocke pas. Avant le
+ * 01/10, elle sortait du stock à chaque vente : un garage voyait « Heure de
+ * main-d'œuvre » en rupture, la tuile de caisse était grisée, et l'Accueil
+ * comptait une alerte de stock qui n'en était pas une (audit jour 3).
+ */
+export function holdsStock(company: { sector: string }, product: { id: string; kind?: RevenueKind }): boolean {
+  return revenueKindOf(company, { productId: product.id }, product) !== 'SERVICE';
+}
 
 export function isComposed(product: Pick<Product, 'components'>): boolean {
   return !!product.components?.length;

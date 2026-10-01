@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { holdsStock } from '../lib/recipes';
 import { useStore } from '../lib/store';
 import { Badge, Empty, Field, Modal, Money, PageHeader, StatCard, Table } from '../components/UI';
 import { IconAlert, IconLayers, IconPlus } from '../components/Icons';
@@ -15,7 +16,8 @@ export default function Stock() {
   const [qty, setQty] = useState('');
   const [reason, setReason] = useState('');
 
-  const active = db.products.filter((p) => !p.archived);
+  // Les prestations (main-d'œuvre, diagnostic…) ne se stockent pas.
+  const active = db.products.filter((p) => !p.archived && holdsStock(db.company, p));
   const alerts = active.filter((p) => p.stock <= p.reorderPoint);
   const stockValue = active.reduce((s, p) => s + Math.max(0, p.stock) * p.cost, 0);
   const retailValue = active.reduce((s, p) => s + Math.max(0, p.stock) * p.price, 0);

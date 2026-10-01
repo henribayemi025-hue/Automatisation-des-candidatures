@@ -43,8 +43,16 @@ export default function Sales() {
     });
   }, [db.sales, status, from, to, q]);
 
-  const revenue = sales.reduce((s, x) => s + saleRevenue(x), 0);
-  const collected = sales.reduce((s, x) => s + x.paid, 0);
+  // Les totaux comparent ce qui a été facturé (taxe comprise) à ce qui est
+  // rentré. Avant le 01/10, « Chiffre d'affaires » était hors taxe et
+  // « Encaissé » taxe comprise : l'encaissé dépassait les ventes, ce qui n'a
+  // aucun sens pour une commerçante (audit jour 3). Les ventes annulées ne
+  // comptent pas.
+  const counted = sales.filter((x) => x.status !== 'CANCELLED');
+  const billed = counted.reduce((s, x) => s + x.total, 0);
+  const revenue = counted.reduce((s, x) => s + saleRevenue(x), 0);
+  const collected = counted.reduce((s, x) => s + x.paid, 0);
+  const hasTax = billed !== revenue;
 
   return (
     <>
@@ -52,8 +60,18 @@ export default function Sales() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard label={t('Ventes affichées')} value={sales.length} />
-        <StatCard label={t('Chiffre d\'affaires')} value={<Money value={revenue} />} tone="dark" />
-        <StatCard label={t('Encaissé')} value={<Money value={collected} />} tone="positive" />
+        <StatCard
+          label={t('Total facturé')}
+          value={<Money value={billed} />}
+          hint={hasTax ? t('dont {amount} hors taxe', { amount: formatMoney(revenue, db.company.currency) }) : undefined}
+          tone="dark"
+        />
+        <StatCard
+          label={t('Encaissé')}
+          value={<Money value={collected} />}
+          hint={billed > collected ? t('Reste à encaisser : {amount}', { amount: formatMoney(billed - collected, db.company.currency) }) : t('Tout est encaissé')}
+          tone="positive"
+        />
       </div>
 
       <div className="card mt-6 mb-4 flex flex-wrap items-end gap-3">
