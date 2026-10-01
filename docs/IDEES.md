@@ -53,6 +53,33 @@ n° 4 du 17/09). *Ce qu'on demande à Beau* : une vraie page de cahier
 
 ---
 
+### Place de marché (Alpha), 01/10
+
+Constat mesuré par Alpha le 29/09, comptes de test exclus : 216 personnes
+distinctes sans compte, 25 ont ouvert au moins un article, 0 commande. Le
+frein est l'arrivée sur un article, puis le passage à l'acte, pas la vitrine.
+
+- ☐ **1. Le statut WhatsApp du jour, pour chaque vendeuse.** Un bouton dans
+  son espace fabrique une image (3 articles avec photo, prix dans la monnaie
+  de la boutique) et le lien de sa boutique, prêts à poster en statut. Les
+  acheteuses viennent de son réseau, pas de nous. Rien en base, tout à
+  partir des articles existants.
+- ☐ **2. L'accueil qui montre des articles tout de suite.** Seules 25
+  personnes sur 216 ont ouvert un article. Le premier écran doit montrer de
+  vrais articles avec leur prix, avant toute explication. Mesure avant et
+  après avec les événements existants. Rien en base.
+- ☐ **3. « Ma commande » pour l'acheteuse sans compte.** Elle a laissé un
+  prénom et un WhatsApp ; elle reçoit un lien vers une page qui suit sa
+  commande (reçue, confirmée, en route). Elle revient, et la vendeuse est
+  poussée à répondre. Il faut un jeton par commande, donc une colonne
+  additive : accord de Beau d'abord.
+
+Sur l'idée 1 d'Accounting (premier jour accompagné) : Alpha l'étend aux
+boutiques ouvertes dans les dernières 24 h, pour que Beau ait une seule
+liste chaque matin. C'est Beau qui envoie, de son téléphone.
+
+---
+
 ## Idée issue de la veille du 30/09/2026 — à décider par Beau
 
 - ☐ **Encaisser par PI-SPI directement dans la caisse (UEMOA).**
