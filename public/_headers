@@ -1,0 +1,8 @@
+# En-têtes de sécurité d'accounting.finjaro.net (audit d'Alpha du 01/10, A-M4).
+# Lu par Cloudflare pour les fichiers servis depuis dist/.
+/*
+  Strict-Transport-Security: max-age=15552000
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Content-Security-Policy: frame-ancestors 'self' https://finjaro.net https://*.finjaro.net https://*.finjaro.workers.dev
+  Permissions-Policy: geolocation=(), microphone=(self), camera=(self)

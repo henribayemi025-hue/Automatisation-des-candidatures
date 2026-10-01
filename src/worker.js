@@ -11,28 +11,25 @@ const GEMINI_TIMEOUT_MS = 30_000;
 const SUPABASE_URL = 'https://bokwivwizghdlaedczbw.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_UMnuj2_xJ7uZt76TspkBAA_EiAMg6zt';
 const MAX_MESSAGES = 16;
-const RATE_LIMIT = 60; // appels par utilisateur et par heure (par isolat)
+const RATE_LIMIT = 60; // appels par utilisateur et par heure
+// Plafonds de taille (audit Alpha du 01/10, A-M3) : une requête énorme coûte
+// cher chez Google et peut faire tomber l'isolat.
+const MAX_BODY_BYTES = 20 * 1024 * 1024; // corps entier, pièces jointes comprises
+const MAX_FILE_CHARS = 14_000_000; // une pièce jointe en base64 (≈ 10 Mo)
+const MAX_CONTEXT_CHARS = 200_000; // contexte de l'application (chiffres, écran)
+const FILE_TYPES = /^(image\/(jpeg|png|webp|heic|heif)|application\/pdf)$/;
 
 const usage = new Map();
 
+// Seulement les noms convenus (audit A-m3) : accepter « toute variable qui
+// ressemble à une clé » pouvait envoyer à Google un autre secret du worker.
+// Vérifié le 01/10 : la production n'a que GEMINI_API_KEY.
 function geminiKey(env) {
-  if (env.GEMINI_API_KEY) return env.GEMINI_API_KEY;
-  // La clé peut avoir été enregistrée sous un autre nom dans le tableau de bord :
-  // on accepte tout nom évocateur, ou toute valeur qui a la forme d'une clé Google.
-  for (const [k, v] of Object.entries(env)) {
-    if (typeof v !== 'string' || v.length < 20) continue;
-    if (/gemini|google|api[_-]?key|ia|ai/i.test(k) || /^AIza[0-9A-Za-z_-]{20,}$/.test(v)) return v;
-  }
-  return null;
+  return typeof env.GEMINI_API_KEY === 'string' && env.GEMINI_API_KEY ? env.GEMINI_API_KEY : null;
 }
 
 function deepseekKey(env) {
-  if (env.DEEPSEEK_API_KEY) return env.DEEPSEEK_API_KEY;
-  for (const [k, v] of Object.entries(env)) {
-    if (typeof v !== 'string' || v.length < 20) continue;
-    if (/deepseek/i.test(k)) return v;
-  }
-  return null;
+  return typeof env.DEEPSEEK_API_KEY === 'string' && env.DEEPSEEK_API_KEY ? env.DEEPSEEK_API_KEY : null;
 }
 
 const ROUTES = [
@@ -164,6 +161,25 @@ async function verifyUser(req) {
   }
 }
 
+// Limite partagée par toutes les instances, tenue en base (audit A-M3) :
+// finia_quota_assistant() compte les appels de la personne connectée sur
+// l'heure. Tant que la fonction n'existe pas en base (migration à appliquer
+// avec l'accord de Beau), on retombe sur le compteur en mémoire.
+async function quotaExceeded(req, userId) {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/finia_quota_assistant`, {
+      method: 'POST',
+      headers: { apikey: SUPABASE_KEY, authorization: req.headers.get('authorization') || '', 'content-type': 'application/json' },
+      body: '{}',
+      signal: AbortSignal.timeout(5000),
+    });
+    if (res.ok) return (await res.json()) === false;
+  } catch {
+    /* base injoignable : compteur local */
+  }
+  return rateLimited(userId);
+}
+
 function rateLimited(userId) {
   const now = Date.now();
   const slot = usage.get(userId) ?? { count: 0, reset: now + 3_600_000 };
@@ -181,10 +197,12 @@ async function callGemini(apiKey, body) {
   for (const model of MODELS) {
     try {
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        // Clé dans l'en-tête, jamais dans l'adresse (audit A-m2) : une adresse
+        // finit dans les journaux, un en-tête non.
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
         {
           method: 'POST',
-          headers: { 'content-type': 'application/json' },
+          headers: { 'content-type': 'application/json', 'x-goog-api-key': apiKey },
           body: JSON.stringify(body),
           signal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
         },
@@ -247,14 +265,21 @@ async function handleAssistant(req, env) {
 
   const user = await verifyUser(req);
   if (!user) return json({ error: 'unauthorized' }, 401);
-  if (rateLimited(user.id)) return json({ error: 'rate_limited' }, 429);
+  if (await quotaExceeded(req, user.id)) return json({ error: 'rate_limited' }, 429);
 
+  const declared = Number(req.headers.get('content-length') || 0);
+  if (declared > MAX_BODY_BYTES) return json({ error: 'too_large' }, 413);
   let payload;
   try {
-    payload = await req.json();
+    const raw = await req.text();
+    if (raw.length > MAX_BODY_BYTES) return json({ error: 'too_large' }, 413);
+    payload = JSON.parse(raw);
   } catch {
     return json({ error: 'bad_json' }, 400);
   }
+  // Un contexte trop gros est remplacé par rien plutôt que tronqué au milieu
+  // d'un JSON : l'assistant répond alors sans les chiffres, et le dit.
+  if (JSON.stringify(payload.context ?? {}).length > MAX_CONTEXT_CHARS) payload.context = { note: 'contexte trop volumineux, non transmis' };
   const messages = Array.isArray(payload.messages) ? payload.messages.slice(-MAX_MESSAGES) : [];
   if (!messages.length) return json({ error: 'empty' }, 400);
 
@@ -285,7 +310,7 @@ async function handleAssistant(req, env) {
     if (i === messages.length - 1) {
       const files = Array.isArray(m.files) ? m.files : m.image ? [m.image] : [];
       for (const f of files.slice(0, 6)) {
-        if (f && typeof f.data === 'string') {
+        if (f && typeof f.data === 'string' && f.data.length <= MAX_FILE_CHARS && FILE_TYPES.test(String(f.mime || 'image/jpeg'))) {
           parts.push({ inline_data: { mime_type: f.mime || 'image/jpeg', data: f.data } });
         }
       }
@@ -329,9 +354,9 @@ export default {
     }
     if (url.pathname === '/api/assistant') return handleAssistant(req, env);
     if (url.pathname === '/api/health') {
-      // Noms des variables vues par le worker (jamais les valeurs), pour diagnostiquer.
-      const vars = Object.keys(env).filter((k) => k !== 'ASSETS');
-      return json({ ok: true, ai: !!geminiKey(env) || !!deepseekKey(env), ai_gemini: !!geminiKey(env), ai_deepseek: !!deepseekKey(env), variables: vars });
+      // Seulement « ça marche / l'IA est branchée » : les noms des variables
+      // renseignaient un curieux sur la configuration (audit A-m1).
+      return json({ ok: true, ai: !!geminiKey(env) || !!deepseekKey(env) });
     }
     return env.ASSETS.fetch(req);
   },

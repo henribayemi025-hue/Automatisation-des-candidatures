@@ -209,6 +209,8 @@ export function aiErrorMessage(code: string): string {
       return 'La clé IA n’est pas encore configurée sur le serveur. Je réponds avec le moteur local.';
     case 'rate_limited':
       return 'Beaucoup de questions d’un coup — reprenons dans quelques minutes. En attendant, moteur local.';
+    case 'too_large':
+      return 'Ce fichier est trop lourd pour l’assistant (10 Mo au plus). Envoyez une photo, ou un PDF plus court.';
     case 'gemini_unavailable':
       return 'L’assistant est momentanément indisponible. Je réponds avec le moteur local en attendant.';
     default:

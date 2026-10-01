@@ -1433,6 +1433,7 @@ export const EN: Record<string, string> = {
   'Reste à encaisser : {amount}': 'Still to collect: {amount}',
   'Tout est encaissé': 'Everything collected',
   '« {name} » n’a pas de stock. Est-ce une prestation (main-d’œuvre, service) ? Si oui, on ne lui comptera plus de stock.': '“{name}” has no stock. Is it a service (labour, work)? If so, its stock will no longer be tracked.',
+  'Ce fichier est trop lourd pour l’assistant (10 Mo au plus). Envoyez une photo, ou un PDF plus court.': 'This file is too heavy for the assistant (10 MB max). Send a photo, or a shorter PDF.',
   'Mois': 'Month',
   'Depuis le 1er du mois': 'Since the 1st of the month',
   'Année': 'Year',
