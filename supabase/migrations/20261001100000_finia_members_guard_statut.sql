@@ -1,6 +1,8 @@
 -- Finjaro Accounting — fermer la réactivation d'un membre retiré (01/10).
 --
--- PAS ENCORE APPLIQUÉE : en attente du mot de Beau (base partagée).
+-- APPLIQUÉE le 01/10 par Alpha, sur le oui de Beau (nom : finia_members_guard_statut).
+-- Vérifiée avant/après dans une transaction annulée : retiré → actif et
+-- rattachement à un autre compte REFUSÉS ; acceptation normale ACCEPTÉE.
 --
 -- Relevé par Alpha (audit complet du 01/10, M-6) et vérifié en lisant la
 -- règle et le déclencheur : la règle `finia_members_self_accept` laisse la
