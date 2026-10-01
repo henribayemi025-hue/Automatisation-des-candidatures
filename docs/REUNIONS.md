@@ -7,6 +7,46 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 13 — 01/10/2026 (matin)
+
+### Ce qui a bougé depuis hier
+
+| Ce qui a changé | État |
+|---|---|
+| Accès GitHub rétabli le 30/09 vers 09:10 UTC (Beau a rebranché le bon compte) | Tout ce qui attendait est en ligne |
+| Audit jour 2 : caisse « taxe comprise », barre panier sur téléphone, axes de l'Accueil, « Mois / Année / 30 j » | En ligne, relu et vérifié en production par Alpha |
+| Démo : chaque métier rentable ; réassort quand un article est épuisé ; main-d'œuvre hors stock (plus de « −30 à −43 % » en rouge) | En ligne (version 64a6c1a2cda0) |
+| Rappel du soir par e-mail | Parti les 29 et 30/09 à 18:00 UTC, sans erreur |
+| Veilles des 30/09 et 01/10 | Écrites ; semaine calme côté concurrence |
+
+### Ce qui casse, ou ce qui inquiète
+
+- **Aucune action enregistrée par un vrai compte depuis deux jours**
+  (29/09 et dernières 24 h). Le rappel du soir n'a rien déclenché pour
+  l'instant ; deux soirs, c'est trop tôt pour conclure.
+- Inscription par numéro : toujours pas essayée en vrai (aucun compte
+  créé depuis deux jours). Alpha attend le oui de Beau.
+
+### Une idée du terrain
+
+Le vrai frein n'est plus l'application mais l'arrivée des gens : les
+messages aux 9 boutiques (PROSPECTION.md, section 7) n'ont pas encore été
+envoyés, et c'est Beau qui doit les envoyer depuis le WhatsApp de Finjaro.
+Tant qu'ils ne partent pas, aucun réglage de l'application ne changera le
+chiffre ci-dessus.
+
+### Ce que je fais aujourd'hui
+
+Audit jour 3 : `Sales.tsx` (ventes et factures) et `Stock.tsx`, sur la démo,
+à 390 px et 1440 px, en mesurant plutôt qu'en lisant le code.
+
+### Ce que j'attends d'Alpha
+
+- L'essai de l'inscription par numéro dès que Beau dit oui.
+- La partie Accounting de `admin_audience_jour()` avant de l'appliquer.
+
+---
+
 ## Réunion n° 12 — 30/09/2026 (matin)
 
 ### Ce qui a bougé depuis hier
