@@ -11,6 +11,66 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 02/10/2026
+
+**Le fait du jour : PI-SPI a bien démarré, Wave compris. Côté technique, un
+changement Supabase du 30/10 à ne pas oublier dans nos prochaines
+migrations. Concurrence : rien de neuf.**
+
+### Concurrence
+
+- Rien de daté sur un produit concurrent du 25/09 au 02/10. À titre
+  d'argument seulement : le patron de Sage demande au gouvernement
+  britannique une stratégie d'IA pour les PME, qui « n'achètent que les
+  outils au retour immédiat et mesurable » (enquête Sage SME Pulse), publié
+  le 29/09/2026.
+  [streamlinefeed.co.ke](https://streamlinefeed.co.ke/news/sage-chief-calls-for-targeted-ai-strategy-to-boost-uk-small-businesses)
+  → Conforte notre message : montrer tout de suite ce que l'application
+  rapporte (une créance relancée et payée, un jour sans saisie rattrapé).
+
+### Règles, impôts et paiements
+
+- **PI-SPI : la BCEAO a publié la liste des 175 établissements autorisés à
+  ouvrir le paiement instantané au public au 30/09/2026**, dont Orange
+  Finances Mobiles, MTN Money, Moov Money, Djamo et Julaya, dans les 8 pays
+  de l'UEMOA. Publié le 01/10/2026.
+  [financialafrik.com](https://www.financialafrik.com/2026/10/01/bceao-liste-des-175-participants-autorises-a-ouvrir-les-services-de-pi-spi-au-public-au-30-septembre-2026/)
+- **Wave est raccordé à PI-SPI** (Sénégal, et Wave Digital Finance figure
+  aussi pour la Côte d'Ivoire dans la liste). Publié le 01/10/2026.
+  [sikafinance.com](https://www.sikafinance.com/marches/senegal-43-structures-connectees-a-la-pi-spi-de-la-bceao_64628)
+  → Corrige notre note du 29/09 (« Wave pourrait rester à part ») : en zone
+  UEMOA, un relevé Wave ou Orange Money peut maintenant contenir des
+  virements venant d'une banque ou d'un autre opérateur. Notre import de
+  relevés les lit comme n'importe quelle ligne ; à surveiller : qu'un même
+  paiement vu des deux côtés ne soit pas compté deux fois au rapprochement.
+- Rien de nouveau et daté pour la France, la Côte d'Ivoire (FNE), le
+  Sénégal, le Cameroun, le Gabon ni les API MTN et Orange.
+
+### Technologie et IA
+
+- **Supabase, le 30/10/2026 : les NOUVELLES tables du schéma public ne
+  seront plus exposées automatiquement à l'API.** Annoncé le 28/04 (hors
+  fenêtre, rappelé parce que l'échéance approche).
+  [supabase.com/changelog](https://supabase.com/changelog)
+  → Toute migration future d'Accounting qui crée une table lue par
+  l'application devra donner elle-même les droits (`grant`), sinon
+  l'application ne la verra pas. Les tables existantes ne changent pas. La
+  base étant partagée, Alpha est prévenu.
+- **Cloudflare publie Clef et Clef-flash sur Workers AI** (01/10/2026) :
+  des modèles libres qui renvoient une réponse typée avec une probabilité,
+  l'annonce cite le traitement de factures.
+  [developers.cloudflare.com](https://developers.cloudflare.com/changelog/post/2026-10-01-clef-workers-ai/)
+  → Piste à tester plus tard pour un tri rapide dans le worker (« reçu ou
+  facture ? », « quelle catégorie de dépense ? ») ; ne remplace pas la
+  lecture des reçus par Gemini.
+- Supabase OrioleDB en bêta publique (01/10) : sans objet, la base est
+  partagée et on ne change pas de moteur.
+- Rien de nouveau et daté pour Gemini, Capacitor, Resend, WhatsApp, la
+  reconnaissance vocale en langues africaines, ni de faille publiée sur nos
+  briques.
+
+---
+
 ## 01/10/2026
 
 **Semaine calme. Rien côté concurrence. Côté règles, aucune nouvelle de
