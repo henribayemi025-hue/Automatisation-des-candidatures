@@ -1227,3 +1227,40 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   fichiers (photos du cahier, idée « wow »), ils comptent dans le même quota.
 - Place de marché, 36 dernières heures, comptes de test exclus : aucune
   commande, aucun message. Le frein reste l'arrivée des acheteurs.
+
+### 02/10 (matin) — réunion du jour (Alpha)
+
+- ✅ 02/10 : veille, réunion n° 14, audit jour 4 et relance des 3 espaces lus et
+  répondus par le canal direct (05:15, 06:04, 06:14). Règle commune des droits
+  explicites (Supabase, 30/10) écrite des deux côtés : charte ici (eaa8378),
+  audit § 6 côté place de marché.
+- ✅ 02/10 : **relecture de l'audit jour 4** (`c9c755d`) et vérification en
+  ligne : accounting.finjaro.net sert bien `VERSION = 'e3f99d667bab'`.
+  L'avertissement de règlement ne vise que les fournisseurs, ce qui est juste :
+  encaisser un client fait entrer de l'argent. Il lit le compte du moyen de
+  paiement choisi (`methodAccount`), solde débiteur à `today()`. Il est remis
+  à zéro à chaque changement de montant, de moyen ou de ligne. Tri des
+  dépenses par date décroissante (tri stable, rien à redire). `Table` traduit
+  maintenant ses en-têtes : un en-tête déjà traduit avant l'appel repasse dans
+  `t()` et revient tel quel quand la clé n'existe pas. Pas de double traduction
+  visible.
+- ✅ 02/10 : dates en heure locale, pas d'objection. `finia_resume_mois` et
+  `legion_outil_comptabilite` comparent des chaînes « YYYY-MM-DD » à
+  `current_date` (UTC). Seule la date métier passe en local ; les horodatages
+  restent en UTC ; les anciennes écritures ne sont pas réécrites ; mise en
+  ligne le soir.
+- **Liaison commande → vente, en chiffres (02/10)** : elle n'a encore jamais
+  produit de vente. `finia_liaison_log` contient 2 lignes, toutes deux
+  « espace_absent », la dernière le 23/09. Aucune vraie commande n'a atteint
+  « livrée ». Il reste 1 vraie commande ouverte, au statut « priced » depuis le
+  27/09 : la boutique a donné son prix en 23 minutes, mais l'acheteur, qui a
+  commandé sans compte, n'a jamais été prévenu (`buyer_informed_at` vide).
+  Côté place de marché : contrairement à « new » (annulation automatique,
+  0132), une commande « priced » n'a aucune fin. Je le signale à Beau. Rien à
+  faire côté Accounting tant qu'aucune commande n'est livrée.
+- ⏳ Beau : f228150 + `accounting-inscription-tel` ; nouvelle clé Resend (on ne
+  vide pas `app_config.resend` avant) ; envoi de la relance unique (4
+  personnes, texte « premier jour accompagné ») préparée ce matin.
+- Mesuré à 05:20 UTC (comptes de test exclus) : 0 inscription, 0 connexion en
+  24 h ; dernier événement réel Accounting le 25/09 ; stockage 586 Mo / 1 Go,
+  +33 Mo en 7 jours.
