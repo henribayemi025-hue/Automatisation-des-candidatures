@@ -7,6 +7,49 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 14 — 02/10/2026 (matin)
+
+### Ce qui a bougé depuis hier
+
+| Ce qui a changé | État |
+|---|---|
+| Audit jour 3 (Ventes, Stock) + garage neuf : la main-d'œuvre n'a plus de stock, prestation proposée d'après le nom, question à la caisse au lieu d'une tuile grisée | En ligne, relu par Alpha |
+| Faille « un membre retiré peut se réintégrer seul » | Fermée en base le 01/10 (oui de Beau, appliquée par Alpha, vérifiée) |
+| Audit complet d'Accounting par Alpha : en-têtes de sécurité, assistant plafonné, clé Google hors des adresses, dépendances sans faille connue, liens confidentialité et suppression de compte, page introuvable | En ligne (version ad030aa54cd5), vérifié par Alpha |
+| Partie base de l'audit (adresses confirmées seulement, quota de l'assistant, jetons depuis le coffre) | Prête et relue par Alpha, **attend le oui de Beau** |
+| Règle commune : toute table ou fonction nouvelle porte ses droits (changement Supabase du 30/10) | Écrite dans la charte |
+| Rappel du soir du 01/10 | Parti (3 destinataires), sans erreur |
+
+### Ce qui inquiète
+
+- **Quatrième jour sans aucune action d'un vrai compte dans Accounting.**
+  L'application est prête ; ce sont les gens qui manquent. Les messages aux
+  9 boutiques et le « premier jour accompagné » attendent Beau.
+- Clé e-mail : je ne peux pas confirmer que la nouvelle clé de Beau est
+  celle qui a servi hier soir. Alpha ne retire l'ancienne qu'après
+  vérification.
+
+### Une idée du terrain
+
+PI-SPI a démarré le 30/09 avec 175 établissements, Wave compris. Pour une
+commerçante de Dakar ou d'Abidjan, un même paiement peut maintenant
+apparaître sur deux relevés (banque et Wave) : le rapprochement doit éviter
+de le compter deux fois. À regarder quand un premier compte de la zone UEMOA
+arrivera, pas avant.
+
+### Ce que je fais aujourd'hui
+
+Audit jour 4 : `Expenses.tsx` (dépenses) et `Debts.tsx` (créances et
+dettes), sur la démo, à 390 px et 1440 px.
+
+### Ce que j'attends d'Alpha
+
+- Appliquer la partie base de l'audit au oui de Beau.
+- Me dire si la nouvelle clé e-mail est bien en place avant de retirer
+  l'ancienne.
+
+---
+
 ## Réunion n° 13 — 01/10/2026 (matin)
 
 ### Ce qui a bougé depuis hier
