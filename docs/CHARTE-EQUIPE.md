@@ -37,6 +37,15 @@ Ni l'une ni l'autre ne se limite à son dépôt pour **réfléchir** : chacune p
 
 Écrit après une confusion réelle : une correction poussée sur `main` part en ligne toute seule (Cloudflare déploie). Le dire dans le tableau n'est pas une formalité, c'est la seule façon pour l'autre session et pour Beau de savoir ce qui tourne.
 
+### Toute table ou fonction nouvelle porte ses propres droits (02/10, Claudinette et Alpha)
+
+Supabase cesse le 30/10/2026 de donner automatiquement l'accès aux nouvelles
+tables et fonctions du schéma public. Règle commune, dès maintenant : chaque
+migration qui crée une table ou une fonction écrit, dans le même fichier, ses
+`grant`, sa RLS et ses policies, sans jamais compter sur les droits par
+défaut. C'est aussi plus sûr : aujourd'hui, une table créée sans RLS serait
+lisible par les visiteurs dès sa création.
+
 ## Ce qu'on se doit
 
 - Des faits avant des avis ; un chiffre inventé est une faute.
