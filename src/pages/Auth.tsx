@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { currentSource } from '../lib/source';
 import { isUnconfirmedError, useCollab } from '../lib/collab';
 import { saveCache } from '../lib/store';
 import { BackupError, readBackup } from '../lib/backup';
@@ -141,6 +142,15 @@ export default function Auth() {
         </section>
 
         <section className="rounded-card border border-hairline bg-white p-6 shadow-[0_18px_40px_rgba(23,27,38,0.08)] sm:p-8">
+          {/* Arrivée depuis l'espace vendeuse de la place de marché (?src=vendeuse-finjaro) :
+              elle a déjà un compte, on le lui dit d'abord. Formulation relue par Alpha le 02/10 :
+              la liaison n'a encore produit aucune vente, donc « peuvent », pas « arriveront ». */}
+          {currentSource().visit.startsWith('vendeuse') && mode === 'login' && (
+            <div className="mb-5 rounded-input border border-[#B8860B]/40 bg-[#FBF1DF] px-4 py-3 text-caption text-ink">
+              <p className="font-semibold">{t('Vous vendez déjà sur Finjaro ?')}</p>
+              <p className="mt-0.5">{t('Connectez-vous avec le même compte, rien à recréer : vos ventes livrées sur Finjaro peuvent arriver dans votre caisse.')}</p>
+            </div>
+          )}
           <h2 className="font-display text-[26px] font-bold text-ink">{mode === 'login' ? t('Se connecter') : t('Créer mon compte')}</h2>
           <p className="mt-1 text-caption text-muted">
             {mode === 'login' ? t('Retrouvez votre espace.') : t('Gratuit pour démarrer — aucune carte bancaire.')}
