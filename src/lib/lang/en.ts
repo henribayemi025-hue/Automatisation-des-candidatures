@@ -2105,4 +2105,17 @@ export const EN: Record<string, string> = {
   'Montant ({currency})': 'Amount ({currency})',
   'Rattaché à': 'Linked to',
   'Disponible : {available} · règlement : {amount}. Enregistrez d’abord l’argent entré, ou choisissez un autre moyen de paiement.': 'Available: {available} · payment: {amount}. Record the money that came in first, or choose another payment method.',
+  // Photos des papiers (02/10)
+  'Photos des papiers': 'Photos of paperwork',
+  'Photographiez vos papiers, page après page': 'Photograph your paperwork, page by page',
+  'Cahier de ventes, factures, reçus, tickets : prenez autant de photos que vous voulez, l’une après l’autre. Chaque photo est lue tout de suite et ses ventes et dépenses s’ajoutent à la liste. Vous vérifiez, puis vous enregistrez tout d’un coup.': 'Sales book, invoices, receipts, tickets: take as many photos as you like, one after another. Each photo is read straight away and its sales and expenses are added to the list. You check, then save everything at once.',
+  'Photo suivante': 'Next photo',
+  'Prendre une photo': 'Take a photo',
+  'Choisir plusieurs photos': 'Choose several photos',
+  'Lecture en cours : {n} photo(s)…': 'Reading: {n} photo(s)…',
+  '{p} photo(s) lue(s) · {o} opération(s) ajoutée(s) à la liste.': '{p} photo(s) read · {o} transaction(s) added to the list.',
+  'Vérifier et enregistrer →': 'Check and save →',
+  'Une question sur un document ? Demandez à l’assistant.': 'A question about a document? Ask the assistant.',
+  'Aucune opération lisible sur « {name} ». Reprenez la photo de plus près, bien à plat et éclairée.': 'No readable transaction on “{name}”. Retake the photo closer, flat and well lit.',
+  'la photo': 'the photo',
 };

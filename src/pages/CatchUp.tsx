@@ -6,7 +6,7 @@ import { EXPENSE_LABEL } from '../lib/expenses';
 import { toMinor } from '../lib/money';
 import { guessCategory, parseStatement } from '../lib/statement';
 import { OPENING_FIELDS, balanceToLines, buildOpeningEntry, parseBalanceFile } from '../lib/opening';
-import { AIError, aiErrorMessage, askAI, buildContext, fileToBase64 } from '../lib/ai';
+import { AIError, aiErrorMessage, askAI, buildContext, fileToBase64, fileToImage } from '../lib/ai';
 import { useCollab } from '../lib/collab';
 import type { BalanceRow } from '../lib/opening';
 import { formatMoney } from '../lib/money';
@@ -129,6 +129,100 @@ export default function CatchUp() {
     }
     setRows([blankRow(today()), blankRow(today()), blankRow(today())]);
     setSaved(t('{n} opération(s) enregistrée(s), à leur date.', { n }));
+  }
+
+  // ---- Onglet « photos » ----
+  // On photographie page après page (cahier, factures, reçus, tickets) :
+  // chaque photo est lue tout de suite et ses opérations rejoignent la liste
+  // « jour par jour ». Rien n'est enregistré avant que la personne valide.
+  const [photoQueue, setPhotoQueue] = useState(0);
+  const [photoRead, setPhotoRead] = useState({ photos: 0, operations: 0 });
+  const [photoNote, setPhotoNote] = useState('');
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const galleryRef = useRef<HTMLInputElement>(null);
+  const photoChain = useRef<Promise<void>>(Promise.resolve());
+
+  const METHOD_OF: Record<string, PaymentMethod> = { especes: 'CASH', espèces: 'CASH', cash: 'CASH', mobile: 'MOBILE', carte: 'CARD', card: 'CARD', banque: 'BANK', bank: 'BANK', virement: 'BANK' };
+
+  function operationsToRows(raw: unknown): Row[] {
+    if (!Array.isArray(raw)) return [];
+    const out: Row[] = [];
+    for (const o of raw as Record<string, unknown>[]) {
+      const montant = Number(String(o?.montant ?? '').replace(/[\s\u202f]/g, '').replace(',', '.'));
+      if (!(montant > 0)) continue;
+      const libelle = String(o?.libelle ?? '').trim().slice(0, 120);
+      const date = /^\d{4}-\d{2}-\d{2}$/.test(String(o?.date)) && String(o?.date) <= today() ? String(o?.date) : today();
+      const method = METHOD_OF[String(o?.moyen ?? '').toLowerCase()] ?? 'CASH';
+      const row = blankRow(date);
+      row.method = method;
+      if (String(o?.type).toLowerCase().startsWith('d')) {
+        row.kind = 'EXPENSE';
+        row.label = libelle;
+        row.amountRaw = String(montant);
+        row.category = guessCategory(libelle) as AccountKey;
+      } else {
+        row.kind = 'SALE';
+        row.label = libelle;
+        row.amountRaw = String(montant);
+        // Un article du catalogue n'est repris que si le prix écrit est le
+        // sien : le chiffre de la page fait foi, pas le catalogue.
+        const qty = Math.max(1, Math.round(Number(o?.quantite) || 1));
+        const product = products.find((p) => p.name.trim().toLowerCase() === libelle.toLowerCase());
+        if (product && product.price * qty === toMinor(montant, db.company.currency)) {
+          row.productId = product.id;
+          row.qty = String(qty);
+        }
+      }
+      out.push(row);
+    }
+    return out;
+  }
+
+  async function readPhoto(file: File) {
+    try {
+      const part = file.type === 'application/pdf' ? await fileToBase64(file) : await fileToImage(file, 1800);
+      const result = await askAI(
+        [
+          {
+            role: 'user',
+            text: t('Lis ce document (page de cahier, facture, reçu ou ticket) et relève CHAQUE opération écrite. Réponds UNIQUEMENT avec un bloc ```operations``` contenant un tableau JSON : [{"date":"AAAA-MM-JJ","type":"vente" ou "depense","libelle":"…","quantite":1,"montant":nombre en {devise} sans espace,"moyen":"especes" | "mobile" | "carte" | "banque"}]. Une facture ou un reçu de fournisseur est une dépense. Si le mois ou l’année manquent, prends ceux d’aujourd’hui ({today}). N’invente rien : une ligne illisible est laissée de côté.', { devise: db.company.currency, today: today() }),
+            files: [part],
+          },
+        ],
+        buildContext(db, '/rattrapage'),
+      );
+      const block = result.text.match(/```(?:operations|json)?\s*([\s\S]*?)```/);
+      let found: Row[] = [];
+      try {
+        found = operationsToRows(JSON.parse(block ? block[1] : result.text));
+      } catch {
+        found = [];
+      }
+      if (found.length) {
+        // Les lignes vides du tableau laissent la place aux lignes lues.
+        setRows((list) => [...list.filter((r) => r.amountRaw || r.productId || r.label.trim()), ...found]);
+        setSaved('');
+      }
+      setPhotoRead((c) => ({ photos: c.photos + 1, operations: c.operations + found.length }));
+      if (!found.length) setPhotoNote(t('Aucune opération lisible sur « {name} ». Reprenez la photo de plus près, bien à plat et éclairée.', { name: file.name || t('la photo') }));
+    } catch (e) {
+      setPhotoNote(t(aiErrorMessage(e instanceof AIError ? e.code : 'unknown')));
+    }
+  }
+
+  function onPhotos(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    if (!user) {
+      setPhotoNote(t('La lecture de documents demande un compte connecté.'));
+      return;
+    }
+    setPhotoNote('');
+    const list = [...files].slice(0, 20);
+    setPhotoQueue((n) => n + list.length);
+    // Une photo après l'autre : on peut continuer à photographier pendant la lecture.
+    for (const file of list) {
+      photoChain.current = photoChain.current.then(() => readPhoto(file)).finally(() => setPhotoQueue((n) => n - 1));
+    }
   }
 
   // ---- Onglet « relevé » ----
@@ -349,7 +443,7 @@ export default function CatchUp() {
         {([
           ['days', 'Jour par jour'],
           ['statement', 'Relevé mobile money ou banque'],
-          ['photo', 'Photo d’une facture'],
+          ['photo', 'Photos des papiers'],
           ['opening', 'Reprise d’un bilan existant'],
         ] as [Tab, string][]).map(([value, label]) => (
           <button
@@ -739,18 +833,46 @@ export default function CatchUp() {
       )}
 
       {tab === 'photo' && (
-        <div className="card flex h-[620px] flex-col p-0">
-          <div className="border-b border-hairline px-5 py-4">
+        <div className="space-y-4">
+          <div className="card">
             <h2 className="flex items-center gap-2 text-section">
               <IconCamera className="h-5 w-5 text-teal" />
-              {t('Photographiez la facture ou le reçu')}
+              {t('Photographiez vos papiers, page après page')}
             </h2>
             <p className="mt-1 text-caption text-muted">
-              {t('Appuyez sur l’appareil photo, prenez le document : l’assistant lit le montant, la date et le fournisseur, et vous propose la dépense à valider.')}
+              {t('Cahier de ventes, factures, reçus, tickets : prenez autant de photos que vous voulez, l’une après l’autre. Chaque photo est lue tout de suite et ses ventes et dépenses s’ajoutent à la liste. Vous vérifiez, puis vous enregistrez tout d’un coup.')}
             </p>
+            <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => { onPhotos(e.target.files); e.target.value = ''; }} />
+            <input ref={galleryRef} type="file" accept="image/*,application/pdf" multiple className="hidden" onChange={(e) => { onPhotos(e.target.files); e.target.value = ''; }} />
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button type="button" onClick={() => cameraRef.current?.click()} className="btn-primary">
+                <IconCamera className="h-4 w-4" />
+                {photoRead.photos || photoQueue ? t('Photo suivante') : t('Prendre une photo')}
+              </button>
+              <button type="button" onClick={() => galleryRef.current?.click()} className="btn-ghost">
+                {t('Choisir plusieurs photos')}
+              </button>
+            </div>
+            {(photoQueue > 0 || photoRead.photos > 0) && (
+              <div className="mt-4 rounded-input border border-hairline bg-base/60 px-3 py-2.5 text-caption text-ink" aria-live="polite">
+                {photoQueue > 0 && <p className="font-semibold">{t('Lecture en cours : {n} photo(s)…', { n: photoQueue })}</p>}
+                {photoRead.photos > 0 && (
+                  <p>{t('{p} photo(s) lue(s) · {o} opération(s) ajoutée(s) à la liste.', { p: photoRead.photos, o: photoRead.operations })}</p>
+                )}
+                {photoRead.operations > 0 && (
+                  <button type="button" onClick={() => setTab('days')} className="mt-2 font-semibold text-brand-600">
+                    {t('Vérifier et enregistrer →')}
+                  </button>
+                )}
+              </div>
+            )}
+            {photoNote && <p className="mt-3 text-caption text-[#9A3B1E]">{photoNote}</p>}
           </div>
-          <div className="min-h-0 flex-1 px-5 py-4">
-            <AssistantChat />
+          <div className="card flex h-[520px] flex-col p-0">
+            <div className="border-b border-hairline px-5 py-3 text-caption font-semibold text-ink">{t('Une question sur un document ? Demandez à l’assistant.')}</div>
+            <div className="min-h-0 flex-1 px-5 py-4">
+              <AssistantChat />
+            </div>
           </div>
         </div>
       )}
