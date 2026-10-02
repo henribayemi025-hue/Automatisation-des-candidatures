@@ -101,7 +101,18 @@ export function answer(db: DB, question: string): Answer {
   if (/\bfin(ia|ou)\b/i.test(question)) {
     return {
       text: t(
-        'Finia est l’assistante de la place de marché Finjaro : https://finjaro.net — elle aide à ouvrir une boutique, à publier des articles, à suivre les commandes et les livraisons.\n\nElle ne voit pas votre comptabilité, et moi je ne vois pas ce qui se passe sur la place de marché. Chacune son côté, même compte pour vous.\n\nCe qui passe de l’une à l’autre : une commande LIVRÉE là-bas entre toute seule dans votre journal ici.',
+        'Finia, c’est moi : l’assistante de tout Finjaro. Ici, dans Accounting, je vois vos comptes ; sur la place de marché (https://finjaro.net), je vous aide à vendre en ligne.\n\nMême compte partout. Ce qui passe de l’une à l’autre : une commande LIVRÉE sur la place de marché entre toute seule dans votre journal ici.',
+      ),
+    };
+  }
+
+  // Léo (02/10, décision de Beau relayée par Alpha) : une seule Finia, qui
+  // connaît tout Finjaro. On donne le lien, sans annoncer de fonction ni de
+  // chiffre qu'on ne mesure pas d'ici.
+  if (/\bl[ée]o\b|legion|l[ée]gion|agents? d[’']entreprise/i.test(question)) {
+    return {
+      text: t(
+        'Léo, ce sont les agents d’entreprise de Finjaro : https://finjaro.net/legion — même compte qu’ici, pas d’inscription à refaire.\n\nDepuis Accounting, je ne vois pas ce qui se passe dans Léo : je ne lis que vos comptes.',
       ),
     };
   }
@@ -111,7 +122,7 @@ export function answer(db: DB, question: string): Answer {
   if (/qui es[- ]tu|tu es qui|c[’']est quoi finjaro|finjaro accounting|pr[ée]sente[- ]toi|what are you/.test(q)) {
     return {
       text: t(
-        'Finjaro Accounting tient les comptes d’un commerce : caisse, stock, ventes, dépenses, dettes — et derrière chaque opération, une comptabilité en partie double. Je réponds avec VOS chiffres, calculés sur cet appareil, jamais inventés.\n\nÀ côté, il y a la place de marché Finjaro, pour vendre en ligne : https://finjaro.net — même compte.',
+        'Finjaro Accounting tient les comptes d’un commerce : caisse, stock, ventes, dépenses, dettes — et derrière chaque opération, une comptabilité en partie double. Je réponds avec VOS chiffres, calculés sur cet appareil, jamais inventés.\n\nÀ côté, avec le même compte : la place de marché Finjaro, pour vendre en ligne (https://finjaro.net), et Léo, les agents d’entreprise (https://finjaro.net/legion).',
       ),
     };
   }

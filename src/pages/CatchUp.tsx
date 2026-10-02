@@ -198,6 +198,10 @@ export default function CatchUp() {
       } catch {
         found = [];
       }
+      // Une facture seule peut revenir au format « dépense » de l'assistante.
+      if (!found.length && result.expense && result.expense.amount > 0) {
+        found = operationsToRows([{ date: result.expense.date, type: 'depense', libelle: [result.expense.supplier, result.expense.description].filter(Boolean).join(' — '), montant: result.expense.amount, moyen: ({ CASH: 'especes', MOBILE: 'mobile', CARD: 'carte', BANK: 'banque' } as Record<string, string>)[result.expense.method] ?? '' }]);
+      }
       if (found.length) {
         // Les lignes vides du tableau laissent la place aux lignes lues.
         setRows((list) => [...list.filter((r) => r.amountRaw || r.productId || r.label.trim()), ...found]);
