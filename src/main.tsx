@@ -8,6 +8,9 @@ import { ThemeProvider } from './lib/theme';
 import { LangProvider } from './lib/i18n';
 import { OfflineProvider } from './lib/offline';
 import './index.css';
+import { captureSource } from './lib/source';
+
+captureSource();
 import { capterPartage } from './lib/partage';
 
 // Un message partagé depuis le téléphone arrive dans l'adresse. On le met de

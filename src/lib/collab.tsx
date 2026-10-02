@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { currentSource } from './source';
 import type { ReactNode } from 'react';
 import type { RealtimeChannel, User } from '@supabase/supabase-js';
 import { authErrorInUrl, cleanAuthParams, supabase } from './supabase';
@@ -78,6 +79,11 @@ function unconfirmedMessage(): string {
 }
 
 /** Vrai si l'erreur de connexion vient d'une adresse pas encore confirmée (on propose alors de renvoyer le lien). */
+function sourceMeta(): { accounting_src?: string; accounting_src_visite?: string } {
+  const { first, visit } = currentSource();
+  return first ? { accounting_src: first, accounting_src_visite: visit } : {};
+}
+
 export function isUnconfirmedError(message: string | null): boolean {
   return !!message && message === unconfirmedMessage();
 }
@@ -176,6 +182,18 @@ export function CollabProvider({ children }: { children: ReactNode }) {
   userRef.current = user;
 
   // ---------- Session ----------
+  // Origine de l'inscription (?src=) posée une seule fois sur un compte NEUF
+  // (moins d'une heure) : couvre aussi l'inscription par numéro et Google,
+  // qui ne passent pas par signUp(). Clés propres à Accounting, pour ne rien
+  // écraser de la place de marché (même auth.users).
+  useEffect(() => {
+    if (!user || user.user_metadata?.accounting_src) return;
+    if (Date.now() - new Date(user.created_at).getTime() > 3600 * 1000) return;
+    const meta = sourceMeta();
+    if (!meta.accounting_src) return;
+    void supabase.auth.updateUser({ data: meta });
+  }, [user]);
+
   useEffect(() => {
     void (async () => {
       // Le retour de Google est traité par supabase-js (PKCE, `?code=…`).
@@ -612,7 +630,7 @@ export function CollabProvider({ children }: { children: ReactNode }) {
           email: id.address,
           password,
           options: {
-            data: { name, app: 'finia', ...(byPhone ? { phone_login: phoneDigits(email) } : {}) },
+            data: { name, app: 'finia', ...(byPhone ? { phone_login: phoneDigits(email) } : {}), ...sourceMeta() },
             // Sans ça, le lien de confirmation se construit sur le Site URL
             // (finjaro.net) : quelqu'un qui s'inscrit ici confirme son adresse
             // et atterrit sur la place de marché, pas dans sa comptabilité.
