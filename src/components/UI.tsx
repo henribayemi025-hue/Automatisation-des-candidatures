@@ -213,7 +213,7 @@ export function Table({
           <tr className="bg-base/70">
             {head.map((h, i) => (
               <th key={`${h}-${i}`} className="th">
-                {h}
+                {h && t(h)}
               </th>
             ))}
           </tr>

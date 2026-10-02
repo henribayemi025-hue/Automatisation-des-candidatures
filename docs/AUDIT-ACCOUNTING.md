@@ -152,6 +152,27 @@ Fait par Claudinette sur la démo (boutique et garage, Cameroun), 390 px et
 Aucune erreur JavaScript (seules erreurs : polices bloquées par le réseau
 de l'environnement de test).
 
-### À faire demain (jour 4)
+### Jour 4 fait le 02/10 (ci-dessous).
 
-`Expenses.tsx` (dépenses) et `Debts.tsx` (créances et dettes).
+---
+
+## Jour 4 — `Expenses.tsx` (dépenses) et `Debts.tsx` (créances et dettes), 02/10
+
+Fait par Claudinette sur la démo (boutique, Cameroun), 390 px et 1440 px,
+en français et en anglais, sans compte.
+
+| # | Constat | Gravité | Ce qui a été fait |
+|---|---|---|---|
+| 1 | Payer un fournisseur ne prévenait pas quand la caisse n'avait pas assez d'argent (les dépenses le font déjà) : une caisse pouvait passer en négatif sans un mot. | Moyen | Même avertissement que pour une dépense, avec « Enregistrer quand même ». Le calcul est celui des dépenses, vérifié à l'écran sur une dépense ; dans la démo, les caisses ont assez d'argent pour toutes les dettes, donc l'avertissement fournisseur n'a pas pu s'afficher en vrai. |
+| 2 | Dépenses : l'avertissement « pas assez d'argent » restait affiché après avoir corrigé le montant, le moyen de paiement ou la date, et réapparaissait à la réouverture. | Petit | Il disparaît dès qu'on change un de ces champs. Vérifié. |
+| 3 | Liste des dépenses dans l'ordre de saisie : une dépense saisie après coup se perdait au milieu. | Petit | La plus récente en haut, par date. Vérifié. |
+| 4 | En anglais, une vingtaine de textes restaient en français : titres des colonnes de **tous** les tableaux de l'application, titre des dettes, « Compte imputé », « Montant (XAF) », « {n} jours »… | Moyen pour l'ouverture au monde | Titres de colonnes traduits une fois pour toutes dans le composant tableau ; textes des deux écrans passés en traduction. Vérifié en anglais. |
+| 5 | Tableau « Soldés » des dettes : sur téléphone, la colonne Date était coupée et il fallait faire défiler. | Petit | Origine et Date masquées sur téléphone, comme dans le tableau du dessus. Mesuré : 356 px pour 356 px disponibles. |
+| 6 | **La date « du jour » est celle de Londres, pas celle du commerce.** `today()` et 37 autres endroits prennent la date en temps universel. À Toronto, une vente de 20 h est datée du lendemain ; à Douala, une vente entre minuit et 1 h est datée de la veille. | **Moyen, et grave à l'échelle mondiale** (rapports du jour, clôture, rappels du soir). | Pas corrigé aujourd'hui : 38 endroits à changer ensemble, sinon des comparaisons de dates se décalent d'un jour entre elles. Proposé pour demain, avec un test à minuit dans plusieurs fuseaux. |
+
+Aucune erreur JavaScript.
+
+### À faire demain (jour 5)
+
+Le n° 6 (date du jour en heure locale, partout à la fois), puis
+`Purchases.tsx` (achats).

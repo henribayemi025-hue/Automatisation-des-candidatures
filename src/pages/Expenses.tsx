@@ -40,7 +40,9 @@ export default function Expenses() {
         if (from && e.date < from) return false;
         if (to && e.date > to) return false;
         return true;
-      }),
+      })
+      // La plus récente en haut, même saisie après coup.
+      .sort((a, b) => b.date.localeCompare(a.date)),
     [db.expenses, from, to],
   );
 
@@ -84,7 +86,7 @@ export default function Expenses() {
         title={t('Dépenses')}
         subtitle={t('Chaque dépense est immédiatement passée en écriture comptable')}
         actions={
-          <button onClick={() => setOpen(true)} className="btn-primary">
+          <button onClick={() => { setShortfall(null); setOpen(true); }} className="btn-primary">
             <IconPlus className="h-4 w-4" />
             {t('Nouvelle dépense')}
           </button>
@@ -97,7 +99,7 @@ export default function Expenses() {
         <StatCard
           label={t('Poste principal')}
           value={byCategory[0] ? t(byCategory[0][0]) : '—'}
-          hint={byCategory[0] ? undefined : 'Aucune dépense sur la période'}
+          hint={byCategory[0] ? undefined : t('Aucune dépense sur la période')}
         />
       </div>
 
@@ -163,11 +165,11 @@ export default function Expenses() {
       <Modal open={open} onClose={() => setOpen(false)} title={t('Nouvelle dépense')}>
         <div className="space-y-4">
           <Field label={t('Date')}>
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="field" />
+            <input type="date" value={date} onChange={(e) => { setDate(e.target.value); setShortfall(null); }} className="field" />
           </Field>
           <Field
             label={t('Poste de charge')}
-            hint={`Compte imputé : ${accountCode(db.company.chart, accountKey)}`}
+            hint={t('Compte imputé : {code}', { code: accountCode(db.company.chart, accountKey) })}
           >
             <select
               value={accountKey}
@@ -184,11 +186,11 @@ export default function Expenses() {
           <Field label={t('Description')}>
             <input value={description} onChange={(e) => setDescription(e.target.value)} className="field" />
           </Field>
-          <Field label={`Montant (${db.company.currency})`}>
-            <input value={amountRaw} onChange={(e) => setAmountRaw(e.target.value)} inputMode="decimal" className="field num" />
+          <Field label={t('Montant ({currency})', { currency: db.company.currency })}>
+            <input value={amountRaw} onChange={(e) => { setAmountRaw(e.target.value); setShortfall(null); }} inputMode="decimal" className="field num" />
           </Field>
           <Field label={t('Payé par')}>
-            <select value={method} onChange={(e) => setMethod(e.target.value as PaymentMethod)} className="field">
+            <select value={method} onChange={(e) => { setMethod(e.target.value as PaymentMethod); setShortfall(null); }} className="field">
               <option value="CASH">{t('Espèces (caisse)')}</option>
               <option value="MOBILE">{t('Mobile money')}</option>
               <option value="BANK">{t('Banque')}</option>

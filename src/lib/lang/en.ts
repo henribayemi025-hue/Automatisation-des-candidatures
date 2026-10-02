@@ -2100,4 +2100,9 @@ export const EN: Record<string, string> = {
   'Non merci': 'No thanks',
   'Créer l’article': 'Create item',
   '« {name} » est maintenant un article : touchez-le dans la liste pour l’encaisser.': '“{name}” is now an item: tap it in the list to ring it up.',
+  // Audit jour 4 (02/10)
+  'Compte imputé : {code}': 'Posted to account: {code}',
+  'Montant ({currency})': 'Amount ({currency})',
+  'Rattaché à': 'Linked to',
+  'Disponible : {available} · règlement : {amount}. Enregistrez d’abord l’argent entré, ou choisissez un autre moyen de paiement.': 'Available: {available} · payment: {amount}. Record the money that came in first, or choose another payment method.',
 };
