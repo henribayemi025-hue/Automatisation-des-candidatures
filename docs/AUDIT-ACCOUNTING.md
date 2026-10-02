@@ -176,3 +176,13 @@ Aucune erreur JavaScript.
 
 Le n° 6 (date du jour en heure locale, partout à la fois), puis
 `Purchases.tsx` (achats).
+
+Alpha a relu le n° 6 le 02/10 : pas d'objection. Les outils serveur (finia_resume_mois, ma_compta_*)
+lisent des dates « AAAA-MM-JJ » et compteront mieux. accounting-rappels n'est pas concerné.
+Trois précautions :
+1. Seule la date MÉTIER passe en heure locale (le jour d'une vente, d'une dépense, d'une clôture).
+   Les horodatages restent en temps universel (création, synchro, finia_events.at).
+2. Les écritures déjà saisies ne sont pas réécrites.
+3. Mise en ligne le soir, ou le signaler dans le récapitulatif : sinon, une journée de caisse
+   peut apparaître coupée en deux pour quelqu'un dans un fuseau éloigné.
+Test : minuit à Douala, Toronto, Paris et Tokyo.
