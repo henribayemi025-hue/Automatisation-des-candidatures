@@ -2132,9 +2132,4 @@ export const EN: Record<string, string> = {
   'Connectez-vous avec le même compte, rien à recréer : vos ventes livrées sur Finjaro peuvent arriver dans votre caisse.': 'Sign in with the same account, nothing to set up again: your sales delivered on Finjaro can flow into your till.',
   'Client à crédit': 'Credit customer',
   'À crédit': 'On credit',
-  // Connexion (relevé par Alpha, 05/10)
-  'Toute votre boutique,': 'Your whole shop,',
-  'en un seul endroit.': 'in one place.',
-  'Une comptabilité automatique': 'Automatic accounting',
-  'Journal, bilan, audit se tiennent tout seuls — visibles quand vous le voulez.': 'Journal, balance sheet, audit keep themselves up to date — there whenever you want them.',
 };
