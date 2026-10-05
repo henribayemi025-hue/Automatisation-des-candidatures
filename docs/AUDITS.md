@@ -6,6 +6,73 @@ est corrigé ou reste à décider.
 
 ---
 
+## 05/10/2026
+
+### Sécurité
+
+- **Production `bokwivwizghdlaedczbw`, en lecture seule** :
+  - RLS actif sur les cinq tables `finia_*`. Mêmes 12 règles d'accès que le 28/09.
+  - Seules les fonctions de lecture de rôle (`finia_can_emit`, `finia_is_member`,
+    `finia_is_owner`, `finia_role_of`) sont exécutables par `anon` et
+    `authenticated` ; les fonctions de Léo restent réservées au serveur.
+  - La garde « membre retiré » du 01/10 est bien en place
+    (`finia_members_guard` contient la vérification `removed`).
+  - La migration f228150 (adresses confirmées, quota de l'assistant) n'est
+    toujours pas appliquée : `finia_quota_assistant` est absente, comme prévu
+    tant que Beau n'a pas dit oui.
+- **Aucun secret dans le dépôt** : clés Google, DeepSeek, Resend, `service_role`,
+  clés privées. Seule apparaît la clé `anon` publique, dans une migration.
+- **Scénarios de rôles rejoués** sur le projet de test `qiyvoaljqmbfldephobp`
+  (actif de nouveau). Comptes fictifs, le tout dans une transaction annulée :
+  - intrus : ne lit aucun événement, ne voit pas l'espace, écriture refusée ;
+  - caissier : lit, vend ; « modifier l'entreprise » refusé ; se faire passer
+    pour la propriétaire refusé ;
+  - membre retiré : ne lit rien, écriture refusée, **mais peut se remettre
+    « actif »**. Sur le projet de test, `finia_members_guard` n'a pas la
+    correction du 01/10, qui est en place en production : le projet de test
+    est en retard sur la production. À aligner (décision d'Alpha et de Beau,
+    car c'est la base de test de la place de marché).
+
+### Code
+
+- Vérification des types et construction : propres.
+- **38 scripts `scripts/*-check.ts`** : 2 échecs au premier passage, corrigés.
+  Les 38 passent ensuite (code de sortie et texte de chaque script vérifiés).
+  - `liens-check` : 6 échecs. Le contrôle attendait l'ancienne réponse
+    « Finia est l'assistante de la place de marché » ; depuis le 02/10
+    (décision « une seule Finia »), elle répond « Finia, c'est moi ». Contrôle
+    mis à jour. La réponse dit aussi de nouveau ce qu'elle ne voit pas.
+  - `cash-check` : **dans la démo, la caisse passait sous zéro** fin
+    juillet, quelle que soit la date. La cause : le réassort automatique
+    ajouté le 30/09, payé en espèces. L'apport de départ en caisse de la démo
+    passe de 2 500 000 à 3 000 000. Vérifié pour cinq dates, de septembre 2026
+    à janvier 2027.
+- **Navigateur, 35 écrans de la démo à 390 et 1280 px** : aucune erreur
+  JavaScript, aucun écran vide, aucun débordement horizontal.
+
+### Comptabilité
+
+`SIM_YEARS=2 npx vite-node scripts/sim-passe1.ts`, comparé au 28/09 :
+- **Boutique** : 3 anomalies, les mêmes (achats sans « payé par », pas de
+  retour d'article, dépense refusée dans un exercice clos).
+- **Salon** : 7 anomalies au lieu de 8. Une prestation ne fait plus tomber le
+  stock en négatif (correction du 01/10, `holdsStock`) ; il reste un écart
+  entre la valeur du stock et le compte de stock, déjà connu.
+- Aucune régression.
+
+### Corrigé pendant cet audit
+
+Contrôle `liens-check` aligné sur « une seule Finia » ; apport de départ de la
+démo. Commités avec les travaux du jour, mis en ligne ce soir (19 h 30, heure de
+Douala), après la date locale.
+
+### Ce qui reste à décider
+
+- Aligner le projet de test sur la production (garde « membre retiré »).
+- Toujours en attente : « payé par » sur les achats, et le retour d'article.
+
+---
+
 ## 28/09/2026
 
 ### Sécurité

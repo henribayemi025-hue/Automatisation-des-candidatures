@@ -102,7 +102,7 @@ export function answer(db: DB, question: string): Answer {
   if (/\bfin(ia|ou)\b/i.test(question)) {
     return {
       text: t(
-        'Finia, c’est moi : l’assistante de tout Finjaro. Ici, dans Accounting, je vois vos comptes ; sur la place de marché (https://finjaro.net), je vous aide à vendre en ligne.\n\nMême compte partout. Ce qui passe de l’une à l’autre : une commande LIVRÉE sur la place de marché entre toute seule dans votre journal ici.',
+        'Finia, c’est moi : l’assistante de tout Finjaro. Ici, dans Accounting, je vois vos comptes ; sur la place de marché (https://finjaro.net), je vous aide à vendre en ligne.\n\nDepuis Accounting, je ne vois pas ce qui se passe sur la place de marché, et là-bas je ne vois pas vos comptes. Même compte partout. Ce qui passe de l’une à l’autre : une commande LIVRÉE sur la place de marché entre toute seule dans votre journal ici.',
       ),
     };
   }

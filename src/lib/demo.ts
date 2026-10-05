@@ -313,12 +313,15 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
     ref: 'OD-0000',
     label: 'Apport de la propriétaire',
     lines: [
-      { account: accountCode(chart, 'CASH'), label: 'Apport en caisse', debit: money(2500000), credit: 0 },
+      // 3 000 000 et non plus 2 500 000 depuis le réassort automatique (30/09) :
+      // les premiers réassorts, payés en espèces, faisaient passer la caisse
+      // sous zéro fin juillet (audit du 05/10, scripts/cash-check.ts).
+      { account: accountCode(chart, 'CASH'), label: 'Apport en caisse', debit: money(3000000), credit: 0 },
       { account: accountCode(chart, 'MOBILE_MONEY'), label: 'Apport sur le compte mobile', debit: money(400000), credit: 0 },
       { account: accountCode(chart, 'BANK'), label: 'Apport en banque', debit: money(1500000), credit: 0 },
       // Le capital est la somme des trois lignes converties : l'arrondi par
       // devise ne doit pas déséquilibrer l'écriture.
-      { account: accountCode(chart, 'CAPITAL'), label: 'Capital', debit: 0, credit: money(2500000) + money(400000) + money(1500000) },
+      { account: accountCode(chart, 'CAPITAL'), label: 'Capital', debit: 0, credit: money(3000000) + money(400000) + money(1500000) },
     ],
   });
 
