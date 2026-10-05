@@ -1,3 +1,4 @@
+import { localISO } from './dates';
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { looksLikeService } from './recipes';
 import type { ReactNode } from 'react';
@@ -45,7 +46,7 @@ export function newId(): string {
 }
 
 export function today(): string {
-  return new Date().toISOString().slice(0, 10);
+  return localISO();
 }
 
 export const CACHE_PREFIX = 'finia.cache.';
@@ -288,7 +289,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           id: existing?.id ?? input.id ?? newId(),
           createdAt: existing?.createdAt ?? new Date().toISOString(),
         } as Product;
-        dispatch('product.save', { product, movementId: newId(), entryId: newId() });
+        dispatch('product.save', { product, movementId: newId(), entryId: newId(), date: today() });
       },
 
       archiveProduct(productId) {
@@ -660,7 +661,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
 
       reconcileEntry(entryId, account, on, statementDate) {
-        dispatch('entry.reconcile', { entryId, account, on, statementDate, reconciliationId: newId() });
+        dispatch('entry.reconcile', { entryId, account, on, statementDate, reconciliationId: newId(), date: today() });
       },
 
       closeFiscalYear(range) {
@@ -711,7 +712,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       closeSession(counted, note) {
         const session = dbRef.current.sessions.find((s) => !s.closedAt);
         if (!session) throw new Error('Aucune session ouverte');
-        dispatch('session.close', { sessionId: session.id, counted, note, entryId: newId() });
+        dispatch('session.close', { sessionId: session.id, counted, note, entryId: newId(), date: today() });
       },
 
       loadDemo() {

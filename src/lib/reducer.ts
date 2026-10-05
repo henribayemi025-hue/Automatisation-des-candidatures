@@ -416,7 +416,7 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       if (product.stock > 0) {
         db.movements.unshift({
           id: p.movementId as string,
-          date: ev.at.slice(0, 10),
+          date: (p.date as string) || ev.at.slice(0, 10),
           productId: product.id,
           productName: product.name,
           type: 'IN',
@@ -430,7 +430,7 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
         if (amount > 0) {
           post(db, ev, {
             id: p.entryId as string,
-            date: ev.at.slice(0, 10),
+            date: (p.date as string) || ev.at.slice(0, 10),
             journal: 'OD',
             ref: `INIT-${product.sku || product.id.slice(0, 5).toUpperCase()}`,
             label: `Stock initial ${product.name}`,
@@ -1104,7 +1104,7 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
           id: p.reconciliationId as string,
           entryId,
           account,
-          statementDate: (p.statementDate as string) || (ev.at.slice(0, 10) as string),
+          statementDate: (p.statementDate as string) || (p.date as string) || (ev.at.slice(0, 10) as string),
           createdAt: ev.at,
         });
       }
@@ -1360,7 +1360,7 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
         const label = `Écart de caisse à la clôture (${short ? 'manquant' : 'excédent'})${note ? ` — ${note}` : ''}`;
         post(db, ev, {
           id: p.entryId as string,
-          date: ev.at.slice(0, 10),
+          date: (p.date as string) || ev.at.slice(0, 10),
           journal: 'OD',
           ref: `CAISSE-${session.id.slice(0, 5).toUpperCase()}`,
           label,

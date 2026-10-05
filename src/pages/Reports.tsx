@@ -1,3 +1,4 @@
+import { localISO } from '../lib/dates';
 import { useState } from 'react';
 import { useDB } from '../lib/store';
 import { balanceSheet, incomeStatement, trialBalance } from '../lib/ledger';
@@ -32,7 +33,7 @@ const REPORTS: ReportDef[] = [
 export default function Reports() {
   const db = useDB();
   const [from, setFrom] = useState(monthStart());
-  const [to, setTo] = useState(new Date().toISOString().slice(0, 10));
+  const [to, setTo] = useState(localISO());
 
   const money = (v: Minor) => formatMoney(v, db.company.currency);
 
@@ -110,7 +111,7 @@ export default function Reports() {
   function generate(def: ReportDef) {
     const { head, rows, totals } = buildRows(def.id);
     const sheet = def.id === 'BALANCE' ? balanceSheet(db.accounts, db.entries, to) : null;
-    const period = def.ranged ? `Période du ${from} au ${to}` : `Arrêté au ${new Date().toISOString().slice(0, 10)}`;
+    const period = def.ranged ? `Période du ${from} au ${to}` : `Arrêté au ${localISO()}`;
     const revenue = db.sales
       .filter((s) => s.status === 'CONFIRMED' && s.date >= from && s.date <= to)
       .reduce((s, x) => s + saleRevenue(x), 0);

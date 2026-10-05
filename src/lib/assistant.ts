@@ -1,3 +1,4 @@
+import { localISO } from './dates';
 import { accountCode } from './chart';
 import { holdsStock } from './recipes';
 import { balanceSheet, incomeStatement, runAuditChecks } from './ledger';
@@ -25,23 +26,23 @@ function cap(s: string): string {
 }
 
 function resolvePeriod(q: string): Period {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localISO();
   if (/aujourd|ce jour|today/.test(q)) return { from: today, to: today, label: t("aujourd'hui") };
   if (/hier|yesterday/.test(q)) {
     const d = new Date();
     d.setDate(d.getDate() - 1);
-    const y = d.toISOString().slice(0, 10);
+    const y = localISO(d);
     return { from: y, to: y, label: t('hier') };
   }
   if (/semaine|7 jours|sept jours|week/.test(q)) {
     const d = new Date();
     d.setDate(d.getDate() - 6);
-    return { from: d.toISOString().slice(0, 10), to: today, label: t('ces 7 derniers jours') };
+    return { from: localISO(d), to: today, label: t('ces 7 derniers jours') };
   }
   if (/30 jours|trente jours|30 days/.test(q)) {
     const d = new Date();
     d.setDate(d.getDate() - 29);
-    return { from: d.toISOString().slice(0, 10), to: today, label: t('ces 30 derniers jours') };
+    return { from: localISO(d), to: today, label: t('ces 30 derniers jours') };
   }
   if (/an(n[ée]e)?|exercice|year/.test(q)) {
     return { from: `${new Date().getFullYear()}-01-01`, to: today, label: t('cette année') };
@@ -305,14 +306,14 @@ export function insights(db: DB): { tone: 'good' | 'warn' | 'bad'; text: string 
   if (negative.length) list.push({ tone: 'bad', text: t('{n} article(s) ont un stock sous zéro ({names}) : des ventes ont dépassé le rayon, souvent deux caisses hors ligne. Faites un inventaire et un ajustement.', { n: negative.length, names: negative.slice(0, 3).map((p) => p.name).join(', ') }) });
   const noCost = salesWithoutCost(db);
   if (noCost.sales.length) list.push({ tone: 'bad', text: t('{n} vente(s) Finjaro sans coût d’achat : votre résultat est surestimé d’au plus {amount}. Complétez le coût depuis Ventes.', { n: noCost.sales.length, amount: money(noCost.exposure) }) });
-  const subs = summarize(db, new Date().toISOString().slice(0, 10));
+  const subs = summarize(db, localISO());
   if (subs.expired > 0) list.push({ tone: 'bad', text: t('{n} abonnement(s) expiré(s) : {names}. Un rappel WhatsApp part depuis l’écran Abonnements.', { n: subs.expired, names: subs.expiredList.slice(0, 3).map((x) => x.customerName).join(', ') }) });
   if (subs.soon > 0) list.push({ tone: 'warn', text: t('{n} abonnement(s) finissent dans moins de {d} jours : {names}.', { n: subs.soon, d: SOON_DAYS, names: subs.soonList.slice(0, 3).map((x) => x.customerName).join(', ') }) });
   if (s.lowStock > 0) list.push({ tone: 'warn', text: t('{n} produit(s) sous le seuil de réappro : préparez une commande fournisseur.', { n: s.lowStock }) });
 
   // Le seuil fiscal passe devant le reste : c'est le seul avertissement de
   // cette liste qui engage une obligation légale, pas une opportunité manquée.
-  const seuil = alerteSeuil(db, new Date().toISOString().slice(0, 10), money, t);
+  const seuil = alerteSeuil(db, localISO(), money, t);
   if (seuil) list.unshift(seuil);
 
   const errors = runAuditChecks(db.accounts, db.entries).filter((c) => c.severity === 'ERROR');

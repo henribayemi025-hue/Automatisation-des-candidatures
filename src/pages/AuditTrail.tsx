@@ -1,3 +1,4 @@
+import { localISO } from '../lib/dates';
 import { useMemo, useState } from 'react';
 import { useDB } from '../lib/store';
 import { Badge, Empty, Field, PageHeader, StatCard, Table } from '../components/UI';
@@ -29,7 +30,7 @@ export default function AuditTrail() {
     (a) => (entity ? a.entity === entity : true) && (action ? a.action === action : true),
   );
 
-  const todayCount = db.audit.filter((a) => a.at.slice(0, 10) === new Date().toISOString().slice(0, 10)).length;
+  const todayCount = db.audit.filter((a) => localISO(new Date(a.at)) === localISO()).length;
 
   return (
     <>

@@ -1,3 +1,4 @@
+import { localISO } from '../lib/dates';
 import { useMemo, useState } from 'react';
 import { useDB } from '../lib/store';
 import { balanceSheet, incomeStatement } from '../lib/ledger';
@@ -53,7 +54,7 @@ function Section({
 export default function Statements() {
   const db = useDB();
   const [from, setFrom] = useState(monthStart());
-  const [to, setTo] = useState(new Date().toISOString().slice(0, 10));
+  const [to, setTo] = useState(localISO());
 
   const income = useMemo(
     () => incomeStatement(db.accounts, db.entries, from || undefined, to || undefined),

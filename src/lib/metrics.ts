@@ -1,16 +1,17 @@
+import { localISO } from './dates';
 import { accountCode } from './chart';
 import { holdsStock } from './recipes';
 import { balanceOf, incomeStatement } from './ledger';
 import type { DB, Minor, Sale } from './types';
 
 export function monthStart(d = new Date()): string {
-  return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0, 10);
+  return localISO(new Date(d.getFullYear(), d.getMonth(), 1));
 }
 
 export function daysAgo(n: number): string {
   const d = new Date();
   d.setDate(d.getDate() - n);
-  return d.toISOString().slice(0, 10);
+  return localISO(d);
 }
 
 export function saleRevenue(sale: Sale): Minor {
@@ -38,7 +39,7 @@ export interface Snapshot {
 }
 
 export function snapshot(db: DB): Snapshot {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localISO();
   const from = monthStart();
 
   const confirmed = db.sales.filter((s) => s.status === 'CONFIRMED');
@@ -93,7 +94,7 @@ export function dailySeries(db: DB, days: number, majorDivisor: number): DayPoin
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    const key = d.toISOString().slice(0, 10);
+    const key = localISO(d);
     const revenue = db.sales
       .filter((s) => s.status === 'CONFIRMED' && s.date === key)
       .reduce((s, x) => s + saleRevenue(x), 0);

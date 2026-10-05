@@ -1,3 +1,4 @@
+import { localISO } from '../lib/dates';
 import { useMemo, useState } from 'react';
 import { useDB } from '../lib/store';
 import { accountCode } from '../lib/chart';
@@ -10,7 +11,7 @@ import { t } from '../lib/i18n';
 export default function CashBook() {
   const db = useDB();
   const [from, setFrom] = useState(monthStart());
-  const [to, setTo] = useState(new Date().toISOString().slice(0, 10));
+  const [to, setTo] = useState(localISO());
 
   const treasury = useMemo(
     () =>

@@ -35,7 +35,7 @@ function findDate(text: string, todayISO: string): string {
   }
   const today = new Date(todayISO);
   if (/\bhier|yesterday\b/i.test(text)) {
-    today.setDate(today.getDate() - 1);
+    today.setUTCDate(today.getUTCDate() - 1);
     return today.toISOString().slice(0, 10);
   }
   if (/\baujourd|today\b/i.test(text)) return todayISO;

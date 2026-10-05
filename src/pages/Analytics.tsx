@@ -1,3 +1,4 @@
+import { localISO } from '../lib/dates';
 import { useMemo, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useDB } from '../lib/store';
@@ -14,7 +15,7 @@ const PALETTE = ['#C25E38', '#0ea5e9', '#8b5cf6', '#f59e0b', '#D14343', '#14b8a6
 export default function Analytics() {
   const db = useDB();
   const [from, setFrom] = useState(monthStart());
-  const [to, setTo] = useState(new Date().toISOString().slice(0, 10));
+  const [to, setTo] = useState(localISO());
 
   const divisor = factor(db.company.currency);
 
@@ -65,13 +66,13 @@ export default function Analytics() {
       <PageHeader title={t('Analyse')} subtitle={t('Performance commerciale et rentabilité')} />
 
       <div className="card mb-4 flex flex-wrap items-end gap-3">
-        <button onClick={() => { setFrom(new Date(Date.now() - 6 * 864e5).toISOString().slice(0, 10)); setTo(new Date().toISOString().slice(0, 10)); }} className="btn-ghost">
+        <button onClick={() => { setFrom(localISO(new Date(Date.now() - 6 * 864e5))); setTo(localISO()); }} className="btn-ghost">
           {t('7 jours')}
         </button>
-        <button onClick={() => { setFrom(new Date(Date.now() - 29 * 864e5).toISOString().slice(0, 10)); setTo(new Date().toISOString().slice(0, 10)); }} className="btn-ghost">
+        <button onClick={() => { setFrom(localISO(new Date(Date.now() - 29 * 864e5))); setTo(localISO()); }} className="btn-ghost">
           {t('30 jours')}
         </button>
-        <button onClick={() => { setFrom(monthStart()); setTo(new Date().toISOString().slice(0, 10)); }} className="btn-ghost">
+        <button onClick={() => { setFrom(monthStart()); setTo(localISO()); }} className="btn-ghost">
           {t('Ce mois')}
         </button>
         <Field label={t('Du')}>

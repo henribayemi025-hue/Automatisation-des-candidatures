@@ -1,3 +1,4 @@
+import { localISO } from './dates';
 import { accountCode } from './chart';
 import { currency, factor } from './money';
 import { applyEvent, saleTotals } from './reducer';
@@ -45,7 +46,7 @@ function seeded(seed: number) {
 function dayISO(base: Date, offset: number): string {
   const d = new Date(base);
   d.setDate(d.getDate() + offset);
-  return d.toISOString().slice(0, 10);
+  return localISO(d);
 }
 
 /** Horodatage dans la journée : les événements restent dans l'ordre. */
@@ -626,7 +627,7 @@ export function buildDemoEvents(start: DB, actor: Actor, runId: string, todayISO
     for (const item of MONTHLY_EXPENSES) {
       const d = new Date(base);
       d.setMonth(d.getMonth() + month, item.day);
-      const date = d.toISOString().slice(0, 10);
+      const date = localISO(d);
       if (date >= todayISO) continue;
       const expense: Expense = {
         id: id(),

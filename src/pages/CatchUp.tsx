@@ -54,7 +54,7 @@ function recentDays(count: number): string[] {
   const base = new Date(`${today()}T12:00:00.000Z`);
   for (let i = 0; i < count; i += 1) {
     const d = new Date(base);
-    d.setDate(d.getDate() - i);
+    d.setUTCDate(d.getUTCDate() - i);
     out.push(d.toISOString().slice(0, 10));
   }
   return out;

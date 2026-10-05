@@ -1,3 +1,4 @@
+import { localISO } from './dates';
 import { normalizeDB } from './reducer';
 import type { DB } from './types';
 
@@ -69,7 +70,7 @@ export function backupFilename(db: DB): string {
     .replace(/^-|-$/g, '')
     .toLowerCase()
     .slice(0, 40);
-  return `${name || 'finjaro'}-${new Date().toISOString().slice(0, 10)}.finjaro.json`;
+  return `${name || 'finjaro'}-${localISO()}.finjaro.json`;
 }
 
 export function backupText(db: DB): string {
