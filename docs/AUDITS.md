@@ -68,7 +68,9 @@ Douala), après la date locale.
 
 ### Ce qui reste à décider
 
-- Aligner le projet de test sur la production (garde « membre retiré »).
+- ~~Aligner le projet de test sur la production (garde « membre retiré »)~~ :
+  fait par Alpha le 05/10 à 07:00 UTC. Rejoué ensuite : le membre retiré est
+  refusé (« seul son propriétaire peut vous réinviter »).
 - Toujours en attente : « payé par » sur les achats, et le retour d'article.
 
 ---
