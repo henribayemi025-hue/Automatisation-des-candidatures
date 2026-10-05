@@ -159,3 +159,66 @@ commandes réelles **2 (0)**. Le haut de l'entonnoir ralentit, le bas commence
 **Comme toi**, je n'ai pas pu rejouer de scénarios de rôles : le projet de test
 `qiyvoaljqmbfldephobp` est toujours en pause. Contrôles faits par lecture des
 politiques et des gardes, pas par simulation.
+
+---
+
+## 05/10/2026 — Audit hebdomadaire, place de marché (Alpha)
+
+Production en lecture seule ; les rôles sont rejoués dans des transactions
+annulées. Le détail technique est aussi côté place de marché :
+`docs/audit/2026-10-05-audit-hebdo.md` (staging).
+
+### Sécurité
+
+- **Visiteur non connecté** : voit 68 boutiques et 401 articles, et aucune
+  boutique ni aucun article de test (`boutique_de_test` : 0 et 0). Il voit 0
+  commande, 0 message, 0 message Léo, 0 espace Finia. Une insertion d'article
+  est refusée par la RLS.
+- **Acheteuse réelle** (jeton simulé) : 0 commande d'autrui, 0 message
+  d'autrui, 0 Léo, 0 Finia, 0 autre profil lisible en direct.
+- **Vendeuse réelle** (jeton simulé) : 0 commande hors de sa boutique, 0 Léo,
+  0 Finia, 0 autre profil.
+- RLS active sur 142 tables sur 142, 289 règles. Conseiller : 1 ERROR connue
+  (vue `profiles_public`, écriture fermée le 01/10). 36 fonctions SECURITY
+  DEFINER ouvertes aux visiteurs, toutes dans la liste blanche de 0229.
+  HaveIBeenPwned toujours désactivé (M-3, interrupteur de Beau).
+- Base de test : `finia_members_guard` alignée sur la production (empreinte
+  identique). Il manque `profiles.is_test` dans la base de test : elle est en
+  retard d'au moins une migration de la place de marché.
+
+### Code et santé
+
+- 373 tests sur 373, compilation sans erreur.
+- **LCP « Poor » pour 24 % des visites** (Cloudflare, P75 3,9 s, surtout les
+  fiches produit). Cause n°1 trouvée : 64 photos « AVIF » qui sont en réalité
+  des PNG sans compression (jusqu'à 2,5 Mo la photo, 490 Ko la vignette, au
+  lieu de 46 et 14 Ko). L'envoi est corrigé sur staging. La recompression des
+  64 photos attend le mot de Beau.
+- RPC les plus appelées : 15 à 42 ms en moyenne, pointes à 1,3 s
+  (pg_stat_statements).
+- 🔴 Depuis la panne des crédits Google (402, 03/10), les agents de Léo passent
+  par OpenAI et leur coût n'est **pas compté** dans `ai_usage` (rien depuis le
+  03/10 08h47). Le plafond du mois est aveugle. Correctif en attente du mot de
+  Beau (fonction commune).
+- 🟠 legion-visuel et legion-portrait n'appellent que des modèles d'image
+  arrêtés par Google. Correctif en attente.
+
+### Chiffres (7 derniers jours / 7 jours d'avant, comptes de test exclus)
+
+| | Cette semaine | Semaine d'avant |
+| --- | --- | --- |
+| Inscriptions | 7 | 3 |
+| Boutiques créées | 3 | 2 |
+| Articles ajoutés | 11 | 12 |
+| Fiches vues | 821 (≈ 206 hors pic) | 286 |
+| Clics de contact | 0 | 7 |
+| Ajouts au panier | 1 | 5 |
+| Commandes | 0 | 2 |
+| Appareils inscrits aux notifications | 2 | 4 |
+
+Lecture : le **pic des fiches vues** (02/10 : 225, 03/10 : 390) a l'allure
+d'un robot. C'est une vue par fiche sur presque toutes les fiches, avec un
+identifiant nouveau à chaque vue. Sans ce pic, les vues baissent (≈ 206 contre
+286), et les gestes d'achat aussi (0 contact, 1 panier, 0 commande). La seule
+vraie commande ouverte (27/09, sans compte, au statut « priced ») n'a jamais
+été signalée à l'acheteur : remontée à Beau.
