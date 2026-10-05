@@ -1264,3 +1264,37 @@ agents), et l'essai du relais sortant depuis un vrai compte.
 - Mesuré à 05:20 UTC (comptes de test exclus) : 0 inscription, 0 connexion en
   24 h ; dernier événement réel Accounting le 25/09 ; stockage 586 Mo / 1 Go,
   +33 Mo en 7 jours.
+
+### 05/10 (matin) — réunion du jour (Alpha)
+
+- ✅ 05/10 : **essai d'inscription accounting_src** sur le projet de test
+  (qiyvoaljqmbfldephobp). Copie locale d'Accounting branchée sur la base de test,
+  ouverte sur `/?src=test-alpha`, inscription par e-mail : réponse 200, et
+  `raw_user_meta_data` contient bien `accounting_src = test-alpha` et
+  `accounting_src_visite = test-alpha`. Le profil de la place de marché est
+  créé par le déclencheur commun (1 ligne), donc rien de cassé du côté
+  partagé. Seule limite : une adresse en `@example.com` est refusée par
+  Supabase (`email_address_invalid`), et l'essai s'est fait avec une adresse
+  « + » de la boîte Finjaro. Inscription par numéro et par Google non
+  essayées (fonction `accounting-inscription-tel` absente du projet de test).
+- ✅ 05/10 : `finia_members_guard` de la base de test alignée sur la
+  production (empreinte md5 identique). Ton cas « membre retiré qui se remet
+  actif » doit maintenant être refusé en test aussi.
+- ✅ 05/10 : modèles d'image Google. Ton alerte était juste sur le fond, avec
+  une correction de nom : le bon est `gemini-3.1-flash-image`, sans
+  « -preview ». Elle a fait trouver legion-visuel et legion-portrait en panne
+  complète. Correctif en attente du mot de Beau.
+- Vu en passant, à toi de juger : sur la page de connexion en anglais
+  (`finia.lang = en`), deux phrases restent en français : « Toute votre
+  boutique, en un seul endroit. » et « Une comptabilité automatique ».
+- **Liaison commande → vente, mesuré ce matin** : `finia_liaison_log` n'a
+  toujours que ses 2 lignes « espace_absent » du 23/09. La seule vraie
+  commande ouverte (sans compte, 27/09) est toujours « priced » avec
+  `buyer_informed_at` vide, donc 8 jours sans que l'acheteur soit prévenu du
+  prix. Je le remonte à Beau : le recontacter, c'est sortir de l'entreprise,
+  donc c'est sa décision.
+- La base de test n'a pas `profiles.is_test` (la production l'a) : elle est en
+  retard d'au moins une migration de la place de marché. À rattraper de mon
+  côté.
+- ⏳ Beau : prix face à Caisse Boutique ; reprise du catalogue ; mise en ligne
+  des correctifs de fonctions communes (coût OpenAI, modèles d'image).
