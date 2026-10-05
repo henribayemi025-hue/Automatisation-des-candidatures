@@ -41,11 +41,14 @@ interface Row {
   method: PaymentMethod;
   category: AccountKey;
   projectId: string;
+  // Vente à crédit : rien n'est encaissé, une créance est ouverte au nom du client.
+  credit: boolean;
+  customer: string;
 }
 
 let rowSeq = 0;
 function blankRow(date: string): Row {
-  return { id: ++rowSeq, date, kind: 'SALE', productId: '', label: '', qty: '1', amountRaw: '', method: 'CASH', category: 'PURCHASES', projectId: '' };
+  return { id: ++rowSeq, date, kind: 'SALE', productId: '', label: '', qty: '1', amountRaw: '', method: 'CASH', category: 'PURCHASES', projectId: '', credit: false, customer: '' };
 }
 
 /** Les jours ouvrés récents, du plus proche au plus lointain. */
@@ -110,8 +113,8 @@ export default function CatchUp() {
           discount: 0,
           method: row.method,
           customerId: null,
-          customerName: '',
-          paid: product ? product.price * qty : amount,
+          customerName: row.credit ? row.customer.trim() || t('Client à crédit') : '',
+          paid: row.credit ? 0 : product ? product.price * qty : amount,
           projectId: row.projectId || null,
         });
       } else {
@@ -166,6 +169,8 @@ export default function CatchUp() {
         row.amountRaw = String(montant);
         // Un article du catalogue n'est repris que si le prix écrit est le
         // sien : le chiffre de la page fait foi, pas le catalogue.
+        row.credit = o?.credit === true || String(o?.moyen ?? '').toLowerCase().startsWith('cr');
+        row.customer = String(o?.client ?? '').trim().slice(0, 80);
         const qty = Math.max(1, Math.round(Number(o?.quantite) || 1));
         const product = products.find((p) => p.name.trim().toLowerCase() === libelle.toLowerCase());
         if (product && product.price * qty === toMinor(montant, db.company.currency)) {
@@ -185,7 +190,7 @@ export default function CatchUp() {
         [
           {
             role: 'user',
-            text: t('Lis ce document (page de cahier, facture, reçu ou ticket) et relève CHAQUE opération écrite. Réponds UNIQUEMENT avec un bloc ```operations``` contenant un tableau JSON : [{"date":"AAAA-MM-JJ","type":"vente" ou "depense","libelle":"…","quantite":1,"montant":nombre en {devise} sans espace,"moyen":"especes" | "mobile" | "carte" | "banque"}]. Une facture ou un reçu de fournisseur est une dépense. Si le mois ou l’année manquent, prends ceux d’aujourd’hui ({today}). N’invente rien : une ligne illisible est laissée de côté.', { devise: db.company.currency, today: today() }),
+            text: t('Lis ce document (page de cahier, facture, reçu ou ticket) et relève CHAQUE opération écrite. Réponds UNIQUEMENT avec un bloc ```operations``` contenant un tableau JSON : [{"date":"AAAA-MM-JJ","type":"vente" ou "depense","libelle":"…","quantite":1,"montant":nombre en {devise} sans espace,"moyen":"especes" | "mobile" | "carte" | "banque","credit":false,"client":""}]. Une vente notée à crédit (« crédit », « doit », « reste à payer ») a "credit":true et le nom du client s’il est écrit. Une facture ou un reçu de fournisseur est une dépense. Si le mois ou l’année manquent, prends ceux d’aujourd’hui ({today}). N’invente rien : une ligne illisible est laissée de côté.', { devise: db.company.currency, today: today() }),
             files: [part],
           },
         ],
@@ -548,13 +553,27 @@ export default function CatchUp() {
                       )}
                     </td>
                     <td className="td">
-                      <select value={row.method} onChange={(e) => patch(row.id, { method: e.target.value as PaymentMethod })} className="field py-1.5 text-caption">
+                      <select
+                        value={row.kind === 'SALE' && row.credit ? 'CREDIT' : row.method}
+                        onChange={(e) => (e.target.value === 'CREDIT' ? patch(row.id, { credit: true }) : patch(row.id, { method: e.target.value as PaymentMethod, credit: false }))}
+                        className="field py-1.5 text-caption"
+                      >
                         {METHODS.map((m) => (
                           <option key={m.value} value={m.value}>
                             {t(m.label)}
                           </option>
                         ))}
+                        {row.kind === 'SALE' && <option value="CREDIT">{t('À crédit')}</option>}
                       </select>
+                      {row.kind === 'SALE' && row.credit && (
+                        <input
+                          value={row.customer}
+                          onChange={(e) => patch(row.id, { customer: e.target.value })}
+                          placeholder={t('Nom du client')}
+                          aria-label={t('Nom du client')}
+                          className="field mt-1 py-1.5 text-caption"
+                        />
+                      )}
                     </td>
                     {hasProjects && (
                       <td className="td">

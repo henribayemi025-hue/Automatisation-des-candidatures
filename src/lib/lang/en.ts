@@ -2130,4 +2130,6 @@ export const EN: Record<string, string> = {
   'Finjaro Accounting tient les comptes d’un commerce : caisse, stock, ventes, dépenses, dettes — et derrière chaque opération, une comptabilité en partie double. Je réponds avec VOS chiffres, calculés sur cet appareil, jamais inventés.\n\nÀ côté, avec le même compte : la place de marché Finjaro, pour vendre en ligne (https://finjaro.net), et Léo, les agents d’entreprise (https://finjaro.net/legion).': 'Finjaro Accounting keeps a business’s books: till, stock, sales, expenses, debts — and behind every transaction, double-entry accounting. I answer with YOUR figures, computed on this device, never made up.\n\nAlongside, with the same account: the Finjaro marketplace, to sell online (https://finjaro.net), and Léo, the business agents (https://finjaro.net/legion).',
   'Vous vendez déjà sur Finjaro ?': 'Already selling on Finjaro?',
   'Connectez-vous avec le même compte, rien à recréer : vos ventes livrées sur Finjaro peuvent arriver dans votre caisse.': 'Sign in with the same account, nothing to set up again: your sales delivered on Finjaro can flow into your till.',
+  'Client à crédit': 'Credit customer',
+  'À crédit': 'On credit',
 };
