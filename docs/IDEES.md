@@ -2,6 +2,27 @@
 
 Chaque idée : le problème, pour qui, ce que ça vaut, l'effort, ce qu'on demande à Beau. Beau coche ☐ → ☑ quand il décide. Les idées viennent des deux sessions, de la concurrence, du terrain. Rien n'est promis : c'est une liste de choix.
 
+## Idées issues de la veille du 05/10/2026 — à décider par Beau
+
+☐ **Imprimer directement sur un petit ticket Bluetooth (58 mm).**
+Problème : un concurrent camerounais (« Caisse Boutique ») le fait ; nous
+passons par l'impression du téléphone, ce qui demande un réglage. Pour qui :
+les boutiques qui donnent un ticket papier. Valeur : parité avec le concurrent
+direct. Effort : moyen (Web Bluetooth n'existe que sur Chrome Android ; à
+essayer avec une vraie imprimante, que Beau devrait acheter ou emprunter).
+
+☐ **Un prix affiché pour Accounting.** Le concurrent annonce 5 000 FCFA par mois.
+Nous n'affichons aucun prix. À décider par Beau (gratuit pour démarrer ? quel
+prix, dans quelle monnaie selon le pays ?). Effort : faible côté écran.
+
+☐ **Un lien de paiement mobile money sur les factures et les relances.**
+Problème : la cliente doit payer à part, puis la commerçante saisit le
+paiement. Valeur : être payée plus vite, et un paiement déjà rapproché. Effort :
+dépend de l'opérateur (aujourd'hui, un simple lien « payer au numéro » sans API
+serait possible ; la vraie intégration demande un contrat).
+
+---
+
 ## Revue hebdomadaire — 01/10/2026 (Claudinette)
 
 **Le fait de la semaine n'est pas chez les concurrents, il est chez nous :

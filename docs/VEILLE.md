@@ -11,6 +11,67 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 05/10/2026 (couvre du 30/09 au 05/10 ; pas de veille les 03 et 04/10)
+
+**Le fait du jour : un concurrent direct est apparu au Cameroun, au même format
+que nous (application web hors ligne), avec un prix public.**
+
+### Concurrence
+
+- **« Caisse Boutique » (02/10/2026, Cameroun)** : application web de caisse
+  100 % hors ligne. Prix annoncé : 5 000 FCFA par mois, payé en MTN MoMo ou
+  Orange Money. Impression Bluetooth sur ticket thermique 58 mm, mentions DGI
+  sur le reçu (NIU, RCCM, numéro séquentiel).
+  [source](https://dev.to/caisse_boutique/comment-jai-construit-une-pwa-de-caisse-enregistreuse-100-hors-ligne-pour-les-commercants-du-57i6)
+  → *Pour nous* : notre reçu porte déjà NIU et RCCM, et notre caisse marche
+  hors ligne. Ce qui nous manque face à eux : l'impression directe sur un petit
+  ticket Bluetooth (nous passons par l'impression du téléphone) et un prix
+  affiché. Notre avance : la comptabilité automatique, l'assistante, le
+  rattrapage par photo, la place de marché.
+- **Platybooks (01/10/2026, Afrique du Sud)** : un devis accepté devient une
+  facture avec un lien de paiement par carte (Paystack).
+  [source](https://techparley.com/platybooks-wants-to-close-the-gap-between-invoicing-and-payment-for-africas-small-businesses/)
+  → *Pour nous* : un lien de paiement (mobile money) sur nos factures devient
+  une attente de base.
+- **Nigeria (article du 04/10/2026)** : comité de pilotage d'une stratégie
+  nationale de facturation numérique, pour transformer les factures vérifiées
+  en crédit pour les PME.
+  [source](https://oneclickafrica.com/posts/fg-inaugurates-committee-on-digital-invoicing-financial-optimisation-strategy-to-unlock-capital)
+  → *Pour nous* : argument pour le jour où l'on ouvre le Nigeria ; rien à faire
+  maintenant.
+
+### Règles, impôts et paiements
+
+- **Rien de nouveau et d'officiel dans la période** sur la facture électronique
+  (Cameroun, Gabon, Sénégal, Côte d'Ivoire, OHADA) ni sur les API ou tarifs de
+  MTN MoMo, Orange Money et Wave. Plusieurs résultats présentés comme récents
+  par les moteurs de recherche dataient de 2024 ou de 2025 : écartés.
+- **Kenya (02/10/2026)** : coupure programmée de deux heures d'eTIMS, le
+  système obligatoire de facture fiscale.
+  [source](https://peopledaily.digital/business/kra-announces-2-hour-etims-outage-on-friday-night)
+  → *Pour nous* : si l'on se branche un jour sur une facture fiscale en ligne,
+  il faudra une file d'attente qui renvoie après coupure (c'est déjà notre
+  principe hors ligne).
+
+### Technologie et IA
+
+- **Google a arrêté le modèle `gemini-2.5-flash-image` le 02/10/2026**,
+  remplaçant conseillé `gemini-3.1-flash-image-preview`.
+  [source](https://ai.google.dev/gemini-api/docs/deprecations)
+  → *Pour nous* : Accounting n'est pas touché (son assistante utilise
+  `gemini-2.5-flash`, sans date d'arrêt annoncée). La fonction `miroir-ia` de
+  la place de marché utilisait ce modèle en secours : signalé à Alpha.
+- **Cloudflare (01 et 02/10/2026)** : des opérations en cours peuvent garder un
+  Durable Object actif jusqu'à 15 min ; les espaces KV peuvent être fixés dans
+  l'UE ou aux États-Unis, rien en Afrique.
+  [source 1](https://developers.cloudflare.com/changelog/post/2026-10-01-pending-io-keep-alive/) ·
+  [source 2](https://developers.cloudflare.com/changelog/post/2026-10-02-kv-jurisdictions-ga/)
+  → *Pour nous* : rien à faire aujourd'hui (nous n'utilisons ni l'un ni l'autre).
+- **Rien de daté dans la période** sur la lecture d'écriture manuscrite, la
+  voix en langues africaines, Capacitor ou Supabase.
+
+---
+
 ## 02/10/2026
 
 **Le fait du jour : PI-SPI a bien démarré, Wave compris. Côté technique, un
