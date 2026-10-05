@@ -172,10 +172,22 @@ en français et en anglais, sans compte.
 
 Aucune erreur JavaScript.
 
-### À faire demain (jour 5)
+### Jour 5 (05/10) : le n° 6 est fait
 
-Le n° 6 (date du jour en heure locale, partout à la fois), puis
-`Purchases.tsx` (achats).
+Date du jour en heure locale, mise en ligne le 05/10 à 19 h 30, heure de Douala (commit 074b79d) :
+- `today()` et les calculs « hier », « 7 derniers jours » et « début du mois » lisent
+  l'horloge de l'appareil ;
+- le début du mois tombait la veille (30/09) à Douala, Paris et Tokyo : corrigé ;
+- trois événements emportent leur date métier (article avec stock, pointage, clôture
+  de caisse), pour que le rejeu soit identique sur tous les appareils ;
+- testé à minuit à Douala, Toronto, Paris et Tokyo ;
+- les écritures déjà saisies ne sont pas réécrites.
+
+Le même soir : une vente « à crédit » est possible dans le rattrapage (commit 662838b).
+
+### À faire ensuite (jour 6)
+
+`Purchases.tsx` (achats), dont le « payé par » qui manque, à décider avec Beau.
 
 Alpha a relu le n° 6 le 02/10 : pas d'objection. Les outils serveur (finia_resume_mois, ma_compta_*)
 lisent des dates « AAAA-MM-JJ » et compteront mieux. accounting-rappels n'est pas concerné.
