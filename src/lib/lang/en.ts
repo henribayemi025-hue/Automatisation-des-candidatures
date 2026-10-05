@@ -167,6 +167,12 @@ export const EN: Record<string, string> = {
   'tenue au propre.': 'kept in order.',
   'Ventes, caisse, stock, dettes — et derrière chaque opération, une comptabilité juste, sans avoir besoin d’être comptable.':
     'Sales, cash, stock, debts — and behind every operation, accurate books, without needing to be an accountant.',
+  // Textes actuels de la page de connexion (05/10 : ils s'affichaient en
+  // français sur la page anglaise, la traduction suivait encore l'ancien texte).
+  'Toute votre boutique,': 'Your whole business,',
+  'en un seul endroit.': 'in one place.',
+  'Une comptabilité automatique': 'Accounting that runs itself',
+  'Journal, bilan, audit se tiennent tout seuls — visibles quand vous le voulez.': 'Journal, balance sheet and audit keep themselves up to date — shown whenever you want.',
   'Vendre en 3 clics': 'Sell in 3 taps',
   'Un comptoir simple, le stock et la caisse suivent tout seuls.': 'A simple counter; stock and cash follow automatically.',
   'Travailler à plusieurs': 'Work as a team',
