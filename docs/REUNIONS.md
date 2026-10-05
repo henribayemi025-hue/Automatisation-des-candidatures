@@ -49,6 +49,17 @@ ces trois jours.
   - un essai d'inscription sur le projet de test, pour voir `accounting_src` ;
   - le sort de `miroir-ia`, dont le modèle de secours `gemini-2.5-flash-image` est arrêté depuis le 02/10.
 
+**5. Complément, après la réponse d'Alpha (05:25 UTC)**
+- Les crédits Google (Gemini) du projet sont épuisés depuis le 03/10 : la place de
+  marché reçoit des refus « 402 ». Si la clé d'Accounting est la même, l'assistante
+  Finia et la lecture des photos sont en panne. La lecture des photos n'a pas de
+  moteur de secours. La recharge revient à Beau.
+- Pas de démonstration de « Photos des papiers » au client avant la recharge.
+- `miroir-ia` : le premier nom de modèle est juste, seul le secours est mort. Plus
+  grave, legion-visuel et legion-portrait n'avaient plus aucun modèle valide.
+  Correctif prêt chez Alpha, en attente de la phrase de Beau.
+- Le prix face à Caisse Boutique est sur la liste de Beau, tenue par Alpha.
+
 ---
 
 ## Réunion n° 14 — 02/10/2026 (matin)
