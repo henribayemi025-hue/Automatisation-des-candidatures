@@ -7,6 +7,50 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 15 — 05/10/2026 (matin)
+
+Pas de réunion les 03 et 04/10 : la session était à l'arrêt. Celle-ci couvre
+ces trois jours.
+
+**1. Ce qui a bougé depuis le 02/10**
+- Mis en ligne le 02/10 (version servie : `6f9e0184acdc`) :
+  - Rattrapage → « Photos des papiers » : on photographie page après page,
+    chaque photo est lue et ses ventes et dépenses s'ajoutent à la liste à valider ;
+  - Finia connaît Léo, même compte partout ;
+  - étiquette d'origine `?src=` ;
+  - bandeau « Vous vendez déjà sur Finjaro ? ».
+- Aucun commit d'Alpha dans ce dépôt depuis le 02/10.
+- Veille du 05/10 : un concurrent direct au Cameroun, « Caisse Boutique ».
+  Application web hors ligne, 5 000 FCFA par mois, ticket Bluetooth, mentions DGI.
+
+**2. À corriger (yeux d'une commerçante sur téléphone)**
+- La date « du jour » est prise en temps universel (audit jour 4, n° 6) : à
+  Toronto, une vente de 20 h est datée du lendemain. C'est le travail d'aujourd'hui.
+- « Photos des papiers » n'a pas encore été essayé sur une vraie page de cahier.
+  Il faut Beau, ou une commerçante, avec un compte.
+- Une vente « à crédit » lue sur une photo est enregistrée comme payée : il
+  manque la case crédit dans la liste du rattrapage.
+
+**3. Une idée venue de la concurrence**
+- Caisse Boutique affiche un prix et imprime sur un petit ticket Bluetooth.
+  Notre reçu porte déjà NIU et RCCM, et notre caisse marche hors ligne. Il nous
+  manque l'impression directe et un prix affiché. Les deux sont notés dans
+  IDEES.md, pour décision de Beau. Notre avance : la comptabilité automatique,
+  l'assistante, le rattrapage par photo et la place de marché.
+
+**4. Aujourd'hui**
+- Moi : date du jour en heure locale, partout à la fois, avec les précautions
+  d'Alpha. Seule la date métier change ; les horodatages restent en UTC ; le
+  passé n'est pas réécrit. Test à minuit à Douala, Toronto, Paris et Tokyo. Mise
+  en ligne le soir (heure de Douala).
+- Puis : case « à crédit » dans le rattrapage.
+- J'attends d'Alpha :
+  - la réponse de Beau sur la reprise du catalogue de la boutique ;
+  - un essai d'inscription sur le projet de test, pour voir `accounting_src` ;
+  - le sort de `miroir-ia`, dont le modèle de secours `gemini-2.5-flash-image` est arrêté depuis le 02/10.
+
+---
+
 ## Réunion n° 14 — 02/10/2026 (matin)
 
 ### Ce qui a bougé depuis hier
