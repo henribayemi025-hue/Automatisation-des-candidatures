@@ -711,9 +711,10 @@ export function runEntreprise(profile: Profile, years: number, start = '2026-01-
       if (lines.length && ctx.ensureCash(date, Math.round(cost * paidNow), 7, 45)) {
         ctx.purchase(date, lines, ctx.suppliers[0] ?? null, paidNow, 2);
       }
-      if (day <= profile.purchases.everyDays + 1 && !ctx.findings.some((f) => f.quoi.startsWith('Tout achat réceptionné'))) {
-        ctx.finding('jour 1', 'MAJEUR', 'Tout achat réceptionné est réglé depuis la caisse (compte espèces) : l’écran d’achat n’a pas de « payé par ». Un achat réglé par virement ou mobile money fait passer la caisse sous zéro dans l’application, et la banque reste créditée.', 'Achats → nouvelle commande, payer 100 % → réceptionner → lire le compte caisse et le compte banque.');
-      }
+      // L'alerte « l'écran d'achat n'a pas de payé par » était émise d'office.
+      // Le champ « Payé avec » existe depuis le 15/09 (129dee6) et le moteur
+      // l'honore (purchase.paidWith) : alerte retirée le 06/10, elle trompait
+      // les audits.
     }
 
     profile.daily?.(ctx, date, day);

@@ -1,5 +1,7 @@
 # Simulation métiers — passe 1 (faits)
 
+> **Correction du 06/10/2026** : l'anomalie « tout achat réceptionné se règle depuis la caisse » ne vaut plus depuis le 15/09 (129dee6). L'écran d'achat a un champ « Payé avec », et `purchase.receive` débite le compte choisi (`purchase.paidWith`). Les lignes ci-dessous qui la citent datent d'avant cette correction.
+
 Générée le 2026-09-15 par `npx vite-node scripts/sim-passe1.ts` sur 10 ans par entreprise, à travers le moteur réel (`applyEvent`), en mémoire. Aucune base touchée. Rejouable à l'identique (générateur pseudo-aléatoire fixé par entreprise).
 
 Résultats bruts par entreprise : `docs/simulation/<clé>.json` (agrégation : `SIM_JSON=docs/simulation npx vite-node scripts/sim-passe1.ts --aggregate`).

@@ -71,7 +71,11 @@ Douala), après la date locale.
 - ~~Aligner le projet de test sur la production (garde « membre retiré »)~~ :
   fait par Alpha le 05/10 à 07:00 UTC. Rejoué ensuite : le membre retiré est
   refusé (« seul son propriétaire peut vous réinviter »).
-- Toujours en attente : « payé par » sur les achats, et le retour d'article.
+- Toujours en attente : le retour d'article.
+- **Correction du 06/10** : l'anomalie « achats sans payé par » était fausse.
+  L'écran d'achat a un champ « Payé avec » depuis le 15/09 (129dee6), et le moteur
+  débite le bon compte. La simulation émettait cette alerte d'office, sans rien
+  vérifier : alerte retirée de `scripts/sim/harness.ts`.
 
 ---
 
