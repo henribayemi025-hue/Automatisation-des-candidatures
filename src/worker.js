@@ -271,6 +271,36 @@ function json(data, status = 200) {
 }
 
 
+// Dernier secours, texte seulement : la part gratuite de Finia (Gemma par
+// Cloudflare), servie par la fonction commune finia-gratuit (Alpha, 06/10).
+// Elle compte elle-même 10 appels par jour et par personne, puis la part
+// « finia » du plafond commun : aucune clé de plus ici, on transmet seulement le
+// jeton de la personne connectée. Conversation bornée à 12 000 signes là-bas :
+// on envoie la consigne et un contexte resserré.
+const GRATUIT_TIMEOUT_MS = 30_000;
+async function callGratuit(authHeader, context, messages) {
+  const base = systemPrompt({});
+  const ctx = JSON.stringify(context ?? {});
+  // Consigne entière (≈ 6 900 signes), contexte coupé à 2 000 : la présentation
+  // de Finia et ses règles passent toujours en premier.
+  const system = `${base.slice(0, -2)}${ctx.length > 2000 ? `${ctx.slice(0, 2000)}…` : ctx}`;
+  const chat = [
+    { role: 'system', content: system },
+    ...messages.slice(-4).map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.text ?? '').slice(0, 700) })),
+  ];
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/finia-gratuit`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: authHeader, apikey: SUPABASE_KEY },
+    body: JSON.stringify({ messages: chat, max_tokens: 900, temperature: 0.4 }),
+    signal: AbortSignal.timeout(GRATUIT_TIMEOUT_MS),
+  });
+  if (!res.ok) throw new Error(`gratuit ${res.status}`);
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content ?? '';
+  if (!String(text).trim()) throw new Error('gratuit empty');
+  return { text: String(text), model: 'finia-gratuit' };
+}
+
 // Le code de refus de Google (402 crédits épuisés, 429 quota, 404 modèle
 // inconnu) part dans les journaux du Worker et dans la réponse : sans lui, on
 // ne savait pas si Finia était en panne de crédits (05/10, idée d'Alpha).
@@ -324,7 +354,11 @@ async function handleAssistant(req, env) {
       const { text, model } = await callDeepSeek(dsKey, systemPrompt(payload.context), messages);
       return json({ text, model });
     } catch (e) {
-      return aiFailure(e?.message ?? e);
+      try {
+        return json(await callGratuit(req.headers.get('authorization'), payload.context, messages));
+      } catch (e3) {
+        return aiFailure(`${e?.message ?? e} puis ${e3?.message ?? e3}`);
+      }
     }
   }
 
@@ -352,15 +386,23 @@ async function handleAssistant(req, env) {
     const { text, model } = await callGemini(apiKey, body);
     return json({ text, model });
   } catch (e) {
-    if (dsKey && !hasFiles) {
+    const echecs = [String(e?.message ?? e)];
+    if (!hasFiles && dsKey) {
       try {
         const { text, model } = await callDeepSeek(dsKey, systemPrompt(payload.context), messages);
         return json({ text, model });
       } catch (e2) {
-        return aiFailure(`${e?.message ?? e} puis ${e2?.message ?? e2}`);
+        echecs.push(String(e2?.message ?? e2));
       }
     }
-    return aiFailure(e?.message ?? e);
+    if (!hasFiles) {
+      try {
+        return json(await callGratuit(req.headers.get('authorization'), payload.context, messages));
+      } catch (e3) {
+        echecs.push(String(e3?.message ?? e3));
+      }
+    }
+    return aiFailure(echecs.join(' puis '));
   }
 }
 
