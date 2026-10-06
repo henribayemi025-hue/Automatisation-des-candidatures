@@ -270,6 +270,17 @@ function json(data, status = 200) {
   });
 }
 
+
+// Le code de refus de Google (402 crédits épuisés, 429 quota, 404 modèle
+// inconnu) part dans les journaux du Worker et dans la réponse : sans lui, on
+// ne savait pas si Finia était en panne de crédits (05/10, idée d'Alpha).
+function aiFailure(detail) {
+  const d = String(detail ?? '');
+  const status = (d.match(/\b(4\d\d|5\d\d)\b/) || [])[1] || null;
+  console.error('assistant: moteur indisponible', d);
+  return json({ error: status === '402' || status === '429' ? 'ai_quota' : 'gemini_unavailable', status, detail: d }, 502);
+}
+
 async function handleAssistant(req, env) {
   if (req.method !== 'POST') return json({ error: 'method' }, 405);
   const apiKey = geminiKey(env);
@@ -313,7 +324,7 @@ async function handleAssistant(req, env) {
       const { text, model } = await callDeepSeek(dsKey, systemPrompt(payload.context), messages);
       return json({ text, model });
     } catch (e) {
-      return json({ error: 'gemini_unavailable', detail: String(e?.message ?? e) }, 502);
+      return aiFailure(e?.message ?? e);
     }
   }
 
@@ -346,10 +357,10 @@ async function handleAssistant(req, env) {
         const { text, model } = await callDeepSeek(dsKey, systemPrompt(payload.context), messages);
         return json({ text, model });
       } catch (e2) {
-        return json({ error: 'gemini_unavailable', detail: String(e2?.message ?? e2) }, 502);
+        return aiFailure(`${e?.message ?? e} puis ${e2?.message ?? e2}`);
       }
     }
-    return json({ error: 'gemini_unavailable', detail: String(e?.message ?? e) }, 502);
+    return aiFailure(e?.message ?? e);
   }
 }
 
