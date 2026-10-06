@@ -2,6 +2,19 @@
 
 Chaque idée : le problème, pour qui, ce que ça vaut, l'effort, ce qu'on demande à Beau. Beau coche ☐ → ☑ quand il décide. Les idées viennent des deux sessions, de la concurrence, du terrain. Rien n'est promis : c'est une liste de choix.
 
+## Idée issue de la veille du 06/10/2026 — à décider par Beau
+
+☐ **Préparer la facture certifiée, pays par pays.** Problème : dans l'espace OHADA,
+les fiscs homologuent les logiciels de facturation un par un (Burkina depuis le
+07/09/2026 pour les grandes entreprises, Côte d'Ivoire avec la FNE, Congo, Togo).
+Pour qui : les entreprises moyennes, quand elles entreront dans le calendrier (au
+Burkina, novembre et décembre 2026). Valeur : ne pas perdre ces clients plus tard.
+Effort : élevé (une homologation par pays, des échanges avec chaque fisc). Pas
+urgent pour les petits commerces : à surveiller, et à décider avant d'ouvrir un
+pays concerné.
+
+---
+
 ## Idées issues de la veille du 05/10/2026 — à décider par Beau
 
 ☐ **Imprimer directement sur un petit ticket Bluetooth (58 mm).**

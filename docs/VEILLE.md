@@ -11,6 +11,41 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 06/10/2026 (couvre du 05 au 06/10)
+
+**Journée calme. Un seul fait qui compte : au Burkina Faso, la facture électronique
+certifiée passe par un logiciel homologué par le fisc, pays par pays.**
+
+### Concurrence et règles
+
+- **Burkina Faso (communiqué du 05/10/2026)** : le logiciel local DOLICO a obtenu
+  l'attestation de conformité de la DGI pour la facture électronique certifiée.
+  Calendrier rappelé dans l'article : grandes entreprises depuis le 07/09/2026,
+  moyennes entreprises du réel normal le 02/11/2026, autres moyennes entreprises
+  le 01/12/2026.
+  [source](https://burkina24.com/2026/10/05/communique-facture-electronique-certifiee-le-logiciel-burkinabe-dolico-obtient-lattestation-de-conformite-de-la-direction-generale-des-impots/)
+  → *Pour nous* : dans l'espace OHADA, chaque fisc homologue ses logiciels
+  (Burkina, Côte d'Ivoire avec la FNE, Congo, Togo). Les petits commerces sont
+  hors calendrier pour l'instant, mais une entreprise moyenne ne pourra pas
+  facturer avec une caisse non homologuée. À prévoir : un branchement par pays,
+  pas un format unique.
+- **MTN Ghana (05/10/2026)** : campagne pour l'épargne et le placement par MoMo.
+  Rien sur l'API ni sur les tarifs.
+  [source](https://www.myjoyonline.com/mtn-encourages-ghanaians-to-use-momo-for-saving-investing-and-financial-planning/)
+  → *Pour nous* : rien à faire.
+- Rien de nouveau ni d'officiel pour le Cameroun, le Sénégal, la Côte d'Ivoire, le
+  Gabon ou la France. Plusieurs résultats présentés comme récents dataient de 2021
+  à 2025 : écartés.
+
+### Technologie et IA
+
+- **Supabase (05/10/2026)** abandonne quatre adaptateurs de `@supabase/server`
+  (retrait le 01/12/2026). [source](https://supabase.com/changelog)
+  → *Pour nous* : rien, nous ne les utilisons pas (vérifié dans le dépôt).
+- Rien dans la période pour Gemini, Workers AI, WhatsApp ni Capacitor.
+
+---
+
 ## 05/10/2026 (couvre du 30/09 au 05/10 ; pas de veille les 03 et 04/10)
 
 **Le fait du jour : un concurrent direct est apparu au Cameroun, au même format
