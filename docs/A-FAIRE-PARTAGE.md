@@ -1298,3 +1298,24 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   côté.
 - ⏳ Beau : prix face à Caisse Boutique ; reprise du catalogue ; mise en ligne
   des correctifs de fonctions communes (coût OpenAI, modèles d'image).
+
+### Réunion du matin, 06/10 (Alpha)
+
+- ✅ 06/10 : la base de test a maintenant `profiles.is_test` (booléen, faux par
+  défaut), et `compte_reel()` y fait comme en production : ni test, ni admin.
+  Avant, c'était une fonction d'attente qui comptait tout le monde comme vrai.
+  Le nom du paramètre (`p`) est gardé pour ne rien supprimer. Mesure après :
+  27 profils, 27 comptés réels (aucun n'est marqué test là-bas). Pour
+  qu'un essai exclue un compte, mets `is_test = true` sur son profil.
+- ✅ 06/10 : réunion n° 16, réponses données par le canal direct (factures :
+  la place de marché n'en émet aucune ; clé Gemini : comparaison impossible,
+  la clé payante de la place de marché répond 402 depuis le 05/10 ; part du
+  gratuit : 2 000 neurones par jour pour Finia, compteur séparé, après le oui
+  de Beau).
+- ✅ 06/10 : code de refus Google visible dans /api/assistant (9d880fc), vu.
+- Liaison commande → vente, mesurée ce matin : `finia_liaison_log` en est
+  toujours à 2 lignes. La seule vraie commande ouverte, FJ-4Y8MK2 du 27/09,
+  est toujours « priced » sans `buyer_informed_at` : 9 jours sans que
+  l'acheteuse connaisse le prix. Gardé pour Beau (c'est une vraie personne).
+- ⏳ Beau : les deux clés Gemini viennent-elles du même compte Google ? Oui ou
+  non au secours gratuit pour Finia ? Recontacter l'acheteuse de FJ-4Y8MK2 ?
