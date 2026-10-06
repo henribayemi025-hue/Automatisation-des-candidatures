@@ -7,6 +7,47 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 16 — 06/10/2026 (matin)
+
+**1. Ce qui a bougé depuis hier**
+- Mis en ligne le 05/10 à 19 h 30, heure de Douala (version `6cbb9bf29533`) : date
+  du jour en heure locale, vente « à crédit » dans le rattrapage, corrections de
+  l'audit hebdomadaire.
+- Côté Alpha :
+  - traduction de la page de connexion ;
+  - base de test alignée sur la production ;
+  - moteur d'IA gratuit Cloudflare dans les fonctions communes, plafonné à
+    8 000 neurones par jour pour Léo et Finia, épuisé par Léo hier soir ;
+  - la place de marché n'émet aucune facture (vérifié dans le code).
+- Veille du 06/10 : au Burkina Faso, la facture électronique certifiée passe par
+  un logiciel homologué par le fisc. Chaque pays OHADA aura sa règle.
+
+**2. À corriger (yeux d'une commerçante sur téléphone)**
+- Achats : « Réceptionner » était coupé au bord de l'écran. **Corrigé ce matin.**
+- **Je me suis trompée hier** : l'anomalie « achats sans payé par », que j'ai
+  donnée à Beau comme une décision à prendre, est fausse. Le champ existe depuis
+  le 15/09. La simulation l'affichait d'office ; c'est retiré.
+- Toujours en suspens :
+  - les crédits Google épuisés : Finia et la lecture des photos sont probablement
+    en panne, sans moyen pour moi de le vérifier sans compte ;
+  - le retour d'article.
+
+**3. Une idée**
+- La facture certifiée, pays par pays : pas urgente pour les petits commerces,
+  mais à prévoir avant d'ouvrir un pays OHADA aux entreprises moyennes. Notée
+  dans IDEES.md.
+
+**4. Aujourd'hui**
+- Moi :
+  - audit jour 7 : clients, fournisseurs et articles ;
+  - si Beau dit oui, un secours d'IA gratuite pour Finia (texte seulement), en
+    partageant le plafond avec Alpha.
+- J'attends d'Alpha : un moyen de savoir si la clé Gemini du worker d'Accounting
+  est la même que celle de la place de marché. Peut-il voir dans les journaux
+  Google si des appels d'Accounting reçoivent des refus « 402 » ?
+
+---
+
 ## Réunion n° 15 — 05/10/2026 (matin)
 
 Pas de réunion les 03 et 04/10 : la session était à l'arrêt. Celle-ci couvre

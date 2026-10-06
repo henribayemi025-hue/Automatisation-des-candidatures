@@ -179,7 +179,7 @@ export default function Purchases() {
 
       <div className="card mt-4 p-0">
         {filtered.length ? (
-          <Table head={['Référence', 'Fournisseur', 'Date', 'Montant', 'Payé', 'Statut', '']} phoneHide={[1, 3, 5]} phoneNowrapFirst>
+          <Table head={['Référence', 'Fournisseur', 'Date', 'Montant', 'Payé', 'Statut', '']} phoneHide={[1, 3, 5, 7]} phoneNowrapFirst>
             {filtered.map((p) => (
               <tr key={p.id} className="row">
                 <td className="td font-semibold">{p.number}</td>
@@ -212,18 +212,24 @@ export default function Purchases() {
                   {p.status === 'RECEIVED' ? (
                     <Badge tone="success">{t('Reçu')}</Badge>
                   ) : p.status === 'PENDING' ? (
-                    <Badge tone="warn">{t('En attente')}</Badge>
+                    <>
+                      <Badge tone="warn">{t('En attente')}</Badge>
+                      {/* Sur téléphone, le bouton vit sous l'étiquette : en
+                          colonne à part, « Réceptionner » restait coupé au bord
+                          de l'écran même sur deux lignes (audit jour 6, 06/10). */}
+                      <button onClick={() => receive(p.id)} className="mt-1.5 block text-sm font-semibold text-brand-600 sm:hidden">
+                        {t('Réceptionner')}
+                      </button>
+                    </>
                   ) : (
                     <Badge tone="danger">{t('Annulé')}</Badge>
                   )}
                 </td>
                 <td className="td text-right">
                   {p.status === 'PENDING' && (
-                    // Vu le 24/09 : « Réceptionner » dépassait de l'écran sur
-                    // téléphone (35 px de trop), coupé en « Réceptio… » sans
-                    // qu'on devine qu'il fallait faire glisser le tableau.
-                    // max-w le force à passer sur deux lignes à la place.
-                    <button onClick={() => receive(p.id)} className="max-w-[76px] break-words text-sm font-semibold leading-tight text-brand-600 whitespace-normal sm:max-w-none sm:whitespace-nowrap">
+                    // Sur téléphone, cette colonne est masquée : le bouton est
+                    // sous l'étiquette « En attente ».
+                    <button onClick={() => receive(p.id)} className="whitespace-nowrap text-sm font-semibold text-brand-600">
                       {t('Réceptionner')}
                     </button>
                   )}

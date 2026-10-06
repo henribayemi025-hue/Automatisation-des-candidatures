@@ -185,9 +185,18 @@ Date du jour en heure locale, mise en ligne le 05/10 à 19 h 30, heure de Douala
 
 Le même soir : une vente « à crédit » est possible dans le rattrapage (commit 662838b).
 
-### À faire ensuite (jour 6)
+### Jour 6 (06/10) : `Purchases.tsx` (achats)
 
-`Purchases.tsx` (achats), dont le « payé par » qui manque, à décider avec Beau.
+| # | Constat | Gravité | Ce qui a été fait |
+|---|---|---|---|
+| 1 | Sur téléphone, « Réceptionner » restait coupé au bord droit de la liste (« Réceptio / ner »), malgré la correction du 24/09. | Moyen : c'est LE geste qui met le stock à jour. | Sur téléphone, le bouton passe sous l'étiquette « En attente » et la colonne d'action est masquée. Mesuré : tableau de 356 px pour 356 px disponibles ; un clic réceptionne bien. |
+| 2 | « Achats sans payé par » : **fausse alerte**. Le champ « Payé avec » existe depuis le 15/09, et le moteur débite le compte choisi. C'est la simulation qui l'émettait d'office. | — | Alerte retirée de la simulation. Correction notée dans AUDITS.md et SIMULATION-PASSE1.md. Mon message du 05/10 à Beau était donc faux sur ce point. |
+
+Aucune erreur JavaScript à 390 et 1440 px.
+
+### À faire ensuite (jour 7)
+
+`Customers.tsx` (clients et fournisseurs) et `Products.tsx` (articles).
 
 Alpha a relu le n° 6 le 02/10 : pas d'objection. Les outils serveur (finia_resume_mois, ma_compta_*)
 lisent des dates « AAAA-MM-JJ » et compteront mieux. accounting-rappels n'est pas concerné.
