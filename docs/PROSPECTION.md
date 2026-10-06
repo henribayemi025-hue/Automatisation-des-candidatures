@@ -428,15 +428,32 @@ Accounting créé et première vente ; Beau me dit seulement qui a répondu) :
 
 | Boutique | Version | Envoyé le | A répondu | Espace créé | Vente ≤ 7 j |
 |---|---|---|---|---|---|
-| Décoration évents | 1 | | | | |
-| SAMUEL TMC | 1 | | | | |
-| Yak store | 1 | | | | |
-| TANA Shop | 1 | | | | |
-| Lmp sarl | 1 | | | | |
-| claferShop&perfum | 2 | | | | |
-| Nnal Beauty | 2 | | | | |
-| Mon Confort Plus | 2 | | | | |
-| Luxus Beauty | 2 | | | | |
+| Décoration évents | 1 | non confirmé | ? | non | non |
+| SAMUEL TMC | 1 | non confirmé | ? | non | non |
+| Yak store | 1 | non confirmé | ? | non | non |
+| TANA Shop | 1 | non confirmé | ? | non | non |
+| Lmp sarl | 1 | non confirmé | ? | non | non |
+| claferShop&perfum | 2 | non confirmé | ? | non | non |
+| Nnal Beauty | 2 | non confirmé | ? | non | non |
+| Mon Confort Plus | 2 | non confirmé | ? | non | non |
+| Luxus Beauty | 2 | non confirmé | ? | non | non |
+
+
+**Relevé du 06/10/2026** (lecture seule de la base de production) :
+- **0 boutique sur 9** a ouvert un espace Accounting, depuis le 29/09 comme avant.
+  Donc 0 vente. Les 9 boutiques ont été retrouvées par leur nom dans `shops`
+  (deux ont des emojis dans leur nom), et rapprochées de `finia_workspaces` par
+  le propriétaire.
+- **Rien n'indique que les messages aient été envoyés** : Beau ne l'a pas
+  confirmé. On ne peut donc pas comparer les deux versions. Ce 0 ne dit pas
+  qu'un message ne marche pas ; il dit qu'on ne sait pas encore s'il est parti.
+- **À corriger avant l'envoi** : les deux versions promettent que Accounting
+  « reprend en un clic » les articles de la boutique. C'est faux aujourd'hui :
+  la reprise du catalogue attend la décision de Beau (Alpha la lui a posée le
+  02/10). Tant qu'elle n'existe pas, retirer cette phrase. Version 1 proposée :
+  « Finjaro Accounting, gratuit, vous permet d'encaisser sur le téléphone : le
+  stock, les dettes clients et vos comptes se tiennent tout seuls. »
+- Liste B : pas avant que la liste A soit réellement partie.
 
 Avec 9 boutiques, le résultat donnera une tendance, pas une preuve : on
 garde la version gagnante pour la liste B et on continue de compter.
