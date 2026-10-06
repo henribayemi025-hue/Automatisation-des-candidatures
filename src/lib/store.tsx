@@ -41,8 +41,18 @@ import { carryForwardLines, closingPlan, dayAfter } from './closing';
 import { pointagesAPoser } from './leaves';
 
 export function newId(): string {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+  // Anciens téléphones (WebView sans randomUUID) : un vrai UUID v4 quand même.
+  // L'ancien repli (« lzx1k2-ab12cd34 ») était refusé par la base : ces
+  // appareils ne pouvaient rien synchroniser (relevé le 06/10).
+  const b = new Uint8Array(16);
+  const c = (globalThis as { crypto?: { getRandomValues?: (a: Uint8Array) => Uint8Array } }).crypto;
+  if (c?.getRandomValues) c.getRandomValues(b);
+  else for (let i = 0; i < 16; i += 1) b[i] = Math.floor(Math.random() * 256);
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  const h = [...b].map((x) => x.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
 }
 
 export function today(): string {

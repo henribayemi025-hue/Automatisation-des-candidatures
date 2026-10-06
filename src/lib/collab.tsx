@@ -131,6 +131,28 @@ function writeOutbox(ws: string, events: WorkspaceEvent[]) {
   localStorage.setItem(OUTBOX_PREFIX + ws, JSON.stringify(events));
 }
 
+// Refus définitifs (06/10). Vu dans les journaux : un vrai compte, revenu après
+// trois semaines, renvoyait à chaque ouverture 288 événements d'une ancienne
+// démonstration restés en file (identifiants « 95ca3158-0387 », pas des UUID).
+// Le serveur les refuse et les refusera toujours : on les met de côté, sur
+// l'appareil, au lieu de les renvoyer sans fin. Rien n'est effacé.
+const REJECTED_PREFIX = 'finia.rejected.';
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// Codes Postgres d'une donnée refusée pour de bon : format invalide, contrainte,
+// droit refusé. Le réseau, la limite de débit ou une panne serveur, eux, se
+// réessaient.
+const PERMANENT_CODES = new Set(['22P02', '22007', '22023', '23502', '23503', '23514', '42501', 'PGRST204']);
+
+function setAside(ws: string, ev: WorkspaceEvent, reason: string) {
+  try {
+    const list = JSON.parse(localStorage.getItem(REJECTED_PREFIX + ws) ?? '[]') as unknown[];
+    list.push({ ev, reason, at: new Date().toISOString() });
+    localStorage.setItem(REJECTED_PREFIX + ws, JSON.stringify(list.slice(-500)));
+  } catch {
+    /* stockage plein : l'événement est de toute façon refusé par le serveur */
+  }
+}
+
 interface EventRow {
   id: string;
   seq: number;
@@ -285,7 +307,12 @@ export function CollabProvider({ children }: { children: ReactNode }) {
     [store],
   );
 
-  const pushEvent = useCallback(async (ws: string, ev: WorkspaceEvent): Promise<boolean> => {
+  /** 'ok' : enregistré ; 'retry' : à réessayer ; 'rejected' : refusé pour de bon, mis de côté. */
+  const pushEvent = useCallback(async (ws: string, ev: WorkspaceEvent): Promise<'ok' | 'retry' | 'rejected'> => {
+    if (!UUID_RE.test(ev.id)) {
+      setAside(ws, ev, 'identifiant invalide (reste de démonstration)');
+      return 'rejected';
+    }
     const { data, error } = await supabase
       .from('finia_events')
       .insert({
@@ -302,10 +329,14 @@ export function CollabProvider({ children }: { children: ReactNode }) {
     // Clé déjà présente : l'événement est bien arrivé, c'est la réponse qui
     // s'était perdue. Le renvoyer sans fin bloquait la file (ligne 7 du
     // tableau docs/SIMULATION-DECISIONS.md).
-    if (error && error.code === '23505') return true;
-    if (error) return false;
+    if (error && error.code === '23505') return 'ok';
+    if (error && PERMANENT_CODES.has(error.code)) {
+      setAside(ws, ev, `${error.code} ${error.message}`);
+      return 'rejected';
+    }
+    if (error) return 'retry';
     if (data?.seq && data.seq > lastSeq.current) lastSeq.current = data.seq;
-    return true;
+    return 'ok';
   }, []);
 
   const flushOutbox = useCallback(async () => {
@@ -322,8 +353,8 @@ export function CollabProvider({ children }: { children: ReactNode }) {
     setSync('syncing');
     const remaining: WorkspaceEvent[] = [];
     for (const ev of queue) {
-      const ok = await pushEvent(ws.id, ev);
-      if (!ok) remaining.push(ev);
+      const result = await pushEvent(ws.id, ev);
+      if (result === 'retry') remaining.push(ev);
     }
     writeOutbox(ws.id, remaining);
     setPending(remaining.length);
@@ -387,8 +418,10 @@ export function CollabProvider({ children }: { children: ReactNode }) {
       // deux fois (ligne 4 du tableau docs/SIMULATION-DECISIONS.md).
       applied.current.add(ev.id);
       setSync('syncing');
-      const ok = await pushEvent(ws.id, ev);
-      if (ok) {
+      const result = await pushEvent(ws.id, ev);
+      if (result === 'rejected') {
+        setSync('error');
+      } else if (result === 'ok') {
         setSync(readOutbox(ws.id).length ? 'pending' : 'synced');
         void compactIfNeeded();
       } else {
