@@ -496,7 +496,8 @@ export default {
     if (url.pathname === '/api/health') {
       // Seulement « ça marche / l'IA est branchée » : les noms des variables
       // renseignaient un curieux sur la configuration (audit A-m1).
-      return json({ ok: true, ai: !!geminiKey(env) || !!deepseekKey(env) });
+      // Présence des moteurs seulement (vrai / faux), jamais une valeur de clé.
+      return json({ ok: true, ai: !!geminiKey(env) || !!deepseekKey(env) || !!groqKey(env), groq: !!groqKey(env) });
     }
     return env.ASSETS.fetch(req);
   },
