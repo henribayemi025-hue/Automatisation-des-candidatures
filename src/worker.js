@@ -278,23 +278,42 @@ function json(data, status = 200) {
 // jeton de la personne connectée. Conversation bornée à 12 000 signes là-bas :
 // on envoie la consigne et un contexte resserré.
 const GRATUIT_TIMEOUT_MS = 30_000;
-async function callGratuit(authHeader, context, messages) {
-  const base = systemPrompt({});
+// finia-gratuit refuse une consigne « system » de plus de 6 000 signes et une
+// conversation de plus de 12 000 (corpsFinia, côté Alpha). La consigne de
+// Finia en fait ≈ 6 900 à elle seule : envoyée entière avec le contexte, elle
+// était refusée à chaque fois (400 « consigne trop longue », vu le 07/10).
+// On coupe donc à un saut de paragraphe sous 5 800 signes ; la fin des
+// consignes et les chiffres de l'application partent dans un premier message.
+const GRATUIT_SYSTEM_MAX = 5800;
+const GRATUIT_CTX_MAX = 1500;
+
+function gratuitMessages(base, context, messages) {
+  const cut = base.length <= GRATUIT_SYSTEM_MAX ? base.length : base.lastIndexOf('\n\n', GRATUIT_SYSTEM_MAX);
+  const head = base.slice(0, cut > 0 ? cut : GRATUIT_SYSTEM_MAX).trim();
+  const rest = base.slice(cut > 0 ? cut : GRATUIT_SYSTEM_MAX).trim();
   const ctx = JSON.stringify(context ?? {});
-  // Consigne entière (≈ 6 900 signes), contexte coupé à 2 000 : la présentation
-  // de Finia et ses règles passent toujours en premier.
-  const system = `${base.slice(0, -2)}${ctx.length > 2000 ? `${ctx.slice(0, 2000)}…` : ctx}`;
-  const chat = [
-    { role: 'system', content: system },
+  const data = ctx.length > GRATUIT_CTX_MAX ? `${ctx.slice(0, GRATUIT_CTX_MAX)}…` : ctx;
+  return [
+    { role: 'system', content: head },
+    { role: 'user', content: `[Suite des consignes — ne pas répondre à ce message]\n${rest}\n[Contexte]\n${data}` },
     ...messages.slice(-4).map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.text ?? '').slice(0, 700) })),
   ];
+}
+
+async function callGratuit(authHeader, context, messages) {
+  // Consigne de base (sans contexte) : le contexte part à part, tronqué.
+  const full = systemPrompt({});
+  const base = full.slice(0, full.lastIndexOf('[Contexte]')).trim();
+  const chat = gratuitMessages(base, context, messages);
   const res = await fetch(`${SUPABASE_URL}/functions/v1/finia-gratuit`, {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: authHeader, apikey: SUPABASE_KEY },
     body: JSON.stringify({ messages: chat, max_tokens: 900, temperature: 0.4 }),
     signal: AbortSignal.timeout(GRATUIT_TIMEOUT_MS),
   });
-  if (!res.ok) throw new Error(`gratuit ${res.status}`);
+  // Le motif du refus part dans les journaux : sans lui, « 400 » ou « 401 »
+  // ne dit pas quoi corriger.
+  if (!res.ok) throw new Error(`gratuit ${res.status} ${(await res.text()).slice(0, 160)}`);
   const data = await res.json();
   const text = data?.choices?.[0]?.message?.content ?? '';
   if (!String(text).trim()) throw new Error('gratuit empty');
