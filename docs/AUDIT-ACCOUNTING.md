@@ -194,9 +194,22 @@ Le même soir : une vente « à crédit » est possible dans le rattrapage (comm
 
 Aucune erreur JavaScript à 390 et 1440 px.
 
-### À faire ensuite (jour 7)
+### Jour 7 — 07/10 : clients, fournisseurs, articles (`Parties.tsx`, `Products.tsx`)
 
-`Customers.tsx` (clients et fournisseurs) et `Products.tsx` (articles).
+| # | Constat | Gravité | Ce qui a été fait |
+|---|---|---|---|
+| 1 | Articles, sur téléphone : le tableau débordait (410 px pour 356 disponibles). Le nom tombait à 65 px de large. | Moyen : écran ouvert tous les jours. | Sur téléphone : nom, prix, stock. Catégorie, coût et marge restent sur ordinateur et en mode tableau. Mesuré : 356 px pour 356. |
+| 2 | Articles : aucun moyen de retirer un article qu'on ne vend plus. La fonction existait dans le code, sans aucun bouton. | Moyen | « Je ne le vends plus » dans la fiche : l'article est archivé, pas effacé, et reste sur les ventes passées. « Voir les archivés » puis « Réactiver » le remet. Vérifié au clic. |
+| 3 | Clients : le rappel WhatsApp n'existait que dans Dettes. | Petit | « Relancer sur WhatsApp » sur la fiche d'un client qui doit de l'argent et a un numéro. Le lien passe par whatsappLink, donc l'indicatif est géré. |
+| 4 | Fiche client : le clavier du téléphone restait alphabétique pour le numéro et l'e-mail. | Petit | Champs type tel et email. |
+
+Sans souci : la suppression d'un tiers déjà utilisé archive au lieu d'effacer ; les créances restent visibles sur téléphone (seuls e-mail et adresse sont masqués).
+Note : `scripts/whatsapp-partout-check.ts` se lance avec vite-node, pas tsx (il utilise __dirname). Vert.
+Aucune erreur JavaScript à 390 et 1440 px.
+
+### À faire ensuite (jour 8)
+
+`Stock.tsx` et `Quotes.tsx` (devis).
 
 Alpha a relu le n° 6 le 02/10 : pas d'objection. Les outils serveur (finia_resume_mois, ma_compta_*)
 lisent des dates « AAAA-MM-JJ » et compteront mieux. accounting-rappels n'est pas concerné.

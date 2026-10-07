@@ -5,6 +5,8 @@ import { partyUsage } from '../lib/reducer';
 import { Empty, Field, Modal, Money, PageHeader, Table } from '../components/UI';
 import { IconPlus, IconUsers } from '../components/Icons';
 import { t } from '../lib/i18n';
+import { whatsappLink } from '../lib/chat';
+import { formatMoney } from '../lib/money';
 
 type Tab = 'CUSTOMERS' | 'SUPPLIERS';
 const BLANK = { id: '', name: '', phone: '', email: '', address: '' };
@@ -119,6 +121,26 @@ export default function Parties() {
                       </button>
                     ) : (
                       <>
+                        {/* Le rappel part d'ici aussi : c'est souvent depuis la
+                            fiche du client qu'on se souvient qu'il doit. */}
+                        {isCustomers && p.phone && balanceFor(p.id) > 0 && (
+                          <a
+                            href={whatsappLink(
+                              p.phone,
+                              t('Bonjour {name}, petit rappel de {shop} : il reste {amount} à régler. Merci !', {
+                                name: p.name,
+                                shop: db.company.name,
+                                amount: formatMoney(balanceFor(p.id), db.company.currency),
+                              }),
+                              db.company.country,
+                            )}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="btn-ghost px-2 py-1 text-[12px] text-[#1F6F65]"
+                          >
+                            {t('Relancer sur WhatsApp')}
+                          </a>
+                        )}
                         <button
                           onClick={() => {
                             setForm({ id: p.id, name: p.name, phone: p.phone, email: p.email, address: p.address });
@@ -166,10 +188,10 @@ export default function Parties() {
             <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="field" />
           </Field>
           <Field label={t('Téléphone')}>
-            <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="field" />
+            <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} type="tel" inputMode="tel" className="field" />
           </Field>
           <Field label={t('Email')}>
-            <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="field" />
+            <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} type="email" inputMode="email" className="field" />
           </Field>
           <Field label={t('Adresse')}>
             <input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} className="field" />

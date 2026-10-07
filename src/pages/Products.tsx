@@ -29,7 +29,7 @@ const BLANK = {
 };
 
 export default function Products() {
-  const { db, saveProduct } = useStore();
+  const { db, saveProduct, archiveProduct } = useStore();
   const currency = db.company.currency;
   // Le vocabulaire suit le métier : une carte pour un restaurant, des pièces
   // pour un garage, des références pour une pharmacie.
@@ -48,6 +48,11 @@ export default function Products() {
   const [form, setForm] = useState(BLANK);
   const [kindTouched, setKindTouched] = useState(false);
   const [grid, setGrid] = useState(false);
+  // Un article qu'on ne vend plus est retiré de la liste, jamais effacé : il
+  // reste sur les ventes et les inventaires déjà faits.
+  const [showArchived, setShowArchived] = useState(false);
+  const archivedCount = db.products.filter((p) => p.archived).length;
+  const viewingArchived = showArchived && archivedCount > 0;
   const [importOpen, setImportOpen] = useState(false);
   const [importAutoFinjaro, setImportAutoFinjaro] = useState(false);
   const { user } = useCollab();
@@ -133,7 +138,7 @@ export default function Products() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const list = db.products.filter((p) => {
-      if (p.archived) return false;
+      if (!!p.archived !== viewingArchived) return false;
       if (category && p.category !== category) return false;
       if (!q) return true;
       return (
@@ -149,7 +154,7 @@ export default function Products() {
       stock: (a, b) => a.stock - b.stock,
     };
     return list.sort(by[sort]);
-  }, [db.products, query, category, sort]);
+  }, [db.products, query, category, sort, viewingArchived]);
 
   function openNew() {
     setEditing(null);
@@ -277,6 +282,11 @@ export default function Products() {
           <option value="margin">{t('Trier : meilleure marge')}</option>
           <option value="stock">{t('Trier : stock le plus bas')}</option>
         </select>
+        {archivedCount > 0 && (
+          <button onClick={() => setShowArchived(!showArchived)} className="btn-ghost ml-auto text-caption">
+            {viewingArchived ? t('Revenir aux fiches actives') : t('Voir les archivés ({n})', { n: String(archivedCount) })}
+          </button>
+        )}
       </div>
 
       {grid && (
@@ -293,6 +303,11 @@ export default function Products() {
                 ? [trade.item, 'Catégorie', 'Prix de vente', 'Coût', 'Marge', 'Stock', '']
                 : [trade.item, 'Catégorie', 'Prix', 'Coût', 'Marge', '']
             }
+            // Sur téléphone : nom, prix et stock, ce qu'on cherche au comptoir.
+            // Catégorie, coût et marge restent sur ordinateur (mesuré : avec la
+            // marge, le nom tombait à 65 px et le tableau débordait). En mode tableau,
+            // on garde tout : c'est pour corriger ces cases-là.
+            phoneHide={grid ? undefined : [2, 4, 5]}
           >
             {filtered.map((p) => {
               const margin = p.price - p.cost;
@@ -324,16 +339,22 @@ export default function Products() {
                         )}
                         {grid && (
                           <span className="flex items-center gap-1 text-[11px] text-muted">
-                            seuil <Cell product={p} field="reorderPoint" />
+                            {t('seuil')} <Cell product={p} field="reorderPoint" />
                           </span>
                         )}
                       </div>
                     </td>
                   )}
                   <td className="td text-right">
-                    <button onClick={() => openEdit(p)} className="text-sm font-semibold text-brand-600">
-                      {t('Modifier')}
-                    </button>
+                    {p.archived ? (
+                      <button onClick={() => saveProduct({ ...p, archived: false })} className="text-sm font-semibold text-brand-600">
+                        {t('Réactiver')}
+                      </button>
+                    ) : (
+                      <button onClick={() => openEdit(p)} className="text-sm font-semibold text-brand-600">
+                        {t('Modifier')}
+                      </button>
+                    )}
                   </td>
                 </tr>
               );
@@ -522,7 +543,19 @@ export default function Products() {
             </Field>
           )}
         </div>
-        <div className="mt-6 flex justify-end gap-2">
+        <div className="mt-6 flex flex-wrap items-center justify-end gap-2">
+          {editing && (
+            <button
+              onClick={() => {
+                archiveProduct(editing.id);
+                setOpen(false);
+              }}
+              className="btn-ghost mr-auto text-caption text-brand-600"
+              title={t('Il reste sur les ventes déjà faites. Vous pourrez le réactiver.')}
+            >
+              {t('Je ne le vends plus')}
+            </button>
+          )}
           <button onClick={() => setOpen(false)} className="btn-ghost">
             {t('Annuler')}
           </button>
