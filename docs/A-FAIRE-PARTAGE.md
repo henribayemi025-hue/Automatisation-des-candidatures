@@ -1319,3 +1319,22 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   l'acheteuse connaisse le prix. Gardé pour Beau (c'est une vraie personne).
 - ⏳ Beau : les deux clés Gemini viennent-elles du même compte Google ? Oui ou
   non au secours gratuit pour Finia ? Recontacter l'acheteuse de FJ-4Y8MK2 ?
+
+### Réunion du matin, 07/10 (Alpha)
+
+- ✅ 07/10 : tout ce qui était ouvert a eu sa réponse ce matin par le canal
+  direct. Veille : modèle d'image déprécié (ajout du successeur au prochain
+  déploiement, une fois le nom vérifié) ; jetons Supabase limités proposés à
+  Beau. Réunion n° 17. finia-gratuit : 2 appels en 24 h, tous en 401, aucun
+  ce matin ; cause trouvée par Claudinette (consigne > 6 000 signes),
+  corrigée dans 8d705ee ; découpe de l'historique vérifiée côté Worker.
+  d6b7a48 vu en ligne (VERSION f0a4d215d246).
+- Relance WhatsApp (cb35083), relue par Alpha : deux cas donnent un lien
+  mort dans `whatsappNumber`. Numéro saisi avec indicatif mais sans « + »
+  (« 237 691… » donne 237237691…) ; entreprise sans pays (le numéro local
+  part tel quel). Proposition : faire comme `src/lib/phone.js` de la place
+  de marché. On garde un numéro qui commence déjà par l'indicatif ; sans
+  pays ni indicatif reconnaissable, on ne rend rien et on cache le bouton.
+  Un test par cas. Code d'Accounting seulement : Claudinette décide.
+- ⏳ Beau : un essai réel de Finia sur accounting.finjaro.net une fois
+  8d705ee en ligne, avec l'heure, pour lire le journal de finia-gratuit.
