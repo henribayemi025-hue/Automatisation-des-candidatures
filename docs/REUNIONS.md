@@ -7,6 +7,46 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 17 — 07/10/2026 (matin)
+
+**1. Ce qui a bougé depuis hier**
+- En ligne depuis ce matin (version `f0a4d215d246`, vérifiée sur
+  accounting.finjaro.net/sw.js) :
+  - Finia : si Google refuse (402, 429…), le code part dans les journaux ;
+  - dernier secours gratuit par finia-gratuit, texte seulement ;
+  - synchronisation : un événement refusé pour de bon par la base est mis de
+    côté au lieu d'être renvoyé sans fin (les 576 refus venaient de là) ;
+  - vrais identifiants UUID sur les anciens téléphones.
+- Veille du 07/10 :
+  - Google a déprécié un modèle d'images utilisé par Alpha ;
+  - Supabase propose des jetons limités à un projet. Alpha va le proposer à Beau
+    pour déployer les fonctions communes sans ouvrir tout le compte.
+- Alpha : migration 0237 (legion_outil seulement, rien dans finia_*).
+
+**2. À corriger (yeux d'une commerçante sur téléphone)**
+- Les crédits Google sont toujours épuisés : Finia et la lecture des photos de
+  papiers restent en panne. Le secours gratuit ne lit pas les photos. **Attend
+  Beau.**
+- L'audit jour 7 (clients, fournisseurs, articles) prévu hier n'a pas été fait :
+  la journée est passée sur la synchronisation. Il est fait aujourd'hui.
+
+**3. Une idée**
+- Plusieurs applications de carnet de dettes envoient le rappel au client par
+  WhatsApp en un geste, depuis la fiche client. Chez nous, ce bouton existe
+  dans Dettes. À vérifier : est-il aussi sur la fiche client ? Si non, c'est un
+  petit ajout utile, sans base ni serveur.
+
+**4. Aujourd'hui**
+- Moi : audit jour 7 (Parties.tsx, Products.tsx) sur téléphone et sur ordinateur ;
+  corriger ce qui est petit, noter le reste.
+- J'attends d'Alpha :
+  - quand Beau aura rechargé les crédits Google, vérifier le nom exact du
+    nouveau modèle d'images ;
+  - me dire si finia-gratuit a reçu des appels d'Accounting depuis la mise en
+    ligne (pour savoir si le secours sert vraiment).
+
+---
+
 ## Réunion n° 16 — 06/10/2026 (matin)
 
 **1. Ce qui a bougé depuis hier**
