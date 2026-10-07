@@ -129,7 +129,7 @@ Reste la caisse, avec 4 px de trop : toléré, invisible à l'œil.
 
 ## Ce qui a été corrigé pendant l'audit
 
-Les points 2, 3 et 4 ci-dessus. Les 40 vérifications automatiques du dépôt passent.
+Les points 2, 3 et 4 ci-dessus. Les 39 vérifications automatiques du dépôt passent.
 
 ## Ce qui attend Beau
 
