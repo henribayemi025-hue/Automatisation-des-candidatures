@@ -188,11 +188,15 @@ export function Table({
   children,
   phoneHide,
   phoneNowrapFirst,
+  narrow,
 }: {
   head: string[];
   children: ReactNode;
   phoneHide?: number[];
   phoneNowrapFirst?: boolean;
+  /** Petit tableau posé dans une demi-carte : pas de largeur minimale (sur
+   * grand écran, les deux tableaux de la TVA défilaient de 98 px, 07/10). */
+  narrow?: boolean;
 }) {
   const masques = (phoneHide ?? []).map((n) => `ph-${n}`).join(' ') + (phoneHide?.length ? ' ph-serre' : '');
   // La dernière colonne ne se coupe que si elle porte une donnée. Un intitulé
@@ -205,7 +209,7 @@ export function Table({
   // Sans colonne masquée, la largeur minimale reste : c'est ce qui garde un
   // tableau comptable lisible en le faisant défiler. Avec, on la lève sur
   // téléphone, sinon on aurait caché des colonnes pour rien.
-  const largeur = phoneHide?.length ? 'sm:min-w-[640px]' : 'min-w-[640px]';
+  const largeur = narrow ? '' : phoneHide?.length ? 'sm:min-w-[640px]' : 'min-w-[640px]';
   return (
     <div className="overflow-x-auto scrollbar-thin">
       <table className={`w-full border-collapse ${largeur} ${masques} ${serre} ${montant}`}>

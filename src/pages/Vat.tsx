@@ -113,7 +113,7 @@ export default function Vat() {
             <h2 className="font-bold">{t('Collectée — ventes')}</h2>
           </div>
           {sales.length ? (
-            <Table head={[t('Date'), t('Pièce'), t('Base HT'), label]}>
+            <Table head={[t('Date'), t('Pièce'), t('Base HT'), label]} narrow>
               {sales.map((r, i) => (
                 <tr key={`${r.ref}-${i}`} className="row">
                   <td className="td num text-muted">{r.date}</td>
@@ -133,7 +133,7 @@ export default function Vat() {
             <h2 className="font-bold">{t('Déductible — achats, dépenses, douane')}</h2>
           </div>
           {purchases.length ? (
-            <Table head={[t('Date'), t('Pièce'), t('Base HT'), label]}>
+            <Table head={[t('Date'), t('Pièce'), t('Base HT'), label]} narrow>
               {purchases.map((r, i) => (
                 <tr key={`${r.ref}-${i}`} className="row">
                   <td className="td num text-muted">{r.date}</td>

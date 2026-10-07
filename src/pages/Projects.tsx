@@ -206,18 +206,22 @@ export default function Projects() {
                 </div>
                 <Badge tone={STATUS_TONE[project.status]}>{t(STATUS_LABEL[project.status])}</Badge>
               </div>
-              <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                <div>
+              {/* Sur téléphone, trois montants côte à côte se chevauchaient
+                  (« 125 000 FCFA » ne tient pas dans un tiers d'écran, audit du
+                  07/10) : une ligne par montant ; les trois en colonnes seulement sur grand écran
+                  (à 768 px, deux cartes par ligne, ils débordaient encore). */}
+              <div className="mt-4 grid gap-1.5 xl:grid-cols-3 xl:gap-2 xl:text-center">
+                <div className="flex items-baseline justify-between gap-2 xl:block">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-muted">{t('Dépensé')}</div>
-                  <div className="font-display text-[18px] font-bold text-ink"><Money value={summary.spent} /></div>
+                  <div className="font-display text-[17px] font-bold text-ink xl:text-[18px]"><Money value={summary.spent} /></div>
                 </div>
-                <div>
+                <div className="flex items-baseline justify-between gap-2 xl:block">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-muted">{t('Recettes')}</div>
-                  <div className="font-display text-[18px] font-bold text-ink"><Money value={summary.revenue} /></div>
+                  <div className="font-display text-[17px] font-bold text-ink xl:text-[18px]"><Money value={summary.revenue} /></div>
                 </div>
-                <div>
+                <div className="flex items-baseline justify-between gap-2 xl:block">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-muted">{t('Marge')}</div>
-                  <div className={`font-display text-[18px] font-bold ${summary.margin >= 0 ? 'text-[#1F6F65]' : 'text-[#A63030]'}`}><Money value={summary.margin} /></div>
+                  <div className={`font-display text-[17px] font-bold xl:text-[18px] ${summary.margin >= 0 ? 'text-[#1F6F65]' : 'text-[#A63030]'}`}><Money value={summary.margin} /></div>
                 </div>
               </div>
               <BudgetBar budget={project.budget} spent={summary.spent} />
