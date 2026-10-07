@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { MODULE_HELP } from '../lib/guide';
 import { useDB } from '../lib/store';
@@ -7,6 +7,32 @@ import { IconHelp, IconX } from './Icons';
 import { t } from '../lib/i18n';
 
 const KEY = 'finia.intro.hidden';
+
+// Après trois visites d'un écran, le cadre se replie de lui-même en un petit
+// « ? » : une débutante ne cherche pas la croix, et le cadre prenait un quart
+// du premier écran d'un téléphone à chaque passage (audit du 07/10, idée
+// d'Alpha).
+const VISITS_KEY = 'finia.intro.visits';
+const AUTO_FOLD_AFTER = 3;
+
+function visits(): Record<string, number> {
+  try {
+    return JSON.parse(localStorage.getItem(VISITS_KEY) ?? '{}') ?? {};
+  } catch {
+    return {};
+  }
+}
+
+function countVisit(path: string): number {
+  const v = visits();
+  v[path] = (v[path] ?? 0) + 1;
+  try {
+    localStorage.setItem(VISITS_KEY, JSON.stringify(v));
+  } catch {
+    /* stockage indisponible : le cadre reste ouvert, comme avant */
+  }
+  return v[path];
+}
 
 function hidden(): Set<string> {
   try {
@@ -24,6 +50,12 @@ export default function ModuleIntro() {
   const help = base && base.noStock && !tracksStock(db.company) ? { ...base, ...base.noStock } : base;
   const [dismissed, setDismissed] = useState(() => hidden().has(pathname));
   const [expanded, setExpanded] = useState(false);
+  // Une visite = une arrivée sur l'écran ; au-delà de trois, replié.
+  useEffect(() => {
+    const n = countVisit(pathname);
+    setDismissed(hidden().has(pathname) || n > AUTO_FOLD_AFTER);
+    setExpanded(false);
+  }, [pathname]);
 
   if (!help || pathname === '/') return null;
 
@@ -69,7 +101,11 @@ export default function ModuleIntro() {
           onClick={() => {
             const h = hidden();
             h.add(pathname);
-            localStorage.setItem(KEY, JSON.stringify([...h]));
+            try {
+              localStorage.setItem(KEY, JSON.stringify([...h]));
+            } catch {
+              /* stockage indisponible : masqué pour cette visite seulement */
+            }
             setDismissed(true);
           }}
           aria-label={t('Masquer')}
