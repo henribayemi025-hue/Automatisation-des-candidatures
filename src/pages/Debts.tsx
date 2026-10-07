@@ -9,6 +9,7 @@ import { Badge, Empty, Field, Modal, Money, PageHeader, StatCard, Table, useMone
 import { IconCard, IconCheck } from '../components/Icons';
 import { t } from '../lib/i18n';
 import { whatsappLink } from '../lib/chat';
+import { whatsappNumber } from '../lib/countries';
 import { formatMoney } from '../lib/money';
 
 type Tab = 'CUSTOMER' | 'SUPPLIER';
@@ -121,7 +122,7 @@ export default function Debts() {
                   </td>
                   <td className="td text-right">
                     <div className="flex flex-wrap items-center justify-end gap-3">
-                      {isCustomer && phoneOf(d.partyId) && (
+                      {isCustomer && whatsappNumber(phoneOf(d.partyId), db.company.country) && (
                         <a
                           href={whatsappLink(
                             phoneOf(d.partyId),
@@ -132,7 +133,7 @@ export default function Debts() {
                               origin: d.origin,
                             }),
                             db.company.country,
-                          )}
+                          ) ?? undefined}
                           target="_blank"
                           rel="noreferrer"
                           className="text-sm font-semibold text-[#1F6F65]"

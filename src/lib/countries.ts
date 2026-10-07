@@ -109,14 +109,22 @@ const DIAL_CODES: Record<string, string> = {
  * pays est ajouté (après avoir retiré un éventuel 0 initial, écrit par
  * réflexe local — ex. France « 06 12 34 56 78 »).
  */
-export function whatsappNumber(phone: string, country?: string): string {
-  const trimmed = phone.trim();
-  if (trimmed.startsWith('+')) return trimmed.replace(/[^\d]/g, '');
+export function whatsappNumber(phone: string, country?: string): string | null {
+  const trimmed = (phone ?? '').trim();
   const digits = trimmed.replace(/[^\d]/g, '');
-  if (trimmed.startsWith('00')) return digits.slice(2);
+  // Un lien vers un numéro impossible fait croire que le message est parti
+  // (Alpha, 07/10) : on rend null, et l'écran n'affiche pas le bouton.
+  const ok = (n: string) => (n.length >= 8 && n.length <= 15 ? n : null);
+  if (trimmed.startsWith('+')) return ok(digits);
+  if (digits.startsWith('00')) return ok(digits.slice(2));
   const code = country ? DIAL_CODES[country] : undefined;
-  if (!code) return digits;
-  return code + digits.replace(/^0+/, '');
+  // Numéro recopié tel que WhatsApp l'affiche, indicatif compris mais sans
+  // « + » : « 237 691 02 42 91 » donnait 237237691024291 (Alpha, 07/10).
+  if (code && digits.startsWith(code) && digits.length - code.length >= 7) return ok(digits);
+  if (code) return ok(code + digits.replace(/^0+/, ''));
+  // Sans pays connu : seulement si le numéro porte déjà un indicatif connu.
+  const known = Object.values(DIAL_CODES).some((c) => digits.startsWith(c) && digits.length - c.length >= 7);
+  return known ? ok(digits) : null;
 }
 
 /** Régime d'imposition effectif : l'ancien réglage « taxe activée » vaut réel. */

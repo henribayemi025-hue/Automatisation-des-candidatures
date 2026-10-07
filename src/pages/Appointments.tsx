@@ -7,6 +7,7 @@ import type { Appointment } from '../lib/types';
 import { Badge, Empty, Field, Modal, Money, PageHeader, StatCard } from '../components/UI';
 import { IconHistory, IconPlus } from '../components/Icons';
 import { whatsappLink } from '../lib/chat';
+import { whatsappNumber } from '../lib/countries';
 import { t } from '../lib/i18n';
 
 /**
@@ -102,7 +103,8 @@ export default function Appointments() {
     const texte = t('Bonjour {name}, petit rappel : votre rendez-vous {label} est prévu le {date} à {time}. À bientôt.', {
       name: a.customerName, label: a.label, date: a.date, time: a.time,
     });
-    window.open(whatsappLink(a.phone, texte, db.company.country), '_blank');
+    const link = whatsappLink(a.phone, texte, db.company.country);
+    if (link) window.open(link, '_blank');
   }
 
   return (
@@ -165,7 +167,7 @@ export default function Appointments() {
                 {a.status === 'BOOKED' && (
                   <button onClick={() => encaisser(a)} className="text-sm font-semibold text-brand-600">{t('Elle est venue — encaisser')}</button>
                 )}
-                {a.status === 'BOOKED' && a.phone && (
+                {a.status === 'BOOKED' && whatsappNumber(a.phone, db.company.country) && (
                   <button onClick={() => rappel(a)} className="text-sm font-semibold text-muted">{t('Rappel WhatsApp')}</button>
                 )}
                 <button onClick={() => modifier(a)} className="text-sm font-semibold text-muted">{t('Modifier')}</button>

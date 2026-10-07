@@ -6,6 +6,7 @@ import { Empty, Field, Modal, Money, PageHeader, Table } from '../components/UI'
 import { IconPlus, IconUsers } from '../components/Icons';
 import { t } from '../lib/i18n';
 import { whatsappLink } from '../lib/chat';
+import { whatsappNumber } from '../lib/countries';
 import { formatMoney } from '../lib/money';
 
 type Tab = 'CUSTOMERS' | 'SUPPLIERS';
@@ -123,7 +124,7 @@ export default function Parties() {
                       <>
                         {/* Le rappel part d'ici aussi : c'est souvent depuis la
                             fiche du client qu'on se souvient qu'il doit. */}
-                        {isCustomers && p.phone && balanceFor(p.id) > 0 && (
+                        {isCustomers && whatsappNumber(p.phone, db.company.country) && balanceFor(p.id) > 0 && (
                           <a
                             href={whatsappLink(
                               p.phone,
@@ -133,7 +134,7 @@ export default function Parties() {
                                 amount: formatMoney(balanceFor(p.id), db.company.currency),
                               }),
                               db.company.country,
-                            )}
+                            ) ?? undefined}
                             target="_blank"
                             rel="noreferrer"
                             className="btn-ghost px-2 py-1 text-[12px] text-[#1F6F65]"

@@ -35,10 +35,13 @@ export async function chatImageUrl(path: string): Promise<string | null> {
 /**
  * Lien WhatsApp « clic pour écrire », avec le message déjà rédigé. wa.me
  * exige le format international ; `country` (celui de l'entreprise) sert à
- * compléter un numéro saisi localement, sans indicatif.
+ * compléter un numéro saisi localement, sans indicatif. Rend null quand le
+ * numéro ne peut pas donner un lien valable.
  */
-export function whatsappLink(phone: string, text: string, country?: string): string {
-  return `https://wa.me/${whatsappNumber(phone, country)}?text=${encodeURIComponent(text)}`;
+export function whatsappLink(phone: string, text: string, country?: string): string | null {
+  const number = whatsappNumber(phone, country);
+  // null : numéro inutilisable, l'écran ne montre pas le bouton.
+  return number ? `https://wa.me/${number}?text=${encodeURIComponent(text)}` : null;
 }
 
 /** Le message mentionne-t-il l'assistant ? (@assistant, @ia, @ai) */

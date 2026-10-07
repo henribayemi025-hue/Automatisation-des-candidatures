@@ -8,6 +8,7 @@ import { Badge, Empty, Field, Modal, Money, PageHeader, StatCard, Table } from '
 import Receipt from '../components/Receipt';
 import { IconHistory, IconPlus } from '../components/Icons';
 import { whatsappLink } from '../lib/chat';
+import { whatsappNumber } from '../lib/countries';
 import { t } from '../lib/i18n';
 
 /**
@@ -176,11 +177,11 @@ export default function Subscriptions() {
       {sub.status !== 'CANCELLED' && (
         <button onClick={() => setRenewing(sub)} className="text-sm font-semibold text-brand-600">{t('Encaisser une période')}</button>
       )}
-      {sub.phone && sub.periods.length > 0 && (
-        <a href={whatsappLink(sub.phone, invoiceText(sub), db.company.country)} target="_blank" rel="noreferrer" className="text-sm font-semibold text-[#1F6F65]">{t('Facture WhatsApp')}</a>
+      {whatsappNumber(sub.phone, db.company.country) && sub.periods.length > 0 && (
+        <a href={whatsappLink(sub.phone, invoiceText(sub), db.company.country) ?? undefined} target="_blank" rel="noreferrer" className="text-sm font-semibold text-[#1F6F65]">{t('Facture WhatsApp')}</a>
       )}
-      {sub.phone && (state === 'SOON' || state === 'EXPIRED') && (
-        <a href={whatsappLink(sub.phone, reminderText(sub, state), db.company.country)} target="_blank" rel="noreferrer" className="text-sm font-semibold text-[#1F6F65]">{t('Rappel WhatsApp')}</a>
+      {whatsappNumber(sub.phone, db.company.country) && (state === 'SOON' || state === 'EXPIRED') && (
+        <a href={whatsappLink(sub.phone, reminderText(sub, state), db.company.country) ?? undefined} target="_blank" rel="noreferrer" className="text-sm font-semibold text-[#1F6F65]">{t('Rappel WhatsApp')}</a>
       )}
       {sub.periods.length > 0 && (
         <button onClick={() => showInvoice(sub)} className="text-sm font-semibold text-muted">{t('Voir la facture')}</button>
