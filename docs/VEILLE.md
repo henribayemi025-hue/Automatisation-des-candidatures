@@ -11,6 +11,45 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 07/10/2026 (couvre du 06 au 07/10)
+
+**Journée calme. Rien qui menace le produit ou qui demande une décision.**
+
+### Concurrence
+
+- **Inde (06/10/2026)** : la 57e réunion du Conseil de la GST est repoussée au
+  08/10. Au programme : simplifier les procédures des petits contribuables
+  (pénalités de retard, enregistrement plus rapide). Rien sur la facture
+  électronique.
+  [source](https://www.tribuneindia.com/news/arrest-provisions/govt-reschedules-gst-council-57th-meeting-to-october-8-cites-unavoidable-circumstances)
+  → *Pour nous* : rien à faire avant d'ouvrir l'Inde.
+
+### Règles, impôts et paiements
+
+- Rien de daté dans la période (facture électronique OHADA ou France, MTN MoMo,
+  Orange Money, Wave). Deux sources n'ont pas pu être ouvertes (Agence Ecofin,
+  refus d'accès ; Business in Cameroon, page vide).
+
+### Technologie et IA
+
+- **Gemini (06/10/2026)** : nouveau modèle d'images `gemini-nano-banana-2.1` ;
+  `gemini-3.1-flash-image` est déprécié, sans date d'arrêt.
+  [source](https://ai.google.dev/gemini-api/docs/changelog)
+  → *Pour nous* : Accounting ne l'utilise pas. Les fonctions d'images de la place
+  de marché, passées dessus le 06/10, devront changer un jour : signalé à Alpha.
+- **Cloudflare AI Gateway (06/10/2026)** : une clé refusée par un fournisseur
+  renvoie désormais toujours 401.
+  [source](https://developers.cloudflare.com/changelog/post/2026-10-05-provider-credential-errors/)
+  → *Pour nous* : rien, nous n'utilisons pas AI Gateway.
+- **Supabase (06/10/2026)** : jetons d'accès personnels limités à un projet et à
+  des droits précis.
+  [source](https://supabase.com/changelog/scoped-personal-access-tokens-ga)
+  → *Pour nous* : utile pour une base partagée par plusieurs applications : un
+  jeton en lecture seule sur le seul projet commun, pour les agents. À proposer
+  à Beau quand il voudra resserrer les accès.
+
+---
+
 ## 06/10/2026 (couvre du 05 au 06/10)
 
 **Journée calme. Un seul fait qui compte : au Burkina Faso, la facture électronique
