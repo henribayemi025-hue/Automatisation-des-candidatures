@@ -28,6 +28,10 @@ function geminiKey(env) {
   return typeof env.GEMINI_API_KEY === 'string' && env.GEMINI_API_KEY ? env.GEMINI_API_KEY : null;
 }
 
+function groqKey(env) {
+  return typeof env.GROQ_API_KEY === 'string' && env.GROQ_API_KEY ? env.GROQ_API_KEY : null;
+}
+
 function deepseekKey(env) {
   return typeof env.DEEPSEEK_API_KEY === 'string' && env.DEEPSEEK_API_KEY ? env.DEEPSEEK_API_KEY : null;
 }
@@ -263,6 +267,55 @@ async function callDeepSeek(apiKey, systemPromptText, messages) {
   return { text, model: 'deepseek-chat' };
 }
 
+// Groq, offre gratuite (Beau, 07/10 : « Groq partout »). Texte seulement.
+// Chaque modèle a sa part du jour ; un 429 veut dire qu'elle est prise, on
+// passe au suivant. Llama n'y est plus gratuit depuis le 16/08/2026 : ces
+// trois-là seulement (vérifiés par Alpha le 07/10). La limite par minute
+// (8 000 jetons pour gpt-oss) compte aussi la sortie demandée : contexte et
+// historique sont donc bornés, et max_tokens aussi.
+const GROQ_MODELS = ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b', 'openai/gpt-oss-20b'];
+const GROQ_TIMEOUT_MS = 25_000;
+// Au pire ≈ 17 000 signes envoyés (consigne 6 900 + contexte 4 000 + 6
+// messages de 1 000), soit moins de 6 000 jetons avec la réponse.
+const GROQ_CTX_MAX = 4000;
+
+async function callGroq(apiKey, context, messages) {
+  const ctx = JSON.stringify(context ?? {});
+  const system = systemPrompt(ctx.length > GROQ_CTX_MAX ? `${ctx.slice(0, GROQ_CTX_MAX)}…` : context);
+  const chat = [
+    { role: 'system', content: system },
+    ...messages.slice(-6).map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.text ?? '').slice(0, 1000) })),
+  ];
+  const echecs = [];
+  for (const model of GROQ_MODELS) {
+    try {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model,
+          messages: chat,
+          temperature: 0.4,
+          max_tokens: 1500,
+          ...(model.startsWith('openai/gpt-oss') ? { reasoning_effort: 'low' } : {}),
+        }),
+        signal: AbortSignal.timeout(GROQ_TIMEOUT_MS),
+      });
+      if (!res.ok) {
+        echecs.push(`groq ${model} ${res.status}`);
+        continue;
+      }
+      const data = await res.json();
+      const text = data?.choices?.[0]?.message?.content ?? '';
+      if (String(text).trim()) return { text: String(text), model: `groq:${model}` };
+      echecs.push(`groq ${model} empty`);
+    } catch (e) {
+      echecs.push(`groq ${model} ${e?.message ?? e}`);
+    }
+  }
+  throw new Error(echecs.join(', '));
+}
+
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -334,7 +387,8 @@ async function handleAssistant(req, env) {
   if (req.method !== 'POST') return json({ error: 'method' }, 405);
   const apiKey = geminiKey(env);
   const dsKey = deepseekKey(env);
-  if (!apiKey && !dsKey) return json({ error: 'missing_api_key' }, 503);
+  const gqKey = groqKey(env);
+  if (!apiKey && !dsKey && !gqKey) return json({ error: 'missing_api_key' }, 503);
 
   const user = await verifyUser(req);
   if (!user) return json({ error: 'unauthorized' }, 401);
@@ -364,22 +418,37 @@ async function handleAssistant(req, env) {
   if (!apiKey && hasFiles) {
     return json({
       text: "Je ne peux pas encore lire les photos ni les PDF avec le moteur disponible en ce moment. Décrivez-moi le contenu en texte, ou réessayez plus tard.",
-      model: 'deepseek-chat',
+      model: 'texte-seulement',
     });
   }
 
-  if (!apiKey) {
-    try {
-      const { text, model } = await callDeepSeek(dsKey, systemPrompt(payload.context), messages);
-      return json({ text, model });
-    } catch (e) {
+  // Secours texte, dans l'ordre : Groq (gratuit), DeepSeek (payant, si la
+  // clé existe), finia-gratuit (Cloudflare, part « finia »).
+  async function secoursTexte(echecs) {
+    if (gqKey) {
       try {
-        return json(await callGratuit(req.headers.get('authorization'), payload.context, messages));
-      } catch (e3) {
-        return aiFailure(`${e?.message ?? e} puis ${e3?.message ?? e3}`);
+        return json(await callGroq(gqKey, payload.context, messages));
+      } catch (e1) {
+        echecs.push(String(e1?.message ?? e1));
       }
     }
+    if (dsKey) {
+      try {
+        const { text, model } = await callDeepSeek(dsKey, systemPrompt(payload.context), messages);
+        return json({ text, model });
+      } catch (e2) {
+        echecs.push(String(e2?.message ?? e2));
+      }
+    }
+    try {
+      return json(await callGratuit(req.headers.get('authorization'), payload.context, messages));
+    } catch (e3) {
+      echecs.push(String(e3?.message ?? e3));
+    }
+    return aiFailure(echecs.join(' puis '));
   }
+
+  if (!apiKey) return secoursTexte([]);
 
   const contents = messages.map((m, i) => {
     const parts = [{ text: String(m.text ?? '').slice(0, 4000) }];
@@ -406,21 +475,7 @@ async function handleAssistant(req, env) {
     return json({ text, model });
   } catch (e) {
     const echecs = [String(e?.message ?? e)];
-    if (!hasFiles && dsKey) {
-      try {
-        const { text, model } = await callDeepSeek(dsKey, systemPrompt(payload.context), messages);
-        return json({ text, model });
-      } catch (e2) {
-        echecs.push(String(e2?.message ?? e2));
-      }
-    }
-    if (!hasFiles) {
-      try {
-        return json(await callGratuit(req.headers.get('authorization'), payload.context, messages));
-      } catch (e3) {
-        echecs.push(String(e3?.message ?? e3));
-      }
-    }
+    if (!hasFiles) return secoursTexte(echecs);
     return aiFailure(echecs.join(' puis '));
   }
 }
