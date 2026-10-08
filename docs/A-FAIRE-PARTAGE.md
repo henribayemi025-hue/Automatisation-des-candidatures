@@ -1452,3 +1452,11 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   côté Finia : une réponse qui oubliait un champ exigé passe au moteur
   suivant au lieu d'arriver incomplète. Aucune table finia_* ni auth.users
   touchée, aucune migration.
+
+- ✅ 08/10 22 h 40 (contrôle de 2 h, Alpha) : rien de neuf côté Accounting
+  depuis 7ab5011. Signalé à Claudinette par le canal direct : deux fonctions
+  de Léo redéployées par la CI (communes staging/prod) — `_shared/code.ts`
+  (un fichier absent se dit « chemin introuvable », plus « GitHub 404 ») et
+  `legion-travail` (un passage où aucune IA ne répond rend l'essai à la
+  tâche ; 146 tâches d'entreprises réelles remises à 2 essais). Aucune table
+  finia_* ni auth.users touchée, aucune migration, moteur commun inchangé.
