@@ -195,6 +195,13 @@ export function CollabProvider({ children }: { children: ReactNode }) {
 
   const lastSeq = useRef(0);
   const snapshotSeq = useRef(0);
+  // Devise portée par l'instantané `finia_workspaces.data`. La liaison avec la
+  // place de marché la lit là d'abord (finia_devise_espace) : un instantané
+  // créé vide avant l'installation garde une devise vide tant qu'aucun
+  // compactage n'a eu lieu, et une commande livrée ne devient alors aucune
+  // vente (« devise_de_l_espace_inconnue »). Trouvé par Alpha le 08/10 sur les
+  // trois espaces réels reliés à une boutique.
+  const snapshotCurrency = useRef('');
   const applied = useRef(new Set<string>());
   const channel = useRef<RealtimeChannel | null>(null);
   const page = useRef('/');
@@ -275,6 +282,7 @@ export function CollabProvider({ children }: { children: ReactNode }) {
         return;
       }
       snapshotSeq.current = Number(row.snapshot_seq ?? 0);
+      snapshotCurrency.current = String((row.data as Partial<DB> | null)?.company?.currency ?? '');
       // Empreinte de l'instantané reçu, pour la comparer aux scellés du journal.
       const snapshotHash = row.data ? await hashState(normalizeDB(row.data as Partial<DB>)).catch(() => '') : '';
 
@@ -372,8 +380,15 @@ export function CollabProvider({ children }: { children: ReactNode }) {
   const compactIfNeeded = useCallback(async () => {
     const ws = workspaceRef.current;
     if (!ws || ws.role !== 'owner') return;
-    if (lastSeq.current - snapshotSeq.current < COMPACT_AFTER) return;
     const state = store.getState();
+    // Compacter tout de suite quand l'instantané n'a pas encore la devise que
+    // l'entreprise a choisie : c'est elle que la liaison lit.
+    const currencyStale = !!state.company.currency && snapshotCurrency.current !== state.company.currency;
+    if (!currencyStale && lastSeq.current - snapshotSeq.current < COMPACT_AFTER) return;
+    // Rien tant que la file locale n'est pas vide : l'instantané contiendrait
+    // des opérations pas encore au journal, qui seraient rejouées une seconde
+    // fois à la prochaine ouverture.
+    if (readOutbox(ws.id).length) return;
     const sealedSeq = lastSeq.current;
     const { error } = await supabase
       .from('finia_workspaces')
@@ -381,6 +396,7 @@ export function CollabProvider({ children }: { children: ReactNode }) {
       .eq('id', ws.id);
     if (error) return;
     snapshotSeq.current = sealedSeq;
+    snapshotCurrency.current = state.company.currency;
     // L'empreinte part au journal, qui lui ne peut être ni modifié ni effacé :
     // un instantané réécrit après coup cesserait de lui correspondre.
     try {
@@ -433,6 +449,12 @@ export function CollabProvider({ children }: { children: ReactNode }) {
       }
     });
   }, [store, pushEvent, compactIfNeeded]);
+
+  // À l'ouverture d'un espace : un instantané resté sans devise (espaces créés
+  // avant le 08/10) est réécrit tout de suite, sans attendre 300 opérations.
+  useEffect(() => {
+    if (sync === 'synced') void compactIfNeeded();
+  }, [sync, compactIfNeeded]);
 
   // ---------- Découverte des espaces à la connexion ----------
   useEffect(() => {
