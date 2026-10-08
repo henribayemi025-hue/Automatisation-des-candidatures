@@ -87,6 +87,54 @@ empruntée, donc la démo à trois écrans est possible dès aujourd'hui, mais �
 répéter d'abord sur la base de test. Conseil d'Alpha retenu : la répéter avec
 un téléphone en 4G et un ordinateur en Wi-Fi.
 
+### Concurrence et le trou « je regarde → je contacte » (Alpha, revue du jeudi 08/10)
+
+Mesuré ce matin en production, comptes de test exclus. En 30 jours : 2 092
+fiches produit vues, 474 boutiques vues, 207 recherches, 12 ajouts au panier,
+2 commandes passées, 10 « intentions de contact » (bouton contact pressé sur
+une fiche), 1 clic WhatsApp. Depuis le début (22/07) : 2 816 fiches vues,
+10 intentions de contact, 2 clics WhatsApp, 3 commandes. Le trou est
+toujours là : moins d'une fiche vue sur 200 mène à un contact.
+
+Ce que font les autres à cet endroit précis du parcours :
+
+- **Facebook Marketplace** : la boîte de message d'une annonce est
+  **pré-remplie** (« Hi, is this available? »), donc contacter coûte un seul
+  geste ; et Meta propose maintenant au vendeur une réponse automatique de
+  Meta AI à cette question, à activer annonce par annonce, relue avant envoi.
+  Sources (secondaires, pas de page officielle Meta trouvée) :
+  [The Drive](https://thedrive.com/news/heres-how-facebook-marketplace-should-make-car-buying-suck-less),
+  [APH Networks](https://aphnetworks.com/news/31470-still-available-facebook-marketplace-now-lets-meta-ai-respond).
+- **Jumia, T2 2026 (12/08)** : revenu de la place de marché +34 % à 28,8 M$,
+  ventes des vendeurs tiers +26 %, articles vendus par des vendeurs
+  internationaux +96 %, Nigeria GMV +36 % ; cap mis sur « l'activation des
+  vendeurs locaux » et l'équilibre visé au T4 2026 ; 50 M$ levés (dont 25 M$
+  de l'IFC). Sources : [communiqué Jumia](https://www.newswire.com/news/jumia-reports-second-quarter-2026-results-and-announces-capital-raise),
+  [MarketBeat](https://www.marketbeat.com/instant-alerts/jumia-technologies-q2-earnings-call-highlights-2026-08-12/).
+- **WhatsApp Business** : au Sénégal comme au Nigeria, le catalogue WhatsApp
+  (gratuit) reste la vitrine n° 1 des petits vendeurs ; un guide nigérian
+  (juin 2026) décrit Paystack dans la conversation via Flowcart depuis avril
+  2026 — une seule source, à confirmer. Sources :
+  [Kolonell, juin 2026](https://kolonell.com/en/blog/create-whatsapp-shop-catalog-free-2026),
+  [brands.ng](https://brands.ng/?p=2166).
+- **Jiji** : rien de neuf côté produit en 2026 (rachat de Bikroy au
+  Bangladesh, mai 2026) ; ses outils payants restent le « boost » et le
+  paiement au clic, déployés en 2024 chez plus de 250 000 entreprises selon
+  Jiji. Sources : [TechCabal](https://techcabal.com/2026/05/12/jiji-acquires-bikroy-bangladesh-startup/),
+  [Capital Ethiopia](https://capitalethiopia.com/2024/06/10/jiji-expands-premium-services-to-ethiopia/).
+- **Bumpa (Nigeria, Kenya)** : plus de 136 000 commerçants selon un
+  comparatif, boutique + stock + paiements + comptabilité ; 40 % de ses
+  transactions venaient d'Instagram, d'où son intégration Meta (article non
+  daté). Sources : [Practical Ecommerce](https://www.practicalecommerce.com/top-ecommerce-tools-in-africa),
+  [Condia](https://thecondia.com/bumpa-meta-integration-instagram-sales/).
+
+Les trois idées de la semaine sont au-dessus (recopiées par Claudinette). Une
+quatrième, pour le trou lui-même :
+
+| ☐ | Idée | Problème résolu | Pour qui | Ce que ça vaut | Effort | Ce qu'on demande à Beau |
+|---|---|---|---|---|---|---|
+| ☐ | **« Encore disponible ? » en un geste, et la réponse avant même d'écrire.** Sur chaque fiche : un bouton qui ouvre WhatsApp avec la question déjà écrite (« Bonjour, l'article X sur Finjaro est-il encore disponible ? ») ; et, au-dessus, ce que la place de marché sait déjà : « Disponible · 8 en stock · retrait à Douala » (stock de la fiche, ville de la boutique). Aucune IA. | La question que tout le monde se pose n'a pas de réponse sur la fiche, et écrire le premier message coûte : 2 092 fiches vues, 10 contacts en 30 jours. | Les acheteuses ; les vendeuses fatiguées des « c'est disponible ? ». | Le geste qui fait démarrer la plupart des conversations sur Facebook Marketplace, mesurable chez nous dès la première semaine (contact_intent / product_view). | Petit : un texte pré-rempli (le mécanisme existe pour la commande sans compte) et une ligne de disponibilité depuis le stock de la fiche ; à vérifier d'abord si le bouton actuel écrit déjà une question. | Un oui, et le texte de la question en français et en anglais. |
+
 ### L'idée « wow » pour une démo : la comptable voit la vente arriver
 
 - **Le déroulé :**
