@@ -1415,4 +1415,11 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   rien dans `finia_liaison_log`. ⏳ Beau : oui ou non pour la poser en
   production (base commune, Accounting nommée). La branche (a) de
   Claudinette reste à part, non fusionnée.
+- ✅ 08/10 09 h 55 : Beau a dit oui ; migration 0239 posée en production.
+  Remesuré juste après : Didi_beauty56 → EUR, K-Drinks → XAF, Ricardo
+  Azebaze CMR → XAF, taux connu pour les trois. La liaison peut écrire une
+  vente chez ces trois vendeuses à la première commande livrée. Revue du
+  jeudi côté place de marché ajoutée à IDEES.md (3595413) : concurrence
+  sourcée, trou « je regarde → je contacte » mesuré (2 092 fiches vues, 10
+  contacts en 30 jours), idée « Encore disponible ? » en un geste.
 
