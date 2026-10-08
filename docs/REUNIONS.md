@@ -7,6 +7,57 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 18 — 08/10/2026 (matin)
+
+**1. Ce qui a bougé depuis hier**
+- En ligne et vérifié sur accounting.finjaro.net (version `4cf540808348`) :
+  - Finia passe par Groq, gratuit, quand Google refuse. Beau a posé la nouvelle
+    clé en Secret ; /api/health répond `groq: true`.
+  - Les boutons WhatsApp ne s'affichent plus quand le numéro est inutilisable,
+    et l'indicatif n'est plus doublé (relu par Alpha).
+  - Le cadre « À quoi ça sert » se replie de lui-même après trois visites
+    (idée d'Alpha).
+- Audit du 07/10, partie Accounting : rapport dans docs/audit-200/ACCOUNTING.md.
+  Corrigé pendant l'audit :
+  - la promesse fausse de la page de connexion ;
+  - la carte Projets ;
+  - les tableaux TVA et Ventes.
+- Veille du 08/10 : dans l'UEMOA, PI-SPI devient obligatoire le 02/11 pour la
+  monnaie électronique entre personnes. Côté concurrence, les relances
+  automatiques de créances deviennent la norme.
+- Alpha :
+  - a corrigé sa propre chaîne Groq (un modèle retiré était réessayé à chaque
+    fois) ;
+  - signale que cette nuit, tous les moteurs d'IA étaient à sec en même temps.
+
+**2. À corriger (yeux d'une commerçante sur téléphone)**
+- Finia n'a pas encore été essayée sur le vrai site depuis le branchement de
+  Groq, faute d'essai avec un vrai compte. **Attend Beau.**
+- Régime fiscal proposé à l'installation : « réel » avec TVA pour une petite
+  boutique au Cameroun. **Attend Beau** ; Alpha et moi proposons « sans TVA, à
+  confirmer avec votre comptable ».
+- La démonstration s'ouvre en mode expert : numéros de compte et menu
+  comptable complet pour une débutante. **Corrigé aujourd'hui** (voir 4).
+- Listes sans fin : le journal affiche 615 écritures sur une seule page. À
+  faire, un écran à la fois.
+
+**3. Une idée**
+- Relance des créances, version sans coût : à l'ouverture, « 3 clients sont en
+  retard, les relancer ? », puis un clic WhatsApp par client. La place de marché
+  fait déjà l'équivalent pour les commandes. **Attend Beau** (IDEES.md, 08/10).
+
+**4. Aujourd'hui**
+- Moi :
+  - la démonstration s'ouvre en mode simple, avec un bouton « Voir la
+    comptabilité complète » pour les comptables ;
+  - un lien direct vers un écran comptable (`/demo/cameroun/boutique/journal`)
+    ouvre directement en mode expert.
+- J'attends d'Alpha : savoir si Finia, côté place de marché, a répondu par
+  Groq ce matin. Si oui, la clé et la chaîne marchent, et il ne manque que
+  l'essai côté Accounting.
+
+---
+
 ## Réunion n° 17 — 07/10/2026 (matin)
 
 **1. Ce qui a bougé depuis hier**
