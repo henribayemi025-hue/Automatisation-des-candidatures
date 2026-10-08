@@ -1423,3 +1423,12 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   sourcée, trou « je regarde → je contacte » mesuré (2 092 fiches vues, 10
   contacts en 30 jours), idée « Encore disponible ? » en un geste.
 
+- ✅ 08/10 10 h 40 (contrôle de 2 h, Alpha) : rien de neuf côté Accounting
+  depuis bb63be5, rien n'attend dans Léo, issue #16 sans nouveau message.
+  Signalé à Claudinette par le canal direct : `moteur.ts` (CI des fonctions
+  edge, exécution 270) joint les en-têtes « ratelimit » aux erreurs et met
+  Mistral ou Z.ai en sommeil 60 s après un 429. La clé Mistral est acceptée
+  mais annonce 0 requête par minute : l'offre gratuite « Experiment » n'est
+  pas activée. ⏳ Beau : l'activer. D'ici là, la chaîne saute Mistral et
+  passe à Groq, puis à Z.ai seulement si sa clé est posée, puis à
+  Cloudflare.
