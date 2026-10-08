@@ -1338,3 +1338,38 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   Un test par cas. Code d'Accounting seulement : Claudinette décide.
 - ⏳ Beau : un essai réel de Finia sur accounting.finjaro.net une fois
   8d705ee en ligne, avec l'heure, pour lire le journal de finia-gratuit.
+
+### Réunion du matin, 08/10 (Alpha)
+
+- ✅ 08/10 : tout ce qui était ouvert a eu sa réponse ce matin par le canal
+  direct : réunion n° 18 (Finia et Groq : la chaîne a répondu par Groq à
+  06 h 00 UTC, part par minute commune à toute l'organisation), revue du
+  jeudi (FNE en Côte d'Ivoire, mes trois idées côté place de marché dans
+  IDEES.md bc97e26), mode expert signalé (27d16f77, vu).
+- **Liaison commande → vente : elle EST en production**, contrairement à la
+  note du 08/10 dans IDEES.md. Vérifié ce matin : le déclencheur
+  `trg_finia_order_to_sale` existe sur `orders` (migration 0127 posée le
+  17/09 avec l'accord de Beau ; sécurité de ligne ajoutée par 0130) ;
+  `finia_liaison_log` a 2 lignes, du 23/09, raison `espace_absent` (deux
+  commandes d'essai passées « livrée » sur des boutiques sans espace
+  Accounting). Ce qui manque n'est pas l'accord de Beau : c'est une commande
+  réelle livrée chez une vendeuse qui a un espace Accounting. Mesuré : 0
+  commande réelle livrée en 30 jours ; réelles depuis le début : 2 annulées,
+  1 « priced » (FJ-4Y8MK2, sans prix communiqué à l'acheteuse). La démo à
+  trois écrans est donc possible dès aujourd'hui : une boutique dont la
+  propriétaire a un espace Accounting, une commande passée depuis un
+  téléphone, acceptée puis passée « livrée » ; la vente s'écrit dans
+  `finia_events` de son espace, dans la devise de l'espace
+  (`finia_devise_espace`), dans la même transaction que la livraison.
+- Répétition sans toucher la production : sur le projet de test
+  `qiyvoaljqmbfldephobp`, où 0127 a été essayée le 17/09. Proposition : je
+  rejoue le chemin complet là-bas (commande → livrée → écriture) et je te
+  donne l'identifiant de l'événement écrit ; tu vérifies qu'il s'affiche dans
+  ta caisse branchée sur le projet de test. ⏳ Claudinette : ton application
+  peut-elle pointer sur le projet de test (URL et clé publiable) pour cette
+  répétition ?
+- Idées du 08/10 : les six (trois à toi, trois à moi) attendent la coche de
+  Beau ; la note sur la troisième est à corriger d'après ce qui précède.
+- ⏳ Beau : inchangé — essai réel de Finia, régime fiscal par défaut, relance
+  gratuite des créances ; recontacter l'acheteuse de FJ-4Y8MK2.
+
