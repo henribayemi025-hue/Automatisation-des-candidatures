@@ -2,6 +2,95 @@
 
 Chaque idée : le problème, pour qui, ce que ça vaut, l'effort, ce qu'on demande à Beau. Beau coche ☐ → ☑ quand il décide. Les idées viennent des deux sessions, de la concurrence, du terrain. Rien n'est promis : c'est une liste de choix.
 
+## Revue hebdomadaire — 08/10/2026 (Claudinette)
+
+### Ce que font les concurrents cette semaine
+
+- **Ghana, StashUp Kiosk (article du 07/10)** :
+  - une vitrine à partager sur WhatsApp, Instagram ou Facebook ;
+  - paiement par mobile money ;
+  - gratuit à l'ouverture, 1,5 % par vente conclue, sans abonnement.
+
+  [GhanaWeb](https://www.ghanaweb.com/GhanaHomePage/features/Ghana-s-informal-sellers-are-getting-a-new-way-to-run-their-businesses-2055576)
+  C'est exactement le pont « vitrine → gestion » de Finjaro, avec un prix à la
+  commission.
+- **Comores, Massiwa AI Suite (analyse du 06/10)** : gestion SYSCOHADA avec
+  stock et mobile money, de 10,17 € à 30,50 € par mois.
+  [Capmad](https://www.capmad.com/article/massiwa-ai-suite-pousse-les-erp-africains-a-se-caler-sur-les-realites-des-pme)
+- **Nigeria, Afri Invoice (07/10)** : des formules pour se mettre à la facture
+  électronique du fisc. Prix non publiés.
+  [BusinessDay](https://businessday.ng/technology/article/tax-reforms-afri-invoice-rolls-out-new-plans-to-ease-e-invoicing-adoption/)
+- **Inde, BharatNXT (07/10)** : relances de paiement automatiques et liens
+  d'encaissement.
+  [Tribune India](https://www.tribuneindia.com/news/business/bharatnxt-partners-with-bharat-connect-for-business-to-power-a-unified-b2b-invoicing-and-payments-network-for-indias-msmes/)
+- **QuickBooks sur Muse (Meta)** : déjà noté le 01/10. Un article du 06/10
+  confirme que c'est en service.
+  [American Banker](https://americanbanker.com/payments/news/intuit-adds-metas-muse-to-small-business-ai-menu)
+- **WhatsApp Business** : plusieurs prestataires annoncent que les réponses
+  libres envoyées par l'API deviennent payantes depuis le 01/10/2026, avec une
+  franchise mensuelle par numéro.
+  [Chatfuel](https://chatfuel.com/docs/whatsapp-pricing-2026),
+  [Zoho](https://help.zoho.com/portal/en/community/topic/whatsapp-business-platform-message-pricing-guide)
+  La page officielle de Meta ne le disait pas encore lors de la veille de ce
+  matin, donc **à confirmer**. Cela ne touche pas nos simples liens wa.me, mais
+  renchérit toute relance vraiment automatique par l'API.
+
+### Une obligation qui touche nos commerçantes : la Côte d'Ivoire contrôle la FNE depuis le 01/09/2026
+
+- **Ce que dit la règle :**
+  - en Côte d'Ivoire, la facture normalisée électronique (FNE) est obligatoire
+    pour presque tous les contribuables, micro-entreprises et entreprenants
+    compris ;
+  - le reçu de vente aux particuliers (RNE) ne se fait qu'avec un terminal
+    agréé ou l'application officielle ;
+  - une FNE passe d'abord par la DGI : numéro fiscal, cachet et QR code avant
+    d'être remise au client.
+
+  [Edicom](https://edicomgroup.com/fr/blog/obligation-facturation-electronique-cote-d-ivoire)
+- **Les contrôles :** un communiqué de la DGI du 21/08/2026 les a fait
+  commencer le 01/09/2026. La FENACCI (commerçants) en demandait la suspension
+  et une campagne de formation. [Koaci](https://www.koaci.com/article/2026/08/30/cote-divoire/societe/cote-divoire-facturation-normalisee-electronique-la-fenacci-exige-la-suspension-des-controles-des-le-1er-septembre-et-rappelle-au-gouvernement-sa-promesse-de-concertation_200026.html)
+- **Le lien de causalité :**
+  1. Une commerçante ivoirienne vend avec Accounting et remet le document
+     imprimé.
+  2. Ce document s'intitule « Facture » dès qu'un client est choisi, mais ce
+     n'est pas une FNE : il n'a ni numéro fiscal, ni cachet, ni QR code.
+  3. En cas de contrôle, elle croit être en règle et ne l'est pas.
+- **Cameroun, pour mémoire :** la loi de finances 2026 prévoit la facture
+  électronique, d'abord pour les grandes et moyennes entreprises. Selon EcoMatin,
+  la plateforme a été attribuée en mars 2026 avec une échéance en octobre 2027.
+  [EcoMatin](https://ecomatin.net/recettes-fiscales-le-cameroun-pourrait-capter-100-milliards-fcfa-de-plus-grace-a-la-facturation-electronique-bad)
+  Les petites boutiques ne sont pas concernées tout de suite.
+
+### Trois idées nouvelles
+
+| ☐ | Idée | Problème résolu | Pour qui | Ce que ça vaut | Effort | Ce qu'on demande à Beau |
+|---|---|---|---|---|---|---|
+| ☐ | **Dire la vérité sur le document remis, pays par pays.** En Côte d'Ivoire, le document s'appelle « Reçu de caisse », avec une phrase : « Ce document ne remplace pas la facture normalisée électronique (FNE). » | Une commerçante croit que notre « Facture » suffit au contrôle. | Les commerçantes de Côte d'Ivoire, puis chaque pays qui a sa facture certifiée. | Aucune promesse fausse, aucun client mis en défaut. | Faible : un titre et une phrase selon le pays, sans base. | Oui ou non pour la Côte d'Ivoire. Le texte exact sera relu sur la source officielle avant la mise en ligne. |
+| ☐ | **Un module Finjaro Learning de dix minutes : « La facture électronique, ce qui change pour vous ».** Proposé aux fédérations de commerçants, qui réclament justement une formation, avec Accounting à la fin. | Les commerçants subissent la réforme sans comprendre. La FENACCI demande une campagne de formation. | Les commerçants de Côte d'Ivoire d'abord. Le Cameroun en 2027. | De l'acquisition par les fédérations, plus forte qu'un e-mail froid, et une image d'utilité publique. | Moyen : écrire le module à partir des textes officiels, sans rien inventer. Le contact, lui, est l'affaire de Beau. | Faut-il préparer le module ? Beau veut-il contacter une fédération ? Rien n'est envoyé sans lui. |
+| ☐ | **Une grille de prix, enfin.** Proposition : la caisse, le stock et les dettes gratuits. Payant seulement pour la comptabilité complète et le travail à plusieurs. | Accounting n'affiche aucun prix, alors que les concurrents en affichent un. | Toutes les commerçantes, et Alpha pour la place de marché (prix de novembre). | Décider avant que les inscrits de la prospection arrivent. | Faible côté écran. | Le principe (gratuit pour la caisse ?) et un montant par pays. Repères sourcés : Caisse Boutique 5 000 FCFA par mois (veille du 05/10), Massiwa 10,17 à 30,50 € par mois, StashUp 1,5 % par vente. |
+
+### L'idée « wow » pour une démo : la comptable voit la vente arriver
+
+- **Le déroulé :**
+  - deux écrans côte à côte ;
+  - sur le téléphone, une vendeuse encaisse une vente au comptoir ;
+  - sur l'ordinateur, la comptable a le journal ouvert. L'écriture apparaît,
+    avec la caisse, les ventes et la TVA, sans recharger la page, puis le bilan
+    bouge.
+- **Pourquoi ça marche :** ça montre en un geste ce qu'aucun cahier ne fait,
+  la comptabilité qui se tient toute seule pendant qu'on vend.
+- **Ce que ça demande :** rien de nouveau. La synchronisation entre membres d'un
+  même espace existe déjà, et aucune IA n'est nécessaire, donc la démo reste
+  possible même quand les moteurs sont à sec.
+- **À faire avant de la montrer :** la répéter une fois en vrai, avec deux
+  comptes de test sur la base de test, et mesurer le délai réel d'apparition,
+  sans l'annoncer avant de l'avoir mesuré.
+- **Ce qu'on demande à Beau :** rien, sauf s'il veut s'en servir pour un
+  rendez-vous.
+
+---
+
 ## Idée issue de la veille du 08/10/2026 — à décider par Beau
 
 ☐ **Relancer automatiquement les clients qui doivent de l'argent.**
