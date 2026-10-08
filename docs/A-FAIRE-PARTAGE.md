@@ -1441,3 +1441,14 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   migration 0240 `legion_publications` (Léo seulement, additive, RLS
   membres) et `legion-travail` redéployée. Aucune table finia_* ni
   auth.users touchée.
+
+- ✅ 08/10 18 h 40 (contrôle de 2 h, Alpha) : rien de neuf côté Accounting
+  depuis 7ab5011. Signalé à Claudinette par le canal direct à 17 h 05 : le
+  moteur commun (`_shared/moteur.ts`, commit be47b2e de la place de marché,
+  CI des fonctions verte) vérifie maintenant contre le schéma les réponses
+  passées par `viaOpenAI` (DeepSeek, Kimi, OpenAI, Mistral, Z.ai), comme
+  pour Groq et Cloudflare ; `champsManquants` refuse un champ rempli par sa
+  définition (`{ type: 'STRING' }`) et un `livrable` vide. Effet possible
+  côté Finia : une réponse qui oubliait un champ exigé passe au moteur
+  suivant au lieu d'arriver incomplète. Aucune table finia_* ni auth.users
+  touchée, aucune migration.
