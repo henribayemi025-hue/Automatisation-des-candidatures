@@ -70,6 +70,22 @@ Chaque idée : le problème, pour qui, ce que ça vaut, l'effort, ce qu'on deman
 | ☐ | **Un module Finjaro Learning de dix minutes : « La facture électronique, ce qui change pour vous ».** Proposé aux fédérations de commerçants, qui réclament justement une formation, avec Accounting à la fin. | Les commerçants subissent la réforme sans comprendre. La FENACCI demande une campagne de formation. | Les commerçants de Côte d'Ivoire d'abord. Le Cameroun en 2027. | De l'acquisition par les fédérations, plus forte qu'un e-mail froid, et une image d'utilité publique. | Moyen : écrire le module à partir des textes officiels, sans rien inventer. Le contact, lui, est l'affaire de Beau. | Faut-il préparer le module ? Beau veut-il contacter une fédération ? Rien n'est envoyé sans lui. |
 | ☐ | **Une grille de prix, enfin.** Proposition : la caisse, le stock et les dettes gratuits. Payant seulement pour la comptabilité complète et le travail à plusieurs. | Accounting n'affiche aucun prix, alors que les concurrents en affichent un. | Toutes les commerçantes, et Alpha pour la place de marché (prix de novembre). | Décider avant que les inscrits de la prospection arrivent. | Faible côté écran. | Le principe (gratuit pour la caisse ?) et un montant par pays. Repères sourcés : Caisse Boutique 5 000 FCFA par mois (veille du 05/10), Massiwa 10,17 à 30,50 € par mois, StashUp 1,5 % par vente. |
 
+### Trois idées côté place de marché (Alpha, 08/10, recopiées telles quelles)
+
+| ☐ | Idée | Problème résolu | Pour qui | Ce que ça vaut | Effort | Ce qu'on demande à Beau |
+|---|---|---|---|---|---|---|
+| ☐ | **Une carte « Ce que la loi demande dans votre pays » dans l'espace vendeuse.** Une ligne par pays, sourcée, d'après le pays de la boutique. Côte d'Ivoire : FNE et RNE contrôlées depuis le 01/09/2026, « le récapitulatif Finjaro n'est pas une facture ». Cameroun : facture électronique prévue, grandes et moyennes entreprises d'abord (EcoMatin, échéance octobre 2027). Rien pour les pays sans règle connue. | Une vendeuse croit qu'une page de commande vaut facture. | Les vendeuses, à commencer par la boutique ivoirienne et les 59 boutiques camerounaises (mesuré par Alpha le 08/10, comptes de test exclus). | Aucune promesse fausse, même texte que le « Reçu de caisse » d'Accounting. | Petit : une liste de pays et une carte, textes relus par Claudinette. | Oui ou non. Et la carte renvoie-t-elle vers Accounting (« le reçu de caisse, c'est là ») ? |
+| ☐ | **Le prix de la place de marché à la commission, pas à l'abonnement.** Repère : StashUp Kiosk, 1,5 % par vente conclue, sans abonnement. Mesuré par Alpha : 2 commandes en 30 jours sur 59 boutiques. Un abonnement se paierait pour rien ; une commission ne coûte que quand ça vend. | « Gratuit jusqu'en novembre, puis payant » n'a encore ni chiffre ni forme. | Beau, pour novembre. | Un prix qui ne fait fuir personne tant que les acheteurs manquent. | Nul avant la décision. Ensuite, le calcul se fait à la livraison. | Commission (à quel taux ?) ou abonnement, pour la place de marché. |
+| ☐ | **La démo à trois écrans, « de la commande à l'écriture », sans IA.** L'acheteuse commande sur son téléphone, la vendeuse voit arriver la commande et l'accepte, puis la vente apparaît chez la comptable dans Accounting. | On montre deux produits séparés, alors que la force, c'est la chaîne. | Beau en rendez-vous, les fédérations, les salons. | Une démo de deux minutes, avec deux téléphones et un ordinateur. | Une répétition en vrai avec des comptes de test. | Une date pour la répéter avec lui, et son accord pour montrer la chaîne entière. |
+
+**Note de Claudinette sur la troisième idée :** aujourd'hui, aucune commande de
+la place de marché n'arrive dans la caisse d'Accounting. La liaison attend
+l'accord de Beau : c'est une migration sur la base commune. Sans elle, la démo
+s'arrête à deux écrans : la commande d'un côté, la vente saisie à la main de
+l'autre. Conseil d'Alpha retenu pour ma propre démo : la répéter avec un
+téléphone en 4G et un ordinateur en Wi-Fi, car c'est là que le temps réel se
+casse d'habitude.
+
 ### L'idée « wow » pour une démo : la comptable voit la vente arriver
 
 - **Le déroulé :**
