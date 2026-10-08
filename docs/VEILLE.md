@@ -11,6 +11,120 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 08/10/2026 (couvre du 06 au 08/10, élargi au 30/09 quand c'était utile)
+
+### Concurrence
+- **QuickBooks (06/10/2026)** : Intuit ouvre son connecteur QuickBooks à Muse,
+  l'assistant IA de Meta. Il était déjà disponible dans Claude, ChatGPT et
+  Perplexity.
+  [American Banker](https://americanbanker.com/payments/news/intuit-adds-metas-muse-to-small-business-ai-menu)
+  → Le leader ne garde pas son assistant pour lui : il met ses données là où les
+  gens parlent déjà à une IA. À garder en tête pour Finia, sans urgence.
+- **StashUp Kiosk, Ghana (article du 07/10/2026)** :
+  - une vitrine à partager sur WhatsApp, Instagram ou Facebook ;
+  - paiement par mobile money ;
+  - commandes et paiements au même endroit ;
+  - ouverture gratuite, 1,5 % de commission sur chaque vente conclue, sans
+    abonnement.
+
+  [GhanaWeb](https://www.ghanaweb.com/GhanaHomePage/features/Ghana-s-informal-sellers-are-getting-a-new-way-to-run-their-businesses-2055576)
+  → C'est le pont « vitrine → gestion » que vise Finjaro, et une référence de
+  prix pour la place de marché.
+- **Massiwa AI Suite, Comores (analyse du 06/10/2026 ; offre publiée le 07/08)** :
+  - facturation SYSCOHADA, stock, mobile money ;
+  - de 10,17 € à 30,50 € par mois selon la formule, avec un mois d'essai.
+
+  [Capmad](https://www.capmad.com/article/massiwa-ai-suite-pousse-les-erp-africains-a-se-caler-sur-les-realites-des-pme)
+  → En Afrique francophone, la conformité OHADA avec le mobile money s'affiche
+  déjà autour de 10 € par mois. À verser au dossier « prix » qui attend Beau.
+- **Afri Invoice, Nigeria (07/10/2026)** : quatre formules pour passer à la
+  facture électronique du fisc nigérian (validation, numéro unique, API). Prix
+  non publiés.
+  [BusinessDay](https://businessday.ng/technology/article/tax-reforms-afri-invoice-rolls-out-new-plans-to-ease-e-invoicing-adoption/)
+  → Là où la facture électronique devient obligatoire, les petits commerces
+  s'équipent. La conformité pays par pays sert à entrer sur un marché.
+- **BharatNXT, Inde (07/10/2026)** : « Seller Hub », avec liens d'encaissement,
+  **relances de paiement automatiques** et escompte de factures, sur le réseau
+  interentreprises de NPCI.
+  [Tribune India](https://www.tribuneindia.com/news/business/bharatnxt-partners-with-bharat-connect-for-business-to-power-a-unified-b2b-invoicing-and-payments-network-for-indias-msmes/)
+  → La relance automatique des créances devient la norme. Chez nous, elle est
+  manuelle, un clic sur WhatsApp. Idée ajoutée dans IDEES.md.
+
+### Règles, impôts et paiements
+- **UEMOA, PI-SPI obligatoire à partir du 02/11/2026** : texte de la BCEAO du
+  02/10, distinct de la liste des établissements déjà notée le 02/10. Les
+  transactions de monnaie électronique interopérables entre personnes physiques
+  passeront par PI-SPI. Selon la presse, qui concorde, car les PDF de la BCEAO
+  sont des scans illisibles :
+  - envois nationaux gratuits jusqu'à 8 000 FCFA cumulés par jour, par
+    utilisateur et par établissement ;
+  - au-delà, des frais de 0 à 0,8 % HT sont permis ;
+  - réception gratuite ;
+  - entre pays de l'UEMOA à partir du 01/06/2027 ;
+  - rien de fixé pour les paiements aux commerçants.
+
+  [Communiqué BCEAO](https://www.bceao.int/fr/communique-presse/transactions-de-monnaie-electronique-entre-personnes-physiques-par-lintermediaire),
+  [Avis n°0019](https://www.bceao.int/fr/reglementations/avis-ndeg0019-relatif-aux-transactions-de-monnaie-electronique-entre-personnes),
+  [Pulse.ci](https://www.pulse.ci/article/finance-vos-transferts-jusqua-8-000-fcfa-deviennent-gratuits-des-le-2-novembre-dans-lespace-uemoa-2026100702324323017)
+  → L'import des relevés mobile money range déjà les lignes « frais » et
+  « commission » en charges financières. Après le 02/11, il faudra vérifier
+  avec un vrai relevé que les lignes PI-SPI sont bien reconnues. Ne jamais
+  écrire « gratuit » pour les paiements aux commerçants.
+- **France, facture électronique (article du 05/10/2026)** :
+  - l'AIFE, qui gère Chorus Pro, a suspendu à partir du 01/10 ses échanges avec
+    la plateforme agréée de VosFactures, après une intrusion chez un
+    sous-traitant ;
+  - l'intrus serait passé par la génération de PDF à partir des modèles de
+    factures ;
+  - les échanges ont été rétablis ensuite, sous surveillance.
+
+  [Next](https://next.ink/259753/facturation-electronique-fuite-dinformations-chez-vosfactures-a-cause-dun-prestataire/)
+  → Chez nous, factures et tickets se fabriquent dans le navigateur de la
+  personne, sans moteur de PDF sur un serveur : ce point d'entrée n'existe pas.
+  À retenir pour le jour où l'on passera par une plateforme agréée : pouvoir en
+  changer.
+- **Sénégal, SENTAX (communiqué du 30/09/2026, en vigueur le 01/10)** : la
+  plateforme de déclaration en ligne s'ouvre aux moyennes entreprises. Elle est
+  « ouverte », pas obligatoire, pour elles ; elle l'est pour les grandes depuis
+  le 01/09. Il s'agit de déclarations, pas de facture électronique.
+  [DGID](https://www.dgid.sn/)
+  → Un récapitulatif de TVA du mois, prêt à recopier, devient utile aux clients
+  sénégalais de taille moyenne. L'écran TVA le donne déjà ; à vérifier qu'il
+  colle aux cases de SENTAX le jour où un client sénégalais arrive.
+- **Rien de daté et vérifiable du 01 au 08/10** pour le Cameroun (DGI, IGS), le
+  Gabon, l'OHADA, Orange Money et Wave (hors PI-SPI). Les portails de la Côte
+  d'Ivoire (FNE) et du Gabon répondaient en erreur 503.
+
+### Technologie et IA
+- **Groq** : rien de neuf dans le changelog. Mais `qwen/qwen3.8-27b`, deuxième
+  de notre chaîne de secours, est encore « Preview », et Groq prévient que ces
+  modèles peuvent être retirés à bref délai.
+  [Groq, modèles](https://console.groq.com/docs/models)
+  → Sans risque : s'il disparaît, le Worker passe tout seul au suivant (un
+  refus fait passer au modèle suivant). Rien à faire.
+- **Capacitor 8.5.3 (07/10/2026)** : une seule correction, pour iOS avec Swift
+  Package Manager et des plugins Cordova.
+  [Notes de version](https://github.com/ionic-team/capacitor/releases)
+  → Rien côté web. À prendre à la prochaine construction iOS si ce cas se
+  présente.
+- **EmbeddingGemma 2, Google (06/10/2026)** : modèle ouvert de recherche par le
+  sens, qui tourne sur l'appareil et dans le navigateur, sans connexion.
+  Environ 191 Mo de mémoire pour le texte seul. Langues non précisées.
+  [Google Developers](https://developers.googleblog.com/google-ai-edge-with-embeddinggemma-2/)
+  → Piste pour une recherche hors ligne, mais trop lourd pour un téléphone
+  d'entrée de gamme. À surveiller.
+- **Reconnaissance vocale** : rien de daté dans la période. Hors période
+  (24/09) : Sunflower v2 de Sunbird AI, licence Apache 2.0, couvre le wolof, le
+  lingala et le pidgin nigérian, mais aucune langue camerounaise.
+  [Hugging Face](https://huggingface.co/Sunbird/SunflowerASR-51-african-languages)
+- **Rien de neuf** pour Gemini (après le 06/10), Cloudflare Workers, Workers AI
+  et WhatsApp. Deux articles de presse annoncent que les messages libres des
+  entreprises sur WhatsApp Business deviennent payants le 01/10. La page
+  officielle de Meta dit encore le contraire, donc ce n'est pas confirmé, et ça
+  ne touche pas nos simples liens wa.me.
+
+---
+
 ## 07/10/2026 (couvre du 06 au 07/10)
 
 **Journée calme. Rien qui menace le produit ou qui demande une décision.**

@@ -2,6 +2,31 @@
 
 Chaque idée : le problème, pour qui, ce que ça vaut, l'effort, ce qu'on demande à Beau. Beau coche ☐ → ☑ quand il décide. Les idées viennent des deux sessions, de la concurrence, du terrain. Rien n'est promis : c'est une liste de choix.
 
+## Idée issue de la veille du 08/10/2026 — à décider par Beau
+
+☐ **Relancer automatiquement les clients qui doivent de l'argent.**
+- **Problème :** aujourd'hui, la relance d'une dette est manuelle (un clic
+  « Relancer sur WhatsApp »), donc la commerçante doit y penser. En Inde,
+  BharatNXT vient d'en faire une fonction de base (07/10).
+- **Pour qui :** les boutiques qui vendent à crédit, celles qui ont un
+  « cahier de crédit ».
+- **Valeur :** de l'argent qui rentre sans y penser.
+- **Effort :** deux possibilités.
+  - **Faible :** l'application rappelle à la commerçante, à l'ouverture,
+    « 3 clients sont en retard, les relancer ? », et chaque relance reste un
+    clic sur WhatsApp. Rien de payant, rien en base.
+  - **Élevé :** un envoi vraiment automatique par l'API WhatsApp Business,
+    payante, avec un numéro Finjaro et des modèles de messages validés par Meta.
+- **À décider :** la version faible tout de suite ? La version forte plus tard ?
+  Les deux ?
+
+Pour le dossier « prix » (idée du 05/10, toujours en attente) : Massiwa AI
+Suite affiche une gestion conforme OHADA de 10,17 € à 30,50 € par mois. StashUp
+Kiosk au Ghana prend 1,5 % par vente, sans abonnement. Sources dans VEILLE.md,
+note du 08/10.
+
+---
+
 ## Idée issue de la veille du 06/10/2026 — à décider par Beau
 
 ☐ **Préparer la facture certifiée, pays par pays.** Problème : dans l'espace OHADA,
