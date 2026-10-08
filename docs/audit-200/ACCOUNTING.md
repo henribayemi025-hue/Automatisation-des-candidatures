@@ -39,14 +39,22 @@ Les captures sont dans `docs/audit-200/captures/`.
 
 Capture : `p1-02-entreprise.png`.
 
-### 2. GRAVE — corrigé : une promesse fausse sur la page de connexion
+### 2. ANNULÉ le 08/10 — je m'étais trompée sur la page de connexion
 
-**Le lien de causalité :**
-1. Une vendeuse arrive depuis la place de marché.
-2. Elle lisait : « vos ventes livrées sur Finjaro peuvent arriver dans votre caisse ».
-3. Or aucun code ne fait arriver une commande dans la caisse aujourd'hui : la liaison attend toujours l'accord de Beau.
+- **Ce que j'avais écrit le 07/10 :** la phrase « vos ventes livrées sur
+  Finjaro peuvent arriver dans votre caisse » serait fausse, faute de code qui
+  le fasse. Je l'avais remplacée.
+- **C'était une erreur.** La liaison vit dans la base, pas dans ce dépôt :
+  - le déclencheur `trg_finia_order_to_sale`, posé le 17/09 avec l'accord de
+    Beau (migration 0127), écrit un événement `sale.record` dans l'espace de la
+    vendeuse quand une commande passe « livrée » ;
+  - l'application l'affiche, sans doublon.
 
-**Corrigé :** on ne promet plus que ce qui marche. « Même compte, rien à recréer : vos articles Finjaro se reprennent en un geste depuis l'écran Produits. »
+  Vérifié en lecture seule le 08/10. Alpha l'a signalé.
+- **Remis :** la phrase d'origine est revenue, avec « peuvent » : aucune
+  commande réelle n'a encore suivi ce chemin.
+- **Leçon :** avant de déclarer une fonction absente, je cherche aussi dans la
+  base commune.
 
 ### 3. MOYEN — corrigé : la carte d'un projet était illisible sur téléphone et tablette
 

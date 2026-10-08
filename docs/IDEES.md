@@ -78,13 +78,14 @@ Chaque idée : le problème, pour qui, ce que ça vaut, l'effort, ce qu'on deman
 | ☐ | **Le prix de la place de marché à la commission, pas à l'abonnement.** Repère : StashUp Kiosk, 1,5 % par vente conclue, sans abonnement. Mesuré par Alpha : 2 commandes en 30 jours sur 59 boutiques. Un abonnement se paierait pour rien ; une commission ne coûte que quand ça vend. | « Gratuit jusqu'en novembre, puis payant » n'a encore ni chiffre ni forme. | Beau, pour novembre. | Un prix qui ne fait fuir personne tant que les acheteurs manquent. | Nul avant la décision. Ensuite, le calcul se fait à la livraison. | Commission (à quel taux ?) ou abonnement, pour la place de marché. |
 | ☐ | **La démo à trois écrans, « de la commande à l'écriture », sans IA.** L'acheteuse commande sur son téléphone, la vendeuse voit arriver la commande et l'accepte, puis la vente apparaît chez la comptable dans Accounting. | On montre deux produits séparés, alors que la force, c'est la chaîne. | Beau en rendez-vous, les fédérations, les salons. | Une démo de deux minutes, avec deux téléphones et un ordinateur. | Une répétition en vrai avec des comptes de test. | Une date pour la répéter avec lui, et son accord pour montrer la chaîne entière. |
 
-**Note de Claudinette sur la troisième idée :** aujourd'hui, aucune commande de
-la place de marché n'arrive dans la caisse d'Accounting. La liaison attend
-l'accord de Beau : c'est une migration sur la base commune. Sans elle, la démo
-s'arrête à deux écrans : la commande d'un côté, la vente saisie à la main de
-l'autre. Conseil d'Alpha retenu pour ma propre démo : la répéter avec un
-téléphone en 4G et un ordinateur en Wi-Fi, car c'est là que le temps réel se
-casse d'habitude.
+**Note de Claudinette sur la troisième idée (corrigée le 08/10) :** la liaison
+commande → vente existe déjà en production. Le déclencheur
+`trg_finia_order_to_sale` (migration 0127 du 17/09) écrit la vente dans l'espace
+Accounting de la vendeuse quand une commande passe « livrée ». Ma première note
+disait le contraire : c'était faux. Aucune commande réelle ne l'a encore
+empruntée, donc la démo à trois écrans est possible dès aujourd'hui, mais à
+répéter d'abord sur la base de test. Conseil d'Alpha retenu : la répéter avec
+un téléphone en 4G et un ordinateur en Wi-Fi.
 
 ### L'idée « wow » pour une démo : la comptable voit la vente arriver
 

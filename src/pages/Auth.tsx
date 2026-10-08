@@ -144,13 +144,14 @@ export default function Auth() {
         <section className="rounded-card border border-hairline bg-white p-6 shadow-[0_18px_40px_rgba(23,27,38,0.08)] sm:p-8">
           {/* Arrivée depuis l'espace vendeuse de la place de marché (?src=vendeuse-finjaro) :
               elle a déjà un compte, on le lui dit d'abord. Formulation relue par Alpha le 02/10 :
-              la liaison n'a encore produit aucune vente. Audit du 07/10 : aucun code ne fait
-              encore arriver une commande dans la caisse (la liaison attend l'accord de Beau),
-              donc on ne promet que ce qui marche aujourd'hui : la reprise des articles. */}
+              la liaison n'a encore produit aucune vente, donc « peuvent », pas « arriveront ».
+              Elle existe bien : le déclencheur trg_finia_order_to_sale (migration 0127 du
+              17/09) écrit la vente dans l'espace quand une commande passe « livrée ». Le 07/10,
+              je l'avais crue absente en ne cherchant que dans ce dépôt : erreur corrigée le 08/10. */}
           {currentSource().visit.startsWith('vendeuse') && mode === 'login' && (
             <div className="mb-5 rounded-input border border-[#B8860B]/40 bg-[#FBF1DF] px-4 py-3 text-caption text-ink">
               <p className="font-semibold">{t('Vous vendez déjà sur Finjaro ?')}</p>
-              <p className="mt-0.5">{t('Connectez-vous avec le même compte, rien à recréer : vos articles Finjaro se reprennent en un geste depuis l’écran Produits.')}</p>
+              <p className="mt-0.5">{t('Connectez-vous avec le même compte, rien à recréer : vos ventes livrées sur Finjaro peuvent arriver dans votre caisse.')}</p>
             </div>
           )}
           <h2 className="font-display text-[26px] font-bold text-ink">{mode === 'login' ? t('Se connecter') : t('Créer mon compte')}</h2>
