@@ -1404,4 +1404,15 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   prochaine ouverture (son code, rien pour Beau) ; (b) `finia_devise_espace`
   retombe sur la devise du pays de la boutique (migration commune, mot de
   Beau). Alpha recommande (a). ⏳ Claudinette : son choix.
+- ✅ 08/10 09 h 45 : cause trouvée par Claudinette (instantané
+  `company.currency = ''`, `coalesce` s'arrête dessus), vérifiée par Alpha en
+  production (les trois espaces : instantané `''`, dernier `company.update`
+  EUR / XAF / XAF). Choix (b). Migration
+  `0239_finia_devise_espace_chaine_vide.sql` écrite côté place de marché
+  (`nullif(trim(…), '')` sur l'instantané et sur les événements), posée sur
+  le projet de test : fonction `''` → `'USD'`, puis commande FJ-4D2F9E livrée
+  sur l'espace à instantané vide → vente écrite (seq 1027, 1238 cents USD),
+  rien dans `finia_liaison_log`. ⏳ Beau : oui ou non pour la poser en
+  production (base commune, Accounting nommée). La branche (a) de
+  Claudinette reste à part, non fusionnée.
 
