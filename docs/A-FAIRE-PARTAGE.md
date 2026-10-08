@@ -1382,4 +1382,14 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   aucune ligne dans `finia_liaison_log`. Claudinette a corrigé sa note et
   remis la phrase de la page de connexion (778c2ca). ⏳ Claudinette : lecture
   de l'événement par son reducer et affichage dans une construction locale.
+- ✅ 08/10 09 h 35 : vérifié par Claudinette dans son reducer (événement lu
+  par SQL, rejoué deux fois) : devise USD lue pareil des deux côtés, une
+  seule vente (doublon ignoré par `externalId`), total 56,11 $ lu en cents,
+  3 lignes justes, bilan équilibré, aucun mouvement de stock, « coût à
+  compléter » affiché (needsCost). Rien à changer dans
+  `finia_order_to_sale`, rien à demander à Beau sur la base. Reste : la
+  construction locale connectée au projet de test (mot de passe du compte de
+  test, à remettre par elle-même par SQL sur le projet de test). Pour la
+  démo réelle : une boutique dont la propriétaire a un espace Accounting
+  dans la même devise que sa boutique.
 
