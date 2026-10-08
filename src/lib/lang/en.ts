@@ -149,6 +149,8 @@ export const EN: Record<string, string> = {
   'En attente de réseau': 'Waiting for network',
   'Hors ligne': 'Offline',
   'Local (sans compte)': 'Local (no account)',
+  'Voir la comptabilité complète': 'See the full accounting',
+  'Revenir au mode simple': 'Back to simple mode',
   'Mode expert': 'Expert mode',
   'Mode simple': 'Simple mode',
   'devise à choisir': 'currency to choose',

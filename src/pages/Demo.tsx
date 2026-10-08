@@ -92,6 +92,14 @@ const SCREENS: Record<string, string> = {
   'grand-livre': '/grand-livre', balance: '/balance', documents: '/rapports',
 };
 
+/**
+ * Écrans de la comptabilité complète. La démonstration s'ouvre en mode simple
+ * (audit du 07/10 : une débutante voyait les numéros de compte et tout le menu
+ * comptable, qu'elle n'aura pas chez elle) ; un lien direct vers l'un de ces
+ * écrans, lui, est fait pour un comptable : il ouvre en mode expert.
+ */
+const EXPERT_SCREENS = new Set(['/journal', '/grand-livre', '/balance', '/etats', '/plan-comptable', '/tva', '/rapprochement', '/cloture', '/audit']);
+
 export function screenFromSlug(value: string | undefined): string {
   if (!value) return '/';
   return SCREENS[slug(value)] ?? '/';
@@ -115,6 +123,7 @@ export default function Demo() {
     // métier si le lien en demande un autre, pour comparer sans tout recharger.
     if (localStorage.getItem(DEMO_KEY) === '1' && hasContent(db)) {
       if (tradeId !== db.company.sector) setCompany({ sector: tradeId, tracksStock: undefined, name: t('Démonstration — {trade}', { trade: t(SECTORS.find((s) => s.id === tradeId)?.label ?? 'Boutique / commerce') }) });
+      if (EXPERT_SCREENS.has(screen) && db.company.mode !== 'EXPERT') setCompany({ mode: 'EXPERT' });
       window.location.hash = `#${screen}`;
       return;
     }
@@ -127,7 +136,7 @@ export default function Demo() {
       city: '',
       sector: tradeId,
       goals: ['sell', 'stock', 'debts', 'accounting'],
-      mode: 'EXPERT',
+      mode: EXPERT_SCREENS.has(screen) ? 'EXPERT' : 'SIMPLE',
       onboarded: true,
     });
     loadDemo();

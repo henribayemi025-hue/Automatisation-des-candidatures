@@ -147,7 +147,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   const { company } = useDB();
   const { user, sync, pending, signOut, workspace, workspaces, switchWorkspace, invitations, acceptInvitation, displayName, avatarUrl, setPage } =
     useCollab();
-  const { resetAll } = useStoreActions();
+  const { resetAll, setCompany } = useStoreActions();
   const { dark, setChoice } = useTheme();
   const [palette, setPalette] = useState(false);
   const [demo, setDemo] = useState(() => localStorage.getItem(DEMO_KEY) === '1');
@@ -460,6 +460,14 @@ export default function Layout({ children }: { children: ReactNode }) {
             <NavLink to="/manuel" className="btn-ghost px-3 py-1.5 text-caption">
               {t('Manuel')}
             </NavLink>
+            {/* La démonstration s'ouvre en mode simple ; un comptable passe à la
+                comptabilité complète d'un geste, sans chercher les Paramètres. */}
+            <button
+              onClick={() => setCompany({ mode: company.mode === 'EXPERT' ? 'SIMPLE' : 'EXPERT' })}
+              className="text-caption font-semibold text-teal underline-offset-2 hover:underline"
+            >
+              {company.mode === 'EXPERT' ? t('Revenir au mode simple') : t('Voir la comptabilité complète')}
+            </button>
             <button onClick={leaveDemo} className="btn-primary px-3 py-1.5 text-caption">
               {user ? t('Quitter la démonstration') : t('Créer mon compte')}
             </button>

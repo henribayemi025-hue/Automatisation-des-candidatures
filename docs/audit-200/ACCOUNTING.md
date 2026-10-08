@@ -81,7 +81,13 @@ Reste la caisse, avec 4 px de trop : toléré, invisible à l'œil.
 
 **Proposition :** afficher le mois en cours par défaut, avec « Voir plus ». Pas encore fait : ça touche les filtres et l'export Excel de plusieurs écrans, à faire un écran à la fois.
 
-### 6. MOYEN — proposé : la démonstration s'ouvre en mode expert
+### 6. MOYEN — corrigé le 08/10 : la démonstration s'ouvre en mode expert
+
+**Fait le 08/10 :**
+- La démonstration s'ouvre en mode simple, avec « Voir la comptabilité complète » dans le bandeau (un geste pour revenir).
+- Un lien direct vers un écran comptable (`/demo/<pays>/<métier>/journal`) ouvre en mode expert.
+- Vérifié au clic, à 390 et 1 440 px. La visite guidée affiche toujours le bilan.
+- Captures : `demo-390-bandeau.png`, `demo-1440-mode-simple.png`.
 
 **Le lien de causalité :**
 1. Une débutante clique « Ouvrir une démonstration ».
