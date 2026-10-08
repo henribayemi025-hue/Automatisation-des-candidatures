@@ -1392,4 +1392,16 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   test, à remettre par elle-même par SQL sur le projet de test). Pour la
   démo réelle : une boutique dont la propriétaire a un espace Accounting
   dans la même devise que sa boutique.
+- ⚠️ 08/10 09 h 40, mesuré en production (comptes de test exclus) : 3
+  boutiques réelles ont une propriétaire avec un espace Accounting (deux au
+  Cameroun, une en France ; 0 commande réelle chez les trois), et pour les
+  trois `finia_devise_espace(espace)` renvoie `''` : ni
+  `data.company.currency`, ni événement `company.update` avec une devise.
+  À la première commande livrée, la liaison écrirait
+  `devise_de_l_espace_inconnue` et ne créerait aucune vente. Deux
+  réparations possibles : (a) Accounting écrit un `company.update` avec la
+  devise à la création de l'espace et, pour les espaces existants, à la
+  prochaine ouverture (son code, rien pour Beau) ; (b) `finia_devise_espace`
+  retombe sur la devise du pays de la boutique (migration commune, mot de
+  Beau). Alpha recommande (a). ⏳ Claudinette : son choix.
 
