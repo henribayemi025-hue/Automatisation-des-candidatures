@@ -5,8 +5,8 @@ import { createClient } from '@supabase/supabase-js';
 // VITE_SUPABASE_URL / VITE_SUPABASE_KEY : seulement pour une construction
 // locale de répétition contre le projet de test (qiyvoaljqmbfldephobp). Le
 // build de production n'en définit aucune et garde la base partagée.
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://bokwivwizghdlaedczbw.supabase.co';
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY || 'sb_publishable_UMnuj2_xJ7uZt76TspkBAA_EiAMg6zt';
+const SUPABASE_URL = import.meta.env?.VITE_SUPABASE_URL || 'https://bokwivwizghdlaedczbw.supabase.co';
+const SUPABASE_KEY = import.meta.env?.VITE_SUPABASE_KEY || 'sb_publishable_UMnuj2_xJ7uZt76TspkBAA_EiAMg6zt';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: {
