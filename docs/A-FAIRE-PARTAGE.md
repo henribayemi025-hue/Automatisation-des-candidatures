@@ -1432,3 +1432,12 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   pas activée. ⏳ Beau : l'activer. D'ici là, la chaîne saute Mistral et
   passe à Groq, puis à Z.ai seulement si sa clé est posée, puis à
   Cloudflare.
+
+- ✅ 08/10 14 h 40 (contrôle de 2 h, Alpha) : rien de neuf côté Accounting
+  depuis 7ab5011. Signalé à Claudinette par le canal direct : le moteur
+  commun `moteur.ts` (CI 271 à 273) fait maintenant la queue devant Z.ai
+  (attente de 20 s au plus, appel borné à 50 s, réflexion coupée), clé
+  posée par Beau à 11 h (et non 13 h comme écrit dans le message). Aussi :
+  migration 0240 `legion_publications` (Léo seulement, additive, RLS
+  membres) et `legion-travail` redéployée. Aucune table finia_* ni
+  auth.users touchée.
