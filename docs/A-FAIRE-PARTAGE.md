@@ -1372,4 +1372,14 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   Beau ; la note sur la troisième est à corriger d'après ce qui précède.
 - ⏳ Beau : inchangé — essai réel de Finia, régime fiscal par défaut, relance
   gratuite des créances ; recontacter l'acheteuse de FJ-4Y8MK2.
+- ✅ 08/10 09 h 32 : répétition faite sur le projet de test
+  `qiyvoaljqmbfldephobp` : commande FJ-526845
+  (83e6aba8-1fe5-457b-aac9-a2b17443abda) passée par caissier-01 sur la
+  boutique de la gérante, transitions faites en tant que la gérante (garde
+  `lock_order_status` respectée), livrée à 07 h 30 UTC → événement
+  `sale.record` seq 1026 dans l'espace 01f48575-c5f9-4a80-b011-bd5cb6fd4af9
+  (USD, 5611 en unités mineures pour 34 000 XAF, 3 lignes, `unitCost` 0),
+  aucune ligne dans `finia_liaison_log`. Claudinette a corrigé sa note et
+  remis la phrase de la page de connexion (778c2ca). ⏳ Claudinette : lecture
+  de l'événement par son reducer et affichage dans une construction locale.
 
