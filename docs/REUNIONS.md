@@ -7,6 +7,59 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 19 — 09/10/2026 (matin)
+
+**1. Ce qui a bougé depuis hier**
+- **En ligne sur accounting.finjaro.net (version `c2c44acb25b3`, identique à
+  la dernière construction) :**
+  - la démonstration s'ouvre en mode simple, avec « Voir la comptabilité
+    complète » ;
+  - la phrase de la page de connexion est remise : la liaison commande → vente
+    existe bien en base, et je m'étais trompée le 07/10.
+- **Base, avec le oui de Beau (08/10) :** la migration 0239 est posée. Les
+  trois vendeuses réelles qui ont un espace Accounting ont maintenant une
+  devise lue (EUR, XAF, XAF). Leur première commande livrée deviendra une
+  vente dans leur caisse. Aucune commande réelle n'a encore suivi ce chemin.
+- **/api/health ce matin :** `ai: true, groq: true`.
+- **Alpha :** son moteur commun a été retouché et deux fonctions de Léo
+  redéployées, sans toucher à la base ni à Accounting. Il n'encaisse pas par
+  mobile money : ses 20 commandes réelles sont payées à la livraison.
+- **Veille du 09/10 :**
+  - SplashArk démarre au Cameroun, gratuit, avec paiement retenu jusqu'à la
+    livraison. On ne connaît que son communiqué ;
+  - MTN MoMo et Orange Money sont tombés plusieurs heures les 07 et 08/10.
+
+**2. À corriger (yeux d'une commerçante sur téléphone)**
+- **Finia n'a toujours pas été essayée sur le vrai site** depuis Groq. **Attend
+  Beau** : poser une question avec son compte et donner l'heure.
+- **Le régime fiscal par défaut est « réel » avec TVA** pour une petite
+  boutique. **Attend Beau.**
+- **Un paiement mobile money compte comme encaissé tout de suite.** Pendant
+  une panne, la caisse affiche de l'argent jamais reçu. Idée posée dans
+  IDEES.md ; **attend Beau.**
+- **Stock et Devis :** pas encore relus à l'œil sur téléphone. C'est le jour 8
+  de l'audit, fait aujourd'hui.
+
+**3. Une idée**
+- **Mobile money « à confirmer » :** une case « reçu » sur la vente, une ligne
+  dans « À traiter », et un geste pour basculer en espèces ou à crédit. Rien en
+  base. La place de marché a fixé la même règle pour le jour où elle
+  encaissera : « payé » seulement à la confirmation.
+
+**4. Aujourd'hui**
+- **Moi :**
+  - audit jour 8 : Stock et Devis, à 390 et 1 440 px. Je corrige ce qui
+    touche Accounting seule ;
+  - supabase-js 2.117.3 : pas de mise à jour tant que l'envoi d'une photo ne
+    peut pas être essayé de bout en bout (même blocage que l'essai sur le
+    projet de test).
+- **J'attends d'Alpha :**
+  - me prévenir dès qu'une des trois vendeuses a une commande livrée, pour
+    vérifier la vente dans sa caisse ;
+  - la fiche SplashArk de Vigie quand elle sera prête.
+
+---
+
 ## Réunion n° 18 — 08/10/2026 (matin)
 
 **1. Ce qui a bougé depuis hier**
