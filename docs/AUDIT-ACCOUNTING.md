@@ -207,9 +207,25 @@ Sans souci : la suppression d'un tiers déjà utilisé archive au lieu d'effacer
 Note : `scripts/whatsapp-partout-check.ts` se lance avec vite-node, pas tsx (il utilise __dirname). Vert.
 Aucune erreur JavaScript à 390 et 1440 px.
 
-### À faire ensuite (jour 8)
+### Jour 8 — 09/10 : stock et devis (`Stock.tsx`, `Quotes.tsx`)
 
-`Stock.tsx` et `Quotes.tsx` (devis).
+| # | Constat | Gravité | Ce qui a été fait |
+|---|---|---|---|
+| 1 | Correction de stock : il fallait taper un nombre **négatif** pour une sortie (casse, perte, vol), dans un champ à clavier chiffré. Le clavier chiffré de l'iPhone n'a pas de signe moins : la perte ne pouvait pas se saisir. | **Grave** sur iPhone : le stock reste faux. | Deux boutons « J'en retire » / « J'en ajoute », quantité toujours positive. Un « -3 » tapé reste une sortie. L'écran affiche « Stock après correction : 44 » avant d'enregistrer. |
+| 2 | Une quantité illisible (« 2, », du texte) passait : le stock devenait NaN **pour toujours**, car le journal ne s'efface pas. | **Grave** (donnée gâtée) | Bouton bloqué tant que la quantité n'est pas lisible ; « 2,5 » est compris. Le moteur ignore aussi une quantité illisible ou nulle. Vérifié en base : aucun ajustement de stock n'existe encore, donc aucun historique réel ne change. |
+| 3 | Devis : impossible de rouvrir un devis pour le renvoyer au client. Il fallait le refaire. | Moyen | « Ouvrir » sur chaque devis : aperçu, Imprimer, Envoyer sur WhatsApp, Convertir en vente. |
+| 4 | Devis refusé : aucun moyen de l'annuler, la liste grossissait sans fin. | Moyen | « Annuler le devis » (avec confirmation). Il quitte la liste et laisse une trace dans l'historique ; rien n'avait été encaissé ni déstocké. Caché aux caissiers : la base leur refuse ce type d'opération (`finia_can_emit`). Les fonctions serveur ne comptent que les ventes confirmées : rien à changer côté base. |
+| 5 | Stock, téléphone : « Alertes » et « Valorisation » défilaient sur le côté (640 px pour 356). | Moyen | Seuil, coût unitaire et valeur au prix de vente restent sur ordinateur. Mesuré : 356 px pour 356. |
+| 6 | Stock : 577 mouvements sur une seule page dans la démonstration (4 390 mots sur téléphone). | Moyen (point 5 de l'audit du 07/10) | Les 50 plus récents, puis « Voir plus » (100 de plus). |
+| 7 | Stock, téléphone : les quatre cartes de chiffres prenaient tout le premier écran. | Petit | Les deux compteurs (articles, alertes) se partagent une ligne. Libellés « Corriger le stock » au lieu de « Ajustement ». |
+| 8 | Les fenêtres n'étaient pas annoncées comme telles aux lecteurs d'écran. | Petit | `role="dialog"` sur toutes les fenêtres. |
+
+Vérifié au clic à 390 et 1 440 px (démonstration boutique, Cameroun) : sortie de 2 enregistrée (46 → 44), devis rouvert puis annulé, aucune erreur JavaScript.
+Nouveau contrôle `scripts/stock-devis-check.ts` (10 points, vert). Les 40 contrôles du dépôt passent.
+
+### À faire ensuite (jour 9)
+
+`Expenses.tsx` relu le 02/10 ; reste `CashBook.tsx` (livre de caisse) et `Journal.tsx` (point 5 : mois en cours par défaut).
 
 Alpha a relu le n° 6 le 02/10 : pas d'objection. Les outils serveur (finia_resume_mois, ma_compta_*)
 lisent des dates « AAAA-MM-JJ » et compteront mieux. accounting-rappels n'est pas concerné.

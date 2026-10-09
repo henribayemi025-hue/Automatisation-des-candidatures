@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import type { ReactNode } from 'react';
 import type { Company, Sale } from '../lib/types';
 import { formatMoney } from '../lib/money';
 import { locale, t } from '../lib/i18n';
@@ -137,7 +138,11 @@ ${proMentions(company, sale).map((m) => `<div class="foot" style="font-size:10px
   w.document.close();
 }
 
-export default function Receipt({ sale, company, onClose }: { sale: Sale | null; company: Company; onClose: () => void }) {
+/**
+ * `reopened` : la fiche est rouverte depuis une liste (un devis à renvoyer),
+ * pas tout juste enregistrée. `actions` s'ajoute aux boutons du bas.
+ */
+export default function Receipt({ sale, company, onClose, reopened = false, actions }: { sale: Sale | null; company: Company; onClose: () => void; reopened?: boolean; actions?: ReactNode }) {
   const navigate = useNavigate();
   if (!sale) return null;
   const isQuote = sale.status === 'QUOTE';
@@ -149,7 +154,18 @@ export default function Receipt({ sale, company, onClose }: { sale: Sale | null;
   const wa = `https://wa.me/?text=${encodeURIComponent(receiptText(company, sale))}`;
 
   return (
-    <Modal open onClose={onClose} title={isQuote ? t('Devis {n} enregistré', { n: sale.number }) : t('Vente {n} enregistrée', { n: sale.number })}>
+    <Modal
+      open
+      onClose={onClose}
+      title={
+        reopened
+          ? `${isQuote ? t('Devis') : sale.customerId ? t('Facture') : t('Ticket')} ${sale.number}`
+          : isQuote
+            ? t('Devis {n} enregistré', { n: sale.number })
+            : t('Vente {n} enregistrée', { n: sale.number })
+      }
+    >
+      {!reopened && (
       <div className="flex items-center gap-2 rounded-input bg-teal/10 px-3 py-2 text-caption font-semibold text-teal">
         <IconCheck className="h-4 w-4" />
         {isQuote
@@ -158,6 +174,7 @@ export default function Receipt({ sale, company, onClose }: { sale: Sale | null;
             ? t('Caisse, stock et comptabilité mis à jour.')
             : t('Caisse et comptabilité mises à jour.')}
       </div>
+      )}
 
       <div className="mx-auto mt-4 max-w-[340px] rounded-card border border-hairline bg-base px-4 py-4 font-mono text-[12.5px] text-ink">
         <p className="text-center font-bold">{company.name}</p>
@@ -239,7 +256,7 @@ export default function Receipt({ sale, company, onClose }: { sale: Sale | null;
         <a href={wa} target="_blank" rel="noreferrer" className="btn-ghost">
           {t('Envoyer sur WhatsApp')}
         </a>
-        {isQuote && (
+        {isQuote && !reopened && (
           <button
             onClick={() => {
               onClose();
@@ -250,9 +267,12 @@ export default function Receipt({ sale, company, onClose }: { sale: Sale | null;
             {t('Voir les devis')}
           </button>
         )}
-        <button onClick={onClose} className="btn-primary ml-auto">
-          {isQuote ? t('Nouvelle vente') : t('Vente suivante')}
-        </button>
+        {actions}
+        {!reopened && (
+          <button onClick={onClose} className="btn-primary ml-auto">
+            {isQuote ? t('Nouvelle vente') : t('Vente suivante')}
+          </button>
+        )}
       </div>
     </Modal>
   );

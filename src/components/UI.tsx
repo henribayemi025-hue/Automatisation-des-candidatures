@@ -134,7 +134,7 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-0 backdrop-blur-[2px] sm:items-center sm:p-6">
-      <div className={`max-h-[92vh] w-full overflow-y-auto rounded-t-card bg-white p-5 shadow-2xl scrollbar-thin sm:rounded-card sm:p-6 ${wide ? 'sm:max-w-3xl' : 'sm:max-w-lg'}`}>
+      <div role="dialog" aria-modal="true" aria-label={title} className={`max-h-[92vh] w-full overflow-y-auto rounded-t-card bg-white p-5 shadow-2xl scrollbar-thin sm:rounded-card sm:p-6 ${wide ? 'sm:max-w-3xl' : 'sm:max-w-lg'}`}>
         <div className="mb-5 flex items-start justify-between gap-4">
           <h2 className="font-display text-[22px] font-bold text-ink">{title}</h2>
           <button onClick={onClose} aria-label={t('Fermer')} className="rounded-full p-1.5 text-muted hover:bg-base">

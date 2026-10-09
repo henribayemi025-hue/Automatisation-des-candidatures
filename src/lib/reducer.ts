@@ -585,6 +585,16 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       break;
     }
 
+    case 'quote.cancel': {
+      // Devis refusé par le client : il n'a rien encaissé ni déstocké, il
+      // quitte simplement la liste. La trace reste dans l'historique.
+      const i = db.sales.findIndex((s) => s.id === p.saleId && s.status === 'QUOTE');
+      if (i < 0) break;
+      const [quote] = db.sales.splice(i, 1);
+      audit(db, ev, 'sale', quote.id, 'CANCEL', `Devis ${quote.number} annulé — ${quote.customerName}`);
+      break;
+    }
+
     case 'purchase.record': {
       const purchase = structuredClone(p.purchase as Purchase);
       purchase.number = uniqueNumber(db.purchases.map((x) => x.number), purchase.number);
@@ -739,8 +749,10 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
 
     case 'stock.adjust': {
       const product = db.products.find((x) => x.id === p.productId);
-      if (!product) break;
       const qty = p.qty as number;
+      // Une quantité illisible (« 2, », texte) donnait NaN et gâtait le stock
+      // pour de bon : le journal ne s'efface pas (audit jour 8).
+      if (!product || !Number.isFinite(qty) || qty === 0) break;
       const reason = p.reason as string;
       const date = p.date as string;
       product.stock += qty;

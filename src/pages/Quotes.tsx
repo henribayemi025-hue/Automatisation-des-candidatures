@@ -1,20 +1,28 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../lib/store';
+import { useCollab } from '../lib/collab';
 import { toMinor } from '../lib/money';
 import type { PaymentMethod } from '../lib/types';
 import { Empty, Field, Modal, Money, PageHeader, Table } from '../components/UI';
 import { IconDoc, IconPlus } from '../components/Icons';
+import Receipt from '../components/Receipt';
 import { t } from '../lib/i18n';
 
 export default function Quotes() {
-  const { db, confirmQuote } = useStore();
+  const { db, confirmQuote, cancelQuote } = useStore();
+  const { workspace } = useCollab();
+  const [openId, setOpenId] = useState<string | null>(null);
   const [convertId, setConvertId] = useState<string | null>(null);
   const [method, setMethod] = useState<PaymentMethod>('CASH');
   const [paidRaw, setPaidRaw] = useState('');
 
   const quotes = db.sales.filter((s) => s.status === 'QUOTE');
+  const opened = quotes.find((q) => q.id === openId) ?? null;
   const target = quotes.find((q) => q.id === convertId);
+  // La base refuse l'annulation à un caissier (finia_can_emit) : le bouton
+  // ne s'affiche pas plutôt que d'échouer en silence.
+  const canCancel = workspace?.role !== 'cashier';
 
   function submit() {
     if (!target) return;
@@ -25,11 +33,17 @@ export default function Quotes() {
     setMethod('CASH');
   }
 
+  function cancel(id: string, number: string) {
+    if (!window.confirm(t('Annuler le devis {n} ? Il quitte la liste ; rien n’avait été encaissé ni déstocké.', { n: number }))) return;
+    cancelQuote(id);
+    setOpenId(null);
+  }
+
   return (
     <>
       <PageHeader
         title={t('Devis')}
-        subtitle={`${quotes.length} devis en attente de conversion`}
+        subtitle={t('{n} devis en attente de la réponse du client', { n: quotes.length })}
         actions={
           <Link to="/pos" className="btn-primary">
             <IconPlus className="h-4 w-4" />
@@ -51,8 +65,8 @@ export default function Quotes() {
                   <Money value={q.total} />
                 </td>
                 <td className="td text-right">
-                  <button onClick={() => setConvertId(q.id)} className="text-sm font-semibold text-brand-600">
-                    {t('Convertir en vente')}
+                  <button onClick={() => setOpenId(q.id)} className="text-sm font-semibold text-brand-600">
+                    {t('Ouvrir')}
                   </button>
                 </td>
               </tr>
@@ -66,6 +80,33 @@ export default function Quotes() {
           />
         )}
       </div>
+
+      {opened && (
+        <Receipt
+          sale={opened}
+          company={db.company}
+          reopened
+          onClose={() => setOpenId(null)}
+          actions={
+            <>
+              {canCancel && (
+                <button onClick={() => cancel(opened.id, opened.number)} className="btn-ghost text-brand-600">
+                  {t('Annuler le devis')}
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  setOpenId(null);
+                  setConvertId(opened.id);
+                }}
+                className="btn-primary ml-auto"
+              >
+                {t('Convertir en vente')}
+              </button>
+            </>
+          }
+        />
+      )}
 
       <Modal open={!!target} onClose={() => setConvertId(null)} title={t('Convertir le devis en vente')}>
         {target && (

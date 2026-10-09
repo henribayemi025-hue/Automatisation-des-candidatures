@@ -165,6 +165,8 @@ export interface StoreActions {
   archiveSupplier: (supplierId: string, archived: boolean) => void;
   recordSale: (input: SaleInput) => Sale;
   confirmQuote: (saleId: string, method: PaymentMethod, paid: Minor) => void;
+  /** Devis refusé : il quitte la liste, rien d'autre ne bouge. */
+  cancelQuote: (saleId: string) => void;
   recordPurchase: (input: PurchaseInput) => Purchase;
   receivePurchase: (purchaseId: string, date?: string) => void;
   addExpense: (input: ExpenseInput) => void;
@@ -364,6 +366,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           },
         });
         return sale;
+      },
+
+      cancelQuote(saleId) {
+        if (!dbRef.current.sales.some((s) => s.id === saleId && s.status === 'QUOTE')) throw new Error('Devis introuvable');
+        dispatch('quote.cancel', { saleId });
       },
 
       confirmQuote(saleId, method, paid) {

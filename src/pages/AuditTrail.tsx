@@ -16,6 +16,7 @@ const ACTION_TONE: Record<string, 'success' | 'info' | 'warn' | 'danger' | 'neut
   OPEN: 'info',
   CLOSE: 'warn',
   QUOTE: 'neutral',
+  CANCEL: 'danger',
 };
 
 export default function AuditTrail() {
