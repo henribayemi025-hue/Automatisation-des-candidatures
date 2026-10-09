@@ -2,6 +2,33 @@
 
 Chaque idée : le problème, pour qui, ce que ça vaut, l'effort, ce qu'on demande à Beau. Beau coche ☐ → ☑ quand il décide. Les idées viennent des deux sessions, de la concurrence, du terrain. Rien n'est promis : c'est une liste de choix.
 
+## Idée issue de la veille du 09/10/2026 — à décider par Beau
+
+☐ **Mobile money « à confirmer » dans la caisse.**
+- **Problème :** quand la commerçante choisit « Mobile money », la vente
+  compte tout de suite comme encaissée. Or MTN MoMo et Orange Money sont
+  tombés plusieurs heures les 07 et 08/10, au Cameroun notamment. Pendant une
+  panne, le client dit « j'ai envoyé », l'argent n'arrive pas, et la caisse
+  affiche quand même un encaissement.
+- **Pour qui :** toutes les boutiques qui encaissent par mobile money.
+- **Valeur :** une caisse qui ne compte pas de l'argent jamais reçu. À la
+  fermeture, la ligne « 2 paiements mobile money à confirmer » évite de
+  découvrir l'écart des jours plus tard.
+- **Effort :** faible.
+  - Une case « reçu » sur la vente mobile money, cochée par défaut, qu'on
+    peut décocher.
+  - Une ligne dans « À traiter », et la possibilité de basculer la vente en
+    espèces ou à crédit en un geste.
+  - Rien en base : tout passe par les événements de l'espace.
+- **À décider :** oui ou non. Et si oui : case cochée par défaut (rien ne
+  change pour qui ne s'en sert pas) ou décochée (plus sûr, mais un geste de
+  plus à chaque vente) ?
+
+Sources : note du 09/10 dans VEILLE.md. Bujeti (Nigeria, 08/10) relance
+aussi les impayés par WhatsApp, ce qui appuie l'idée du 08/10 ci-dessous.
+
+---
+
 ## Revue hebdomadaire — 08/10/2026 (Claudinette)
 
 ### Ce que font les concurrents cette semaine

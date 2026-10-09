@@ -11,6 +11,122 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 09/10/2026 (couvre du 07 au 09/10)
+
+### Concurrence
+- **SplashArk, Cameroun (communiqué du 08/10/2026)** :
+  - société américaine qui fait du Cameroun son premier marché africain ;
+  - application gratuite pour vendre et prendre des réservations avec acompte
+    (« 35 métiers », selon le communiqué) ;
+  - paiement par mobile money (via pawaPay) ou par carte (via Stripe), l'argent
+    étant retenu jusqu'à la livraison ;
+  - un assistant IA pour fixer les prix ; français et anglais.
+
+  C'est un communiqué rédigé par le fondateur, pas un article : aucune
+  traction n'est mesurée.
+  [EIN Presswire](https://www.einpresswire.com/article/945126301/splashark-lance-au-cameroun-son-appli-pour-vendre-r-server-et-tre-pay-par-mobile-money)
+  → Concurrent direct de la place de marché sur notre marché de démarrage. Il
+  n'a ni caisse ni comptabilité : c'est là que Finjaro se distingue.
+- **Bujeti « Brain », Nigeria et Kenya (article du 08/10/2026 ; ouvert à tous
+  depuis le 30/09)** : quatre « coéquipiers » IA pour les équipes financières.
+  L'un lit les factures et les reçus ; un autre relance les impayés par e-mail,
+  SMS et WhatsApp, et peut proposer un échéancier. Aucun ne peut déplacer
+  d'argent seul.
+  [Disrupt Africa](https://disruptafrica.com/2026/10/08/yc-backed-bujeti-launches-ai-teammates-to-take-manual-work-off-african-finance-teams/)
+  → Deuxième signal en deux jours après BharatNXT : la relance des impayés par
+  WhatsApp devient une attente de base. Voir l'idée du 08/10 dans IDEES.md.
+- **Inde (articles du 08/10/2026, rien de décidé)** :
+  - les frais sur les paiements UPI aux commerçants pourraient passer du
+    15/10 au 01/01/2027
+    ([Inc42](https://inc42.com/buzz/upi-mdr-rollout-may-be-deferred-to-january-2027-amid-pushback-by-retailers/)) ;
+  - le GST Council a donné un accord de principe à une seule déclaration
+    annuelle pour les entreprises jusqu'à « Rs 5 crore » de chiffre d'affaires
+    ([Economic Times](https://economictimes.indiatimes.com/news/economy/policy/gst-reforms-16-lakh-small-businesses-may-get-annual-return-option-easier-e-commerce-selling/articleshow/134799885.cms)).
+
+  → Rien à faire tant que Finjaro n'entre pas en Inde. Le jour venu, UPI y
+  sera le moyen de paiement par défaut.
+- **Brésil (article du 08/10/2026)** : à partir du 01/11/2026, les micro et
+  petites entreprises du Simples Nacional qui facturent des services passent
+  par l'émetteur national de NFS-e, en ligne ou par API.
+  [Contadores](https://www.contadores.cnt.br/noticias/tecnicas/2026/10/08/emissao-de-nfs-e-o-que-muda-para-me-e-epp-em-novembro.html)
+  → Une seule API nationale au lieu de systèmes municipaux : l'entrée au
+  Brésil coûterait moins cher côté facture. Simple note.
+
+### Règles et paiements
+- **Pannes de mobile money (07 et 08/10/2026)**, d'après les pages d'état des
+  agrégateurs (pas des opérateurs) :
+  - MTN MoMo, 07/10, de 03:49 à 05:57 UTC, dans plusieurs pays dont le
+    Cameroun, la Côte d'Ivoire, le Bénin, la RDC et le Nigeria
+    ([pawaPay](https://status.pawapay.io/incidents/t0q35cjjj3d4)) ;
+  - Orange Money Cameroun, 08/10, de 16:41 à 20:29 UTC, encaissements et
+    reversements ([pawaPay](https://status.pawapay.io/incidents/pj0944rvrnmp)) ;
+  - Orange Money Burkina Faso, 07/10, de 12:40 à 16:23 UTC
+    ([Flutterwave](https://status.flutterwave.com/incidents/sthd1xbbphpz)).
+
+  → Trois pannes de plusieurs heures en deux jours. Dans la caisse, une vente
+  « Mobile money » compte comme encaissée tout de suite, même si l'argent
+  n'est jamais arrivé. Idée ajoutée dans IDEES.md.
+- **BCEAO (deux communiqués du 08/10/2026)** :
+  - les Trésors publics de l'UEMOA se branchent sur PI-SPI (salaires,
+    subventions, impôts et taxes), la Côte d'Ivoire d'abord
+    ([BCEAO](https://www.bceao.int/fr/communique-presse/connexion-des-tresors-publics-la-plateforme-interoperable-du-systeme-de-paiement)) ;
+  - la liste des établissements de paiement agréés au 31/08/2026 compte
+    « trente-quatre (34) structures »
+    ([BCEAO](https://www.bceao.int/fr/communique-presse/liste-des-etablissements-de-paiement-agrees-dans-lumoa-au-31-aout-2026)).
+
+  → L'import de relevés devra un jour reconnaître un impôt payé par PI-SPI.
+  Côté place de marché : vérifier qu'un partenaire d'encaissement figure sur
+  la liste avant de signer.
+- **Gabon (dépêche AGP du 08/10/2026)** : la Banque mondiale recommande
+  d'« étendre progressivement Digitax aux petites entreprises ». C'est une
+  recommandation, pas une obligation.
+  [AGP](https://agpgabon.ga/gabon-finances-publiques-la-banque-mondiale-preconise-une-refonte-numerique-de-ladministration-fiscale/)
+  → À surveiller pour un futur export, sans rien promettre dans l'interface.
+- **Côte d'Ivoire, à confirmer** : un site privé (Lookuptax) cite un
+  communiqué de la DGI du 14/09/2026, qui laisse 45 jours aux entreprises
+  émettant leurs factures FNE par API pour se mettre en conformité. Le texte
+  officiel n'a pas pu être ouvert : le site de la DGI était injoignable.
+  [Lookuptax](https://lookuptax.com/tax-changes/cote-divoire/fne-api-conformity-29-oct-2026)
+  → Accounting n'émet pas de FNE par API, donc rien ne casse. À relire avant
+  toute décision sur le « Reçu de caisse » ivoirien.
+- **Rien de daté** : DGI Cameroun, DGID Sénégal, DGI Gabon (sites muets ou
+  injoignables), journaux des API MTN, Orange et Wave.
+
+### Technologie et IA
+- **supabase-js 2.117.3 (07/10/2026)** : corrige l'envoi d'un fichier vers une
+  fonction edge (le type du fichier est conservé) et l'envoi vers le stockage
+  (les champs passent avant le fichier).
+  [GitHub](https://github.com/supabase/supabase-js/releases/tag/v2.117.3)
+  → Accounting est en 2.116.0 et envoie des photos vers le stockage
+  (discussion). Mise à jour à prévoir, puis essai d'un envoi de photo. Pas
+  faite ce matin : la veille ne met rien en ligne.
+- **LightOnOCR-3 (08/10/2026)** : modèles de lecture de documents en trois
+  tailles, sous licence Apache 2.0. Ils repèrent les tableaux, les formulaires
+  et l'écriture manuscrite. La page annonce le meilleur score sur un test de
+  documents français ; les reçus ne sont pas cités.
+  [Hugging Face](https://huggingface.co/blog/lightonai/lightonocr-3)
+  → Un lecteur de reçus ouvert, possible secours à Gemini. Mais il lui faut un
+  serveur avec carte graphique : il ne tourne pas sur Workers.
+- **ML Drift, Google AI Edge (08/10/2026)** : le moteur qui fait tourner l'IA
+  sur la carte graphique du téléphone passe en source ouverte. Il marche sur
+  Android, iOS et ordinateur, et dans le navigateur par WebGPU.
+  [Google Developers](https://developers.googleblog.com/ml-drift-next-gen-gpu-aiml-inference-at-the-edge/)
+  → Rend plausible, un jour, la lecture de reçu hors ligne dans l'application.
+  Rien d'immédiat.
+- **Supabase (08/10/2026)** : la page d'état passe sur incident.io. Les
+  abonnements par SMS, webhook ou RSS sont à refaire ; ceux par e-mail sont
+  conservés.
+  [Supabase](https://supabase.com/changelog/status-page-migration)
+  → Si une alerte de panne arrivait par webhook ou SMS, elle est muette
+  depuis le 08/10.
+- **Reconnaissance vocale** : Falcon ASR (07/10) ne couvre que le français en
+  plus de l'arabe et des grandes langues, et n'a pas encore d'API. Aucune
+  langue africaine trouvée ailleurs.
+- **Rien de daté** : Groq (rien sur gpt-oss), Gemini, Cloudflare Workers AI,
+  Mistral, WhatsApp Business, Capacitor.
+
+---
+
 ## 08/10/2026 (couvre du 06 au 08/10, élargi au 30/09 quand c'était utile)
 
 ### Concurrence
