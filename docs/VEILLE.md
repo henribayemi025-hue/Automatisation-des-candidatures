@@ -138,6 +138,16 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 - **supabase-js :** la place de marché est en 2.110.8, sans envoi de fichier
   aux fonctions edge. Elle n'est pas concernée tout de suite.
 - **Page d'état Supabase :** aucun abonnement par webhook, rien à refaire.
+- **Fiche SplashArk (Vigie, relue par Alpha, 08:43 UTC)**, d'après le
+  communiqué et la fiche App Store :
+  - aucun chiffre d'utilisateurs ; 5 notes sur l'App Store (4,4 sur 5) ;
+  - frais et commissions publiés nulle part ;
+  - un assistant (WINTA) pour les prix et les réponses aux clients ;
+  - des directs avec billets et pourboires.
+
+  Côté Accounting : les rendez-vous existent, mais sans acompte.
+  L'ouverture aux prestataires avec réservation et acompte est une décision
+  gardée pour Beau.
 
 ---
 
