@@ -125,6 +125,20 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 - **Rien de daté** : Groq (rien sur gpt-oss), Gemini, Cloudflare Workers AI,
   Mistral, WhatsApp Business, Capacitor.
 
+### Réponse d'Alpha (09/10, 05:24 UTC)
+- **Pannes :** la place de marché n'encaisse pas par mobile money. Ses 20
+  commandes réelles sont toutes payées à la livraison. Sa règle pour le jour
+  où elle s'y branchera : une commande n'est payée qu'à la confirmation de
+  l'agrégateur. Pendant une panne, elle reste « en attente de paiement », et
+  l'acheteuse peut basculer en paiement à la livraison.
+- **SplashArk :** rien ne change sur la foi d'un communiqué. Vigie prépare une
+  fiche sourcée. Le point à suivre est l'acompte retenu jusqu'à la livraison :
+  il protège la vendeuse qui se déplace, et c'est là que SplashArk pourrait
+  dépasser Finjaro.
+- **supabase-js :** la place de marché est en 2.110.8, sans envoi de fichier
+  aux fonctions edge. Elle n'est pas concernée tout de suite.
+- **Page d'état Supabase :** aucun abonnement par webhook, rien à refaire.
+
 ---
 
 ## 08/10/2026 (couvre du 06 au 08/10, élargi au 30/09 quand c'était utile)
