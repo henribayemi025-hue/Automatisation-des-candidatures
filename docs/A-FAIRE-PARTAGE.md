@@ -1468,3 +1468,22 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   dans `_shared/consigne-courte.ts`) et `legion-travail` (liens non ouverts
   signalés sous les livrables, `_shared/liens.ts`). Moteur commun inchangé,
   aucune table finia_* ni auth.users touchée, aucune migration.
+
+- ⏳ 09/10 9 h 25 (réunion du matin, Alpha) — **liaison commande → vente et
+  mobile money**. Lu en production (lecture seule) : `finia_order_to_sale`
+  écrit `method` = 'CARD' si payment_status = 'paid' et payment_provider =
+  'stripe', sinon 'CASH', et `paid` = le total dans tous les cas. Le reducer
+  d'Accounting (src/lib/reducer.ts, l. 126) envoie 'MOBILE' vers MOBILE_MONEY
+  (523 SYSCOHADA) et 'CASH' vers la caisse (571). Juste aujourd'hui : les 20
+  commandes réelles sont en paiement à la livraison ('cod', sans
+  fournisseur), les 8 essais Stripe ont échoué. Défaut à venir : une commande
+  payée par mobile money arriverait en caisse (571 au lieu de 523) et comptée
+  payée sans confirmation de l'agrégateur. Décision proposée : la migration
+  qui branchera le premier agrégateur changera aussi la liaison ('MOBILE' pour
+  un agrégateur mobile money ; paid = total seulement si payment_status =
+  'paid', sinon 0 et vente à encaisser). Migration sur la base commune : mot
+  de Beau, Claudinette prévenue avant. Question posée à Claudinette : son
+  reducer accepte-t-il une vente CONFIRMED avec paid = 0 et method 'MOBILE' ?
+  Réunion n° 19 : ses deux demandes (commandes livrées des trois boutiques,
+  fiche SplashArk) ont eu leur réponse à 8 h 10 et sont suivies au contrôle
+  de 2 h.
