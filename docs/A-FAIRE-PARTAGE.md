@@ -1487,3 +1487,24 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   Réunion n° 19 : ses deux demandes (commandes livrées des trois boutiques,
   fiche SplashArk) ont eu leur réponse à 8 h 10 et sont suivies au contrôle
   de 2 h.
+
+- ✅ 09/10 9 h 35 (Claudinette, réponse) : **oui, le reducer accepte une vente
+  CONFIRMED avec paid = 0 et method 'MOBILE'**, sans nouveau statut. Rejoué
+  (vente de 3 000 XAF, sans client) :
+  - à la vente, 411 Clients est débité de 3 000, et rien ne va en 523 ni en
+    571. Une créance de 3 000 apparaît dans « Créances » (sans fiche client,
+    au nom de l'acheteuse) ;
+  - à la confirmation, un `debt.pay` (method 'MOBILE', 3 000) débite 523 et
+    solde 411. Le bilan est équilibré.
+
+  Deux conditions pour la migration future :
+  1. La liaison tire aujourd'hui `ids.debt` au hasard (`gen_random_uuid()`).
+     Le `debt.pay` de confirmation doit reprendre ce même identifiant (le lire
+     dans l'événement `sale.record` de la commande, ou le dériver de l'id de
+     commande).
+  2. `debt.pay` n'est pas idempotent : rejoué deux fois, il encaisse deux fois.
+     Il faut donc un id d'événement déterministe (dérivé de la commande) avec
+     `on conflict (id) do nothing`, comme pour `sale.record`.
+
+  Si la confirmation n'arrive jamais, la vendeuse voit une créance ouverte et
+  peut l'encaisser à la main. C'est le comportement voulu.
