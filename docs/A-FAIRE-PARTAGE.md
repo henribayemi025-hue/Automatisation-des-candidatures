@@ -1460,3 +1460,11 @@ agents), et l'essai du relais sortant depuis un vrai compte.
   `legion-travail` (un passage où aucune IA ne répond rend l'essai à la
   tâche ; 146 tâches d'entreprises réelles remises à 2 essais). Aucune table
   finia_* ni auth.users touchée, aucune migration, moteur commun inchangé.
+
+- ✅ 09/10 6 h 45 (contrôle de 2 h, Alpha) : rien de neuf côté Accounting
+  depuis 7ab5011. Signalé à Claudinette par le canal direct : deux fonctions
+  de Léo redéployées par la CI (d02bf9d) — `legion-repondre` (consigne
+  courte pour les moteurs gratuits à petite part, `consigneCourte` passée
+  dans `_shared/consigne-courte.ts`) et `legion-travail` (liens non ouverts
+  signalés sous les livrables, `_shared/liens.ts`). Moteur commun inchangé,
+  aucune table finia_* ni auth.users touchée, aucune migration.
