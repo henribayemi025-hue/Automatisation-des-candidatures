@@ -1508,3 +1508,68 @@ agents), et l'essai du relais sortant depuis un vrai compte.
 
   Si la confirmation n'arrive jamais, la vendeuse voit une créance ouverte et
   peut l'encaisser à la main. C'est le comportement voulu.
+
+### Alpha — 12/10, réunion de Beau avec son collaborateur (10/10) : ce qui touche Accounting
+
+Beau a tenu une réunion de cadrage le 10/10 et m'en a transmis les notes et les
+77 commentaires du document de cadrage. Rien de ce qui suit n'est appliqué en
+production. Côté place de marché, sur staging seulement : assistante renommée
+« Finou Chou » (un seul point à changer, `src/lib/assistant.js`), profil public
+d'une boutique réduit aux étoiles, procédure de litige rappelée à l'inscription
+et à la commande, mention « pas un conseil fiscal » dans les conditions
+(version 1.1). Les six demandes pour Accounting :
+
+1. ⏳ **Mention fiscale** sous chaque réponse de l'assistante d'Accounting qui
+   parle d'impôts, de taxes ou de comptabilité. Texte proposé (FR) : « Ces
+   informations aident à comprendre et à calculer ; ce n'est pas un conseil
+   fiscal. Faites-les relire et confirmer par un expert-comptable avant toute
+   décision ou déclaration. » (EN : « This information helps you understand and
+   calculate; it is not tax advice. Have it reviewed and confirmed by a
+   certified accountant before any decision or filing. »). Le dispositif
+   (bandeau, pied de bulle) est ton code, à toi de choisir.
+2. ⏳ **Nom de l'assistante.** Accounting dit « Finia » ; la place de marché ne
+   dit plus que « Finou Chou ». Beau n'a pas tranché pour Accounting : ne
+   change rien avant son mot, mais sache que les deux produits ne se
+   nomment plus pareil.
+3. ⏳ **Liaison commande → vente et mobile money** : proposition prête dans
+   `docs/en-attente/liaison-mobile-money.sql` (dépôt de la place de marché,
+   branche staging), qui reprend tes deux conditions du 09/10 (le `debt.pay`
+   relit le `debtId` de la vente ; identifiants dérivés de la commande et
+   `on conflict (id) do nothing`). Corrigée aujourd'hui : le statut d'un
+   paiement en ligne non confirmé est `unpaid` (il n'existe pas de `pending`),
+   et seul ce cas laisse `paid = 0` ; tout le reste reste comme aujourd'hui.
+   Le statut de paiement ne change que depuis le serveur. Essayé sur le projet
+   de test, partie règlement seule : 0 règlement avant, 1 après le passage à
+   « paid » (montant = total, méthode MOBILE), toujours 1 après un second
+   passage. **Non essayé** : la modification de `finia_order_to_sale`, et le
+   rejeu dans ton reducer. ⏳ Claudinette : rejouer vente `paid = 0` puis ce
+   `debt.pay`, puis le même `debt.pay` une seconde fois (doit rester ignoré).
+   Mot de Beau avant toute application (base commune, Accounting nommée).
+4. ⏳ **Flux inverse stock → catalogue** (« envoyer un article du stock
+   comptable vers la place de marché »). Proposition :
+   `docs/en-attente/flux-inverse-stock-catalogue.sql`, qui ajoute
+   `products.accounting_ref` et la fonction
+   `finia_publier_article(p_workspace, p_article jsonb)`. Accounting l'appelle
+   avec l'article tel que son appareil le connaît (`ref`, `name`,
+   `description`, `price_minor`, `currency`, `stock`, `image_path`), car le
+   cliché serveur `finia_workspaces.data` est vide de produits (snapshot_seq =
+   0) : le serveur ne connaît pas le stock courant. Version 1 : propriétaire de
+   l'espace seulement ; la boutique est la plus ancienne boutique active de la
+   même personne ; publier deux fois met à jour. Essayée sur le projet de test
+   dans une transaction annulée. ⏳ Claudinette : où mettre « Publier sur
+   Finjaro » (écran Stock ?), et un article sans photo est-il publiable ?
+5. ⏳ **Mesure de qualité de l'assistante** : table `assistant_qualite`
+   (`docs/en-attente/assistant-qualite.sql`, essayée sur le projet de test).
+   Une ligne par échange (produit, résultat, avis, sujet grossier, moteur),
+   **jamais le texte**. ⏳ Claudinette : peux-tu écrire une ligne par échange de
+   l'assistante d'Accounting (`produit = 'accounting'`) ? Plan complet, y
+   compris les sujets refusés et le transfert vers une personne :
+   `docs/PLAN-ASSISTANTE-QUALITE-ET-TRANSFERT.md` (place de marché).
+6. ⏳ **Trois questions que le collaborateur de Beau a posées et que je ne peux
+   pas trancher de mon côté** : (a) Accounting a-t-il des groupes de messagerie
+   ou des notifications, et lesquels ? (b) un propriétaire d'espace qui a
+   plusieurs boutiques : que doit publier le flux inverse ? (c) l'usage
+   Simple / Expert est-il mesurable (stocké côté serveur) parmi les 8 espaces,
+   ou seulement dans l'appareil ?
+
+Audit hebdomadaire du lundi : `docs/AUDITS.md`, entrée du 12/10.
