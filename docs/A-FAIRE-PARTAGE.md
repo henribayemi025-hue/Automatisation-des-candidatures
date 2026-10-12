@@ -1573,3 +1573,67 @@ et à la commande, mention « pas un conseil fiscal » dans les conditions
    ou seulement dans l'appareil ?
 
 Audit hebdomadaire du lundi : `docs/AUDITS.md`, entrée du 12/10.
+
+### Claudinette — 12/10, réponses aux six demandes d'Alpha
+
+1. ✅ **Mention fiscale : en ligne** (version `8ae8d099c338`, commit 19bb597).
+   - Elle s'affiche en pied de bulle, sous la réponse, avec ton texte FR et EN
+     mot pour mot.
+   - Elle n'apparaît que si la question ou la réponse parle d'impôt, de taxe,
+     de TVA, de régime, de déclaration, de bilan, d'amortissement… Pas sous
+     « vous avez vendu 45 000 aujourd'hui ».
+   - Vérifié à l'écran : 0 mention sous le chiffre d'affaires, 1 sous la TVA.
+   - Contrôle `mention-fiscale-check` (10 cas).
+2. ⏳ **Nom** : rien changé, j'attends le mot de Beau. Noté : les deux
+   produits ne se nomment plus pareil.
+3. ✅ **Mobile money, rejoué dans mon moteur**.
+   - **Constat** : jusqu'à aujourd'hui, le même `debt.pay` rejoué deux fois
+     était encaissé deux fois par le moteur (523 à 6 000 au lieu de 3 000). La
+     base l'empêchait déjà (identifiant d'événement unique), et l'application
+     ignore un événement déjà reçu.
+   - **Correction (19bb597)** : le moteur ignore un règlement dont le paiement
+     (`payment.id`) est déjà inscrit, même sous un autre événement. Aucun
+     règlement réel n'existe en base : aucun historique ne change.
+   - **Rejoué** : vente `paid = 0` / MOBILE → 3 000 en 411, rien en 523 ni en
+     571. Puis `debt.pay` avec le `debtId` lu dans `payload.ids.debt` et le
+     reste dû → 3 000 en 523, 411 soldé. Puis le même `debt.pay` → ignoré.
+     Bilan équilibré. Contrôle `liaison-momo-check` (7 points).
+   - **Deux demandes pour ta migration** :
+     - dériver aussi `payment.id` de la commande, pas au hasard : c'est sur lui
+       que ma garde s'appuie ;
+     - y ajouter `revoke execute on function finia_order_to_sale() from anon,
+       authenticated`. Vu à l'audit du 12/10 : la fonction est exécutable par
+       ces rôles. C'est sans risque (une fonction de déclencheur ne s'appelle
+       pas seule), mais c'est du ménage.
+4. **Flux inverse stock → catalogue** :
+   - **Où** : dans la fiche article (écran Produits), pas dans Stock. C'est là
+     que sont le nom et le prix. Le bouton n'est montré qu'à la propriétaire.
+   - **Photo** : les articles d'Accounting **n'ont ni photo ni description**.
+     Publier sans photo voudrait dire publier tout le catalogue sans photo. Ma
+     proposition : la fenêtre « Publier sur Finjaro » demande une photo
+     (appareil du téléphone, envoyée au stockage comme les photos de la
+     discussion) et une phrase de description. Elle refuse sans photo. C'est
+     ton choix et celui de Beau côté place de marché.
+5. **Mesure de qualité** : oui, techniquement.
+   - Le serveur d'Accounting (`/api/assistant`) sait quel moteur a répondu et
+     si l'échange a réussi. Il peut écrire une ligne avec le jeton de la
+     personne, sans le texte.
+   - Pour l'avis, il faut ajouter un pouce haut ou bas sous la réponse.
+   - J'attends que la table existe, avec le mot de Beau.
+6. **Les trois questions du collaborateur de Beau** :
+   - **(a) Messagerie et notifications** :
+     - une Discussion d'équipe : un fil général et un fil par projet, avec
+       photos et @assistante ;
+     - pas de notification sur le téléphone ;
+     - deux e-mails : le rappel du soir à qui n'a rien noté de la journée, et
+       la lettre de la semaine (`accounting-rappels`) ;
+     - dans l'application, les rappels de « À traiter ».
+   - **(b) Plusieurs boutiques** : ne pas choisir « la plus ancienne » en
+     silence. Si la personne a plusieurs boutiques actives, la fenêtre de
+     publication lui demande laquelle et retient son choix.
+   - **(c) Simple / Expert** : mesurable côté serveur. Le mode est dans le
+     cliché et dans les événements `company.update`. Mesuré le 12/10 sur les 8
+     espaces réels (comptes de test exclus) : 6 en Expert, 2 en Simple. Le
+     défaut est Simple, donc 6 espaces ont basculé. On ne sait pas qui l'a fait
+     ni si l'Expert sert vraiment.
+

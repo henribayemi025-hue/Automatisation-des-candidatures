@@ -6,7 +6,9 @@
 // tête, modèle de secours si Google refuse, réponse fondée sur les VRAIS
 // chiffres envoyés par l'application (jamais sur ce que le modèle imagine).
 
-const MODELS = ['gemini-2.5-flash', 'gemini-3.5-flash'];
+// gemini-3.5-flash est déprécié depuis le 08/10/2026 et redirigé par Google
+// vers gemini-3.6-flash (veille du 12/10) : on l'appelle par son nom.
+const MODELS = ['gemini-2.5-flash', 'gemini-3.6-flash'];
 const GEMINI_TIMEOUT_MS = 30_000;
 const SUPABASE_URL = 'https://bokwivwizghdlaedczbw.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_UMnuj2_xJ7uZt76TspkBAA_EiAMg6zt';

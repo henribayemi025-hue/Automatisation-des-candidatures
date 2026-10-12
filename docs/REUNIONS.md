@@ -7,6 +7,59 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 20 — 12/10/2026
+
+**Pas de réunion les 10 et 11/10** : la session de Claudinette était arrêtée.
+Les routines ont sonné sans personne pour répondre. Rattrapé aujourd'hui en une
+fois : veille du 09 au 12/10, audit du lundi, six demandes d'Alpha.
+
+**1. Ce qui a bougé depuis le 09/10**
+- **En ligne sur accounting.finjaro.net (version `8ae8d099c338`, vérifiée) :**
+  - la mention « pas un conseil fiscal » sous les réponses de l'assistante
+    qui parlent d'impôts, de taxes ou de comptabilité (demande de la réunion
+    de Beau du 10/10) ;
+  - sans compte, « Combien de TVA je dois reverser ? » donne la TVA du mois,
+    et non plus les dettes fournisseurs ;
+  - le moteur n'encaisse jamais deux fois le même règlement.
+- **Audit du lundi** : rien de cassé (sécurité rejouée, 42 contrôles, 35
+  écrans à deux largeurs, simulation sur deux ans). Détail dans AUDITS.md.
+- **Alpha** : réunion de cadrage de Beau le 10/10, six demandes pour Accounting,
+  réponses dans A-FAIRE-PARTAGE. Côté place de marché, l'assistante s'appelle
+  désormais « Finou Chou » (sur staging seulement).
+- **Base** : aucune migration, aucune fonction d'Accounting touchée.
+
+**2. À corriger (yeux d'une commerçante sur téléphone)**
+- **Orange Money Cameroun est retombé en panne le 12/10**, pendant 5 h 30.
+  C'est la troisième fois en six jours, et la caisse compte toujours un
+  paiement mobile money comme reçu. **Attend Beau** : l'idée « mobile money à
+  confirmer » (IDEES.md, 09/10).
+- **Toujours en attente de Beau** :
+  - l'essai de Finia avec son compte ;
+  - le régime fiscal par défaut ;
+  - le nom de l'assistante d'Accounting (« Finia » ou « Finou Chou »).
+
+**3. Une idée**
+- **Chopmoney (Ghana, 09/10)** propose un « résumé IA » qui compare deux
+  périodes en langage simple. Accounting a déjà les chiffres comparés sur
+  l'Accueil. Les mettre en une phrase lisible (« ce mois-ci vous avez vendu
+  plus que le mois dernier, surtout le savon ») coûte peu. À proposer après
+  l'audit des listes (point 5).
+
+**4. Aujourd'hui et demain**
+- **Fait aujourd'hui** :
+  - les trois corrections ci-dessus ;
+  - Gemini appelé par son nouveau nom (`gemini-3.6-flash`) ;
+  - réponses aux six demandes d'Alpha.
+- **Demain** : audit jour 9, le livre de caisse, puis le journal avec le mois
+  en cours par défaut (point 5 de l'audit).
+- **J'attends d'Alpha** :
+  - dériver aussi l'identifiant du paiement (`payment.id`) de la commande dans
+    la migration mobile money ;
+  - y ajouter le retrait du droit d'exécution sur `finia_order_to_sale` ;
+  - me dire où en est le nom de l'assistante.
+
+---
+
 ## Réunion n° 19 — 09/10/2026 (matin)
 
 **1. Ce qui a bougé depuis hier**

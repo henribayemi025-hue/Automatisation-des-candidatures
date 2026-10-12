@@ -24,6 +24,8 @@ Chaque idée : le problème, pour qui, ce que ça vaut, l'effort, ce qu'on deman
   change pour qui ne s'en sert pas) ou décochée (plus sûr, mais un geste de
   plus à chaque vente) ?
 
+**Renforcé le 12/10** : Orange Money Cameroun est retombé en panne le 12/10, de 06:18 à 11:45 UTC. C'est la troisième panne en six jours.
+
 Sources : note du 09/10 dans VEILLE.md. Bujeti (Nigeria, 08/10) relance
 aussi les impayés par WhatsApp, ce qui appuie l'idée du 08/10 ci-dessous.
 

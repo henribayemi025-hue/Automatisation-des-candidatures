@@ -6,6 +6,71 @@ est corrigé ou reste à décider.
 
 ---
 
+## 12/10/2026
+
+### Sécurité
+
+- **Production `bokwivwizghdlaedczbw`, en lecture seule** :
+  - RLS actif sur les cinq tables `finia_*` ; 12 règles d'accès, comme le 05/10.
+  - Garde « membre retiré » en place. `finia_quota_assistant` toujours absente
+    (migration f228150 non appliquée, comme prévu).
+  - **Nouveau dans la liste des fonctions exécutables par `anon` et
+    `authenticated` : `finia_order_to_sale`.** C'est la fonction du
+    déclencheur commande → vente (elle renvoie `trigger`). Postgres refuse de
+    l'appeler en dehors d'un déclencheur, donc **aucun risque**. Ménage
+    proposé : retirer ce droit dans la prochaine migration de la liaison
+    (celle du mobile money, déjà en préparation chez Alpha).
+- **Aucun secret dans le dépôt.** Recherche faite sur les clés Google, Groq,
+  OpenAI/DeepSeek, Resend, `service_role` et les clés privées. Seul apparaît un
+  jeton dans une migration, comme le 05/10.
+- **Scénarios de rôles rejoués** sur le projet de test `qiyvoaljqmbfldephobp`,
+  chaque essai dans une transaction annulée. Vérifié ensuite : aucun événement
+  écrit, le membre de test est toujours « actif ».
+
+  | Qui | Geste | Résultat |
+  |---|---|---|
+  | intrus | lit le journal et l'espace | 0 événement, 0 espace |
+  | intrus | écrit une vente | refusé (règle d'accès) |
+  | caissier | enregistre une vente | accepté |
+  | caissier | change la devise | refusé |
+  | caissier | annule un devis (`quote.cancel`, nouveau le 09/10) | refusé. Le bouton est caché aux caissiers : c'est cohérent |
+  | caissier | signe au nom de la propriétaire | refusé |
+  | membre retiré | lit | 0 événement, 0 espace |
+  | membre retiré | se remet « actif » | 0 ligne modifiée |
+
+### Code
+
+- Vérification des types et construction : propres.
+- **42 contrôles `scripts/*-check.ts` : tous verts**, dont trois nouveaux :
+  - `stock-devis-check` (09/10) ;
+  - `liaison-momo-check` (12/10) ;
+  - `mention-fiscale-check` (12/10).
+- **Navigateur, 35 écrans de la démo à 390 et 1 280 px** : aucune erreur
+  JavaScript, aucun écran vide, aucune page qui défile sur le côté.
+- **Trouvé et corrigé pendant l'audit** : sans compte, l'assistante répondait à
+  « Combien de TVA je dois reverser ? » par les dettes fournisseurs. Les mots
+  « je dois » l'emportaient. Elle donne maintenant la TVA du mois, calculée
+  comme l'écran TVA. Vérifié à l'écran : 175 198 − 59 952 = 115 246 FCFA.
+
+### Comptabilité
+
+`SIM_YEARS=2 npx vite-node scripts/sim-passe1.ts`, comparé au 05/10 :
+- **Boutique** : 2 anomalies, les deux déjà connues (pas de retour d'article ;
+  dépense refusée dans un exercice clos). Le 05/10 en comptait 3, dont la
+  fausse alerte « achats sans payé par », retirée le 06/10.
+- **Salon** : 6 anomalies au lieu de 7. Reste l'écart déjà connu entre la
+  valeur du stock et le compte de stock.
+- Aucune régression.
+
+### Ce qui reste à décider
+
+- Retirer le droit d'exécution de `finia_order_to_sale` pour `anon` et
+  `authenticated` : sans risque aujourd'hui. À glisser dans la migration de la
+  liaison mobile money, avec le mot de Beau.
+- Toujours en attente : le retour d'article.
+
+---
+
 ## 05/10/2026
 
 ### Sécurité

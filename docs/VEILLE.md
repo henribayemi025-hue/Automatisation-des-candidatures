@@ -11,6 +11,110 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 12/10/2026 (couvre du 09 au 12/10 ; pas de veille les 10 et 11/10, la session était arrêtée)
+
+### Concurrence
+- **Chopmoney, Ghana (09/10/2026)** : application Android de comptabilité pour
+  petits commerces. Elle enregistre ventes, dépenses et crédits clients, émet
+  des factures, et donne un « résumé IA » qui compare deux périodes. Aucun prix
+  dans l'article.
+  [MyJoyOnline](https://www.myjoyonline.com/chopmoney-bookkeeping-seeks-to-simplify-bookkeeping-for-ghanas-small-businesses/)
+  → Concurrent anglophone le plus proche de la caisse et de la compta
+  d'Accounting. Le résumé en langage simple devient une attente de base.
+- **MoMoGram, Ghana (11/10/2026)** : application Android pour les agents
+  mobile money. Elle automatise les codes USSD et tient des registres
+  exportables en PDF ou Excel, même hors ligne. Gratuite 30 jours, puis
+  « GHS 7 a month ».
+  [Ghana News 24](https://ghananews24.com/tech/article/ghanaian-startup-octagram-tech-launches-momogram-to-speed-up-mobile-money-agents)
+  → Un repère de prix en monnaie locale pour un outil de comptoir.
+- **Viyona Tap & Pay (12/10/2026)** : paiement sans contact qui transforme un
+  téléphone Android en terminal de carte. Lancé au Zimbabwe ; ni prix ni date
+  pour le reste de l'Afrique.
+  [CXOToday](https://cxotoday.com/media-coverage/viyona-fintech-advances-african-expansion-with-tap-pay-softpos-launch-in-zimbabwe-eyes-africas-2-trillion-payments-ecosystem/)
+  → Le terminal de carte devient le téléphone : la caisse d'Accounting n'a
+  pas à viser de matériel dédié.
+- **Transify, Ouganda (article du 10/10/2026 ; outil public depuis février)** :
+  chaque dépense est reliée à son approbation, à sa règle et à ses pièces.
+  Gratuit en « Basic », « $29.99 per month » en « Pro ».
+  [Kenya Today](https://kenya-today.com/report-ugandabased-transify-launches-saas-platform-for-financial-governance-of-smes-ngos-and-schools-9572/)
+  → Une offre « contrôle et audit » se vend au-dessus de la compta de base.
+  Accounting a déjà l'historique et l'audit : piste pour une offre payante.
+- **Brésil (09/10/2026)** : à partir du 01/01/2027, les micro-entrepreneurs
+  qui vendent des marchandises émettront leurs notes avec l'application
+  publique gratuite Nota Fiscal Fácil.
+  [Correio Braziliense](https://www.correiobraziliense.com.br/cbradar/mei-que-vende-mercadoria-passa-a-ter-a-nota-fiscal-facil-como-caminho-preferencial-e-gratuito-para-emitir-nota-a-partir-de-1o-de-janeiro-de-2027-e-micro-e-pequenas-empresas-do-simples-deixam-de-entre/)
+  → Au Brésil, l'émission elle-même sera gratuite ; seul ce qui l'entoure
+  (caisse, stock, compta) se vendra.
+
+### Règles et paiements
+- **Orange Money Cameroun en panne le 12/10/2026**, de 06:18 à 11:45 UTC,
+  d'après la page d'état de pawaPay. C'est la troisième panne en six jours
+  (07, 08 et 12/10).
+  [pawaPay](https://status.pawapay.io/incidents/ps67q9lfxcf3)
+  → Appuie l'idée « mobile money à confirmer » du 09/10, toujours en attente.
+- **Wave Côte d'Ivoire instable le 10/10/2026**, de 01:44 à 03:09 UTC
+  (pawaPay).
+  [pawaPay](https://status.pawapay.io/incidents/h5v0vdpqcfqd)
+- **Côte d'Ivoire, FNE par API : communiqué officiel de la DGI du 14/09/2026,
+  enfin lu.** Il confirme ce que Lookuptax rapportait le 09/10 :
+  - « quarante-cinq (45) jours à compter de la date de signature » pour se
+    mettre en conformité, sinon la clé API peut être suspendue ;
+  - numéro de compte contribuable du client : 7 chiffres et une lettre ;
+  - téléphone à 10 chiffres sans +225 ; e-mail et téléphone obligatoires en B2B ;
+  - pour un client à l'étranger : devise et taux de change obligatoires ;
+  - TVA facturée seulement au régime réel (RNI, RSI) ;
+  - aucune quantité ni valeur négative.
+
+  [DGI Côte d'Ivoire](http://www.fne.dgi.gouv.ci/uploads/communiques/pdf_6aa92f4c0b766_COMMUNIQUE_MISE_EN_CONFORMITE_FNE.pdf)
+  (ouvert en http : le certificat du site ne passe pas)
+  → Accounting n'émet pas de FNE par API aujourd'hui. Le jour où elle le fera,
+  ces contrôles de saisie s'appliquent, et un retour passe par un avoir, jamais
+  par une ligne négative.
+- **France, communiqué du 09/10/2026** :
+  - « Au 4 octobre, 75% des entreprises déclarant de la TVA avaient désigné une
+    plateforme de réception » ;
+  - « aucune sanction pour aucune entreprise ne sera prononcée avant la fin de
+    l'année 2026 » ;
+  - prochaine étape : « l'échéance du 1er septembre 2027 », pour l'émission des
+    factures par les PME et les micro-entreprises.
+
+  [Ministère de l'Économie](https://presse.economie.gouv.fr/facturation-electronique-le-premier-comite-dresse-le-bilan-du-deploiement-et-engage-la-preparation-de-2027/)
+  → Une vendeuse réelle d'Accounting tient ses comptes en euros (France). Pour
+  elle, l'émission par plateforme agréée deviendra obligatoire au 01/09/2027.
+- **Gabon, page « E-Fact » de la DGI** (sans date affichée ; publiée le 10/10
+  d'après les données techniques de la page) :
+  - phase pilote pour les grandes et moyennes entreprises ;
+  - émission possible « via leur logiciel existant, s'il est conforme » ;
+  - facture validée avec un QR code ;
+  - « Aucune sanction automatique » pendant le pilote.
+
+  [DGI Gabon](https://dgi.ga/e-fact/)
+  → Un logiciel conforme est accepté : Accounting peut viser l'homologation
+  quand les spécifications sortiront. Les petits commerces ne sont pas encore
+  concernés.
+
+### Technologie et IA
+- **Gemini (entrée du 08/10/2026)** : « gemini-3.5-flash is deprecated and has
+  been replaced by gemini-3.6-flash ». Les appels à l'ancien nom sont redirigés.
+  [Google](https://ai.google.dev/gemini-api/docs/changelog)
+  → Accounting l'appelait par l'ancien nom : corrigé le 12/10. La place de
+  marché l'utilise aussi (signalé à Alpha).
+- **Cloudflare Workers AI, Clef-omni (09/10/2026)** : un modèle « de décision »
+  qui écoute de l'audio ou regarde une vidéo ou une image, et donne une
+  probabilité pour chaque réponse permise.
+  [Cloudflare](https://developers.cloudflare.com/changelog/post/2026-10-09-clef-omni-workers-ai/)
+  → Pourrait trier une note vocale ou un reçu (« dépense ou recette ? ») sans
+  transcription. Il ne recopie pas un montant : il ne remplace pas la lecture
+  des reçus.
+- **supabase-js 2.118.0-canary (09/10/2026)** : préversion qui ne touche que
+  les types générés. Rien à faire.
+- **Rien de daté** :
+  - Groq : les trois modèles d'Accounting ne sont pas dépréciés ;
+  - Mistral, Capacitor, WhatsApp Business ;
+  - langues africaines, lecture de reçus.
+
+---
+
 ## 09/10/2026 (couvre du 07 au 09/10)
 
 ### Concurrence
