@@ -295,3 +295,63 @@ identifiant nouveau à chaque vue. Sans ce pic, les vues baissent (≈ 206 contr
 286), et les gestes d'achat aussi (0 contact, 1 panier, 0 commande). La seule
 vraie commande ouverte (27/09, sans compte, au statut « priced ») n'a jamais
 été signalée à l'acheteur : remontée à Beau.
+
+## 12/10/2026 — Audit hebdomadaire, place de marché (Alpha)
+
+Production en lecture seule ; les rôles sont rejoués dans des blocs annulés
+(rien n'est écrit). Comptes de test exclus (`compte_reel`). Fenêtres glissantes
+de 7 jours : les chiffres diffèrent donc un peu du rapport du lundi au dimanche
+remis à Beau (`docs/rapports/2026-10-12-semaine.md`, côté place de marché).
+
+### Sécurité
+
+- **Visiteur non connecté** : voit 69 boutiques et 402 articles, et aucune
+  boutique ni aucun article de test (0 et 0). Il voit 0 commande, 0 profil,
+  0 message Léo, 0 espace Finia. Une insertion d'article est refusée.
+- **Acheteuse réelle** (jeton simulé) : 0 commande d'autrui, 0 conversation
+  d'autrui, 0 message d'autrui, 0 Léo, 0 Finia, 0 autre profil lisible.
+- **Vendeuse réelle** (jeton simulé) : 0 commande ni conversation hors de sa
+  boutique, 0 Léo, 0 Finia, 0 autre profil.
+- RLS active sur 147 tables sur 147 (142 sur 142 il y a une semaine), 291
+  règles. Conseiller de sécurité : mêmes lignes que le 05/10 (1 ERROR,
+  `profiles_public` en SECURITY DEFINER ; 4 WARN dont HaveIBeenPwned toujours
+  désactivé, interrupteur de Beau). 36 fonctions SECURITY DEFINER ouvertes aux
+  visiteurs, même nombre que le 05/10 ; leur appartenance à la liste blanche de
+  0229 n'a pas été revérifiée une à une cette semaine.
+- Le statut de paiement d'une commande ne se modifie que depuis le serveur
+  (`lock_order_financials` : service_role ou réglage interne). Vérifié en
+  essayant une modification depuis le projet de test.
+
+### Code et santé
+
+- 587 tests sur 587, compilation sans erreur (staging, 12/10).
+- **Pas remesuré cette semaine** : le LCP de Cloudflare (24 % « Poor » au
+  05/10) — le connecteur Cloudflare n'est pas autorisé dans cette session ; et
+  les RPC les plus lentes.
+- 🔴 Les agents de Léo tournent sur des moteurs gratuits, moins bons :
+  DeepSeek et Kimi ont coupé (solde épuisé, 12/10 à 02 h 01 UTC) et le Gemini
+  payant l'était au dernier contrôle. Recharger est une dépense : décision de
+  Beau.
+- 🟠 Le faux site `finjaro.com` (autre entreprise) revient dans les sources de
+  plusieurs agents : consigne « finjaro.net est notre seul site » à poser.
+- 248 livrables d'agents attendent une relecture (9 marqués « fait »).
+
+### Chiffres (7 derniers jours / 7 jours d'avant, comptes de test exclus)
+
+| | Cette semaine | Semaine d'avant |
+| --- | --- | --- |
+| Inscriptions | 1 | 6 |
+| Boutiques créées | 1 | 2 |
+| Articles ajoutés | 2 | 5 |
+| Fiches vues | 555 (367 fiches différentes) | 820 |
+| Intentions de contact | 2 | 0 |
+| Ajouts au panier | 0 | 1 |
+| Commandes | 0 | 0 |
+| Appareils inscrits aux notifications (web / mobile) | 0 / 1 | 0 / 1 |
+
+Lecture : la place de marché a presque cessé de bouger (1 inscription, 0
+panier, 0 commande). La dernière commande remonte au 27/09. Le pic de fiches
+vues du 02-03/10 est sorti de la fenêtre. Ce qu'on fait pour inverser la
+tendance est dans le rapport du lundi : prospection par e-mail (0 réponse
+positive à ce jour), mise en ligne de finjaro.net attendue (rien depuis le
+08/10 à 14 h 59).
