@@ -2149,4 +2149,10 @@ export const EN: Record<string, string> = {
   'Annuler le devis': 'Cancel quote',
   'Annuler le devis {n} ? Il quitte la liste ; rien n’avait été encaissé ni déstocké.': 'Cancel quote {n}? It leaves the list; nothing had been collected or taken out of stock.',
   'Articles': 'Products',
+  'Ces informations aident à comprendre et à calculer ; ce n’est pas un conseil fiscal. Faites-les relire et confirmer par un expert-comptable avant toute décision ou déclaration.': 'This information helps you understand and calculate; it is not tax advice. Have it reviewed and confirmed by a certified accountant before any decision or filing.',
+  'Aucune {tax} dans vos écritures sur la période ({period}).': 'No {tax} in your entries for the period ({period}).',
+  '{tax} à reverser sur la période ({period}) : {amount}.': '{tax} to pay over for the period ({period}): {amount}.',
+  'Crédit de {tax} sur la période ({period}) : {amount}.': '{tax} credit for the period ({period}): {amount}.',
+  '{tax} collectée': '{tax} collected',
+  '{tax} déductible': '{tax} deductible',
 };

@@ -15,6 +15,7 @@ import { IconAlert, IconCheck, IconChevronRight, IconSend, IconSparkle } from '.
 import { t } from '../lib/i18n';
 import { useOffline } from '../lib/offline';
 import { Linkify } from './Linkify';
+import { FISCAL_MENTION, speaksFiscal } from '../lib/fiscal-mention';
 
 interface Message {
   id: number;
@@ -196,7 +197,7 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
           </p>
         )}
 
-        {messages.map((m) => (
+        {messages.map((m, i) => (
           <div key={m.id} className={m.role === 'user' ? 'flex justify-end' : 'flex justify-start'}>
             <div className={`max-w-[88%] rounded-card px-4 py-3 ${m.role === 'user' ? 'bg-teal text-white' : 'bg-base'}`}>
               {m.imageName && <div className="mb-1 text-[11px] opacity-80">📷 {m.imageName}</div>}
@@ -250,6 +251,9 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
                 </button>
               )}
               {m.local && user && <div className="mt-1 text-[10px] text-muted">{t('moteur local')}</div>}
+              {m.role === 'assistant' && speaksFiscal(m.text, messages[i - 1]?.role === 'user' ? messages[i - 1].text : undefined) && (
+                <p className="mt-2 border-t border-black/10 pt-2 text-[11px] leading-snug text-muted">{t(FISCAL_MENTION)}</p>
+              )}
             </div>
           </div>
         ))}

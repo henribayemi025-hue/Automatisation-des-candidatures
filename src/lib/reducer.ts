@@ -798,6 +798,11 @@ export function applyEvent(prev: DB, ev: WorkspaceEvent): DB {
       const debt = db.debts.find((d) => d.id === p.debtId);
       if (!debt) break;
       const payment = p.payment as Debt['payments'][number];
+      // Un règlement déjà inscrit ne s'encaisse pas deux fois. La base l'empêche
+      // déjà (identifiant d'événement unique), mais la confirmation d'un
+      // paiement mobile money par la liaison peut être rejouée : le moteur
+      // reste juste même si le même règlement arrive deux fois (12/10).
+      if (debt.payments.some((x) => x.id === payment.id)) break;
       debt.payments.push(payment);
       const customerSide = debt.party === 'CUSTOMER';
       post(db, ev, {

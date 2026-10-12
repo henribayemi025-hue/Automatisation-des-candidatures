@@ -1,7 +1,7 @@
 import { localISO } from './dates';
 import { accountCode } from './chart';
 import { holdsStock } from './recipes';
-import { balanceSheet, incomeStatement, runAuditChecks } from './ledger';
+import { balanceSheet, entriesInRange, incomeStatement, runAuditChecks } from './ledger';
 import { monthStart, outstanding, productPerformance, saleRevenue, snapshot } from './metrics';
 import { formatMoney, formatPercent } from './money';
 import { SOON_DAYS, summarize } from './subscriptions';
@@ -162,6 +162,36 @@ export function answer(db: DB, question: string): Answer {
         { label: t('Coût des ventes'), value: money(cogs) },
         { label: t('Marge brute'), value: money(gross) },
         { label: t('Résultat net'), value: money(income.netIncome) },
+      ],
+    };
+  }
+
+  // « Combien de TVA je dois reverser ? » tombait sur les dettes fournisseurs
+  // (« je dois ») : la taxe passe avant les dettes (audit du 12/10). Mêmes
+  // calculs que l'écran TVA, sans le journal de clôture.
+  const taxLabel = db.company.taxLabel || t('TVA');
+  if (/\btva\b|\bvat\b|taxe [àa] reverser|taxe sur la valeur/.test(q) || (taxLabel && q.includes(taxLabel.toLowerCase()))) {
+    const collected = accountCode(db.company.chart, 'VAT_COLLECTED');
+    const deductible = accountCode(db.company.chart, 'VAT_DEDUCTIBLE');
+    let out = 0;
+    let inp = 0;
+    for (const e of entriesInRange(db.entries, period.from, period.to).filter((x) => x.journal !== 'CL')) {
+      for (const l of e.lines) {
+        if (l.account === collected) out += l.credit - l.debit;
+        if (l.account === deductible) inp += l.debit - l.credit;
+      }
+    }
+    if (!out && !inp) {
+      return { text: t('Aucune {tax} dans vos écritures sur la période ({period}).', { tax: taxLabel, period: period.label }) };
+    }
+    const due = out - inp;
+    return {
+      text: due >= 0
+        ? t('{tax} à reverser sur la période ({period}) : {amount}.', { tax: taxLabel, period: period.label, amount: money(due) })
+        : t('Crédit de {tax} sur la période ({period}) : {amount}.', { tax: taxLabel, period: period.label, amount: money(-due) }),
+      facts: [
+        { label: t('{tax} collectée', { tax: taxLabel }), value: money(out) },
+        { label: t('{tax} déductible', { tax: taxLabel }), value: money(inp) },
       ],
     };
   }
