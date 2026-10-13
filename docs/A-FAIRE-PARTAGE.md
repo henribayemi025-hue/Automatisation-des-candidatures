@@ -1711,3 +1711,56 @@ Garde-fous que je propose : données de la personne connectée seulement, moteur
 **Règle d’architecture envoyée par Beau (13/10), valable pour tous les agents financiers d’Accounting : le modèle ne fait jamais de calcul.** Il choisit un outil et ses arguments (typés, plages vérifiées avant l’appel) ; le calcul est fait par du code déterministe (ton moteur d’écritures, tes indicateurs, les taux de change) ; le modèle reformule sans modifier les valeurs, et chaque chiffre affiché vient d’un résultat d’outil. Un contrôle séparé bloque l’affichage si un invariant casse (débit = crédit, somme des parties = total, signes, période comptable, division par zéro). Les mesures (marge, trésorerie, résultat) sont définies une fois et nommées. Ce que la règle garantit : aucun chiffre calculé par le modèle. Ce qu’elle ne garantit pas : le choix de la bonne mesure et l’interprétation, donc validation humaine, et je ne promets pas « zéro erreur » à un client. Tu as déjà l’essentiel (un moteur d’écritures déterministe, un assistant qui lit un contexte chiffré) ; la correction de la TVA lue dans les dettes fournisseurs du 12/10 est un cas d’école de ce que la règle empêche. Dis-moi ce qui manque pour que l’assistant d’aujourd’hui la respecte à 100 %.
 
 **Précision de Beau (13/10) sur les courbes du mode Expert : « style TradingView, ça peut prendre de Google Finance pour montrer par jour les valeurs des actions ».** Il veut donc aussi des **cours de marché au jour le jour**, pas seulement les courbes des chiffres de l’entreprise. Ce que j’ai lu aujourd’hui (guides de fournisseurs, donc à confirmer) : Google n’offre **pas d’API officielle** pour Finance ; la formule GOOGLEFINANCE existe seulement dans Google Sheets, avec des données différées d’environ 15 à 20 minutes ; des services tiers revendent le contenu de Google Finance, avec un risque sur leurs conditions et leur fiabilité. Des fournisseurs de données de marché (Alpha Vantage, Finnhub, Twelve Data) proposent une offre gratuite, **dont je n’ai lu ni les limites ni les conditions de réutilisation**. Proposition, pour plus tard et au rang le plus bas : un petit module « cours du jour » (clôture quotidienne des valeurs que la personne choisit), alimenté par un fournisseur à offre gratuite et mis en cache côté serveur pour rester dans les limites, avec la mention « information, pas un conseil en investissement » et l’attribution exigée par la source ; il demande une clé de fournisseur, donc un compte à créer par Beau. Ne rien construire avant le rapprochement, la facture en photo et les courbes des chiffres de l’entreprise.
+
+### Claudinette — 13/10 au soir, réponses à « Accounting passe en priorité »
+
+**(a) La mesure.** Lecture seule, en production, mesurée le 13/10 à 18 h 25 UTC :
+
+```sql
+select count(distinct e.workspace_id) filter (where e.at > now() - interval '7 days') as espaces_actifs_7j,
+       count(distinct e.workspace_id) filter (where e.at > now() - interval '30 days') as espaces_actifs_30j,
+       max(e.at) as dernier_geste
+from public.finia_events e
+join public.finia_workspaces w on w.id = e.workspace_id
+where compte_reel(w.owner_id)
+  and e.type not in ('snapshot.seal', 'company.update', 'workspace.restore')
+  and not (e.type = 'sale.record' and (e.payload->'sale') ? 'externalId');
+```
+
+On ne compte que les gestes d'une personne : ni la compaction, ni un
+changement de réglage, ni une vente arrivée de la place de marché.
+
+**Résultat aujourd'hui : 0 espace actif sur 7 jours, 2 sur 30 jours. Dernier
+geste réel le 23/09.** L'objectif de cinq usages par semaine part donc de zéro.
+Limite : quelqu'un qui utilise Accounting sans compte (sur son appareil) n'est
+pas compté, puisque rien n'arrive en base.
+
+**(b) À montrer cette semaine**, sans donnée privée : la démonstration, ouverte
+sans compte et avec des chiffres d'exemple.
+- `https://accounting.finjaro.net/#/demo/cameroun/boutique/pos` : vendre en
+  trois gestes, puis le reçu envoyé sur WhatsApp. C'est le plus parlant pour
+  une commerçante.
+- `…/#/demo/cameroun/boutique` : l'accueil avec les chiffres du mois et les
+  courbes.
+- `…/#/demo/cameroun/boutique/livre-caisse` : le livre de caisse avec son solde
+  ligne par ligne (en ligne depuis aujourd'hui).
+- `…/#/demo/cameroun/boutique/dettes` : qui me doit, avec la relance WhatsApp.
+- Pour l'Europe : `…/#/demo/france/boutique` (en euros).
+
+**À NE PAS montrer pour l'instant : la lecture d'une photo de reçu.** La seule
+IA qui lit les images est Gemini, et elle refuse (crédits épuisés). Groq et le
+secours gratuit ne lisent que du texte : une photo n'est pas lue aujourd'hui.
+Montrer l'assistante qui répond sur les chiffres (texte) est vrai.
+
+**(c) Ordre de construction** : je garde le tien, avec deux précisions.
+1. **Rapprochement ventes / paiements** : j'y mets l'idée « mobile money à
+   confirmer » du 09/10. Un paiement mobile reste à confirmer jusqu'au
+   rapprochement avec le relevé. C'est la même chose.
+2. **Facture en photo** : l'écran existe déjà, mais sans IA qui lit les
+   images, il ne lit rien. À construire seulement si un moteur gratuit qui lit
+   les images est trouvé. Sinon, je le repousse après les courbes.
+3. **Courbes de l'entreprise en mode Expert** : d'accord.
+
+D'ici là, je finis l'audit des listes (les ventes : 276 lignes sur une seule
+page dans la démonstration).
+
