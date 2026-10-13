@@ -9,6 +9,20 @@ import type { JournalCode, JournalLine } from '../lib/types';
 import { Badge, Empty, Field, Modal, Money, PageHeader, StatCard } from '../components/UI';
 import { IconPlus, IconReceipt, IconX } from '../components/Icons';
 import { t } from '../lib/i18n';
+import { monthStart } from '../lib/metrics';
+import { localISO } from '../lib/dates';
+
+// 615 écritures sur une seule page dans la démonstration (audit du 07/10,
+// point 5) : le journal s'ouvre sur le mois en cours, la suite à la demande.
+// L'export Excel et le FEC gardent toute la période choisie.
+const PAGE = 50;
+
+function previousMonth(): { from: string; to: string } {
+  const d = new Date();
+  const first = new Date(d.getFullYear(), d.getMonth() - 1, 1);
+  const last = new Date(d.getFullYear(), d.getMonth(), 0);
+  return { from: localISO(first), to: localISO(last) };
+}
 
 const JOURNALS: { code: JournalCode; label: string }[] = [
   { code: 'VT', label: 'Ventes' },
@@ -37,8 +51,13 @@ export default function Journal() {
     URL.revokeObjectURL(url);
   }
 
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
+  const [from, setFromRaw] = useState(monthStart());
+  const [to, setToRaw] = useState('');
+  const [shown, setShown] = useState(PAGE);
+  const setFrom = (v: string) => { setFromRaw(v); setShown(PAGE); };
+  const setTo = (v: string) => { setToRaw(v); setShown(PAGE); };
+  const last = previousMonth();
+  const preset = !to && from === monthStart() ? 'month' : from === last.from && to === last.to ? 'last' : !from && !to ? 'all' : '';
   const [open, setOpen] = useState(false);
   const [error, setError] = useState('');
 
@@ -153,7 +172,7 @@ export default function Journal() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label={t('Écritures affichées')} value={entries.length} />
+        <StatCard label={t('Écritures sur la période')} value={entries.length} />
         <StatCard label={t('Total mouvementé')} value={<Money value={totalDebit} />} tone="dark" />
         <StatCard
           label={t('Contrôle')}
@@ -164,7 +183,20 @@ export default function Journal() {
       </div>
 
       <div className="card mt-6 mb-4 flex flex-wrap items-end gap-3">
-        <select value={journal} onChange={(e) => setJournal(e.target.value)} className="field w-auto">
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t('Période')}>
+          {(
+            [
+              ['month', 'Ce mois-ci', () => { setFrom(monthStart()); setTo(''); }],
+              ['last', 'Mois dernier', () => { setFrom(last.from); setTo(last.to); }],
+              ['all', 'Tout', () => { setFrom(''); setTo(''); }],
+            ] as [string, string, () => void][]
+          ).map(([key, lab, go]) => (
+            <button key={key} type="button" aria-pressed={preset === key} onClick={go} className={preset === key ? 'btn-dark' : 'btn-ghost'}>
+              {t(lab)}
+            </button>
+          ))}
+        </div>
+        <select value={journal} onChange={(e) => { setJournal(e.target.value); setShown(PAGE); }} className="field w-auto">
           <option value="">{t('Tous les journaux')}</option>
           {JOURNALS.map((j) => (
             <option key={j.code} value={j.code}>
@@ -183,7 +215,7 @@ export default function Journal() {
       <div className="card p-0">
         {entries.length ? (
           <div className="divide-y divide-slate-100 dark:divide-white/5">
-            {entries.map((e) => (
+            {entries.slice(0, shown).map((e) => (
               <div key={e.id} className="p-4 sm:p-5">
                 <div className="mb-3 flex flex-wrap items-center gap-2">
                   <Badge tone="info">{e.journal}</Badge>
@@ -224,6 +256,14 @@ export default function Journal() {
                 </div>
               </div>
             ))}
+            {entries.length > shown && (
+              <div className="flex flex-wrap items-center justify-center gap-3 px-4 py-3 text-caption text-muted">
+                {t('{n} écritures sur {total}', { n: shown, total: entries.length })}
+                <button onClick={() => setShown((n) => n + PAGE * 2)} className="btn-ghost">
+                  {t('Voir plus')}
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <Empty

@@ -223,9 +223,20 @@ Aucune erreur JavaScript à 390 et 1440 px.
 Vérifié au clic à 390 et 1 440 px (démonstration boutique, Cameroun) : sortie de 2 enregistrée (46 → 44), devis rouvert puis annulé, aucune erreur JavaScript.
 Nouveau contrôle `scripts/stock-devis-check.ts` (10 points, vert). Les 40 contrôles du dépôt passent.
 
-### À faire ensuite (jour 9)
+### Jour 9 — 13/10 : livre de caisse et journal (`CashBook.tsx`, `Journal.tsx`)
 
-`Expenses.tsx` relu le 02/10 ; reste `CashBook.tsx` (livre de caisse) et `Journal.tsx` (point 5 : mois en cours par défaut).
+| # | Constat | Gravité | Ce qui a été fait |
+|---|---|---|---|
+| 1 | Livre de caisse : l'export sortait les montants en unités mineures. Pour une boutique en euros, 12,34 € devenait « 1234 » dans le fichier remis au comptable. | **Grave pour les comptes en euros** (une vendeuse réelle tient ses comptes en euros) | Export Excel en vraies unités, comme le journal. Vérifié sur la démonstration France : la dernière ligne vaut 10 732,19, égale au solde affiché. |
+| 2 | Livre de caisse : pas de colonne « solde », alors que c'est la colonne d'un cahier de caisse. | Moyen | Solde au début de la période, puis solde ligne après ligne. Vérifié : 9 524,64 + 1 890,48 − 682,93 = 10 732,19 €, égal à la carte « Solde total ». Sur téléphone, la colonne reste sur ordinateur ; le tableau tient (356 px pour 356). |
+| 3 | Journal : tout l'historique sur une page (615 écritures dans la démonstration). | Moyen (point 5 de l'audit du 07/10) | Il s'ouvre sur le mois en cours, avec trois boutons : « Ce mois-ci », « Mois dernier », « Tout ». 50 écritures, puis « Voir plus ». L'export Excel et le FEC gardent toute la période choisie. |
+
+Aucun lien de l'application ne mène à une écriture précise du journal : l'ouvrir sur le mois en cours ne cache rien.
+Vérifié au clic à 390 et 1 280 px. Les 42 contrôles passent ; 35 écrans sur 35 sans souci aux deux largeurs.
+
+### À faire ensuite (jour 10)
+
+Les ventes (`Sales.tsx`, 276 lignes dans la démonstration) avec le même principe, puis `Reports.tsx`.
 
 Alpha a relu le n° 6 le 02/10 : pas d'objection. Les outils serveur (finia_resume_mois, ma_compta_*)
 lisent des dates « AAAA-MM-JJ » et compteront mieux. accounting-rappels n'est pas concerné.

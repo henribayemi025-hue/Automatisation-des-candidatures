@@ -2155,4 +2155,12 @@ export const EN: Record<string, string> = {
   'Crédit de {tax} sur la période ({period}) : {amount}.': '{tax} credit for the period ({period}): {amount}.',
   '{tax} collectée': '{tax} collected',
   '{tax} déductible': '{tax} deductible',
+  'Ce mois-ci': 'This month',
+  'Mois dernier': 'Last month',
+  '{n} écritures sur {total}': '{n} of {total} entries',
+  'Écritures sur la période': 'Entries in the period',
+  'Solde au début de la période': 'Balance at the start of the period',
+  'Mouvements du {from} au {to}': 'Movements from {from} to {to}',
+  'début': 'start',
+  'aujourd’hui': 'today',
 };
