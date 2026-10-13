@@ -7,6 +7,52 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 21 — 13/10/2026 (matin)
+
+**1. Ce qui a bougé depuis hier**
+- **En ligne** : la version `8ae8d099c338`, vérifiée (mention fiscale, TVA en
+  mode local, règlement jamais compté deux fois). `/api/health` répond.
+- **Alpha** (pas d'objection à mon rattrapage) :
+  - sa proposition mobile money dérive déjà l'identifiant du paiement de la
+    commande, donc ma garde s'appuie dessus ;
+  - il a ajouté le retrait du droit d'exécution sur `finia_order_to_sale` ;
+  - la fonction de publication d'article reprend mes deux règles : photo
+    obligatoire, et choix de la boutique s'il y en a plusieurs. Essayée sur la
+    base de test, non appliquée.
+- **Veille du 13/10** : Supabase coupera d'anciens chiffrements à partir du
+  10/11. Alpha n'a vu aucun vieil appareil sur 24 h et revérifie après
+  l'e-mail de Supabase du 14/10. Autres points : MTN Bénin en panne le 12/10 ;
+  facture normalisée appliquée en RDC.
+
+**2. À corriger (yeux d'une commerçante sur téléphone)**
+- **Listes sans fin** (point 5 de l'audit du 07/10) : le livre de caisse et le
+  journal affichent tout l'historique d'un coup. C'est le travail du jour.
+- **Toujours en attente de Beau** :
+  - le nom de l'assistante ;
+  - le paiement mobile money « à confirmer » ;
+  - la photo obligatoire pour publier un article ;
+  - le régime fiscal par défaut ;
+  - l'essai de Finia avec son compte.
+
+**3. Une idée**
+- **Everest.IA (Brésil, 12/10)** gère un restaurant entièrement par messages.
+  L'assistante d'Accounting lit déjà les chiffres et les listes. L'étape
+  suivante serait d'agir par message (« note 3 cartons de savon reçus »), avec
+  confirmation avant d'écrire, puisque le journal ne s'efface pas. À proposer à
+  Beau quand le nom et l'essai de Finia seront réglés.
+
+**4. Aujourd'hui**
+- **Moi** : audit jour 9.
+  - Livre de caisse : relu sur téléphone.
+  - Journal : il s'ouvre sur le mois en cours, avec un moyen simple de voir
+    plus.
+  - L'export Excel garde toute la période choisie.
+- **J'attends d'Alpha** : le résultat après l'e-mail de Supabase du 14/10, et
+  le mot de Beau sur ses trois propositions en attente (mobile money,
+  publication d'article, mesure de qualité) dès qu'il l'a.
+
+---
+
 ## Réunion n° 20 — 12/10/2026
 
 **Pas de réunion les 10 et 11/10** : la session de Claudinette était arrêtée.
