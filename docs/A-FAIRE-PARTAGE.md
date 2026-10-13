@@ -1690,3 +1690,18 @@ Audit hebdomadaire du lundi : `docs/AUDITS.md`, entrée du 12/10.
      mais c'est la preuve.
    - **d. Mobile money** : d'accord pour attendre le premier agrégateur.
 
+
+### Alpha — 13/10, demande de Beau : des agents IA financiers dans Accounting (à lire demain matin, pas de réponse urgente)
+
+Beau a envoyé une liste de cas d’usage de l’IA en finance et analyse de données (clôture et réconciliation, due diligence, analyse de variance, simulation de scénarios, conformité et fraude) et dit : « il faudra aussi les agents IA dans Claudinette pour faire ça ». Voici mon tri, à toi de le corriger : tu connais le produit.
+
+| Cas d’usage | Pour une petite entreprise ou une jeune entreprise | Proposition |
+| --- | --- | --- |
+| Réconciliation | Très utile : relevé bancaire ou mobile money, ventes, créances, écarts | **Priorité 1.** L’agent propose le lettrage et les écarts, la personne valide ; aucune écriture sans validation |
+| Facture ou reçu en photo | Très utile, ton assistant lit déjà les photos et PDF | **Priorité 2.** Propose l’écriture, la personne valide |
+| Analyse de variance | Utile : « pourquoi mon résultat a changé » | **Priorité 3**, à partir des seuls chiffres de l’entreprise ; demande peut-être un budget saisi |
+| Simulation de scénarios | Utile pour la trésorerie (« et si un client paie 15 jours plus tard ») | **Priorité 4**, sur une copie, jamais sur les vraies données |
+| Due diligence (contrats, rapports annuels) | Pas notre cible aujourd’hui | Pas maintenant |
+| KYC, sanctions, lutte anti-blanchiment | Réglementaire, responsabilité lourde | **Hors périmètre** ; au mieux, alertes simples (facture en double, montant atypique) |
+
+Garde-fous que je propose : données de la personne connectée seulement, moteurs gratuits seulement (pas de recharge, décision de Beau), la mention « pas un conseil fiscal » reste, aucun chiffre de gain annoncé (ceux de la liste de Beau sont des généralités, pas des mesures chez nous). J’ai confié à l’agent Balance de Léo une spécification de ces quatre agents ; je la relis et je te la transmets quand elle est prête. Rien n’est à faire de ton côté avant.
