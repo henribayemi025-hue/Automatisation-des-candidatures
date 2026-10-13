@@ -18,7 +18,7 @@ const PILLARS = [
 ];
 
 export default function Auth() {
-  const { signIn, signUp, resendConfirmation, signInWithGoogle, continueAsGuest, sessionExpired, authError, lastEmail } = useCollab();
+  const { signIn, signUp, resendConfirmation, resetPassword, signInWithGoogle, continueAsGuest, sessionExpired, authError, lastEmail } = useCollab();
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState(displayIdentity(lastEmail));
@@ -36,6 +36,33 @@ export default function Auth() {
   // Adresse qui attend son lien de confirmation : on propose de le renvoyer.
   const [awaiting, setAwaiting] = useState('');
   const byPhone = looksLikePhone(email);
+  // Mot de passe oublié (Beau, 13/10) : la réponse s'affiche dans le cadre,
+  // là où est le pouce, pas en haut de l'écran.
+  const [forgot, setForgot] = useState(false);
+  const [forgotMsg, setForgotMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  async function oublie() {
+    setForgotMsg(null);
+    if (!email.trim()) {
+      setForgotMsg({ ok: false, text: t('Entrez d’abord votre adresse e-mail dans le champ ci-dessus.') });
+      document.getElementById('auth-email')?.focus();
+      return;
+    }
+    setBusy(true);
+    const { error: err, phone } = await resetPassword(email.trim());
+    setBusy(false);
+    if (err) return setForgotMsg({ ok: false, text: err });
+    if (phone) {
+      return setForgotMsg({
+        ok: false,
+        text: t('Ce compte a été créé avec un numéro de téléphone : il n’a pas d’adresse e-mail où envoyer un lien. Écrivez-nous à fin.finjaro@gmail.com.'),
+      });
+    }
+    setForgotMsg({
+      ok: true,
+      text: t('Si un compte existe pour {email}, un lien vient de partir. Ouvrez-le sur ce téléphone, dans ce navigateur. Pensez aux courriers indésirables.', { email: email.trim() }),
+    });
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -244,6 +271,40 @@ export default function Auth() {
               {busy ? t('Un instant…') : mode === 'login' ? t('Se connecter') : t('Créer mon compte')}
             </button>
           </form>
+
+          {mode === 'login' && (
+            <div className="mt-3">
+              {!forgot ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForgot(true);
+                    setForgotMsg(null);
+                  }}
+                  className="w-full text-center text-caption font-semibold text-brand-600 underline underline-offset-2"
+                >
+                  {t('Mot de passe oublié ?')}
+                </button>
+              ) : (
+                <div className="rounded-input border border-hairline bg-base p-3">
+                  <p className="text-caption text-ink">
+                    {t('Nous envoyons un lien à l’adresse e-mail ci-dessus pour choisir un nouveau mot de passe.')}
+                  </p>
+                  {forgotMsg && (
+                    <p role={forgotMsg.ok ? 'status' : 'alert'} className={`mt-2 text-caption font-semibold ${forgotMsg.ok ? 'text-ink' : 'text-brand-600'}`}>
+                      {forgotMsg.text}
+                    </p>
+                  )}
+                  <button type="button" onClick={() => void oublie()} disabled={busy} className="btn-primary mt-3 w-full">
+                    {busy ? t('Un instant…') : forgotMsg?.ok ? t('Renvoyer le lien') : t('Recevoir le lien')}
+                  </button>
+                  <button type="button" onClick={() => setForgot(false)} className="btn-ghost mt-1 w-full justify-center text-caption">
+                    {t('Annuler')}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           {mode === 'signup' && (
             <p className="mt-3 text-center text-[12px] text-muted">
