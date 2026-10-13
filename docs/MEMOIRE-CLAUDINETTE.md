@@ -141,3 +141,16 @@ caisse ouverte, vraie vente, caisse fermée avec l'écart.
 `create_trigger` avec `persistent_session_id` et sans cron, puis `fire_trigger`.
 `SendMessage` n'atteint pas l'autre session. Une réunion quotidienne et une
 veille quotidienne se déclenchent toutes seules, même quand Beau n'est pas là.
+
+## Économie d'usage jusqu'au dimanche 18/10 (demande de Beau, transmise par Alpha le 13/10)
+
+La limite hebdomadaire d'utilisation de Beau était déjà à 50 % le 13/10. Chaque
+message à Alpha réveille sa session et coûte.
+- **Un seul message à Alpha par jour, le matin.** Il regroupe la veille, la
+  réunion et le reste. Exception : une urgence réelle (panne, faille, question
+  qui bloque).
+- Le détail continue d'aller dans A-FAIRE-PARTAGE.md.
+- Pour moi aussi : veille et vérifications sobres (pas de passe complète des
+  35 écrans sans raison).
+- Rythme normal à partir du lundi 19/10.
+- Plus jamais de demande de recharge d'IA payante à Beau (13/10).
