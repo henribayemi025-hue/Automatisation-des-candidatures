@@ -1764,3 +1764,44 @@ Montrer l'assistante qui répond sur les chiffres (texte) est vrai.
 D'ici là, je finis l'audit des listes (les ventes : 276 lignes sur une seule
 page dans la démonstration).
 
+### Claudinette — 13/10 au soir : mot de passe oublié (demande de Beau)
+
+✅ **Construit sur la branche `claudinette/mot-de-passe-oublie` (2b3ccdb), PAS
+sur main, donc pas en ligne.**
+- **Écran de connexion** : « Mot de passe oublié ? » ouvre un cadre qui envoie
+  le lien (`resetPasswordForEmail`, retour sur `/auth/reset`). La réponse
+  s'affiche dans le cadre, sous le pouce. Pour un compte créé avec un numéro de
+  téléphone (adresse interne `@tel.finjaro.net`, aucune boîte), le cadre le dit
+  et donne l'adresse de l'équipe.
+- **`/auth/reset`** : page à part, hors routeur et hors synchronisation. Le
+  nouveau mot de passe se tape deux fois, puis `updateUser` renvoie dans
+  l'application, connecté. Un lien expiré, ou ouvert ailleurs, donne un message
+  clair et un bouton de retour.
+- **Rien changé dans Supabase** : ni Site URL, ni modèles d'e-mail, ni adresses
+  de retour.
+- **Essayé au navigateur, réponses de Supabase simulées : 15 points sur 15.**
+  Adresse vide, numéro de téléphone, envoi avec le bon `redirect_to`, lien
+  expiré, lien sans session, mots de passe différents, changement réussi,
+  retour dans l'application, aucune erreur JavaScript. Les 42 contrôles passent.
+
+⚠️ **Pourquoi je ne peux pas faire l'essai réel complet, ni toi.** Accounting est
+en PKCE : c'est obligatoire avec ses adresses en `#`, voir `supabase.ts`. Le
+lien de l'e-mail ne marche que **dans le navigateur qui a fait la demande**.
+L'essai réel demande donc une seule personne, sur un seul téléphone : demander
+le lien, ouvrir l'e-mail, choisir le mot de passe. Je n'ai pas de boîte
+e-mail ; tu n'as pas mon navigateur. Ce même point vaut pour les vrais
+utilisateurs, d'où le message « ne s'ouvre que sur le téléphone où vous l'avez
+demandé ».
+
+**Ta décision (tu as posé la condition), deux options :**
+1. Je mets en ligne avec le lien caché : visible seulement avec `?essai=mdp`
+   dans l'adresse. Une personne qui a la boîte Finjaro sur son téléphone fait
+   l'essai en deux minutes, puis j'enlève le cache.
+2. Je mets en ligne directement. Si le lien échoue, la personne voit un message
+   clair. Aucune donnée n'est en jeu.
+
+**À vérifier pendant l'essai réel** : le modèle d'e-mail « Reset password » du
+projet doit renvoyer vers `{{ .ConfirmationURL }}` (qui respecte notre
+`redirect_to`), et non vers une adresse fixe de finjaro.net. Je ne peux pas lire
+les modèles depuis la base.
+
