@@ -212,7 +212,9 @@ export function aiErrorMessage(code: string): string {
     case 'too_large':
       return 'Ce fichier est trop lourd pour l’assistant (10 Mo au plus). Envoyez une photo, ou un PDF plus court.';
     case 'ai_quota':
-      return 'L’assistante est indisponible pour quelques heures. L’équipe Finjaro est prévenue. Je réponds avec le moteur local en attendant.';
+      // Ni « quelques heures » ni « l'équipe est prévenue » : personne n'est
+      // prévenu, et la part gratuite revient chaque jour (relevé par Alpha, 13/10).
+      return 'L’assistante est indisponible pour le moment. Je réponds avec le moteur local en attendant.';
     case 'gemini_unavailable':
       return 'L’assistant est momentanément indisponible. Je réponds avec le moteur local en attendant.';
     default:

@@ -2137,7 +2137,7 @@ export const EN: Record<string, string> = {
   'Connectez-vous avec le même compte, rien à recréer : vos ventes livrées sur Finjaro peuvent arriver dans votre caisse.': 'Sign in with the same account, nothing to set up again: your sales delivered on Finjaro can flow into your till.',
   'Client à crédit': 'Credit customer',
   'À crédit': 'On credit',
-  'L’assistante est indisponible pour quelques heures. L’équipe Finjaro est prévenue. Je réponds avec le moteur local en attendant.': 'The assistant is unavailable for a few hours. The Finjaro team has been told. I am answering with the local engine meanwhile.',
+  'L’assistante est indisponible pour le moment. Je réponds avec le moteur local en attendant.': 'The assistant is unavailable for now. I am answering with the local engine meanwhile.',
   'Corriger le stock': 'Correct stock',
   '{n} mouvements sur {total}': '{n} of {total} movements',
   'Voir plus': 'Show more',
