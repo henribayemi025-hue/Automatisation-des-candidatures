@@ -11,6 +11,77 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 13/10/2026 (couvre du 12 au 13/10)
+
+### Concurrence
+- **WallX Africa, Nigeria (12/10/2026)** : passe de l'application de paiement à
+  un « écosystème » pour entreprises. Il réunit outils de gestion, paiement par
+  code, téléphone servant de terminal de carte et paiements transfrontaliers.
+  Il explore le paiement hors ligne et vise l'Afrique puis le Canada, où il a
+  obtenu une licence.
+  [The Guardian Nigeria](https://guardian.ng/business-services/fintech-targets-payment-solutions-for-african-businesses/)
+  → Encore un acteur africain qui marie encaissement et gestion avec une
+  ambition mondiale. Accounting a déjà le hors-ligne : c'est un argument à dire.
+- **ACOM « Everest.IA », Brésil (12/10/2026)** : gestion de restaurants
+  entièrement par messages. Ventes, stock, fournisseurs, prix, notes fiscales et
+  commandes d'achat passent par la conversation, branchée sur la caisse.
+  [Jornal Savassi](https://jornalsavassi.com.br/acom-lanca-everest-ia-plataforma-que-gerencia-restaurantes-por-chat/)
+  → La gestion « par conversation » arrive chez les petits commerces.
+  L'assistante d'Accounting répond déjà sur les chiffres et lit des listes ;
+  la suite logique est de laisser agir par message (« note 3 cartons reçus »).
+- **TallyPrime 7.2, Inde (12/10/2026)** : la connexion au portail de la facture
+  électronique tient désormais « up to 30 days » au lieu de 6 heures.
+  [Tally](https://help.tallysolutions.com/release-notes-tallyprime-7-2/)
+  → Le leader indien vend du confort de conformité : moins de reconnexions,
+  moins de ressaisie. C'est la barre à atteindre partout où la facture
+  électronique devient obligatoire.
+
+### Règles et paiements
+- **RDC (12/10/2026)** : la DGI forme la Banque centrale à la facture
+  normalisée, du 12 au 16/10. L'article écrit que « la phase d'application
+  effective des obligations légales a commencé ». Il ne donne ni format ni
+  montant de sanction.
+  [Congo Quotidien](https://www.congoquotidien.com/2026/10/12/dgi-bcc-facture-normalisee-kinshasa/)
+  → La RDC rejoint les pays francophones où la facture normalisée est exigée
+  en pratique. À suivre pour le module de facturation, rien à coder tant
+  qu'aucun format n'est publié.
+- **MTN MoMo Bénin en panne le 12/10/2026**, de 16:06 à 17:45 UTC, sur les
+  encaissements (page d'état de pawaPay).
+  [pawaPay](https://status.pawapay.io/incidents/1d8wzzd9wwvw)
+  → Quatrième panne mobile money relevée depuis le 07/10. Même conclusion :
+  un paiement mobile doit pouvoir rester « à confirmer ».
+- **BCEAO, Instruction n° 020 (adoptée le 8 octobre 2026, article du 09/10)** :
+  le solde de monnaie électronique par client et par émetteur « ne doit pas
+  dépasser 4 millions de FCFA ». Les rechargements sont « plafonné[s] à 15
+  millions de FCFA » par mois. Le texte « entrera en vigueur le 2 novembre 2026 ».
+  [Financial Afrik](https://www.financialafrik.com/2026/10/09/umoa-la-bceao-double-le-plafond-des-avoirs-en-monnaie-electronique-a-4-millions-de-fcfa/)
+  → Une commerçante de l'UEMOA qui garde tout sur son portefeuille mobile peut
+  buter sur ce plafond. Rien à changer dans Accounting ; bon à savoir pour
+  l'import de relevés.
+
+### Technologie et IA
+- **Supabase (12/10/2026)** : quatre anciennes suites de chiffrement TLS 1.2
+  seront coupées « Starting November 10, 2026 at the earliest », sur Auth,
+  l'API, le stockage, le temps réel et les fonctions edge. Les projets
+  concernés reçoivent un e-mail le 14/10.
+  [Supabase](https://supabase.com/changelog/cbc-tls-ciphers-deprecated)
+  → La base est commune à toutes les applications Finjaro. Si l'e-mail arrive
+  pour `bokwivwizghdlaedczbw`, un vieux téléphone jamais mis à jour pourrait ne
+  plus se connecter. À surveiller le 14/10.
+- **Cloudflare Workers (12/10/2026)** : lors d'une mise à jour de Cloudflare,
+  une requête en cours a désormais « a grace period of up to 20 minutes » au
+  lieu de 30 secondes.
+  [Cloudflare](https://developers.cloudflare.com/changelog/post/2026-10-12-longer-runtime-update-grace-period/)
+  → Une longue réponse de l'assistante a moins de risques d'être coupée. Le
+  nouvel essai reste utile.
+- **Rien de daté** :
+  - supabase-js (préversions sans changement de code), Gemini, Groq,
+    Workers AI, Mistral ;
+  - WhatsApp, Capacitor, applications installables ;
+  - lecture de reçus, langues africaines.
+
+---
+
 ## 12/10/2026 (couvre du 09 au 12/10 ; pas de veille les 10 et 11/10, la session était arrêtée)
 
 ### Concurrence
