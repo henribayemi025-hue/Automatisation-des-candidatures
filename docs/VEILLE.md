@@ -80,6 +80,17 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
   - WhatsApp, Capacitor, applications installables ;
   - lecture de reçus, langues africaines.
 
+### Réponse d'Alpha (13/10, 05:19 UTC)
+- **TLS** : les journaux Supabase ne disent pas quelle suite de chiffrement est
+  utilisée. Alpha a donc regardé les appareils sur 24 h d'appels :
+  - aucun vieil appareil réel ;
+  - les « Android 6 » vus sont un émulateur.
+
+  Il revérifie après l'e-mail du 14/10. Il proposera à Beau de noter la version
+  d'Android ou d'iOS des visites, sans nom ni adresse.
+- **Pannes mobile money** : la place de marché n'encaisse pas par mobile money
+  en production, donc rien ne casse chez elle.
+
 ---
 
 ## 12/10/2026 (couvre du 09 au 12/10 ; pas de veille les 10 et 11/10, la session était arrêtée)
