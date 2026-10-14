@@ -12,13 +12,28 @@ import { t } from '../lib/i18n';
 import { sectorProfile } from '../lib/sector';
 import { EXPENSE_LABEL as CATEGORY_LABEL } from '../lib/expenses';
 import ProjectSelect from '../components/ProjectSelect';
+import { monthStart } from '../lib/metrics';
+import { localISO } from '../lib/dates';
 
+// Même principe que les ventes (audit jour 12) : le mois en cours, 50 lignes,
+// puis « Voir plus ».
+const PAGE = 50;
+
+function previousMonth(): { from: string; to: string } {
+  const d = new Date();
+  return { from: localISO(new Date(d.getFullYear(), d.getMonth() - 1, 1)), to: localISO(new Date(d.getFullYear(), d.getMonth(), 0)) };
+}
 
 export default function Expenses() {
   const { db, addExpense } = useStore();
   const money = useMoney();
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
+  const [from, setFromRaw] = useState(monthStart());
+  const [to, setToRaw] = useState('');
+  const [shown, setShown] = useState(PAGE);
+  const setFrom = (v: string) => { setFromRaw(v); setShown(PAGE); };
+  const setTo = (v: string) => { setToRaw(v); setShown(PAGE); };
+  const last = previousMonth();
+  const preset = !to && from === monthStart() ? 'month' : from === last.from && to === last.to ? 'last' : !from && !to ? 'all' : '';
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(today());
   const [accountKey, setAccountKey] = useState<AccountKey>('UTILITIES');
@@ -42,7 +57,7 @@ export default function Expenses() {
         return true;
       })
       // La plus récente en haut, même saisie après coup.
-      .sort((a, b) => b.date.localeCompare(a.date)),
+      .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt)),
     [db.expenses, from, to],
   );
 
@@ -54,8 +69,10 @@ export default function Expenses() {
     return [...map.entries()].sort((a, b) => b[1] - a[1]);
   }, [filtered]);
 
+  const amountMinor = toMinor(amountRaw || 0, db.company.currency);
+
   function submit(force = false) {
-    const amount = toMinor(amountRaw || 0, db.company.currency);
+    const amount = amountMinor;
     if (amount <= 0) return;
     if (!force) {
       const available = balanceOf(methodAccount(db.company.chart, method), db.entries, 'DEBIT', undefined, date);
@@ -94,7 +111,7 @@ export default function Expenses() {
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label={t('Total affiché')} value={<Money value={total} />} tone="dark" />
+        <StatCard label={t('Dépenses sur la période')} value={<Money value={total} />} tone="dark" />
         <StatCard label={t('Nombre de dépenses')} value={filtered.length} />
         <StatCard
           label={t('Poste principal')}
@@ -104,6 +121,19 @@ export default function Expenses() {
       </div>
 
       <div className="card mt-6 mb-4 flex flex-wrap items-end gap-3">
+        <div className="flex w-full flex-wrap gap-2" role="group" aria-label={t('Période')}>
+          {(
+            [
+              ['month', 'Ce mois-ci', () => { setFrom(monthStart()); setTo(''); }],
+              ['last', 'Mois dernier', () => { setFrom(last.from); setTo(last.to); }],
+              ['all', 'Tout', () => { setFrom(''); setTo(''); }],
+            ] as [string, string, () => void][]
+          ).map(([key, lab, go]) => (
+            <button key={key} type="button" aria-pressed={preset === key} onClick={go} className={preset === key ? 'btn-dark' : 'btn-ghost'}>
+              {t(lab)}
+            </button>
+          ))}
+        </div>
         <Field label={t('Du')}>
           <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="field" />
         </Field>
@@ -116,7 +146,7 @@ export default function Expenses() {
         <div className="card p-0">
           {filtered.length ? (
             <Table head={['Date', 'Catégorie', 'Compte', 'Description', 'Montant']} phoneHide={[3]} phoneNowrapFirst>
-              {filtered.map((e) => (
+              {filtered.slice(0, shown).map((e) => (
                 <tr key={e.id} className="row">
                   <td className="td text-slate-500">{e.date}</td>
                   <td className="td font-medium">{t(e.category)}</td>
@@ -128,10 +158,19 @@ export default function Expenses() {
                 </tr>
               ))}
             </Table>
-          ) : (
+          ) : null}
+          {filtered.length > shown && (
+            <div className="flex flex-wrap items-center justify-center gap-3 border-t border-hairline px-4 py-3 text-caption text-muted">
+              {t('{n} dépenses sur {total}', { n: shown, total: filtered.length })}
+              <button onClick={() => setShown((n) => n + PAGE * 2)} className="btn-ghost">
+                {t('Voir plus')}
+              </button>
+            </div>
+          )}
+          {filtered.length ? null : (
             <Empty
               title={t('Aucune dépense trouvée')}
-              hint={t('Enregistrez vos charges pour obtenir un résultat net fiable.')}
+              hint={from || to ? t('Aucune dépense sur la période choisie. Choisissez « Tout » pour voir les autres.') : t('Enregistrez vos charges pour obtenir un résultat net fiable.')}
               icon={<IconWallet className="h-10 w-10" />}
             />
           )}
@@ -212,11 +251,11 @@ export default function Expenses() {
             {t('Annuler')}
           </button>
           {shortfall ? (
-            <button onClick={() => submit(true)} className="btn-ghost">
+            <button onClick={() => submit(true)} disabled={amountMinor <= 0} className="btn-ghost">
               {t('Enregistrer quand même')}
             </button>
           ) : null}
-          <button onClick={() => submit()} className="btn-primary">
+          <button onClick={() => submit()} disabled={amountMinor <= 0} className="btn-primary">
             {t('Enregistrer la dépense')}
           </button>
         </div>

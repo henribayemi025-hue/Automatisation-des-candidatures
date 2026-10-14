@@ -257,9 +257,20 @@ Vérifié au clic à 390 et 1 280 px : 46 ventes ce mois-ci dans la démonstrati
 
 Vérifié au clic à 390 et 1 280 px dans la démonstration : boutons de période, documents « Ventes » (274 lignes sur l'exercice, paiements en clair) et « Marges », aucune page qui défile sur le côté, aucune erreur JavaScript. Les 43 contrôles passent.
 
-### À faire ensuite (jour 12)
+### Jour 12 — 14/10 : les dépenses (`Expenses.tsx`) et la saisie des montants
 
-`Expenses.tsx` (liste des dépenses : même principe du mois en cours).
+| # | Constat | Gravité | Ce qui a été fait |
+|---|---|---|---|
+| 1 | **Un montant tapé avec un espace de milliers était tronqué** : « 25 000 » devenait 25, parce que la conversion s'arrêtait au premier espace. Cela touchait les 48 champs de montant de l'application (ventes, dépenses, achats, dettes, articles, caisse…), pas seulement les dépenses. | **Élevé** (chiffres faux enregistrés sans avertissement) | Corrigé à la source (`toMinor`, `src/lib/money.ts`) : espaces ordinaires et insécables retirés avant la conversion. Contrôle `scripts/saisie-montant-check.ts` (10 cas ; 5 échouent sans le correctif). Lecture seule en production : une boutique réelle a deux ventes à 50 et 120 FCFA le 23/09. Troncature possible, **pas prouvée** ; rien n'a été modifié, le journal ne se réécrit pas. |
+| 2 | La liste s'ouvrait sur toutes les dépenses depuis le début. | Moyen (point 5 de l'audit du 07/10) | Mois en cours par défaut, trois boutons « Ce mois-ci », « Mois dernier », « Tout » ; 50 lignes, puis « Voir plus » ; message quand la période choisie est vide. |
+| 3 | « Enregistrer la dépense » restait cliquable sans montant, et le clic ne faisait rien. | Petit | Bouton inactif tant que le montant n'est pas valable. |
+| 4 | Deux dépenses du même jour sortaient dans un ordre quelconque. | Petit | Départage par heure de saisie, la plus récente en haut. |
+
+Vérifié au clic à 390 et 1 280 px dans la démonstration : ouverture sur le mois, « Tout » (19 dépenses), bouton inactif sans montant, « 25 000 » enregistré à 25 000 FCFA, aucune page qui défile sur le côté, aucune erreur JavaScript. Les 44 contrôles passent.
+
+### À faire ensuite (jour 13)
+
+`Purchases.tsx` (achats) et `Debts.tsx` (dettes) : même principe du mois en cours, et vérifier au clic que les champs de montant acceptent « 25 000 ».
 
 Alpha a relu le n° 6 le 02/10 : pas d'objection. Les outils serveur (finia_resume_mois, ma_compta_*)
 lisent des dates « AAAA-MM-JJ » et compteront mieux. accounting-rappels n'est pas concerné.

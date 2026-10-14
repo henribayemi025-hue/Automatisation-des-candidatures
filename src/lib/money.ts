@@ -125,9 +125,14 @@ export function factor(code: string): number {
   return Math.pow(10, currency(code).decimals);
 }
 
-/** Convertit une saisie utilisateur ("12,50") en unités mineures. */
+/**
+ * Convertit une saisie utilisateur ("12,50", "25 000") en unités mineures.
+ *
+ * Les espaces (y compris insécables) sont retirés d'abord : parseFloat
+ * s'arrête au premier espace, et « 25 000 » devenait 25 (audit jour 12, 14/10).
+ */
 export function toMinor(input: string | number, code: string): Minor {
-  const raw = typeof input === 'number' ? input : parseFloat(String(input).replace(',', '.'));
+  const raw = typeof input === 'number' ? input : parseFloat(String(input).replace(/[\s\u00A0\u202F]/g, '').replace(',', '.'));
   if (!isFinite(raw)) return 0;
   return Math.round(raw * factor(code));
 }
