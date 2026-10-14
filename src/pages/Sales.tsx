@@ -7,6 +7,17 @@ import { Badge, Empty, Modal, Money, PageHeader, StatCard, Table } from '../comp
 import { IconReceipt } from '../components/Icons';
 import type { Sale } from '../lib/types';
 import { t } from '../lib/i18n';
+import { monthStart } from '../lib/metrics';
+import { localISO } from '../lib/dates';
+
+// 276 ventes sur une seule page dans la démonstration (audit jour 10) : la
+// liste s'ouvre sur le mois en cours, 50 lignes, puis « Voir plus ».
+const PAGE = 50;
+
+function previousMonth(): { from: string; to: string } {
+  const d = new Date();
+  return { from: localISO(new Date(d.getFullYear(), d.getMonth() - 1, 1)), to: localISO(new Date(d.getFullYear(), d.getMonth(), 0)) };
+}
 
 const METHOD_LABEL: Record<string, string> = {
   CASH: 'Espèces',
@@ -19,16 +30,26 @@ const METHOD_LABEL: Record<string, string> = {
 export default function Sales() {
   const { db, completeSaleCost } = useStore();
   const [status, setStatus] = useState('');
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
+  const [from, setFromRaw] = useState(monthStart());
+  const [to, setToRaw] = useState('');
+  const [shown, setShown] = useState(PAGE);
+  const setFrom = (v: string) => { setFromRaw(v); setShown(PAGE); };
+  const setTo = (v: string) => { setToRaw(v); setShown(PAGE); };
+  const last = previousMonth();
+  const preset = !to && from === monthStart() ? 'month' : from === last.from && to === last.to ? 'last' : !from && !to ? 'all' : '';
   const [detail, setDetail] = useState<Sale | null>(null);
   const [q, setQ] = useState('');
   const [costRaw, setCostRaw] = useState<Record<number, string>>({});
 
+  // L'accueil et la clôture envoient ici « compléter le coût » des ventes
+  // venues de la place de marché. Elles restent visibles quelle que soit la
+  // période affichée : une vente du mois dernier ne doit pas disparaître.
+  const toCost = useMemo(() => db.sales.filter((s) => s.status === 'CONFIRMED' && needsCost(s)), [db.sales]);
+
   const sales = useMemo(() => {
     const needle = q.trim().toLowerCase();
     const digits = needle.replace(/[^\d]/g, '');
-    return db.sales.filter((s) => {
+    const list = db.sales.filter((s) => {
       if (s.status === 'QUOTE') return false;
       if (status && s.status !== status) return false;
       if (from && s.date < from) return false;
@@ -41,6 +62,9 @@ export default function Sales() {
       if (digits && (String(s.total).includes(digits) || String(s.paid).includes(digits))) return true;
       return false;
     });
+    // Les plus récentes d'abord, même pour une vente rattrapée ou arrivée de la
+    // place de marché avec une date passée.
+    return list.sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt));
   }, [db.sales, status, from, to, q]);
 
   // Les totaux comparent ce qui a été facturé (taxe comprise) à ce qui est
@@ -59,7 +83,7 @@ export default function Sales() {
       <PageHeader title={t('Historique des ventes')} subtitle={t('Toutes les factures émises')} />
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label={t('Ventes affichées')} value={sales.length} />
+        <StatCard label={t('Ventes sur la période')} value={sales.length} />
         <StatCard
           label={t('Total facturé')}
           value={<Money value={billed} />}
@@ -74,11 +98,39 @@ export default function Sales() {
         />
       </div>
 
+      {toCost.length > 0 && (
+        <div className="card mt-6 border-amber-200 bg-amber-50/60">
+          <p className="text-caption font-semibold text-ink">
+            {t('{n} vente(s) venue(s) de Finjaro attendent leur coût d’achat.', { n: toCost.length })}
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {toCost.slice(0, 6).map((s) => (
+              <button key={s.id} onClick={() => setDetail(s)} className="btn-ghost text-caption">
+                {s.number} · {s.date}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="card mt-6 mb-4 flex flex-wrap items-end gap-3">
+        <div className="flex w-full flex-wrap gap-2" role="group" aria-label={t('Période')}>
+          {(
+            [
+              ['month', 'Ce mois-ci', () => { setFrom(monthStart()); setTo(''); }],
+              ['last', 'Mois dernier', () => { setFrom(last.from); setTo(last.to); }],
+              ['all', 'Tout', () => { setFrom(''); setTo(''); }],
+            ] as [string, string, () => void][]
+          ).map(([key, lab, go]) => (
+            <button key={key} type="button" aria-pressed={preset === key} onClick={go} className={preset === key ? 'btn-dark' : 'btn-ghost'}>
+              {t(lab)}
+            </button>
+          ))}
+        </div>
         <input
           id="sales-search"
           value={q}
-          onChange={(e) => setQ(e.target.value)}
+          onChange={(e) => { setQ(e.target.value); setShown(PAGE); }}
           placeholder={t('Numéro, client, article, montant…')}
           className="field min-w-[220px] flex-1"
         />
@@ -94,7 +146,7 @@ export default function Sales() {
       <div className="card p-0">
         {sales.length ? (
           <Table head={['Facture', 'Client', 'Caissier', 'Total', 'Paiement', 'Statut', 'Date', '']} phoneHide={[1, 3, 5, 7]}>
-            {sales.map((s) => {
+            {sales.slice(0, shown).map((s) => {
               const unpaid = s.total - s.paid;
               return (
                 <tr key={s.id} className="row">
@@ -130,7 +182,26 @@ export default function Sales() {
             })}
           </Table>
         ) : (
-          <Empty title={t('Aucune vente trouvée')} icon={<IconReceipt className="h-10 w-10" />} />
+          <Empty
+            title={t('Aucune vente trouvée')}
+            hint={from || to ? t('La recherche porte sur la période choisie.') : undefined}
+            icon={<IconReceipt className="h-10 w-10" />}
+          />
+        )}
+        {sales.length > shown && (
+          <div className="flex flex-wrap items-center justify-center gap-3 border-t border-hairline px-4 py-3 text-caption text-muted">
+            {t('{n} ventes sur {total}', { n: shown, total: sales.length })}
+            <button onClick={() => setShown((n) => n + PAGE * 2)} className="btn-ghost">
+              {t('Voir plus')}
+            </button>
+          </div>
+        )}
+        {!sales.length && (from || to) && (
+          <div className="flex justify-center pb-5">
+            <button onClick={() => { setFrom(''); setTo(''); }} className="btn-ghost">
+              {t('Chercher sur toute la période')}
+            </button>
+          </div>
         )}
       </div>
 

@@ -2163,4 +2163,9 @@ export const EN: Record<string, string> = {
   'Mouvements du {from} au {to}': 'Movements from {from} to {to}',
   'début': 'start',
   'aujourd’hui': 'today',
+  'Ventes sur la période': 'Sales in the period',
+  'La recherche porte sur la période choisie.': 'The search covers the chosen period.',
+  '{n} ventes sur {total}': '{n} of {total} sales',
+  'Chercher sur toute la période': 'Search all dates',
+  '{n} vente(s) venue(s) de Finjaro attendent leur coût d’achat.': '{n} sale(s) from Finjaro are waiting for their purchase cost.',
 };

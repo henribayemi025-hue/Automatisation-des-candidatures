@@ -234,9 +234,20 @@ Nouveau contrôle `scripts/stock-devis-check.ts` (10 points, vert). Les 40 contr
 Aucun lien de l'application ne mène à une écriture précise du journal : l'ouvrir sur le mois en cours ne cache rien.
 Vérifié au clic à 390 et 1 280 px. Les 42 contrôles passent ; 35 écrans sur 35 sans souci aux deux largeurs.
 
-### À faire ensuite (jour 10)
+### Jour 10 — 14/10 : les ventes (`Sales.tsx`)
 
-Les ventes (`Sales.tsx`, 276 lignes dans la démonstration) avec le même principe, puis `Reports.tsx`.
+| # | Constat | Gravité | Ce qui a été fait |
+|---|---|---|---|
+| 1 | 276 ventes sur une seule page dans la démonstration. | Moyen (point 5 de l'audit du 07/10) | Ouverture sur le mois en cours, avec trois boutons : « Ce mois-ci », « Mois dernier », « Tout ». 50 lignes, puis « Voir plus ». |
+| 2 | L'ordre suivait l'enregistrement, pas la date. Une vente rattrapée, ou arrivée de la place de marché avec une date passée, se glissait en tête. | Petit | Les plus récentes d'abord, triées par date. |
+| 3 | L'accueil et la clôture envoient ici « compléter le coût » des ventes venues de Finjaro. On ne les voyait que dans le détail d'une vente : avec le mois par défaut, une vente du mois dernier serait devenue introuvable. | Moyen (conséquence du n° 1, vue avant de livrer) | Un encart les liste toujours, quelle que soit la période, avec un bouton par vente. Pas visible dans la démonstration, qui n'a pas de vente venue de Finjaro ; la règle (`needsCost`) est déjà couverte par les contrôles de la liaison. |
+| 4 | Une recherche sans résultat sur le mois laissait croire que la vente n'existait pas. | Petit | « La recherche porte sur la période choisie », et un bouton « Chercher sur toute la période ». |
+
+Vérifié au clic à 390 et 1 280 px : 46 ventes ce mois-ci dans la démonstration, la plus récente en tête, « Tout » puis « Voir plus », aucune page qui défile sur le côté, aucune erreur JavaScript. Les 42 contrôles passent.
+
+### À faire ensuite (jour 11)
+
+`Reports.tsx` (rapports), puis `Expenses.tsx` (liste des dépenses : même principe du mois en cours).
 
 Alpha a relu le n° 6 le 02/10 : pas d'objection. Les outils serveur (finia_resume_mois, ma_compta_*)
 lisent des dates « AAAA-MM-JJ » et compteront mieux. accounting-rappels n'est pas concerné.
