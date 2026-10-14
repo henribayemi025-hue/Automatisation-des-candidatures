@@ -245,9 +245,21 @@ Vérifié au clic à 390 et 1 280 px. Les 42 contrôles passent ; 35 écrans sur
 
 Vérifié au clic à 390 et 1 280 px : 46 ventes ce mois-ci dans la démonstration, la plus récente en tête, « Tout » puis « Voir plus », aucune page qui défile sur le côté, aucune erreur JavaScript. Les 42 contrôles passent.
 
-### À faire ensuite (jour 11)
+### Jour 11 — 14/10 : les rapports (`Reports.tsx`)
 
-`Reports.tsx` (rapports), puis `Expenses.tsx` (liste des dépenses : même principe du mois en cours).
+| # | Constat | Gravité | Ce qui a été fait |
+|---|---|---|---|
+| 1 | Le document imprimable recopiait tels quels les noms de clients, d'articles, de tiers et de l'entreprise. Il s'ouvre dans la même origine que l'application : un nom écrit comme du code (« <img onerror=…> ») s'y serait exécuté avec la session de la personne qui imprime. Les noms de clients arrivent aussi des commandes de la place de marché, donc de quelqu'un d'extérieur. Le reçu, lui, échappait déjà. | **Élevé** (faille) | Le document est construit par `src/lib/report-doc.ts`, qui échappe tout ce qu'il reçoit. Contrôle `scripts/rapports-check.ts` (10 points). Lecture seule en production : **aucun** événement ne contient de balise, donc rien n'a été exploité. |
+| 2 | Le moyen de paiement s'imprimait en code interne (« CASH », « MOBILE »), et tout le document restait en français pour une entreprise en anglais. | Petit | Libellés traduits (« Espèces », « Mobile money »…), en-têtes, période et pied de page passent par la traduction ; la langue du document suit celle de l'application. |
+| 3 | Une vente de la place de marché sans coût d'achat gonfle la marge et le résultat sans que le document le dise. | Moyen (vérité des chiffres) | Les rapports « Marges » et « Compte de résultat » portent un avertissement : nombre de ventes concernées et montant maximal de la surestimation. |
+| 4 | Fenêtre bloquée par le navigateur : rien ne se passait. | Petit | Message clair dans la page. |
+| 5 | La période se saisissait à la main seulement. | Petit | Trois boutons : « Ce mois-ci », « Mois dernier », « Exercice en cours » (début d'exercice de l'entreprise). |
+
+Vérifié au clic à 390 et 1 280 px dans la démonstration : boutons de période, documents « Ventes » (274 lignes sur l'exercice, paiements en clair) et « Marges », aucune page qui défile sur le côté, aucune erreur JavaScript. Les 43 contrôles passent.
+
+### À faire ensuite (jour 12)
+
+`Expenses.tsx` (liste des dépenses : même principe du mois en cours).
 
 Alpha a relu le n° 6 le 02/10 : pas d'objection. Les outils serveur (finia_resume_mois, ma_compta_*)
 lisent des dates « AAAA-MM-JJ » et compteront mieux. accounting-rappels n'est pas concerné.

@@ -5,10 +5,26 @@ import { balanceSheet, incomeStatement, trialBalance } from '../lib/ledger';
 import { monthStart, outstanding, productPerformance, saleRevenue } from '../lib/metrics';
 import { formatMoney, currency as currencyOf } from '../lib/money';
 import { buildFec, fecFileName, fecPartiesFrom } from '../lib/fec';
+import { fiscalYearStart } from '../lib/kpi';
+import { salesWithoutCost } from '../lib/liaison';
+import { reportHtml } from '../lib/report-doc';
 import type { Minor } from '../lib/types';
 import { Field, PageHeader } from '../components/UI';
 import { IconBook, IconBox, IconCard, IconDoc, IconReceipt, IconScale, IconTrend } from '../components/Icons';
-import { locale, t } from '../lib/i18n';
+import { locale, t, useLang } from '../lib/i18n';
+
+const METHOD_LABEL: Record<string, string> = {
+  CASH: 'Espèces',
+  MOBILE: 'Mobile money',
+  CARD: 'Carte',
+  BANK: 'Virement',
+  CREDIT: 'Crédit',
+};
+
+function previousMonth(): { from: string; to: string } {
+  const d = new Date();
+  return { from: localISO(new Date(d.getFullYear(), d.getMonth() - 1, 1)), to: localISO(new Date(d.getFullYear(), d.getMonth(), 0)) };
+}
 
 type ReportId = 'SALES' | 'INVENTORY' | 'EXPENSES' | 'MARGINS' | 'INCOME' | 'BALANCE' | 'RECEIVABLES';
 
@@ -34,6 +50,12 @@ export default function Reports() {
   const db = useDB();
   const [from, setFrom] = useState(monthStart());
   const [to, setTo] = useState(localISO());
+  const [blocked, setBlocked] = useState(false);
+  const { lang } = useLang();
+  const today = localISO();
+  const last = previousMonth();
+  const yearFrom = fiscalYearStart(db.company.fiscalYearStart, today);
+  const preset = from === monthStart() && to === today ? 'month' : from === last.from && to === last.to ? 'last' : from === yearFrom && to === today ? 'year' : '';
 
   const money = (v: Minor) => formatMoney(v, db.company.currency);
 
@@ -42,31 +64,31 @@ export default function Reports() {
       case 'SALES': {
         const sales = db.sales.filter((s) => s.status === 'CONFIRMED' && s.date >= from && s.date <= to);
         return {
-          head: ['Facture', 'Date', 'Client', 'Paiement', 'Total', 'Payé'],
-          rows: sales.map((s) => [s.number, s.date, s.customerName, s.method, money(s.total), money(s.paid)]),
-          totals: ['', '', '', 'Total', money(sales.reduce((x, s) => x + s.total, 0)), money(sales.reduce((x, s) => x + s.paid, 0))],
+          head: [t('Facture'), t('Date'), t('Client'), t('Paiement'), t('Total'), t('Payé')],
+          rows: sales.map((s) => [s.number, s.date, s.customerName, t(METHOD_LABEL[s.method] ?? s.method), money(s.total), money(s.paid)]),
+          totals: ['', '', '', t('Total'), money(sales.reduce((x, s) => x + s.total, 0)), money(sales.reduce((x, s) => x + s.paid, 0))],
         };
       }
       case 'INVENTORY': {
         const products = db.products.filter((p) => !p.archived);
         return {
-          head: ['Produit', 'Référence', 'Quantité', 'Coût unitaire', 'Valeur'],
+          head: [t('Produit'), t('Référence'), t('Quantité'), t('Coût unitaire'), t('Valeur')],
           rows: products.map((p) => [p.name, p.sku || '—', String(p.stock), money(p.cost), money(Math.max(0, p.stock) * p.cost)]),
-          totals: ['', '', '', 'Total', money(products.reduce((s, p) => s + Math.max(0, p.stock) * p.cost, 0))],
+          totals: ['', '', '', t('Total'), money(products.reduce((s, p) => s + Math.max(0, p.stock) * p.cost, 0))],
         };
       }
       case 'EXPENSES': {
         const list = db.expenses.filter((e) => e.date >= from && e.date <= to);
         return {
-          head: ['Date', 'Catégorie', 'Compte', 'Description', 'Montant'],
+          head: [t('Date'), t('Catégorie'), t('Compte'), t('Description'), t('Montant')],
           rows: list.map((e) => [e.date, e.category, e.account, e.description || '—', money(e.amount)]),
-          totals: ['', '', '', 'Total', money(list.reduce((s, e) => s + e.amount, 0))],
+          totals: ['', '', '', t('Total'), money(list.reduce((s, e) => s + e.amount, 0))],
         };
       }
       case 'MARGINS': {
         const perf = productPerformance(db, from, to);
         return {
-          head: ['Produit', 'Quantité', 'CA', 'Coût', 'Marge'],
+          head: [t('Produit'), t('Quantité'), t('CA'), t('Coût'), t('Marge')],
           rows: perf.map((p) => [p.name, String(p.qty), money(p.revenue), money(p.cost), money(p.margin)]),
           totals: ['', '', money(perf.reduce((s, p) => s + p.revenue, 0)), money(perf.reduce((s, p) => s + p.cost, 0)), money(perf.reduce((s, p) => s + p.margin, 0))],
         };
@@ -74,35 +96,35 @@ export default function Reports() {
       case 'INCOME': {
         const income = incomeStatement(db.accounts, db.entries, from, to);
         return {
-          head: ['Compte', 'Intitulé', 'Nature', 'Montant'],
+          head: [t('Compte'), t('Intitulé'), t('Nature'), t('Montant')],
           rows: [
-            ...income.revenue.map((b) => [b.account.code, b.account.label, 'Produit', money(b.balance)]),
-            ...income.expenses.map((b) => [b.account.code, b.account.label, 'Charge', money(b.balance)]),
+            ...income.revenue.map((b) => [b.account.code, t(b.account.label), t('Produit'), money(b.balance)]),
+            ...income.expenses.map((b) => [b.account.code, t(b.account.label), t('Charge'), money(b.balance)]),
           ],
-          totals: ['', '', 'Résultat net', money(income.netIncome)],
+          totals: ['', '', t('Résultat net'), money(income.netIncome)],
         };
       }
       case 'BALANCE': {
         const balances = trialBalance(db.accounts, db.entries, from, to);
         return {
-          head: ['Compte', 'Intitulé', 'Débit', 'Crédit', 'Solde'],
-          rows: balances.map((b) => [b.account.code, b.account.label, money(b.debit), money(b.credit), money(b.balance)]),
-          totals: ['', 'Totaux', money(balances.reduce((s, b) => s + b.debit, 0)), money(balances.reduce((s, b) => s + b.credit, 0)), ''],
+          head: [t('Compte'), t('Intitulé'), t('Débit'), t('Crédit'), t('Solde')],
+          rows: balances.map((b) => [b.account.code, t(b.account.label), money(b.debit), money(b.credit), money(b.balance)]),
+          totals: ['', t('Totaux'), money(balances.reduce((s, b) => s + b.debit, 0)), money(balances.reduce((s, b) => s + b.credit, 0)), ''],
         };
       }
       case 'RECEIVABLES': {
         const open = db.debts.filter((d) => outstanding(d) > 0);
         return {
-          head: ['Tiers', 'Type', 'Origine', 'Date', 'Montant', 'Reste dû'],
+          head: [t('Tiers'), t('Type'), t('Origine'), t('Date'), t('Montant'), t('Reste dû')],
           rows: open.map((d) => [
             d.partyName,
-            d.party === 'CUSTOMER' ? 'Créance client' : 'Dette fournisseur',
+            d.party === 'CUSTOMER' ? t('Créance client') : t('Dette fournisseur'),
             d.origin,
             d.date,
             money(d.amount),
             money(outstanding(d)),
           ]),
-          totals: ['', '', '', 'Total', '', money(open.reduce((s, d) => s + outstanding(d), 0))],
+          totals: ['', '', '', t('Total'), '', money(open.reduce((s, d) => s + outstanding(d), 0))],
         };
       }
     }
@@ -111,63 +133,40 @@ export default function Reports() {
   function generate(def: ReportDef) {
     const { head, rows, totals } = buildRows(def.id);
     const sheet = def.id === 'BALANCE' ? balanceSheet(db.accounts, db.entries, to) : null;
-    const period = def.ranged ? `Période du ${from} au ${to}` : `Arrêté au ${localISO()}`;
     const revenue = db.sales
       .filter((s) => s.status === 'CONFIRMED' && s.date >= from && s.date <= to)
       .reduce((s, x) => s + saleRevenue(x), 0);
+    // Une vente de la place de marché sans coût d'achat pèse son prix entier
+    // dans la marge et le résultat : le document le dit au lieu de l'afficher
+    // comme un bénéfice acquis.
+    const noCost = def.id === 'MARGINS' || def.id === 'INCOME' ? salesWithoutCost(db, from, to) : null;
 
-    const html = `<!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><title>${def.title} — ${db.company.name}</title>
-<style>
-  *{box-sizing:border-box}
-  body{font-family:Inter,system-ui,sans-serif;margin:0;padding:32px;color:#0f1420}
-  header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #C25E38;padding-bottom:16px;margin-bottom:24px}
-  h1{margin:0;font-size:22px}
-  .muted{color:#64748b;font-size:12px;margin-top:4px}
-  .brand{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#AC4F2D}
-  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
-  th{text-align:left;background:#f1f5f9;padding:8px;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#475569}
-  td{padding:8px;border-bottom:1px solid #e2e8f0}
-  tfoot td{font-weight:800;border-top:2px solid #0f1420;border-bottom:none}
-  .meta{display:flex;gap:24px;font-size:12px;color:#475569;margin-bottom:16px}
-  footer{margin-top:32px;padding-top:12px;border-top:1px solid #e2e8f0;font-size:10px;color:#94a3b8;display:flex;justify-content:space-between}
-  @media print{body{padding:16px}}
-</style></head><body>
-<header>
-  <div>
-    <div class="brand">Finjaro Accounting</div>
-    <h1>${def.title}</h1>
-    <div class="muted">${def.subtitle}</div>
-  </div>
-  <div style="text-align:right">
-    <div style="font-weight:700">${db.company.name}</div>
-    <div class="muted">${[db.company.city, db.company.country].filter(Boolean).join(', ') || '—'}</div>
-    <div class="muted">${period}</div>
-  </div>
-</header>
-<div class="meta">
-  <span><strong>Devise :</strong> ${db.company.currency}</span>
-  <span><strong>Référentiel :</strong> ${db.company.chart}</span>
-  ${def.ranged ? `<span><strong>CA de la période :</strong> ${money(revenue)}</span>` : ''}
-  ${sheet ? `<span><strong>Équilibre :</strong> ${sheet.difference === 0 ? 'vérifié' : 'écart détecté'}</span>` : ''}
-</div>
-<table>
-  <thead><tr>${head.map((h) => `<th>${h}</th>`).join('')}</tr></thead>
-  <tbody>${
-    rows.length
-      ? rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')
-      : `<tr><td colspan="${head.length}" style="text-align:center;color:#94a3b8;padding:32px">Aucune donnée sur la période</td></tr>`
-  }</tbody>
-  ${totals && rows.length ? `<tfoot><tr>${totals.map((c) => `<td>${c}</td>`).join('')}</tr></tfoot>` : ''}
-</table>
-<footer>
-  <span>Édité le ${new Date().toLocaleString(locale())}</span>
-  <span>${rows.length} ligne(s) — document généré par Finjaro Accounting</span>
-</footer>
-<script>window.onload=function(){window.print()}</script>
-</body></html>`;
+    const html = reportHtml({
+      lang,
+      title: t(def.title),
+      subtitle: t(def.subtitle),
+      companyName: db.company.name,
+      place: [db.company.city, db.company.country].filter(Boolean).join(', ') || '—',
+      period: def.ranged ? t('Période du {from} au {to}', { from, to }) : t('Arrêté au {date}', { date: today }),
+      meta: [
+        [t('Devise'), db.company.currency],
+        [t('Référentiel'), db.company.chart],
+        ...(def.ranged ? [[t('CA de la période'), money(revenue)] as [string, string]] : []),
+        ...(sheet ? [[t('Équilibre'), sheet.difference === 0 ? t('vérifié') : t('écart détecté')] as [string, string]] : []),
+      ],
+      warning: noCost?.sales.length
+        ? t('{n} vente(s) de la place de marché sans coût d’achat sur la période : la marge et le résultat sont surestimés d’au plus {amount}. Complétez le coût dans Ventes.', { n: noCost.sales.length, amount: money(noCost.exposure) })
+        : undefined,
+      head,
+      rows,
+      totals,
+      empty: t('Aucune donnée sur la période'),
+      edited: t('Édité le {date}', { date: new Date().toLocaleString(locale()) }),
+      lines: t('{n} ligne(s) — document généré par Finjaro Accounting', { n: rows.length }),
+    });
 
     const w = window.open('', '_blank');
+    setBlocked(!w);
     if (!w) return;
     w.document.write(html);
     w.document.close();
@@ -192,6 +191,19 @@ export default function Reports() {
       />
 
       <div className="card mb-6 flex flex-wrap items-end gap-3">
+        <div className="flex w-full flex-wrap gap-2" role="group" aria-label={t('Période')}>
+          {(
+            [
+              ['month', 'Ce mois-ci', () => { setFrom(monthStart()); setTo(today); }],
+              ['last', 'Mois dernier', () => { setFrom(last.from); setTo(last.to); }],
+              ['year', 'Exercice en cours', () => { setFrom(yearFrom); setTo(today); }],
+            ] as [string, string, () => void][]
+          ).map(([key, lab, go]) => (
+            <button key={key} type="button" aria-pressed={preset === key} onClick={go} className={preset === key ? 'btn-dark' : 'btn-ghost'}>
+              {t(lab)}
+            </button>
+          ))}
+        </div>
         <Field label={t('Du')}>
           <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="field" />
         </Field>
@@ -202,6 +214,12 @@ export default function Reports() {
           {t('La période s\'applique aux rapports datés. L\'inventaire et les encours sont toujours arrêtés au jour même.')}
         </p>
       </div>
+
+      {blocked && (
+        <p role="alert" className="card mb-6 text-sm font-semibold text-brand-600">
+          {t('Le navigateur a bloqué la fenêtre du document. Autorisez les fenêtres pour ce site, puis réessayez.')}
+        </p>
+      )}
 
       {/* Le FEC est le seul export que l'administration fiscale française sait
           lire telle quelle : journal complet, une ligne par ligne d'écriture. */}
