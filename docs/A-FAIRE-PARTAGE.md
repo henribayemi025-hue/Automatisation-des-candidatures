@@ -1915,3 +1915,28 @@ réel**, sans rien soustraire toi-même.
 
 Quand A et B sont en ligne, dis-le : j'essaie le circuit complet (publier → commander →
 livrer → stock des deux côtés) avec le compte d'essai avant de l'annoncer à Beau.
+
+### Claude — 14/10 après-midi : invitation par e-mail et Discussion « façon Google Chat » (demandes de Beau)
+
+**1. Invitation (en ligne depuis ce commit, `ec43aff`).** Beau a invité un collègue (écran Équipe) et s'est
+attendu à ce que celui-ci **reçoive un e-mail avec un lien**. Ce n'est pas le cas : `inviteMember` écrit une
+ligne dans `finia_members`, rien d'autre ; le message affiché laissait croire que la personne était prévenue.
+Corrigé côté interface : le message dit la vérité et propose **WhatsApp, e-mail, copie** ; le bouton
+« Inviter quelqu'un » est maintenant en haut de la Discussion, dans tous les canaux.
+**À toi** : l'e-mail automatique. Une fonction edge `finia-invitation` (commune aux deux applications :
+préviens Beau avant de la déployer) qui envoie, par Resend, « X t'invite sur l'espace Y » avec un lien vers
+`https://accounting.finjaro.net` (sans jeton, sans création de compte, sans `inviteUserByEmail` : **on ne
+touche ni à l'authentification ni au Site URL**). Appelée après l'écriture dans `finia_members`, par la
+propriétaire seulement. Mesure : invitations envoyées → invitations devenues « Actif ».
+
+**2. Discussion façon Google Chat — ⚠️ à trancher avec Beau avant de coder.** Beau veut : espaces (projets,
+départements), discussions 1:1 et de groupe, fils, réactions, @mentions, accusés de lecture, appels voix et
+vidéo, tâches, recherche, épingler, historique. **La réunion du 13/10 avait conclu l'inverse** pour Accounting
+(« stock et finances seulement, garder le chat simple, ne rien ajouter »). Je suis le dernier mot de Beau,
+mais je lui pose la question dans son compte rendu. En attendant sa réponse, rien d'autre que le jalon 1 :
+- **Jalon 1** : bouton « Nouvelle discussion » → choisir un membre (1:1) ou plusieurs (groupe) ; un bouton
+  « Appeler » qui ouvre une salle de réunion par lien (aucun serveur à nous, aucune clé payante) et
+  poste le lien dans la discussion.
+- **Jalon 2** (si Beau confirme) : fils de réponses, réactions, @mentions de membres, accusés de lecture.
+- **Jalon 3** : tâches assignées avec date, recherche (expéditeur, date, pièce jointe), épingler, historique.
+Règles à garder : aucun texte qui suppose un pays ; l'e-mail d'un membre n'est montré qu'à la propriétaire.
