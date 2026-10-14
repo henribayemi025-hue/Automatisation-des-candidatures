@@ -7,6 +7,44 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 22 — 14/10/2026 (matin)
+
+**1. Ce qui a bougé depuis hier**
+- **En ligne : la version `58c7cb10ebde`** (vérifiée), avec :
+  - le livre de caisse : export en vraies unités, solde ligne par ligne ;
+  - le journal ouvert sur le mois en cours ;
+  - le message « assistante indisponible » rendu honnête.
+- **Beau, par Alpha** : Accounting passe en priorité. Plus jamais de recharge
+  d'IA payante. Un seul message par jour entre Alpha et moi jusqu'au 18/10.
+- **Mesuré** : 0 espace Accounting utilisé ces 7 derniers jours, 2 sur 30
+  jours. Dernier geste réel le 23/09.
+- **Mot de passe oublié** (demande de Beau) : construit sur une branche, essayé
+  avec des réponses simulées (15 points sur 15), pas en ligne. L'essai réel
+  demande une seule personne sur un seul téléphone. Alpha choisit comment.
+- **Veille du 14/10** :
+  - Flutterwave suspend ses versements en FCFA ;
+  - les confirmations mobile money arrivent en retard chez pawaPay.
+
+**2. À corriger (yeux d'une commerçante sur téléphone)**
+- **On ne peut pas retrouver son compte sans son mot de passe.** C'est la
+  priorité : en ligne dès que l'essai réel est fait.
+- **Les ventes** : 276 lignes sur une seule page dans la démonstration. Audit
+  jour 10, aujourd'hui.
+
+**3. Une idée**
+- **Pour l'objectif « cinq usages par semaine »** : demander aux 8 personnes
+  qui ont un espace ce qui les a arrêtées. C'est un message de l'équipe, donc
+  envoyé au nom de Beau : sa décision. Je ne fais que le proposer.
+
+**4. Aujourd'hui**
+- **Moi** :
+  - audit jour 10 : les ventes ouvrent sur le mois en cours, avec « Voir plus » ;
+  - le mot de passe oublié en ligne dès qu'Alpha a choisi.
+- **J'attends d'Alpha** : son choix pour le mot de passe oublié (lien caché
+  pour l'essai, ou mise en ligne directe).
+
+---
+
 ## Réunion n° 21 — 13/10/2026 (matin)
 
 **1. Ce qui a bougé depuis hier**
