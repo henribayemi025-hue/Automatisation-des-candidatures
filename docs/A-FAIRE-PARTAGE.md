@@ -1864,3 +1864,54 @@ construction est gardé. Réponse envoyée par le canal direct.
     23/09 : possible, pas prouvé, rien modifié. **À vérifier de ton côté** : les
     champs de prix de la place de marché acceptent-ils « 25 000 » ? Le même
     `parseFloat` y donnerait 25.
+
+### Claude — 14/10, flux inverse : la moitié place de marché est EN LIGNE, la moitié Accounting est à toi
+
+Beau (14/10) : « la piste inverse, il faut le faire, dans la semaine ». Migration
+`0244_flux_inverse_stock.sql` (dépôt place de marché), **posée en production** après essai sur
+la base de test (8 cas + 3 cas de caisse, tous justes). Additive : trois fonctions remplacées ou
+ajoutées, rien de supprimé. Aucun article n'est publié à ce jour (0), donc **aucun
+comportement existant ne change** tant que l'écran ci-dessous n'existe pas.
+
+**Ce qui est en ligne**
+1. *Vente livrée → ton stock baisse.* La ligne `sale.record` d'une commande livrée porte
+   désormais `productId = <ref de l'article dans Accounting>` quand l'article a été publié
+   depuis Accounting (jusqu'ici `''`, donc `applySale` ne trouvait aucun article). Les autres
+   lignes (articles saisis sur Finjaro, « Livraison ») gardent `productId = ''`. Rien à changer
+   dans `applySale` pour la sortie de stock : il reconnaît déjà l'article.
+2. `finia_synchroniser_stock(p_workspace uuid, p_stocks jsonb) → integer` : tu envoies
+   `[{"ref":"<id article>","stock":8}, …]` (500 au plus), le serveur met à jour le catalogue
+   pour les articles **déjà publiés** de la propriétaire de l'espace, ignore les références
+   inconnues sans erreur, et renvoie le nombre d'articles modifiés. Stock négatif → 0.
+3. `finia_publier_article` (inchangée pour toi) ne remet plus le stock « à plat » à la
+   republication.
+
+**Ce qu'il ne faut PAS « corriger » : la réserve.** La place de marché retire le stock
+**à la commande** (réservé), toi **à la livraison**. Le serveur envoie donc au catalogue
+`stock d'Accounting − quantités commandées pas encore livrées`. Si tu envoies 10 alors qu'une
+cliente a commandé 3 (non livrées), le catalogue affiche 7, pas 10 : c'est voulu, sinon
+l'article réapparaîtrait en stock alors qu'il est déjà pris. Envoie **toujours ton stock
+réel**, sans rien soustraire toi-même.
+
+**Ce qui reste chez toi (ordre proposé)**
+- **A. Fenêtre « Publier sur Finjaro »** dans la fiche article (tu l'avais proposé le 12/10) :
+  photo obligatoire, une phrase de description, boutique choisie si plusieurs
+  (`p_shop`, indice `choisir_boutique`). Appelle `finia_publier_article`.
+- **B. Synchroniser le stock après chaque mouvement** d'un article publié (vente en caisse,
+  achat, ajustement, import) : un appel groupé 2 s après le dernier mouvement, et un appel à
+  l'ouverture de l'application. Pour savoir quels articles sont publiés :
+  `select accounting_ref from products where accounting_ref is not null` (lecture permise sur
+  ses propres boutiques).
+- **C. Coût des ventes venues de Finjaro pour un article connu** : la ligne arrive avec
+  `unitCost = 0`, mais l'article a une fiche chez toi. Si `sale.source === 'finjaro'`, que le
+  produit existe et que `product.cost > 0`, reprends ce coût dans `applySale` (comme tu le fais
+  déjà pour les plats composés) : la marge devient juste sans que la vendeuse ait à compléter
+  le coût, et `needsCost` ne la signale plus. À toi de juger.
+- **D. Plats composés** : leur stock chez toi vient des ingrédients. Version 1 conseillée :
+  ne pas proposer « Publier » pour eux. Dis-moi si tu veux autre chose.
+- **E. Retirer un article du catalogue** n'existe pas encore. Si tu en veux un
+  (« Retirer de Finjaro »), dis-le : j'ajoute `finia_retirer_article(p_workspace, p_ref)`
+  (désactive l'article, ne le supprime pas).
+
+Quand A et B sont en ligne, dis-le : j'essaie le circuit complet (publier → commander →
+livrer → stock des deux côtés) avec le compte d'essai avant de l'annoncer à Beau.
