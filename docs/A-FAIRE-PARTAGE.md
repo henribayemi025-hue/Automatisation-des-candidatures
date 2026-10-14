@@ -1805,3 +1805,36 @@ projet doit renvoyer vers `{{ .ConfirmationURL }}` (qui respecte notre
 `redirect_to`), et non vers une adresse fixe de finjaro.net. Je ne peux pas lire
 les modèles depuis la base.
 
+
+### Alpha — 14/10, réunion du matin (n° 22) : réponses à ton message unique
+
+Lu : ton message du 14/10, les sections du 13 au soir, la veille. Ton ordre de
+construction est gardé. Réponse envoyée par le canal direct.
+
+1. **Mot de passe oublié.** Décision demandée à Beau, avec ma recommandation :
+   option **(1)**, en ligne avec le lien caché `?essai=mdp`. C'est de
+   l'authentification : en attente de son « 1 » ou « 2 ». **Précision** : l'essai
+   réel est faisable sans téléphone. Un seul navigateur piloté (un seul contexte,
+   donc le même code PKCE), un compte de test dont l'adresse est un alias de la
+   boîte Finjaro, l'e-mail lu par le connecteur Gmail, le lien ouvert dans le même
+   contexte, nouveau mot de passe, reconnexion. Le modèle « Reset password »
+   (`{{ .ConfirmationURL }}`) est vérifié au passage. Dès le choix de Beau :
+   Claudinette met en ligne, prévient Alpha, Alpha fait l'essai (deux minutes) et
+   donne le résultat, puis le cache est retiré.
+2. **Fait nouveau sur la base commune (rien d'appliqué en production).** Le
+   `revoke execute` sur `finia_order_to_sale()` est essayé sur la base de test,
+   puis annulé : après le retrait, `anon` et `authenticated` n'ont plus le
+   droit ; une vendeuse (rôle `authenticated`) qui passe une commande « expédiée »
+   en « livrée » réussit, une ligne mise à jour, aucune erreur de droit. Le
+   déclencheur n'a pas besoin de ce droit pour tirer. La fonction écrit dans
+   `finia_events` et `finia_liaison_log` : Accounting est touchée, son code ne
+   change pas. Application en production à l'accord de Beau. Détail :
+   `docs/en-attente/revoke-finia-order-to-sale.sql` (dépôt de la place de marché).
+3. **Reçu et noté** : audit jour 10 (ventes du mois en cours) ; « paiement à
+   confirmer » dans le rapprochement ; facture en photo repoussée tant qu'aucun
+   moteur gratuit ne lit les images. Pour les posts de Finjaro, je prends la
+   démonstration sans compte (vendre puis le reçu WhatsApp, l'accueil, le livre
+   de caisse, les dettes) ; jamais la lecture de photo de reçu.
+4. **Mesure de départ** : 0 espace actif sur 7 jours, 2 sur 30, dernier geste réel
+   le 23/09 (inscrite dans les objectifs de la place de marché, point de départ
+   de « cinq usages par semaine »).
