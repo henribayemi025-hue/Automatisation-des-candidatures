@@ -36,6 +36,8 @@ interface CollabValue {
   signUp: (email: string, password: string, name: string) => Promise<{ error: string | null; needsConfirmation: boolean }>;
   /** Renvoie le lien de confirmation d'inscription ; message d'erreur ou null. */
   resendConfirmation: (email: string) => Promise<string | null>;
+  /** Mot de passe oublié : envoie le lien. `phone` : compte créé avec un numéro, sans boîte e-mail. */
+  resetPassword: (email: string) => Promise<{ error: string | null; phone: boolean }>;
   signInWithGoogle: () => Promise<void>;
   /** Renvoie un message si la déconnexion est refusée (opérations non envoyées), sinon null. */
   signOut: () => Promise<string | null>;
@@ -88,7 +90,7 @@ export function isUnconfirmedError(message: string | null): boolean {
   return !!message && message === unconfirmedMessage();
 }
 
-function frenchError(message: string, byPhone = false): string {
+export function frenchError(message: string, byPhone = false): string {
   const m = message.toLowerCase();
   if (m.includes('invalid login credentials'))
     return byPhone ? t('Numéro ou mot de passe incorrect.') : t('Email ou mot de passe incorrect.');
@@ -101,6 +103,8 @@ function frenchError(message: string, byPhone = false): string {
     return byPhone ? t('Ce numéro n’est pas accepté. Vérifiez l’indicatif du pays.') : t('Adresse email invalide.');
   if (m.includes('email not confirmed')) return unconfirmedMessage();
   if (m.includes('rate limit')) return t('Trop de tentatives, réessayez dans quelques minutes.');
+  if (m.includes('for security purposes')) return t('Un lien vient déjà de partir. Attendez une minute avant d’en redemander un.');
+  if (m.includes('should be different') || m.includes('same password')) return t('Choisissez un mot de passe différent de l’ancien.');
   if (m.includes('network') || m.includes('fetch')) return t('Connexion impossible : vérifiez votre réseau.');
   return message;
 }
@@ -687,6 +691,19 @@ export function CollabProvider({ children }: { children: ReactNode }) {
           options: { emailRedirectTo: `${window.location.origin}/` },
         });
         return error ? frenchError(error.message) : null;
+      },
+      // Mot de passe oublié (Beau, 13/10). Le lien revient sur /auth/reset
+      // (adresse déjà autorisée dans Supabase : https://accounting.finjaro.net/**).
+      // Rien n'est changé côté Supabase : ni le Site URL, ni les modèles d'e-mail,
+      // communs avec la place de marché.
+      async resetPassword(email) {
+        const id = toLogin(email);
+        if (!id.address) return { error: id.error, phone: false };
+        if (isPhoneAddress(id.address)) return { error: null, phone: true };
+        const { error } = await supabase.auth.resetPasswordForEmail(id.address, {
+          redirectTo: `${window.location.origin}/auth/reset`,
+        });
+        return { error: error ? frenchError(error.message) : null, phone: false };
       },
       async signInWithGoogle() {
         await supabase.auth.signInWithOAuth({

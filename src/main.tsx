@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { HashRouter } from 'react-router-dom';
 import App from './App';
+import ResetPassword from './pages/ResetPassword';
 import { StoreProvider } from './lib/store';
 import { CollabProvider } from './lib/collab';
 import { ThemeProvider } from './lib/theme';
@@ -20,7 +21,19 @@ if (capterPartage()) {
   window.location.hash = '#/rattrapage';
 }
 
+// Lien « mot de passe oublié » : page à part, sans routeur ni synchronisation.
+const resetting = window.location.pathname.startsWith('/auth/reset');
+
 createRoot(document.getElementById('root')!).render(
+  resetting ? (
+    <React.StrictMode>
+      <ThemeProvider>
+        <LangProvider>
+          <ResetPassword />
+        </LangProvider>
+      </ThemeProvider>
+    </React.StrictMode>
+  ) : (
   <React.StrictMode>
     <ThemeProvider>
       <OfflineProvider>
@@ -39,5 +52,6 @@ createRoot(document.getElementById('root')!).render(
       </StoreProvider>
       </OfflineProvider>
     </ThemeProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
+  ),
 );
