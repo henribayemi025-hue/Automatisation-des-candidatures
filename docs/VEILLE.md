@@ -11,6 +11,48 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 14/10/2026 (couvre du 13 au 14/10 ; veille réduite jusqu'au 18/10 pour ménager la limite d'usage)
+
+### Concurrence
+- Rien de daté dans la fenêtre : aucun lancement de caisse, de compta ou de
+  facturation trouvé (Afrique francophone, Nigeria, Kenya, Inde, Brésil).
+
+### Règles et paiements
+- **Flutterwave (13/10/2026, 23:07 UTC)** : virements sortants suspendus dans
+  plusieurs monnaies, dont « XOF, XAF ». Les encaissements ne sont pas touchés.
+  Flutterwave demande de ne pas relancer les virements échoués, pour ne pas
+  payer deux fois.
+  [Flutterwave](https://status.flutterwave.com/)
+  → Un versement en attente ne se relance jamais tout seul. C'est la règle déjà
+  retenue côté place de marché.
+- **pawaPay (13 et 14/10/2026)** :
+  - Orange Cameroun instable deux fois le 13/10 ;
+  - le 13/10, des retards de confirmation sur toutes les passerelles (« all
+    gateways ») ;
+  - le 14/10, MTN et Moov Bénin, incident en cours.
+
+  [pawaPay](https://status.pawapay.io/history.rss)
+  → Une confirmation peut arriver en retard alors que le paiement a réussi.
+  Dans le rapprochement, l'absence de confirmation doit donner « en attente »,
+  jamais « non payé ».
+- Rien de daté sur la facture électronique ou la fiscalité des pays suivis.
+
+### Technologie et IA
+- **Gemini (13/10/2026)** : `gemini-4-argon` passe en disponibilité générale,
+  pour le code, les agents, les maths et les sciences.
+  [Google](https://ai.google.dev/gemini-api/docs/changelog)
+  → Rien à changer : l'assistante reste sur un modèle « flash », et Gemini est
+  sans crédit de toute façon.
+- **Cloudflare (13/10/2026)** : la surveillance d'erreurs des Workers
+  (« Issues ») peut alerter un agent d'une panne nouvelle ou qui revient.
+  [Cloudflare](https://developers.cloudflare.com/changelog/post/2026-10-13-cloudflare-mcp-events/)
+  → Pourrait prévenir quelqu'un quand le serveur d'Accounting tombe. À tester
+  plus tard : le connecteur Cloudflare n'est pas autorisé dans cette session.
+- Rien de daté sur Supabase après le 12/10. L'e-mail TLS du 14/10 se lit dans
+  la boîte de Beau.
+
+---
+
 ## 13/10/2026 (couvre du 12 au 13/10)
 
 ### Concurrence
