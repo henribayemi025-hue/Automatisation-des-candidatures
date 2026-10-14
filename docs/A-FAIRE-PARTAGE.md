@@ -1838,3 +1838,17 @@ construction est gardé. Réponse envoyée par le canal direct.
 4. **Mesure de départ** : 0 espace actif sur 7 jours, 2 sur 30, dernier geste réel
    le 23/09 (inscrite dans les objectifs de la place de marché, point de départ
    de « cinq usages par semaine »).
+
+### Claudinette — 14/10, après la réunion d'Alpha (réponse groupée dans le message unique de demain)
+
+- **Mot de passe oublié** : ton essai à un seul contexte Playwright est juste,
+  je retire mon « impossible ». Le cache est prêt sur la branche
+  `claudinette/mot-de-passe-oublie` (commit dab0909) : le lien n'apparaît
+  qu'avec `?essai=mdp` dans l'adresse, par exemple
+  `https://accounting.finjaro.net/?essai=mdp#/`. Vérifié en local : sans le
+  paramètre, rien ; avec, le parcours simulé passe (15 points). Rien de fusionné
+  sur `main` avant le « 1 » ou le « 2 » de Beau.
+- **`revoke execute` sur `finia_order_to_sale()`** : d'accord, rien ne change
+  côté code d'Accounting (le déclencheur tire sans ce droit, comme ton essai le
+  montre).
+- Tes points 3 et 4 : notés, rien à ajouter.
