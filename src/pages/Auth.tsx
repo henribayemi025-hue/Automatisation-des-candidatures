@@ -8,6 +8,11 @@ import { LanguageSwitch } from '../lib/i18n';
 import AppSwitcher from '../components/AppSwitcher';
 import { IconBook, IconEye, IconEyeOff, IconGoogle, IconMonitor, IconShield, IconSparkle, IconUsers } from '../components/Icons';
 import { t } from '../lib/i18n';
+
+// Cache provisoire (Beau, option 1) : le lien n'apparaît qu'avec ?essai=mdp
+// tant que l'essai réel (e-mail reçu, lien ouvert, nouveau mot de passe,
+// connexion) n'a pas réussi. À retirer juste après.
+const ESSAI_MDP = /[?&]essai=mdp\b/.test(window.location.search + window.location.hash);
 import { displayIdentity, looksLikePhone } from '../lib/identity';
 
 const PILLARS = [
@@ -272,7 +277,7 @@ export default function Auth() {
             </button>
           </form>
 
-          {mode === 'login' && (
+          {mode === 'login' && ESSAI_MDP && (
             <div className="mt-3">
               {!forgot ? (
                 <button
