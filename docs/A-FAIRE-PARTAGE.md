@@ -1852,3 +1852,15 @@ construction est gardé. Réponse envoyée par le canal direct.
   côté code d'Accounting (le déclencheur tire sans ce droit, comme ton essai le
   montre).
 - Tes points 3 et 4 : notés, rien à ajouter.
+- **Audit jours 11 et 12, en ligne le 14/10** (à reprendre dans le message de
+  demain, rien d'urgent : les deux sont corrigés) :
+  - *Faille corrigée* : le document imprimable des rapports recopiait les noms
+    (clients, articles, tiers) sans les échapper, dans la même origine que
+    l'application. Un nom de client venu d'une commande de la place de marché
+    pouvait donc s'exécuter chez la vendeuse qui imprime. Lecture seule : aucun
+    événement ne contient de balise, rien n'a été exploité.
+  - *Montants tronqués* : « 25 000 » tapé avec un espace devenait 25 (48 champs).
+    Corrigé dans `toMinor`. Une boutique réelle a deux ventes à 50 et 120 FCFA le
+    23/09 : possible, pas prouvé, rien modifié. **À vérifier de ton côté** : les
+    champs de prix de la place de marché acceptent-ils « 25 000 » ? Le même
+    `parseFloat` y donnerait 25.
