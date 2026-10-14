@@ -1940,3 +1940,42 @@ mais je lui pose la question dans son compte rendu. En attendant sa réponse, ri
 - **Jalon 2** (si Beau confirme) : fils de réponses, réactions, @mentions de membres, accusés de lecture.
 - **Jalon 3** : tâches assignées avec date, recherche (expéditeur, date, pièce jointe), épingler, historique.
 Règles à garder : aucun texte qui suppose un pays ; l'e-mail d'un membre n'est montré qu'à la propriétaire.
+
+### Claude — 14/10 soir : mot de passe oublié EN LIGNE, et la base de la Discussion « tout Google Chat » est posée
+
+**Mot de passe oublié.** Ta branche est fusionnée et le cache `?essai=mdp` est retiré (commit `9f2e81f`), sur l'ordre
+exprès de Beau. Essayé pour de vrai en production avec le compte d'essai : demande → e-mail reçu en quelques
+secondes → lien ouvert dans le même navigateur → nouveau mot de passe → application ouverte ; le même lien dans un
+autre navigateur dit « Ce lien a expiré ou a déjà servi » ; le nouveau mot de passe connecte, un faux est refusé.
+Rien changé côté Supabase (ni Site URL, ni redirections). Reste : l'e-mail est le modèle commun de Supabase
+(anglais, « powered by Supabase ») ; le changer touche aussi la place de marché, c'est à Beau.
+
+**Discussion : décision de Beau, « tout Google Chat »** (la réunion du 13/10 est écartée sur ce point). Tu n'as plus
+à attendre de réponse : jalons 1 à 3 de la section précédente, sans restriction. **La base est en production**
+(migration `0245_finia_chat.sql`, dépôt place de marché ; essayée sur la base de test, 25 cas de droits). À toi l'écran.
+
+Pourquoi des tables à part et pas `finia_events` : le journal est lu par tous les membres, un message « privé » y
+serait lisible par tous. Ici chaque ligne n'est visible que par les personnes de la discussion (RLS).
+Les canaux existants (Général, projets) restent dans le journal : l'écran affiche les deux listes ensemble.
+
+| À faire | Comment (client Supabase) |
+|---|---|
+| Qui peut être invité à une discussion | `rpc('finia_chat_annuaire', { p_workspace })` → `{ user_id, nom, role }` ; **jamais d'e-mail** ; un membre jamais connecté n'y est pas (l'afficher « pas encore connecté ») |
+| Liste de gauche + non lus | `rpc('finia_chat_resume', { p_workspace })` → `space_id, kind, name, starred, muted, non_lus, dernier_at, dernier_apercu, membres[]` ; pour un `dm`, le nom est celui de l'autre personne (via l'annuaire) |
+| Nouvelle discussion | `rpc('finia_chat_creer', { p_workspace, p_kind: 'dm'｜'group'｜'space', p_membres: [user_id…], p_nom })` ; `dm` rejouable (renvoie l'existante) ; groupe 3 à 50 ; Espace nommé jusqu'à 200 |
+| Ajouter des personnes | `rpc('finia_chat_ajouter', { p_space, p_membres })` (créateur seulement ; pas dans un `dm`) |
+| Écrire, répondre en fil | `from('finia_chat_messages').insert({ space_id, user_id: moi, body, parent_id?, mentions?, meta? })` ; `kind` = `text`｜`task` (`call` et `system` : voir plus bas) ; un fil n'a qu'un niveau ; 4000 caractères |
+| Lire | `select` trié par `created_at` desc, par pages ; les réponses ont `parent_id` ; **temps réel** : `channel().on('postgres_changes', { table: 'finia_chat_messages', filter: 'space_id=eq.<id>' })` |
+| Modifier / supprimer son message | `update({ body, edited_at })` / `update({ deleted_at })` (jamais un vrai `delete`) |
+| Réactions | `insert`/`delete` dans `finia_chat_reactions` `{ message_id, user_id, emoji }` |
+| Épingler | `finia_chat_pins` `{ space_id, message_id, pinned_by }` |
+| Accusé de lecture, favori, sourdine | `update` de ma ligne dans `finia_chat_members` : `last_read_at`, `starred`, `muted` (seules colonnes modifiables) |
+| Appel voix ou vidéo | `rpc('finia_chat_appeler', { p_space, p_video })` → crée un message `call` avec `meta.url` (salle Jitsi au nom impossible à deviner, aucun compte, aucune clé). **Afficher le nom de domaine du lien avant d'ouvrir** |
+| Recherche | index prêt : `.textSearch('body', mot, { config: 'simple' })`, à filtrer par discussion |
+
+**Pas encore fait (jalons suivants, à toi ou à moi selon ce qui est demandé)** : pièces jointes (bucket `finia-chat`
+déjà utilisé par l'ancien chat), historique éphémère 24 h (le champ `history_on` existe, aucune purge n'est écrite),
+résumés par l'IA, badge « Externe », alerte sur données sensibles (numéro de carte…), bots et webhooks entrants,
+rattacher une vente, une dette ou un article à un message (carte), mentions `@tous`.
+Règle de Beau (CLAUDE.md §11) : avant de livrer l'écran, le dérouler : 1er, 10e, 50e message ; vide ; erreur ; lent ;
+téléphone et grand écran. Dis-moi quand le jalon 1 est en ligne : j'essaie le circuit à deux comptes.
