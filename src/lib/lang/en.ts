@@ -989,6 +989,13 @@ export const EN: Record<string, string> = {
   'Tout voir, comptabilité, sans l’équipe ni les paramètres': 'See everything, accounting, without team or settings',
   'Espace « {name} » — {n} personne(s) en ligne': 'Workspace “{name}” — {n} person(s) online',
   '{email} peut maintenant se connecter avec ce même email et rejoindre l’espace.': '{email} can now sign in with that email and join the workspace.',
+  '{email} est ajouté à l’espace. Aucun e-mail ne part tout seul pour l’instant : envoyez-lui ce message.': '{email} was added to the workspace. No email is sent automatically yet: send them this message.',
+  'Bonjour, je t’invite sur mon espace « {space} » dans Finjaro Accounting. Ouvre https://accounting.finjaro.net et connecte-toi avec cette adresse e-mail : {email}. L’espace s’ouvre tout de suite.': 'Hello, I am inviting you to my workspace “{space}” in Finjaro Accounting. Open https://accounting.finjaro.net and sign in with this email address: {email}. The workspace opens right away.',
+  'Envoyer par WhatsApp': 'Send on WhatsApp',
+  'Envoyer par e-mail': 'Send by email',
+  'Copier le message': 'Copy the message',
+  'Message copié': 'Message copied',
+  'Invitation sur Finjaro Accounting': 'Invitation to Finjaro Accounting',
   'Aucun espace actif.': 'No active workspace.',
 
   // ---- Settings ----

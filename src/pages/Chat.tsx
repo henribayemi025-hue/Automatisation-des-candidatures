@@ -164,12 +164,20 @@ export default function Chat() {
         title={t('Discussion')}
         subtitle={t('Votre équipe et l’assistant, au même endroit que les chiffres')}
         actions={
-          presence.length > 0 ? (
-            <span className="inline-flex items-center gap-2 text-caption text-muted">
-              <IconUsers className="h-4 w-4" />
-              {t('{n} en ligne', { n: presence.length })}
-            </span>
-          ) : undefined
+          <div className="flex items-center gap-3">
+            {presence.length > 0 && (
+              <span className="inline-flex items-center gap-2 text-caption text-muted">
+                <IconUsers className="h-4 w-4" />
+                {t('{n} en ligne', { n: presence.length })}
+              </span>
+            )}
+            {/* Beau (14/10) : « je ne sais pas comment ajouter quelqu'un » — le bouton est là, dans tous les canaux. */}
+            {user && (
+              <Link to="/equipe" className="btn-primary px-3 py-1.5 text-caption">
+                {t('Inviter quelqu’un')}
+              </Link>
+            )}
+          </div>
         }
       />
 

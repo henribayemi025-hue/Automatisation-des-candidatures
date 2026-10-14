@@ -19,6 +19,9 @@ export default function Team() {
   const [error, setError] = useState('');
   const [ok, setOk] = useState('');
   const [busy, setBusy] = useState(false);
+  // Adresse qui vient d'être ajoutée : il reste à l'avertir (aucun e-mail ne part tout seul).
+  const [prevenir, setPrevenir] = useState('');
+  const [copie, setCopie] = useState(false);
 
   const isOwner = workspace?.role === 'owner';
 
@@ -31,8 +34,24 @@ export default function Team() {
     setBusy(false);
     if (err) setError(err);
     else {
-      setOk(t('{email} peut maintenant se connecter avec ce même email et rejoindre l’espace.', { email }));
+      // Beau (14/10) : « il doit recevoir un e-mail avec un lien ». Il n'en part pas encore : on le dit,
+      // et on donne le moyen de prévenir la personne tout de suite (WhatsApp, e-mail, copie).
+      setOk(t('{email} est ajouté à l’espace. Aucun e-mail ne part tout seul pour l’instant : envoyez-lui ce message.', { email }));
+      setPrevenir(email.trim().toLowerCase());
+      setCopie(false);
       setEmail('');
+    }
+  }
+
+  const message = (addr: string) =>
+    t('Bonjour, je t’invite sur mon espace « {space} » dans Finjaro Accounting. Ouvre https://accounting.finjaro.net et connecte-toi avec cette adresse e-mail : {email}. L’espace s’ouvre tout de suite.', { space: workspace?.name ?? '', email: addr });
+
+  async function copier(addr: string) {
+    try {
+      await navigator.clipboard.writeText(message(addr));
+      setCopie(true);
+    } catch {
+      setCopie(false);
     }
   }
 
@@ -117,7 +136,32 @@ export default function Team() {
           </p>
           {!isOwner && <p className="mt-3 rounded-input bg-base px-3 py-2 text-caption text-muted">{t('Seul le propriétaire peut inviter.')}</p>}
           {error && <div className="mt-3 rounded-input bg-[#FDEDED] px-3 py-2 text-caption text-[#A63030]">{error}</div>}
-          {ok && <div className="mt-3 rounded-input bg-[#EAF6EA] px-3 py-2 text-caption text-[#1F6F65]">{ok}</div>}
+          {ok && (
+            <div className="mt-3 rounded-input bg-[#EAF6EA] px-3 py-2 text-caption text-[#1F6F65]">
+              {ok}
+              {prevenir && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <a
+                    className="btn-primary px-3 py-1.5 text-caption"
+                    href={`https://wa.me/?text=${encodeURIComponent(message(prevenir))}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t('Envoyer par WhatsApp')}
+                  </a>
+                  <a
+                    className="btn-ghost px-3 py-1.5 text-caption"
+                    href={`mailto:${prevenir}?subject=${encodeURIComponent(t('Invitation sur Finjaro Accounting'))}&body=${encodeURIComponent(message(prevenir))}`}
+                  >
+                    {t('Envoyer par e-mail')}
+                  </a>
+                  <button type="button" className="btn-ghost px-3 py-1.5 text-caption" onClick={() => void copier(prevenir)}>
+                    {copie ? t('Message copié') : t('Copier le message')}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
           <form onSubmit={invite} className="mt-4 space-y-4">
             <Field label={t('Email')}>
               <input id="invite-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} disabled={!isOwner} className="field" placeholder={t('caissier@exemple.com')} />
