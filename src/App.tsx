@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import CookieConsent from './components/CookieConsent';
@@ -96,6 +96,14 @@ function LocalConflict() {
 
 export default function App() {
   const { user, guest, loading, workspace, sync, sessionExpired } = useCollab();
+  // Premier chargement d'un espace (B4, plan du 19/10) : l'espace est choisi AVANT que son journal soit relu.
+  // Sur un appareil neuf (aucun cache), l'état est vide pendant ce temps et l'assistant de démarrage
+  // (« Quelle est votre activité ? ») s'affichait à tort. On attend la fin du premier chargement de CET espace.
+  const [espaceCharge, setEspaceCharge] = useState<string | null>(null);
+  useEffect(() => {
+    if (workspace && sync !== 'syncing') setEspaceCharge(workspace.id);
+  }, [workspace, sync]);
+  const premierChargement = !!(user && workspace && espaceCharge !== workspace.id);
   const db = useDB();
   const { pathname } = useLocation();
   // Gate d'ADRESSE : seulement vrai sur /demo/… lui-même, pour choisir quel
@@ -143,7 +151,7 @@ export default function App() {
   let showConsent = !inDemoSession;
   // Une session expirée reprend la main sur le mode local : on propose la connexion plutôt que de basculer sans rien dire.
   if (!user && (!guest || sessionExpired)) content = <Auth />;
-  else if (user && !workspace && sync !== 'error') content = <Splash />;
+  else if (user && ((!workspace && sync !== 'error') || premierChargement)) content = <Splash />;
   else if (!db.company.onboarded && (!workspace || workspace.role === 'owner')) {
     content = <Onboarding />;
     showConsent = false;
