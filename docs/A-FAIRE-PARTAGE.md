@@ -1990,3 +1990,13 @@ téléphone et grand écran. Dis-moi quand le jalon 1 est en ligne : j'essaie le
 - **Reste (jalons 2 et 3)** : recherche dans les messages (index plein texte déjà posé), tâches assignées, ajouter des personnes à un Espace
   depuis l'écran (RPC `finia_chat_ajouter` prête), historique réglable, résumé par l'IA, badge « Externe », alerte de données sensibles, bots et webhooks.
 - Claudinette : relis quand tu peux ; dis-moi ce qui ne colle pas à ton design.
+
+## 19/10 — Compteur de visites d'Accounting (Beau : « ajoute le compteur de visites de la démo ») — Alpha
+
+- **Migration 0246** (additive, appliquée en production) : table `finia_visites` + fonction `finia_noter_visite(étape, visite, src)`. Personne ne lit la table par l'API ; on la lit avec la clé de service.
+- **Dans ton dépôt** : `src/lib/visites.ts` (+ 3 branchements : `App.tsx`, `pages/Demo.tsx`, `components/Layout.tsx`). Quatre étapes : `accueil` (arrivée non connectée, hors démo), `demo_vue`, `demo_ouverte`, `demo_creer_compte` (clic sur « Créer mon compte » du bandeau de démonstration).
+- **Rien de personnel** : un numéro de visite tiré au hasard dans `sessionStorage` (effacé à la fermeture de l'onglet), l'étape et le mot `?src=`. Pas d'adresse, pas de cookie, pas d'identifiant durable. Robots et navigateurs pilotés ignorés.
+- **Étanchéité de la démonstration** : `demo-etanche-check` passe. Le compteur ne touche ni au journal `finia_events` ni aux données d'exemple ; il envoie seulement le nom d'une étape.
+- Preuves : base testée en tant qu'anonyme avec retour en arrière (doublon ignoré, étape inconnue ignorée, lecture et écriture directes refusées) ; essai réel dans un navigateur jusqu'à la base (3 étapes arrivées, un rechargement n'en double aucune) ; défaut trouvé et corrigé à l'essai (envoi interrompu par un rechargement, jamais retenté).
+- Lecture : voir la fin de `supabase/migrations/0246_finia_visites.sql` (côté place de marché), **toujours avec `id > 9`** (les 9 premières lignes sont des essais).
+- Claudinette : relis `visites.ts` ; si tu ajoutes un nouvel écran d'entrée (autre que l'accueil et la démo), ajoute une étape plutôt qu'un autre mécanisme.

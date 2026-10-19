@@ -21,6 +21,7 @@ import CatchUp from './pages/CatchUp';
 import Projects from './pages/Projects';
 import Chat from './pages/Chat';
 import Messages from './pages/Messages';
+import { noterVisite } from './lib/visites';
 import ProjectDetail from './pages/ProjectDetail';
 import Products from './pages/Products';
 import Purchases from './pages/Purchases';
@@ -127,6 +128,12 @@ export default function App() {
   useEffect(() => {
     if (!inDemoSession) trackPageView();
   }, [pathname, inDemoSession]);
+
+  // Compteur de visites (19/10) : une personne qui arrive sans être connectée = une visite « accueil ».
+  // (La démonstration compte ses propres étapes, dans Demo.tsx.) Rien de personnel ne part : voir lib/visites.ts.
+  useEffect(() => {
+    if (!loading && !user && !inDemoSession) noterVisite('accueil');
+  }, [loading, user, inDemoSession]);
 
   if (loading) return <Splash />;
   // Lien de démonstration : un seul clic, sans compte. Une personne déjà

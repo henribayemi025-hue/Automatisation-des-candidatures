@@ -7,6 +7,7 @@ import { currencyLabel } from '../lib/money';
 import { SECTORS } from '../lib/guide';
 import { sectorProfile } from '../lib/sector';
 import { LanguageSwitch, t } from '../lib/i18n';
+import { noterVisite } from '../lib/visites';
 import AppSwitcher from '../components/AppSwitcher';
 import { IconBook, IconChevronRight, IconShield, IconSparkle } from '../components/Icons';
 
@@ -114,9 +115,15 @@ export default function Demo() {
   const [busy, setBusy] = useState(false);
   const started = useRef(false);
 
+  // Compteur de visites : la page de choix de la démonstration a été vue.
+  useEffect(() => {
+    noterVisite('demo_vue');
+  }, []);
+
   function open(name: string, tradeId = trade, screen = '/') {
     const profile = countryProfile(name);
     if (!profile || busy) return;
+    noterVisite('demo_ouverte'); // compteur de visites : une démonstration ouverte (une fois par visite)
     setBusy(true);
     // Revenir sur le lien de démonstration ne doit pas empiler un second jeu
     // de données : on rouvre l'espace déjà rempli — en changeant seulement de

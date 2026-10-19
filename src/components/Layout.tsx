@@ -47,6 +47,7 @@ import {
   IconSend,
 } from './Icons';
 import { t } from '../lib/i18n';
+import { noterVisite } from '../lib/visites';
 
 type Area = 'sell' | 'stock' | 'finance' | 'accounting' | 'team' | 'settings';
 
@@ -469,7 +470,13 @@ export default function Layout({ children }: { children: ReactNode }) {
             >
               {company.mode === 'EXPERT' ? t('Revenir au mode simple') : t('Voir la comptabilité complète')}
             </button>
-            <button onClick={leaveDemo} className="btn-primary px-3 py-1.5 text-caption">
+            <button
+              onClick={() => {
+                if (!user) noterVisite('demo_creer_compte'); // compteur de visites : la démonstration donne envie de créer un compte
+                leaveDemo();
+              }}
+              className="btn-primary px-3 py-1.5 text-caption"
+            >
               {user ? t('Quitter la démonstration') : t('Créer mon compte')}
             </button>
           </div>
