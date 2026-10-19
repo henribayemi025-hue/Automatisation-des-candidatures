@@ -59,6 +59,15 @@ interface CollabValue {
 
   presence: Presence[];
   sync: SyncStatus;
+  /**
+   * L'espace affiché est-il vraiment chargé (instantané en ligne ou copie de
+   * cet appareil) ? Faux pendant le chargement sur un appareil neuf : l'écran
+   * de démarrage ne doit pas s'afficher sur un espace vide en apparence (B4).
+   */
+  workspaceReady: boolean;
+  /** La liste des espaces n'a pas pu être lue : on le dit, on ne crée rien, on propose de réessayer. */
+  discoveryFailed: boolean;
+  retryDiscovery: () => void;
   /** L'instantané affiché correspond-il à l'empreinte inscrite au journal ? */
   sealVerdict: SealVerdict | null;
   pending: number;
@@ -189,6 +198,9 @@ export function CollabProvider({ children }: { children: ReactNode }) {
   const [invitations, setInvitations] = useState<Workspace[]>([]);
   const [presence, setPresence] = useState<Presence[]>([]);
   const [sync, setSync] = useState<SyncStatus>('offline');
+  const [readyId, setReadyId] = useState<string | null>(null);
+  const [discoveryFailed, setDiscoveryFailed] = useState(false);
+  const [discoveryRun, setDiscoveryRun] = useState(0);
   // Verdict du scellé : l'écran correspond-il au journal ? Voir src/lib/seal.ts.
   const [sealVerdict, setSealVerdict] = useState<SealVerdict | null>(null);
   const [pending, setPending] = useState(0);
@@ -267,7 +279,10 @@ export function CollabProvider({ children }: { children: ReactNode }) {
       setSync('syncing');
       store.setScope(ws.id);
       const cached = loadCache(ws.id);
-      if (cached) store.replaceState(cached);
+      if (cached) {
+        store.replaceState(cached);
+        setReadyId(ws.id);
+      } else setReadyId(null);
 
       const { data: row, error } = await supabase
         .from('finia_workspaces')
@@ -298,6 +313,7 @@ export function CollabProvider({ children }: { children: ReactNode }) {
       lastSeq.current = events.length ? events[events.length - 1].seq! : snapshotSeq.current;
       const base = normalizeDB(row.data as Partial<DB>);
       store.replaceState(replay(base, events));
+      setReadyId(ws.id);
       // Charger un espace remplace l'état local : ce qui était affiché n'était
       // plus la démonstration de toute façon. On éteint le drapeau, sinon il
       // survit à la connexion et bloque la synchronisation du vrai travail.
@@ -455,9 +471,10 @@ export function CollabProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     (async () => {
       setSync('syncing');
+      setDiscoveryFailed(false);
       const email = (user.email ?? '').toLowerCase();
 
-      const [{ data: owned }, { data: memberRows }, { data: invitedRows }] = await Promise.all([
+      const [{ data: owned, error: ownedError }, { data: memberRows, error: memberError }, { data: invitedRows }] = await Promise.all([
         supabase.from('finia_workspaces').select('id, name, owner_id, data').eq('owner_id', user.id),
         supabase
           .from('finia_members')
@@ -467,6 +484,15 @@ export function CollabProvider({ children }: { children: ReactNode }) {
         supabase.from('finia_members').select('workspace_id, role').eq('status', 'invited').eq('email', email),
       ]);
       if (cancelled) return;
+      // Une lecture en échec (réseau, session pas encore prête) n'est PAS
+      // « aucun espace » : avant, on tentait d'en créer un vide, la création
+      // était refusée (un espace par personne) et l'écran de démarrage
+      // s'affichait sur un compte qui avait déjà ses données (B4, 14/10).
+      if (ownedError || memberError) {
+        setDiscoveryFailed(true);
+        setSync('error');
+        return;
+      }
 
       type OwnedRow = { id: string; name: string; owner_id: string; data: Partial<DB> };
       const list: Workspace[] = [];
@@ -542,12 +568,15 @@ export function CollabProvider({ children }: { children: ReactNode }) {
       const wanted = localStorage.getItem(LAST_WS_KEY);
       const chosen = list.find((w) => w.id === wanted) ?? list[0] ?? null;
       setWorkspace(chosen);
-      if (!chosen) setSync('error');
+      if (!chosen) {
+        setSync('error');
+        setDiscoveryFailed(true);
+      }
     })();
     return () => {
       cancelled = true;
     };
-  }, [user, store]);
+  }, [user, store, discoveryRun]);
 
   // ---------- Espace actif : chargement, temps réel, présence ----------
   useEffect(() => {
@@ -812,6 +841,9 @@ export function CollabProvider({ children }: { children: ReactNode }) {
 
       presence,
       sync,
+      workspaceReady: !!workspace && readyId === workspace.id,
+      discoveryFailed,
+      retryDiscovery: () => setDiscoveryRun((n) => n + 1),
       sealVerdict,
       pending,
       localConflict,
@@ -835,7 +867,7 @@ export function CollabProvider({ children }: { children: ReactNode }) {
         }
       },
     }),
-    [user, loading, guest, sessionExpired, authError, lastEmail, workspace, workspaces, members, invitations, presence, sync, pending, localConflict, rebuild, loadWorkspace, flushOutbox],
+    [user, loading, guest, sessionExpired, authError, lastEmail, workspace, workspaces, members, invitations, presence, sync, readyId, discoveryFailed, pending, localConflict, rebuild, loadWorkspace, flushOutbox],
   );
 
   return <CollabContext.Provider value={value}>{children}</CollabContext.Provider>;

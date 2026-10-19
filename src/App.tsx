@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import CookieConsent from './components/CookieConsent';
@@ -63,6 +63,18 @@ function Splash() {
   );
 }
 
+function LoadFailed({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="grid min-h-screen place-items-center bg-base px-4">
+      <div role="alert" className="card w-full max-w-sm text-center">
+        <h1 className="font-display text-[22px] font-bold text-ink">{t('Votre espace ne se charge pas')}</h1>
+        <p className="mt-2 text-body text-muted">{t('La connexion au serveur a échoué. Vos données sont en sécurité en ligne ; rien n’a été créé ni modifié.')}</p>
+        <button onClick={onRetry} className="btn-primary mt-4 w-full">{t('Réessayer')}</button>
+      </div>
+    </div>
+  );
+}
+
 function LocalConflict() {
   const { localConflict, resolveLocalConflict, workspace } = useCollab();
   if (!localConflict) return null;
@@ -95,15 +107,7 @@ function LocalConflict() {
 }
 
 export default function App() {
-  const { user, guest, loading, workspace, sync, sessionExpired } = useCollab();
-  // Premier chargement d'un espace (B4, plan du 19/10) : l'espace est choisi AVANT que son journal soit relu.
-  // Sur un appareil neuf (aucun cache), l'état est vide pendant ce temps et l'assistant de démarrage
-  // (« Quelle est votre activité ? ») s'affichait à tort. On attend la fin du premier chargement de CET espace.
-  const [espaceCharge, setEspaceCharge] = useState<string | null>(null);
-  useEffect(() => {
-    if (workspace && sync !== 'syncing') setEspaceCharge(workspace.id);
-  }, [workspace, sync]);
-  const premierChargement = !!(user && workspace && espaceCharge !== workspace.id);
+  const { user, guest, loading, workspace, sync, sessionExpired, workspaceReady, discoveryFailed, retryDiscovery } = useCollab();
   const db = useDB();
   const { pathname } = useLocation();
   // Gate d'ADRESSE : seulement vrai sur /demo/… lui-même, pour choisir quel
@@ -151,7 +155,10 @@ export default function App() {
   let showConsent = !inDemoSession;
   // Une session expirée reprend la main sur le mode local : on propose la connexion plutôt que de basculer sans rien dire.
   if (!user && (!guest || sessionExpired)) content = <Auth />;
-  else if (user && ((!workspace && sync !== 'error') || premierChargement)) content = <Splash />;
+  // Connectée mais l'espace n'a pas pu être lu, ou pas encore chargé sur cet
+  // appareil : jamais l'écran de démarrage à la place de ses données (B4).
+  else if (user && (discoveryFailed || (workspace && !workspaceReady && sync === 'error'))) content = <LoadFailed onRetry={retryDiscovery} />;
+  else if (user && (!workspace || !workspaceReady)) content = <Splash />;
   else if (!db.company.onboarded && (!workspace || workspace.role === 'owner')) {
     content = <Onboarding />;
     showConsent = false;

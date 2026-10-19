@@ -2293,4 +2293,8 @@ export const EN: Record<string, string> = {
   'Stock à 0 : l’article apparaîtra en rupture sur Finjaro jusqu’à votre prochain achat ou correction.': 'Stock at 0: the item will show as out of stock on Finjaro until your next purchase or correction.',
   'Publier': 'Publish',
   'Finjaro ne reconnaît pas encore la devise {currency}. Rien n’a été publié.': 'Finjaro does not support the currency {currency} yet. Nothing was published.',
+  // Chargement de l'espace (B4, 19/10)
+  'Votre espace ne se charge pas': 'Your workspace is not loading',
+  'La connexion au serveur a échoué. Vos données sont en sécurité en ligne ; rien n’a été créé ni modifié.': 'The connection to the server failed. Your data is safe online; nothing was created or changed.',
+  'Réessayer': 'Try again',
 };
