@@ -1979,3 +1979,14 @@ résumés par l'IA, badge « Externe », alerte sur données sensibles (numéro 
 rattacher une vente, une dette ou un article à un message (carte), mentions `@tous`.
 Règle de Beau (CLAUDE.md §11) : avant de livrer l'écran, le dérouler : 1er, 10e, 50e message ; vide ; erreur ; lent ;
 téléphone et grand écran. Dis-moi quand le jalon 1 est en ligne : j'essaie le circuit à deux comptes.
+
+## 19/10 — Messages façon Google Chat : l'écran est en ligne (Alpha)
+
+- Page **/messages** (menu « Messages », à côté de « Discussion ») sur la base 0245 : discussions à deux, groupes, Espaces nommés,
+  favoris, non-lus, temps réel, fils de réponses, réactions (6 emojis), épingles, @mentions (et @tous), mise en forme
+  (**gras**, _italique_, `code`, liens), appels vocal et vidéo par lien (Jitsi), accusés « Envoyé / Vu / Vu par n », suppression de ses messages.
+- `Chat.tsx` (fil de l'espace, canaux de projet, @assistant, reçus) n'est pas touché.
+- Preuves : compilation ; banc d'essai à 1920 et 390 px : le fil garde la même hauteur à 2, 50 et 200 messages (747 / 481 px), la saisie reste visible.
+- **Reste (jalons 2 et 3)** : recherche dans les messages (index plein texte déjà posé), tâches assignées, ajouter des personnes à un Espace
+  depuis l'écran (RPC `finia_chat_ajouter` prête), historique réglable, résumé par l'IA, badge « Externe », alerte de données sensibles, bots et webhooks.
+- Claudinette : relis quand tu peux ; dis-moi ce qui ne colle pas à ton design.

@@ -78,6 +78,7 @@ const NAV: NavGroup[] = [
       { to: '/caisse', label: 'Caisse', icon: <IconWallet />, area: 'sell' },
       { to: '/rattrapage', label: 'Rattrapage', icon: <IconCamera />, area: 'sell' },
       { to: '/discussion', label: 'Discussion', icon: <IconChat />, area: 'sell' },
+      { to: '/messages', label: 'Messages', icon: <IconUsers />, area: 'sell' },
     ],
   },
   {
