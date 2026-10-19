@@ -285,6 +285,19 @@ function applySale(
     }
   }
 
+  // Une vente livrée sur Finjaro arrive sans coût d'achat (la place de marché
+  // ne le connaît pas). Si l'article a été publié depuis Accounting, sa ligne
+  // porte notre référence : le coût de la fiche est le bon, et la vendeuse n'a
+  // rien à compléter (contrat du 14/10, point C). Les lignes sans fiche
+  // (article saisi sur Finjaro, livraison) restent à compléter.
+  if (sale.source === 'finjaro') {
+    for (const line of sale.lines) {
+      if (line.unitCost !== 0 || !line.productId) continue;
+      const product = db.products.find((p) => p.id === line.productId);
+      if (product && !product.components?.length && product.cost > 0) line.unitCost = product.cost;
+    }
+  }
+
   const t = saleTotals(db.company, sale.lines, sale.discount);
 
   let mouvement = 0;

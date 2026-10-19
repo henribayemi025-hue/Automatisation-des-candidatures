@@ -5,6 +5,7 @@ import CookieConsent from './components/CookieConsent';
 import { trackPageView } from './lib/pixel';
 import { isDemo } from './lib/demo-state';
 import LockScreen from './components/LockScreen';
+import FinjaroStockSync from './components/FinjaroStockSync';
 import { useCollab } from './lib/collab';
 import { useDB } from './lib/store';
 import Auth from './pages/Auth';
@@ -150,6 +151,7 @@ export default function App() {
     <>
       <LockScreen />
       <LocalConflict />
+      <FinjaroStockSync />
       <Layout>
         <Routes>
           <Route path="/" element={<Dashboard />} />

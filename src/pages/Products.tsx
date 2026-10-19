@@ -12,6 +12,9 @@ import { exportXlsx } from '../lib/xlsx';
 import { Link } from 'react-router-dom';
 import { t } from '../lib/i18n';
 import { sectorProfile, tracksStock } from '../lib/sector';
+import PublishToFinjaro from '../components/PublishToFinjaro';
+import { publishable, publishedArticles } from '../lib/finjaro-catalog';
+import { isDemo } from '../lib/demo-state';
 
 const BLANK = {
   name: '',
@@ -55,8 +58,21 @@ export default function Products() {
   const viewingArchived = showArchived && archivedCount > 0;
   const [importOpen, setImportOpen] = useState(false);
   const [importAutoFinjaro, setImportAutoFinjaro] = useState(false);
-  const { user } = useCollab();
+  const { user, workspace } = useCollab();
   const isEmpty = db.products.length === 0;
+  // « Publier sur Finjaro » : la propriétaire de l'espace seulement (le
+  // serveur refuse les autres), jamais dans la démonstration.
+  const canPublish = !!user && !!workspace && workspace.role === 'owner' && workspace.ownerId === user.id && !isDemo();
+  const [publishing, setPublishing] = useState<Product | null>(null);
+  const [onFinjaro, setOnFinjaro] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    if (!canPublish || !user || publishing) return;
+    let cancelled = false;
+    publishedArticles(user.id)
+      .then((m) => { if (!cancelled) setOnFinjaro(new Set(m.keys())); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [canPublish, user, publishing]);
   // Catalogue vide : on regarde une fois si la personne a déjà une boutique
   // Finjaro avec des articles, pour lui proposer de les reprendre en un clic
   // plutôt que de les retaper. Trouvé le 28/09 par Alpha : 3 des 8 inscrits
@@ -317,6 +333,7 @@ export default function Products() {
                   <td className="td">
                     <div className="font-semibold">{p.name}</div>
                     {p.sku && <div className="text-xs text-slate-400">{p.sku}</div>}
+                    {onFinjaro.has(p.id) && <div className="mt-0.5"><Badge tone="info">{t('Sur Finjaro')}</Badge></div>}
                   </td>
                   <td className="td text-slate-500">{grid ? <Cell product={p} field="category" /> : p.category || '—'}</td>
                   <td className="td font-semibold num">{grid ? <Cell product={p} field="price" /> : formatMoney(p.price, currency)}</td>
@@ -556,6 +573,21 @@ export default function Products() {
               {t('Je ne le vends plus')}
             </button>
           )}
+          {editing && canPublish && publishable(editing) && (
+            <button
+              onClick={() => {
+                // Ce qui vient d'être modifié dans la fiche (nom, prix) part
+                // aussi : on enregistre avant d'ouvrir la publication.
+                submit();
+                setOpen(false);
+                setPublishing(editing);
+              }}
+              className="btn-ghost"
+              title={t('Mettre cet article en vente dans votre boutique Finjaro')}
+            >
+              {onFinjaro.has(editing.id) ? t('Mettre à jour sur Finjaro') : t('Publier sur Finjaro')}
+            </button>
+          )}
           <button onClick={() => setOpen(false)} className="btn-ghost">
             {t('Annuler')}
           </button>
@@ -564,6 +596,8 @@ export default function Products() {
           </button>
         </div>
       </Modal>
+
+      {publishing && <PublishToFinjaro product={db.products.find((x) => x.id === publishing.id) ?? publishing} onClose={() => setPublishing(null)} />}
     </>
   );
 }
