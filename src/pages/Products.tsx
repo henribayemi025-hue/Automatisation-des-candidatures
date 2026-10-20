@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom';
 import { t } from '../lib/i18n';
 import { sectorProfile, tracksStock } from '../lib/sector';
 import PublishToFinjaro from '../components/PublishToFinjaro';
-import { publishable, publishedArticles } from '../lib/finjaro-catalog';
+import { activeShops, publishable, publishedArticles } from '../lib/finjaro-catalog';
 import { isDemo } from '../lib/demo-state';
 
 const BLANK = {
@@ -65,14 +65,26 @@ export default function Products() {
   const canPublish = !!user && !!workspace && workspace.role === 'owner' && workspace.ownerId === user.id && !isDemo();
   const [publishing, setPublishing] = useState<Product | null>(null);
   const [onFinjaro, setOnFinjaro] = useState<Set<string>>(new Set());
+  const [hasShop, setHasShop] = useState(false);
   useEffect(() => {
     if (!canPublish || !user || publishing) return;
     let cancelled = false;
     publishedArticles(user.id)
       .then((m) => { if (!cancelled) setOnFinjaro(new Set(m.keys())); })
       .catch(() => {});
+    activeShops(user.id)
+      .then((list) => { if (!cancelled) setHasShop(list.length > 0); })
+      .catch(() => {});
     return () => { cancelled = true; };
   }, [canPublish, user, publishing]);
+  // Le bouton « Publier sur Finjaro » est dans la fiche : une vendeuse qui a
+  // une boutique ne le trouverait pas sans cette ligne (réunion n° 23). Elle
+  // disparaît au premier article publié, ou quand on la ferme.
+  const hintKey = `finia.hint.publier.${workspace?.id ?? ''}`;
+  const [hintClosed, setHintClosed] = useState(() => {
+    try { return localStorage.getItem(hintKey) === '1'; } catch { return false; }
+  });
+  const showPublishHint = canPublish && hasShop && onFinjaro.size === 0 && !hintClosed && db.products.some(publishable);
   // Catalogue vide : on regarde une fois si la personne a déjà une boutique
   // Finjaro avec des articles, pour lui proposer de les reprendre en un clic
   // plutôt que de les retaper. Trouvé le 28/09 par Alpha : 3 des 8 inscrits
@@ -273,6 +285,24 @@ export default function Products() {
           </>
         }
       />
+
+      {showPublishHint && (
+        <div className="card mb-4 flex flex-wrap items-center gap-3 border-[#B8860B]/40 bg-[#FBF1DF]">
+          <p className="min-w-0 flex-1 text-caption text-ink">
+            <span className="font-semibold">{t('Vous avez une boutique sur Finjaro.')}</span>{' '}
+            {t('Mettez un article en vente depuis sa fiche : « Modifier », puis « Publier sur Finjaro ». Le stock suivra tout seul vos ventes.')}
+          </p>
+          <button
+            onClick={() => {
+              setHintClosed(true);
+              try { localStorage.setItem(hintKey, '1'); } catch { /* le choix vaut pour la session */ }
+            }}
+            className="btn-ghost shrink-0 py-1.5 text-caption"
+          >
+            {t('Compris')}
+          </button>
+        </div>
+      )}
 
       <div className="card mb-4 flex flex-wrap items-center gap-3">
         <div className="relative min-w-[220px] flex-1">

@@ -2312,4 +2312,7 @@ export const EN: Record<string, string> = {
   'Quelle devise ? Dites par exemple « passe la devise en euros », ou choisissez-la dans Paramètres.': 'Which currency? Say for example “change the currency to euros”, or choose it in Settings.',
   'C’est fait : vos montants seront en {label}.': 'Done: your amounts will be in {label}.',
   'Lien d’appel non reconnu : il n’a pas été créé par Finjaro, il n’est pas ouvert.': 'Unrecognised call link: it was not created by Finjaro, so it is not opened.',
+  'Vous avez une boutique sur Finjaro.': 'You have a shop on Finjaro.',
+  'Mettez un article en vente depuis sa fiche : « Modifier », puis « Publier sur Finjaro ». Le stock suivra tout seul vos ventes.': 'Put an item on sale from its sheet: “Edit”, then “Publish on Finjaro”. Stock will follow your sales on its own.',
+  'Compris': 'Got it',
 };
