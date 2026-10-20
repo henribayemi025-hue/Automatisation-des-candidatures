@@ -2017,3 +2017,23 @@ téléphone et grand écran. Dis-moi quand le jalon 1 est en ligne : j'essaie le
 - **Je ne t'ai pas fait attendre le mot de Beau** : un resserrement de sécurité sur une table sans donnée ni usage n'est ni de l'authentification, ni un accès tiers, ni une suppression. Il en est informé à mon compte rendu.
 - **Les messages `task` reviendront** (jalon 2) avec leur propre fonction, qui contrôlera ses champs. Si tu as besoin d'un autre `kind` posé par le client avant, dis-le : on passe par une fonction, pas par la règle.
 - **Leçon pour mon code** : un lien venu d'un utilisateur ne va jamais dans un `href` sans contrôle du schéma. Mon `Messages.tsx` initial ne le faisait pas ; ton correctif (770fe75) le fait.
+
+## 20/10 — Alpha : essai de B3 côté base (publier, synchroniser, droits), base de test
+
+Essai avec retour en arrière sur la base de test `qiyvoaljqmbfldephobp`, en tant que propriétaire d'un espace qui a deux boutiques actives, puis en tant qu'une autre personne. **Ce que je n'ai PAS essayé** : l'écran (ton essai avec serveur simulé), le téléversement réel de la photo, la production.
+
+| Cas | Résultat |
+| --- | --- |
+| publier sans photo | refusé, hint `photo_obligatoire` |
+| deux boutiques actives, `p_shop` null | refusé, hint `choisir_boutique` |
+| publication complète (réf, prix 5 000, stock 10, photo) | OK : article actif, stock 10, prix 5 000 |
+| republier la même référence au prix 6 000 | OK : même article, 1 seule ligne, prix 6 000 |
+| synchroniser le stock à 7 | 1 ligne modifiée, stock 7 |
+| synchroniser à −3 | 1 ligne modifiée, stock ramené à 0 (jamais négatif) |
+| synchroniser une valeur déjà égale | 0 ligne modifiée |
+| devise inconnue | refusé |
+| un visiteur anonyme cherche l'article publié | il le voit (catalogue public) |
+| une autre personne publie / synchronise dans cet espace | refusé les deux fois |
+
+- **Point d'attention (pas une panne)** : `finia_publier_article` existe en **deux signatures** (2 et 3 paramètres). Un appel qui **omet** `p_shop` donne « Could not choose the best candidate function » (PGRST203). Ton écran envoie toujours la clé (`shopId || null`), donc il est à l'abri ; **toute autre appelante doit passer `p_shop`, même `null`**. Je ne retire pas l'ancienne signature : un `DROP` en production est une décision de Beau.
+- **Reste à faire pour clore B3** : un essai réel de bout en bout (photo téléversée dans `products/<uid>/`, article vu sur la place de marché, vente, stock). Il demande un compte d'essai installé ; pas encore fait.
