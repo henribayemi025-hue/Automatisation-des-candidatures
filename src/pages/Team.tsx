@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { supabase } from '../lib/supabase';
 import { useCollab } from '../lib/collab';
 import type { MemberRole } from '../lib/types';
 import { Badge, Empty, Field, PageHeader, Table } from '../components/UI';
@@ -34,9 +35,17 @@ export default function Team() {
     setBusy(false);
     if (err) setError(err);
     else {
-      // Beau (14/10) : « il doit recevoir un e-mail avec un lien ». Il n'en part pas encore : on le dit,
-      // et on donne le moyen de prévenir la personne tout de suite (WhatsApp, e-mail, copie).
-      setOk(t('{email} est ajouté à l’espace. Aucun e-mail ne part tout seul pour l’instant : envoyez-lui ce message.', { email }));
+      // Beau (14/10) : « il doit recevoir un e-mail avec un lien ». La fonction finia-invitation l'envoie ;
+      // si elle échoue (ou n'est pas encore en ligne), on le dit et on garde WhatsApp, e-mail et copie.
+      const addr = email.trim().toLowerCase();
+      const { data } = workspace
+        ? await supabase.functions.invoke('finia-invitation', { body: { workspace_id: workspace.id, email: addr } }).catch(() => ({ data: null }))
+        : { data: null };
+      setOk(
+        (data as { envoye?: boolean } | null)?.envoye
+          ? t('{email} est ajouté à l’espace et vient de recevoir un e-mail d’invitation. Vous pouvez aussi le prévenir vous-même :', { email })
+          : t('{email} est ajouté à l’espace. Aucun e-mail ne part tout seul pour l’instant : envoyez-lui ce message.', { email }),
+      );
       setPrevenir(email.trim().toLowerCase());
       setCopie(false);
       setEmail('');

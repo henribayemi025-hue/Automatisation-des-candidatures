@@ -2317,4 +2317,5 @@ export const EN: Record<string, string> = {
   'Compris': 'Got it',
   'C’est plus que le reste dû : le règlement sera limité à {amount}.': 'That is more than the balance due: the payment will be limited to {amount}.',
   '{n} sur {total}': '{n} of {total}',
+  '{email} est ajouté à l’espace et vient de recevoir un e-mail d’invitation. Vous pouvez aussi le prévenir vous-même :': '{email} has been added to the workspace and has just received an invitation e-mail. You can also let them know yourself:',
 };
