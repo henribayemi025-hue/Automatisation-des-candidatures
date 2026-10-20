@@ -146,6 +146,9 @@ export async function publishArticle(input: PublishInput): Promise<string> {
       stock: catalogStock(input.product.stock),
       image_path: input.imagePath,
     },
+    // Toujours présent, même à null : la base a deux versions de la fonction
+    // (2 et 3 paramètres) et un appel sans p_shop est refusé comme ambigu
+    // (PGRST203, relevé par Alpha le 20/10).
     p_shop: input.shopId,
   });
   if (error) throw new PublishError(error.message, error.hint || error.code || '');
