@@ -11,6 +11,126 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 20/10/2026 (couvre du 15 au 20/10 ; les veilles du 15 au 19 n'ont pas eu lieu)
+
+### Concurrence
+- **Pesapal, Kenya (19/10/2026)** : avec le cabinet Drift Consult, Pesapal
+  étend RACK, logiciel de gestion pour commerces et restaurants. Il réunit
+  ventes de plusieurs points de vente, stock en temps réel et rapprochement
+  automatique des paiements mobile money et carte. Ni prix ni nombre
+  d'utilisateurs dans l'article.
+  [TechTrendsKE](https://techtrendske.co.ke/2026/10/19/pesapal-rack-business-software-retailers/)
+  → En Afrique de l'Est, la caisse arrive par les sociétés de paiement. Notre
+  réponse : rapprocher nous-mêmes les encaissements, quel que soit l'opérateur.
+- **Safaricom M-PESA Jumbe, Kenya (19/10/2026)** : le commerçant désigne
+  « up to 50 staff members » qui reçoivent les alertes de paiement sur leur
+  propre téléphone, sans voir le solde.
+  [The Online Kenyan](https://www.theonlinekenyan.com/read/story/679506)
+  → Confirme l'usage « une caissière confirme les encaissements sans le
+  téléphone de la patronne ». Notre rôle caissier le permet déjà pour la caisse.
+- **Moniepoint MonieBook, Nigeria (16/10/2026, date tirée des métadonnées de
+  la page)** : un programme de fidélité et un module comptable annoncé
+  « before the end of the year », sur l'outil de caisse relié à ses terminaux.
+  [Leadership](https://leadership.ng/leadership-award-encouraging-acknowledgement-of-our-efforts-moniepoint/)
+  → Le plus gros réseau de terminaux du Nigeria vient sur la comptabilité.
+  Notre différence : aucun terminal ni opérateur imposé, plusieurs pays et
+  devises.
+- **Mastercard et Olist, Brésil (19/10/2026)** : le logiciel de gestion d'Olist
+  (stock, factures, suivi financier, assistante sur WhatsApp en texte ou à la
+  voix) est « gratuito por 12 meses » pour les débutants et micro-entrepreneurs
+  titulaires d'une carte professionnelle Mastercard. Les sources ne
+  s'accordent pas sur la mensualité ensuite : non retenue.
+  [Seu Dinheiro](https://www.seudinheiro.com/2026/seu-negocio/mastercard-e-olist-lancam-beneficio-para-pmes-com-sistema-de-gestao-gratis-por-12-meses-cbcb/)
+  → La gestion par WhatsApp, à la voix, devient un argument courant.
+- **myBillBook, Inde (15/10/2026)** : la saisie de facture par photo
+  (« Scan & Record ») entre dans l'essai, à titre d'expérience.
+  [myBillBook](https://mybillbook.featurebase.app/changelog/product-updates-oct-15-2026)
+  → La saisie des achats par photo devient un produit d'appel. Voir Clairic
+  ci-dessous.
+- Afrique francophone : rien de daté dans la fenêtre.
+
+### Règles et paiements
+- **Flutterwave (15/10/2026)** : incident clos, « XOF, XAF, ZAR, MWK and EGP
+  are back online ». Les virements du 13/10 restés « pending » étaient en
+  cours de rapprochement.
+  [Flutterwave](https://status.flutterwave.com/incidents/25rf98nhjkt3)
+  → Avant de renvoyer un virement resté « en attente », on interroge son statut.
+- **Orange Money Cameroun, presque tous les jours (15 au 20/10/2026)** :
+  9 incidents Orange Cameroun ouverts chez pawaPay du 15/10 au 19/10, surtout
+  sur les encaissements ; quatre ont duré plus de 11 heures ; dernier clos le
+  20/10 à 02:09 UTC. Pay1st confirme des pannes les 15, 16, 17, 18 et 19/10.
+  Orange Sénégal : encaissements coupés le 16/10 de 14:00 à 20:19 UTC. Aucun
+  incident MTN Cameroun chez pawaPay sur la période.
+  [pawaPay](https://status.pawapay.io/history.rss) ·
+  [Pay1st](https://pay1st.statuspage.io/)
+  → Renforce l'idée « Mobile money à confirmer » (IDEES.md, 09/10) : une vente
+  ne doit pas compter comme encaissée tant que l'argent n'est pas arrivé.
+- **MTN MoMo (16/10/2026)** : sur le forum officiel des développeurs, sept fils
+  signalent des erreurs 500 sur le bac à sable, sans réponse de MTN. Rappel
+  (12/10, hors fenêtre) : migration imposée vers `momoapi.momo.africa`,
+  nouveaux identifiants, sans date limite publiée.
+  [MTN MoMo Developers](https://momodevelopercommunity.mtn.com/product-updates/momo-api-enhancement-502)
+  → Rien à faire aujourd'hui (aucune intégration MTN directe), mais toute
+  intégration future part sur la nouvelle adresse.
+- **France, e-reporting (19/10/2026)** : Le Figaro rappelle le second pilier
+  de la réforme (ventes aux particuliers, encaissements). Selon impots.gouv.fr,
+  l'émission et la transmission deviennent obligatoires « à compter du
+  1er septembre 2027 » pour les PME et micro-entreprises. Le guide promis le
+  09/10 « dans un délai de deux semaines » n'est pas encore en ligne au 20/10.
+  [Le Figaro](https://www.lefigaro.fr/entrepreneur/l-e-reporting-l-angle-mort-de-la-reforme-de-la-facturation-electronique-20261019) ·
+  [impots.gouv.fr](https://www.impots.gouv.fr/professionnel/questions/partir-de-quand-suis-je-concerne-par-la-reforme-de-la-facturation)
+  → Pour une commerçante française qui vend à des particuliers, c'est
+  l'e-reporting qui la concerne. Idée notée (IDEES.md), échéance 2027.
+- **Cameroun, budget 2027 (circulaire du 12/10, article du 15/10/2026)** :
+  la circulaire de préparation du budget prévoit de renforcer la taxation en
+  temps réel et la facturation électronique. Obligations, dates et taux :
+  non trouvés, ils dépendront de la loi de finances 2027.
+  [VATupdate](https://www.vatupdate.com/2026/10/15/cameroons-2027-budget-orientation-calls-for-revised-cemac-vat-rules-and-faster-refunds/)
+  → Rien d'obligatoire aujourd'hui. À suivre au vote de la loi de finances.
+- Côte d'Ivoire, Gabon, Sénégal, OHADA : rien de daté dans la fenêtre.
+
+### Technologie et IA
+- **Cloudflare Workers AI, Clairic (19/10/2026, préversion)** : un modèle
+  d'extraction qui reçoit un texte, la liste des champs voulus et jusqu'à
+  4 images (« PNG, JPEG or WebP », « 4 MiB each »), et renvoie une valeur par
+  champ. Le billet de lancement le montre sur « a real-life photo of a
+  receipt ». Les auteurs préviennent : « Reading is strong, but multi-step
+  arithmetic isn't yet. » Rien sur les langues. Workers AI offre « 10,000
+  Neurons per day at no charge » ; Clairic n'est pas dans la liste des modèles
+  exclus de cette part gratuite (déduction : aucune page ne le dit en toutes
+  lettres).
+  [Changelog](https://developers.cloudflare.com/changelog/post/2026-10-19-clairic-workers-ai/) ·
+  [Billet](https://blog.cloudflare.com/clairic-extraction-model/) ·
+  [Prix](https://developers.cloudflare.com/workers-ai/platform/pricing/)
+  → **Premier moyen gratuit plausible de lire les photos de reçus**, en panne
+  chez nous faute de moteur gratuit. À essayer sur de vrais reçus en français,
+  en lisant le total imprimé plutôt qu'en le faisant calculer. La part
+  gratuite est commune au compte Cloudflare (déjà épuisée un matin, le 08/10,
+  côté place de marché). Idée notée (IDEES.md).
+- **DeepSeek (17/10/2026)** : `deepseek-flash` pointe vers un nouveau modèle
+  qui lit les images ; les anciens noms `deepseek-v4-flash` et
+  `deepseek-v4-flash-vision-exp` sont redirigés. Aucune offre gratuite.
+  [DeepSeek](https://api-docs.deepseek.com/news/news261017)
+  → Accounting appelle `deepseek-chat` : non concerné. La lecture d'image
+  DeepSeek est payante, donc écartée (pas de recharge).
+- **Supabase (15/10/2026)** : `@supabase/middleware` (licence MIT) vérifie le
+  jeton de connexion et gère le CORS dans les fonctions edge et sur Workers.
+  [Supabase](https://supabase.com/blog/supabase-middleware)
+  → Pourrait remplacer du code de contrôle écrit à la main ; fonctions
+  communes aux deux applications, donc pas sans le mot de Beau.
+- **Gemini** : `gemini-3.5-flash` est obsolète depuis le 08/10, ses requêtes
+  sont redirigées vers `gemini-3.6-flash`. Pour `gemini-2.5-flash`, la page
+  officielle dit « No shutdown date announced » (des blogs annonçaient à tort
+  une fin au 16/10).
+  [Google](https://ai.google.dev/gemini-api/docs/deprecations)
+  → Accounting appelle `gemini-2.5-flash` puis `gemini-3.6-flash` : rien à
+  changer. La place de marché appelle encore `gemini-3.5-flash` (signalé à
+  Alpha).
+- Rien de daté : Groq, WhatsApp Cloud API, Capacitor, reconnaissance vocale en
+  langues africaines.
+
+---
+
 ## 14/10/2026 (couvre du 13 au 14/10 ; veille réduite jusqu'au 18/10 pour ménager la limite d'usage)
 
 ### Concurrence

@@ -2,6 +2,37 @@
 
 Chaque idée : le problème, pour qui, ce que ça vaut, l'effort, ce qu'on demande à Beau. Beau coche ☐ → ☑ quand il décide. Les idées viennent des deux sessions, de la concurrence, du terrain. Rien n'est promis : c'est une liste de choix.
 
+## Idées issues de la veille du 20/10/2026 — à décider
+
+☐ **Relire les photos de reçus avec Clairic (Cloudflare, part gratuite).**
+- **Problème :** la lecture d'une photo de reçu ou de facture ne marche plus
+  depuis que Gemini n'a plus de crédit ; aucun moteur gratuit utilisé
+  aujourd'hui ne lit les images.
+- **Pour qui :** toute commerçante qui saisit ses achats et dépenses ; c'est
+  aussi un produit d'appel chez les concurrents (myBillBook, 15/10).
+- **Valeur :** la saisie d'un achat en une photo revient, sans recharge.
+- **Effort :** moyen. Ajouter l'accès Workers AI au serveur d'Accounting, une
+  route qui demande les champs (fournisseur, date, total imprimé, taxe), et
+  garder la validation par la personne. D'abord un essai sur de vrais reçus
+  en français.
+- **Risques :** modèle en préversion ; part gratuite commune au compte
+  Cloudflare (déjà épuisée un matin côté place de marché) ; si le compte est
+  sur l'offre payante, un dépassement serait facturé.
+- **À décider :** l'essai par Alpha, depuis un serveur qui a déjà Workers AI,
+  sur 5 à 10 vrais reçus ; puis, si c'est bon, le mot de Beau (toute dépense
+  possible passe par lui).
+
+☐ **E-reporting pour les commerçantes françaises (échéance : 1er septembre 2027).**
+- **Problème :** une petite entreprise française qui vend à des particuliers
+  devra transmettre ses données de ventes et d'encaissements à une plateforme
+  agréée « à compter du 1er septembre 2027 » (impots.gouv.fr).
+- **Pour qui :** les entreprises françaises d'Accounting (plan comptable
+  français déjà géré).
+- **Valeur :** rester utilisable en France après 2027.
+- **Effort :** inconnu tant que le guide officiel annoncé le 09/10 n'est pas
+  paru. Rien à coder avant.
+- **À décider :** rien maintenant ; relire au prochain guide officiel.
+
 ## Idée issue de la veille du 09/10/2026 — à décider par Beau
 
 ☐ **Mobile money « à confirmer » dans la caisse.**
@@ -23,6 +54,8 @@ Chaque idée : le problème, pour qui, ce que ça vaut, l'effort, ce qu'on deman
 - **À décider :** oui ou non. Et si oui : case cochée par défaut (rien ne
   change pour qui ne s'en sert pas) ou décochée (plus sûr, mais un geste de
   plus à chaque vente) ?
+- **Renforcée le 20/10 :** 9 incidents Orange Money Cameroun chez pawaPay du
+  15 au 19/10, dont quatre de plus de 11 heures (VEILLE.md, 20/10).
 
 **Renforcé le 12/10** : Orange Money Cameroun est retombé en panne le 12/10, de 06:18 à 11:45 UTC. C'est la troisième panne en six jours.
 
