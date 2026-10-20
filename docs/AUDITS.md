@@ -6,6 +6,89 @@ est corrigé ou reste à décider.
 
 ---
 
+## 19/10/2026 (fait le 20/10 : la routine du lundi est arrivée avec un jour de retard)
+
+### Sécurité
+
+- **Production `bokwivwizghdlaedczbw`, en lecture seule** :
+  - RLS actif sur les **onze** tables `finia_*`. Les trois tables d'origine
+    gardent leurs 12 règles d'accès. Nouvelles depuis le 12/10 :
+    - Discussion façon Google Chat (`finia_chat_*`, migration 0245) : chaque
+      table a ses règles, réservées aux personnes connectées ;
+    - `finia_visites` (compteur de visites, 0246), `finia_fx_rates`,
+      `finia_liaison_log` : RLS actif et aucune règle, donc aucun accès direct.
+      On n'y passe que par les fonctions.
+  - **Toutes les fonctions `finia_*` ont un chemin de recherche fixé.**
+  - **Le droit d'exécution de `finia_order_to_sale` est retiré** à `anon` et
+    `authenticated`. C'était le ménage proposé le 12/10, il est fait.
+  - `finia_publier_article` et `finia_synchroniser_stock` (contrat du 14/10)
+    ne sont ouvertes qu'aux personnes connectées. Elles refusent tout autre que
+    la propriétaire de l'espace (vérifié ci-dessous).
+  - **Nouvelle fonction ouverte aux visiteurs anonymes : `finia_noter_visite`**
+    (compteur de visites, Alpha, 19/10). Elle est bien gardée :
+    - étapes en liste fermée, format de l'identifiant vérifié ;
+    - plafond global de 120 visites par minute ;
+    - pas de doublon pour une même visite et une même étape.
+
+    **Réserve** : un script peut encore ajouter des visites jusqu'à ce
+    plafond. Les chiffres de visites sont donc à lire comme une indication,
+    pas comme une mesure exacte.
+- **Aucun secret dans le dépôt** (clés Google, Groq, OpenAI/DeepSeek, Resend,
+  `service_role`, clés privées). Seul apparaît le jeton déjà connu dans une
+  migration.
+- **Scénarios de rôles rejoués** sur le projet de test `qiyvoaljqmbfldephobp`.
+  Chaque essai tourne dans une transaction annulée. Vérifié ensuite : toujours
+  1 009 événements, et la caissière de test est toujours « active ».
+
+  | Qui | Geste | Résultat |
+  |---|---|---|
+  | intrus | lit le journal, l'espace, les membres, la Discussion | 0 partout |
+  | intrus | écrit une vente | refusé (règle d'accès) |
+  | caissière | enregistre une vente | accepté |
+  | caissière | change la devise | refusé |
+  | caissière | annule un devis | refusé |
+  | caissière | signe au nom de la propriétaire | refusé |
+  | caissière | synchronise le stock Finjaro (nouveau) | refusé : « Seule la propriétaire de l'espace peut synchroniser le stock. » |
+  | membre retiré | lit | 0 événement, 0 espace |
+  | membre retiré | se remet « actif » | 0 ligne modifiée |
+
+### Code
+
+- Vérification des types et construction : propres.
+- **45 contrôles `scripts/*-check.ts` : tous verts**, dont trois nouveaux :
+  - `rapports-check` (14/10) ;
+  - `saisie-montant-check` (14/10) ;
+  - `publier-finjaro-check` (19/10).
+- **Navigateur, 35 écrans de la démo à 390 et 1 280 px** : aucune erreur
+  JavaScript, aucun écran vide, aucune page qui défile sur le côté.
+- **Messages (Discussion façon Google Chat, Alpha, 19/10), essayé dans le vrai
+  Layout avec un serveur simulé, à 390 × 667, 390 × 844 et 1 280 × 800, avec 2
+  et 50 messages.** Deux défauts trouvés et corrigés (5dc73d1) :
+  - sur un petit téléphone (667 px de haut), la zone d'écriture passait sous
+    la barre de navigation du bas. Cause : la hauteur minimale de la carte,
+    440 px, ramenée à 300 ;
+  - le bouton rond de l'assistante recouvrait « Envoyer ». Il est retiré sur
+    Messages, comme sur la Discussion.
+
+### Comptabilité
+
+`SIM_YEARS=2 npx vite-node scripts/sim-passe1.ts`, comparé au 12/10 :
+- **Boutique** : 2 anomalies, les mêmes (pas de retour d'article ; dépense
+  refusée dans un exercice clos).
+- **Salon** : 6 anomalies, les mêmes (écart entre la valeur du stock et le
+  compte de stock).
+- Aucune régression, y compris avec la reprise du coût de la fiche pour les
+  ventes Finjaro (point C du 14/10).
+
+### Ce qui reste à décider
+
+- Toujours en attente : le retour d'article.
+- Le compteur de visites peut être gonflé par un script, jusqu'à 120 visites
+  par minute. C'est sans gravité, mais à garder en tête avant de citer un
+  chiffre de visites.
+
+---
+
 ## 12/10/2026
 
 ### Sécurité
