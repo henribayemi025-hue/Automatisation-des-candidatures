@@ -2297,4 +2297,18 @@ export const EN: Record<string, string> = {
   'Votre espace ne se charge pas': 'Your workspace is not loading',
   'La connexion au serveur a échoué. Vos données sont en sécurité en ligne ; rien n’a été créé ni modifié.': 'The connection to the server failed. Your data is safe online; nothing was created or changed.',
   'Réessayer': 'Try again',
+  // Réglages par l'assistante (B7, 20/10)
+  'Je peux changer pour vous : le thème (clair, sombre ou celui du téléphone), la langue (français ou anglais), le mode (Simple ou Expert) et, tant que rien n’est saisi, la devise. Dites par exemple « mets le mode sombre ».': 'I can change these for you: the theme (light, dark or your phone’s setting), the language (French or English), the mode (Simple or Expert) and, as long as nothing has been entered yet, the currency. For example, say “dark mode”.',
+  'C’est fait : l’application est en mode sombre. Pour revenir en arrière, dites « mode clair », ou passez par Paramètres.': 'Done: the app is in dark mode. To go back, say “light mode”, or use Settings.',
+  'C’est fait : l’application est en mode clair. Pour revenir en arrière, dites « mode sombre », ou passez par Paramètres.': 'Done: the app is in light mode. To go back, say “dark mode”, or use Settings.',
+  'C’est fait : l’application suit maintenant le réglage clair ou sombre de votre téléphone.': 'Done: the app now follows your phone’s light or dark setting.',
+  'Seules la propriétaire et la gérante de l’espace peuvent changer le mode. Demandez-leur.': 'Only the workspace owner or manager can change the mode. Ask them.',
+  'Vous êtes déjà en mode Expert.': 'You are already in Expert mode.',
+  'Vous êtes déjà en mode Simple.': 'You are already in Simple mode.',
+  'C’est fait : mode Expert. Le journal, le grand livre, la balance et les autres écrans comptables sont dans le menu.': 'Done: Expert mode. The journal, general ledger, trial balance and the other accounting screens are in the menu.',
+  'C’est fait : mode Simple. Les écrans comptables sont rangés ; vos données ne changent pas.': 'Done: Simple mode. The accounting screens are tucked away; your data does not change.',
+  'Seules la propriétaire et la gérante de l’espace peuvent changer la devise. Demandez-leur.': 'Only the workspace owner or manager can change the currency. Ask them.',
+  'Votre devise est {code}. Des montants sont déjà saisis : changer de devise ne les convertirait pas, ils garderaient leur valeur. Si c’est bien voulu, faites-le dans Paramètres.': 'Your currency is {code}. Amounts have already been entered: changing the currency would not convert them, they would keep their value. If that is really what you want, do it in Settings.',
+  'Quelle devise ? Dites par exemple « passe la devise en euros », ou choisissez-la dans Paramètres.': 'Which currency? Say for example “change the currency to euros”, or choose it in Settings.',
+  'C’est fait : vos montants seront en {label}.': 'Done: your amounts will be in {label}.',
 };

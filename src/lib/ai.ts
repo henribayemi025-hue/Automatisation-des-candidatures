@@ -65,6 +65,10 @@ export function buildContext(db: DB, pathname: string) {
     devise: db.company.currency,
     referentiel: db.company.chart,
     mode: db.company.mode,
+    // B7 : sans cette ligne, le modèle affirmait qu'il n'existe que les modes Simple et Expert.
+    reglages_disponibles:
+      'Thème clair, sombre ou automatique ; langue français ou anglais ; mode Simple ou Expert ; devise (Paramètres, avant toute saisie). ' +
+      'La personne peut les demander directement à l’assistante : « mets le mode sombre », « mets l’application en anglais », « passe en mode expert ».',
     ecran: { route: pathname, nom: help?.title ?? pathname, role: help?.what ?? '' },
     aujourdhui: { ca: money(s.revenueToday), ventes: s.salesToday },
     ce_mois: {

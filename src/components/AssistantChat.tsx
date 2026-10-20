@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { today, useStore } from '../lib/store';
+import { hasContent, today, useStore } from '../lib/store';
 import { useCollab } from '../lib/collab';
 import { answer, insights } from '../lib/assistant';
 import type { Answer } from '../lib/assistant';
@@ -12,7 +12,11 @@ import type { AccountKey } from '../lib/chart';
 import type { PaymentMethod } from '../lib/types';
 import { EXPENSE_LABEL } from '../lib/expenses';
 import { IconAlert, IconCheck, IconChevronRight, IconSend, IconSparkle } from './Icons';
-import { t } from '../lib/i18n';
+import { t, useLang } from '../lib/i18n';
+import { useTheme } from '../lib/theme';
+import { currencyLabel } from '../lib/money';
+import { settingsIntent } from '../lib/settings-intent';
+import type { SettingsIntent } from '../lib/settings-intent';
 import { useOffline } from '../lib/offline';
 import { Linkify } from './Linkify';
 import { FISCAL_MENTION, speaksFiscal } from '../lib/fiscal-mention';
@@ -27,7 +31,16 @@ interface Message {
   goto?: string | null;
   imageName?: string;
   local?: boolean;
+  /** Réponse à une demande de réglage : jamais de mention fiscale dessous. */
+  setting?: boolean;
 }
+
+/**
+ * Changer de langue remonte toute l'application, donc ce chat : sans ce relais,
+ * la conversation et la confirmation « C'est fait » disparaissaient à
+ * l'instant même où la personne les attendait.
+ */
+let carried: Message[] | null = null;
 
 const GENERIC = [
   "Quel est mon chiffre d'affaires ce mois ?",
@@ -42,17 +55,25 @@ const GENERIC = [
  * IA Gemini quand la personne est connectée, moteur local sinon ou en secours.
  */
 export default function AssistantChat({ compact = false }: { compact?: boolean }) {
-  const { db, saveProduct, addExpense } = useStore();
-  const { user } = useCollab();
+  const { db, saveProduct, addExpense, setCompany } = useStore();
+  const { user, workspace } = useCollab();
+  const { setChoice } = useTheme();
+  const { setLang } = useLang();
+  // Mêmes droits que l'écran Paramètres : propriétaire ou gérante (ou sans compte).
+  const canEditCompany = !workspace || workspace.role === 'owner' || workspace.role === 'manager';
   const { online } = useOffline();
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    const c = carried;
+    carried = null;
+    return c ?? [];
+  });
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState('');
   const [pendingImage, setPendingImage] = useState<{ mime: string; data: string; name: string } | null>(null);
-  const counter = useRef(0);
+  const counter = useRef(messages.reduce((n, m) => Math.max(n, m.id), 0));
   const bottom = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -74,6 +95,19 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
     const userMsg: Message = { id: ++counter.current, role: 'user', text: q || t('Voici une photo.'), imageName: image?.name };
     const history = [...messages, userMsg];
     setMessages(history);
+
+    // Un réglage demandé (« mets le mode sombre ») est appliqué tout de suite,
+    // sans passer par un modèle (B7).
+    const setting = image ? null : settingsIntent(q);
+    if (setting) {
+      const reply: Message = { id: ++counter.current, role: 'assistant', text: '', local: true, setting: true };
+      if (setting.kind === 'lang') carried = [...history, reply];
+      const done = applySetting(setting);
+      reply.text = done.text;
+      reply.goto = done.goto ?? null;
+      setMessages((m) => [...m, reply]);
+      return;
+    }
 
     if (user && !online) {
       setNotice(t('Pas de réseau : je réponds avec le moteur local, qui lit vos chiffres sur cet appareil. L’assistant complet (photos, explications libres) revient avec la connexion.'));
@@ -107,6 +141,43 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
       ...m,
       { id: ++counter.current, role: 'assistant', text: explain ?? a.text, facts: explain ? undefined : a.facts, local: true },
     ]);
+  }
+
+  function applySetting(s: SettingsIntent): { text: string; goto?: string } {
+    switch (s.kind) {
+      case 'list':
+        return { text: t('Je peux changer pour vous : le thème (clair, sombre ou celui du téléphone), la langue (français ou anglais), le mode (Simple ou Expert) et, tant que rien n’est saisi, la devise. Dites par exemple « mets le mode sombre ».') };
+      case 'theme':
+        setChoice(s.value);
+        return {
+          text: s.value === 'dark'
+            ? t('C’est fait : l’application est en mode sombre. Pour revenir en arrière, dites « mode clair », ou passez par Paramètres.')
+            : s.value === 'light'
+              ? t('C’est fait : l’application est en mode clair. Pour revenir en arrière, dites « mode sombre », ou passez par Paramètres.')
+              : t('C’est fait : l’application suit maintenant le réglage clair ou sombre de votre téléphone.'),
+        };
+      case 'lang':
+        setLang(s.value);
+        // Réponse écrite dans la langue choisie : c'est la première phrase qu'on lit après le changement.
+        return { text: s.value === 'en' ? 'Done: the app is now in English. Say “in French” to switch back.' : 'C’est fait : l’application est en français. Dites « en anglais » pour revenir.' };
+      case 'mode':
+        if (!canEditCompany) return { text: t('Seules la propriétaire et la gérante de l’espace peuvent changer le mode. Demandez-leur.') };
+        if (db.company.mode === s.value) return { text: s.value === 'EXPERT' ? t('Vous êtes déjà en mode Expert.') : t('Vous êtes déjà en mode Simple.') };
+        setCompany({ mode: s.value });
+        return {
+          text: s.value === 'EXPERT'
+            ? t('C’est fait : mode Expert. Le journal, le grand livre, la balance et les autres écrans comptables sont dans le menu.')
+            : t('C’est fait : mode Simple. Les écrans comptables sont rangés ; vos données ne changent pas.'),
+        };
+      case 'currency':
+        if (!canEditCompany) return { text: t('Seules la propriétaire et la gérante de l’espace peuvent changer la devise. Demandez-leur.') };
+        // Des montants déjà saisis ne seraient pas convertis : on ne change rien
+        // tout seul, on explique et on ouvre l'écran.
+        if (hasContent(db)) return { text: t('Votre devise est {code}. Des montants sont déjà saisis : changer de devise ne les convertirait pas, ils garderaient leur valeur. Si c’est bien voulu, faites-le dans Paramètres.', { code: db.company.currency || '—' }), goto: '/parametres' };
+        if (!s.code) return { text: t('Quelle devise ? Dites par exemple « passe la devise en euros », ou choisissez-la dans Paramètres.'), goto: '/parametres' };
+        setCompany({ currency: s.code });
+        return { text: t('C’est fait : vos montants seront en {label}.', { label: currencyLabel(s.code) }) };
+    }
   }
 
   async function onFile(file: File | undefined) {
@@ -251,7 +322,7 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
                 </button>
               )}
               {m.local && user && <div className="mt-1 text-[10px] text-muted">{t('moteur local')}</div>}
-              {m.role === 'assistant' && speaksFiscal(m.text, messages[i - 1]?.role === 'user' ? messages[i - 1].text : undefined) && (
+              {m.role === 'assistant' && !m.setting && speaksFiscal(m.text, messages[i - 1]?.role === 'user' ? messages[i - 1].text : undefined) && (
                 <p className="mt-2 border-t border-black/10 pt-2 text-[11px] leading-snug text-muted">{t(FISCAL_MENTION)}</p>
               )}
             </div>
