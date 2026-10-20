@@ -19,6 +19,15 @@ import { IconChat, IconPlus, IconSearch, IconSend, IconUsers, IconX } from '../c
  * Le fil de l'espace (Discussion : canaux de projet, @assistant, photos de reçus) reste à sa place, inchangé.
  */
 
+/** Le site vers lequel part un lien d'appel (affiché avant d'ouvrir) ; vide si l'adresse est illisible. */
+function domaineDuLien(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return '';
+  }
+}
+
 function heure(iso: string) {
   const d = new Date(iso);
   const auj = new Date().toDateString() === d.toDateString();
@@ -273,7 +282,13 @@ function Bulle({ m, moi, nomDe, noms, suite, reacts, epingle, nbReponses, onRepo
       <div id={'msg-' + m.id} className="mx-auto max-w-sm rounded-card border border-teal/30 bg-teal-light px-4 py-3 text-center">
         <p className="text-body font-semibold text-ink">{m.meta.video ? '🎥' : '📞'} {nomDe(m.user_id)} — {m.meta.video ? t('Appel vidéo') : t('Appel vocal')}</p>
         <p className="text-[11px] text-muted">{heure(m.created_at)}</p>
-        {typeof m.meta.url === 'string' && <a href={m.meta.url} target="_blank" rel="noreferrer" className="btn-primary mt-2 inline-flex">{t('Rejoindre l’appel')}</a>}
+        {typeof m.meta.url === 'string' && (
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <a href={m.meta.url} target="_blank" rel="noreferrer" className="btn-primary inline-flex">{t('Rejoindre l’appel')}</a>
+            {/* Le contrat 0245 demande de montrer vers quel site on part avant d'ouvrir le lien. */}
+            <span className="text-caption text-muted">{domaineDuLien(m.meta.url)}</span>
+          </div>
+        )}
       </div>
     );
   }
