@@ -2315,4 +2315,6 @@ export const EN: Record<string, string> = {
   'Vous avez une boutique sur Finjaro.': 'You have a shop on Finjaro.',
   'Mettez un article en vente depuis sa fiche : « Modifier », puis « Publier sur Finjaro ». Le stock suivra tout seul vos ventes.': 'Put an item on sale from its sheet: “Edit”, then “Publish on Finjaro”. Stock will follow your sales on its own.',
   'Compris': 'Got it',
+  'C’est plus que le reste dû : le règlement sera limité à {amount}.': 'That is more than the balance due: the payment will be limited to {amount}.',
+  '{n} sur {total}': '{n} of {total}',
 };

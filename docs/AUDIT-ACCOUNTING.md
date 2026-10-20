@@ -268,9 +268,21 @@ Vérifié au clic à 390 et 1 280 px dans la démonstration : boutons de périod
 
 Vérifié au clic à 390 et 1 280 px dans la démonstration : ouverture sur le mois, « Tout » (19 dépenses), bouton inactif sans montant, « 25 000 » enregistré à 25 000 FCFA, aucune page qui défile sur le côté, aucune erreur JavaScript. Les 44 contrôles passent.
 
-### À faire ensuite (jour 13)
+### Jour 13 — 20/10 : achats et dettes (`Purchases.tsx`, `Debts.tsx`)
 
-`Purchases.tsx` (achats) et `Debts.tsx` (dettes) : même principe du mois en cours, et vérifier au clic que les champs de montant acceptent « 25 000 ».
+| # | Constat | Gravité | Ce qui a été fait |
+|---|---|---|---|
+| 1 | **Dans un bon de commande, le coût unitaire et la quantité étaient convertis à chaque frappe**, ce qui mangeait la virgule. Constaté à l'écran sur l'ancienne version, démo en euros : « 12,50 » devenait **1 250** (cent fois trop) et une quantité « 2,5 » devenait 5. Le prix en devise étrangère avait le même défaut. En FCFA (sans centimes), seule la quantité décimale était touchée. | **Élevé** (coût d'achat faux, donc stock et marges faux) | Les champs gardent ce qui est tapé ; la conversion se fait à côté. La lecture des quantités (« 2,5 », « 1 000 ») est commune à Stock et Achats (`src/lib/parse.ts`). Vérifié à l'écran : « 2,5 × 12,50 = 31,25 » en euros, « 2,5 × 1 250 = 3 125 » en FCFA. |
+| 2 | Un règlement de dette plus grand que le reste dû était réduit en silence. | Moyen | Le formulaire prévient : « le règlement sera limité à … ». |
+| 3 | « Enregistrer » restait cliquable sans montant, sans effet. | Petit | Bouton inactif tant que le montant n'est pas valable. |
+| 4 | Les dettes soldées s'affichaient toutes, pour toujours ; les dettes ouvertes sans ordre. | Petit | Ouvertes : les plus anciennes d'abord (celles à relancer). Soldées : les 20 plus récentes, puis « Voir plus ». |
+
+La liste des achats (15 dans la démonstration) n'a pas besoin du mois en cours pour l'instant. Vérifié au clic à 390 et 1 280 px (démos France et Cameroun) : aucune page qui défile sur le côté, aucune erreur JavaScript. Les 47 contrôles passent.
+
+### À faire ensuite (jour 14)
+
+`Customers.tsx` (clients et fournisseurs) et `CashRegister.tsx` (caisse du jour) : saisie des montants à la virgule, listes longues.
+
 
 Alpha a relu le n° 6 le 02/10 : pas d'objection. Les outils serveur (finia_resume_mois, ma_compta_*)
 lisent des dates « AAAA-MM-JJ » et compteront mieux. accounting-rappels n'est pas concerné.

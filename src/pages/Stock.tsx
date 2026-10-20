@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { parseQty } from '../lib/parse';
 import { holdsStock } from '../lib/recipes';
 import { useStore } from '../lib/store';
 import { Badge, Empty, Field, Modal, Money, PageHeader, StatCard, Table } from '../components/UI';
@@ -11,11 +12,6 @@ type Tab = 'MOVEMENTS' | 'ALERTS' | 'VALUATION';
 // on montre les plus récents, la suite à la demande.
 const PAGE = 50;
 
-/** « 3 », « 2,5 », « -3 » → nombre ; vide ou illisible → NaN. */
-function parseQty(raw: string): number {
-  const clean = raw.replace(/\s/g, '').replace(',', '.');
-  return clean ? Number(clean) : NaN;
-}
 
 export default function Stock() {
   const { db, adjustStock } = useStore();

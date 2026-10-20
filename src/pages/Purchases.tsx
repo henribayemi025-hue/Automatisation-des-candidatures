@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { parseQty } from '../lib/parse';
 import { useStore } from '../lib/store';
 import { CURRENCIES, factor, formatMoney, toMajor, toMinor } from '../lib/money';
 import { outstanding } from '../lib/metrics';
@@ -43,6 +44,11 @@ export default function Purchases() {
   const [fxRateRaw, setFxRateRaw] = useState('');
   /** Coût unitaire saisi dans la devise étrangère, par produit (unités mineures de cette devise). */
   const [foreignUnit, setForeignUnit] = useState<Record<string, Minor>>({});
+  // Ce que la personne tape, tel quel : convertir à chaque frappe mangeait la
+  // virgule (« 12, » redevenait « 12 ») et rendait les centimes impossibles à
+  // saisir (audit jour 13, 20/10).
+  const [raw, setRaw] = useState<Record<string, { qty?: string; cost?: string; foreign?: string }>>({});
+  const setRawField = (id: string, field: 'qty' | 'cost' | 'foreign', v: string) => setRaw((r) => ({ ...r, [id]: { ...r[id], [field]: v } }));
   const [landedRaw, setLandedRaw] = useState<Record<LandedCostKind, string>>({ CUSTOMS: '', FREIGHT: '', FORWARDING: '', INSURANCE: '', HANDLING: '', OTHER: '' });
   const [importVatRaw, setImportVatRaw] = useState('');
   const [landedPaidWith, setLandedPaidWith] = useState<PaymentMethod>('BANK');
@@ -87,6 +93,12 @@ export default function Purchases() {
     if (!product) return;
     if (lines.some((l) => l.productId === productId)) return;
     setLines([...lines, { productId, name: product.name, qty: 1, unitCost: product.cost }]);
+    // Un article retiré puis remis repart de sa fiche, pas de l'ancienne saisie.
+    setRaw((r) => {
+      const next = { ...r };
+      delete next[productId];
+      return next;
+    });
   }
 
   function reset() {
@@ -100,6 +112,7 @@ export default function Purchases() {
     setAbroad(false);
     setFxRateRaw('');
     setForeignUnit({});
+    setRaw({});
     setLandedRaw({ CUSTOMS: '', FREIGHT: '', FORWARDING: '', INSURANCE: '', HANDLING: '', OTHER: '' });
     setImportVatRaw('');
   }
@@ -296,22 +309,24 @@ export default function Purchases() {
               <li key={l.productId} className="flex items-center gap-2 rounded-xl bg-slate-50 p-3 dark:bg-white/5">
                 <span className="min-w-0 flex-1 truncate text-sm font-semibold">{l.name}</span>
                 <input
-                  value={l.qty}
-                  onChange={(e) =>
-                    setLines(
-                      lines.map((x) =>
-                        x.productId === l.productId ? { ...x, qty: Number(e.target.value) || 0 } : x,
-                      ),
-                    )
-                  }
-                  inputMode="numeric"
+                  value={raw[l.productId]?.qty ?? String(l.qty)}
+                  onChange={(e) => {
+                    setRawField(l.productId, 'qty', e.target.value);
+                    const q = parseQty(e.target.value);
+                    setLines(lines.map((x) => (x.productId === l.productId ? { ...x, qty: Number.isFinite(q) && q > 0 ? q : 0 } : x)));
+                  }}
+                  inputMode="decimal"
+                  aria-label={t('Quantité')}
                   className="field num w-20 py-1.5"
                 />
                 {abroad ? (
                   <span className="flex items-center gap-1">
                     <input
-                      value={foreignUnit[l.productId] === undefined ? '' : toMajor(foreignUnit[l.productId], fxCurrency)}
-                      onChange={(e) => setForeignUnit({ ...foreignUnit, [l.productId]: toMinor(e.target.value || 0, fxCurrency) })}
+                      value={raw[l.productId]?.foreign ?? (foreignUnit[l.productId] === undefined ? '' : String(toMajor(foreignUnit[l.productId], fxCurrency)))}
+                      onChange={(e) => {
+                        setRawField(l.productId, 'foreign', e.target.value);
+                        setForeignUnit({ ...foreignUnit, [l.productId]: toMinor(e.target.value || 0, fxCurrency) });
+                      }}
                       inputMode="decimal"
                       placeholder={t('prix en {c}', { c: fxCurrency })}
                       className="field num w-28 py-1.5"
@@ -320,16 +335,12 @@ export default function Purchases() {
                   </span>
                 ) : (
                   <input
-                    value={toMajor(l.unitCost, currency)}
-                    onChange={(e) =>
-                      setLines(
-                        lines.map((x) =>
-                          x.productId === l.productId
-                            ? { ...x, unitCost: toMinor(e.target.value, currency) }
-                            : x,
-                        ),
-                      )
-                    }
+                    value={raw[l.productId]?.cost ?? String(toMajor(l.unitCost, currency))}
+                    onChange={(e) => {
+                      setRawField(l.productId, 'cost', e.target.value);
+                      setLines(lines.map((x) => (x.productId === l.productId ? { ...x, unitCost: toMinor(e.target.value || 0, currency) } : x)));
+                    }}
+                    aria-label={t('Coût unitaire')}
                     inputMode="decimal"
                     className="field num w-28 py-1.5"
                   />

@@ -27,7 +27,11 @@ export default function Debts() {
   const [shortfall, setShortfall] = useState<{ available: number; amount: number } | null>(null);
 
   const all = db.debts.filter((d) => d.party === tab);
-  const open = all.filter((d) => outstanding(d) > 0);
+  // Les plus anciennes d'abord : ce sont elles qu'on relance (audit jour 13).
+  const open = all.filter((d) => outstanding(d) > 0).sort((a, b) => a.date.localeCompare(b.date));
+  // Les dettes soldées s'accumulent pour toujours : les 20 plus récentes, puis « Voir plus ».
+  const [settledShown, setSettledShown] = useState(20);
+  const settled = all.filter((d) => outstanding(d) === 0).sort((a, b) => b.date.localeCompare(a.date));
   const total = open.reduce((s, d) => s + outstanding(d), 0);
   const oldest = open.slice().sort((a, b) => a.date.localeCompare(b.date))[0];
 
@@ -38,6 +42,8 @@ export default function Debts() {
   );
 
   const target = db.debts.find((d) => d.id === payId);
+  const typed = toMinor(amountRaw || 0, db.company.currency);
+  const overpay = !!target && typed > outstanding(target);
 
   function submit(force = false) {
     if (!target) return;
@@ -166,12 +172,12 @@ export default function Debts() {
         )}
       </div>
 
-      {all.some((d) => outstanding(d) === 0) && (
+      {settled.length > 0 && (
         <div className="card mt-6 p-0">
           <h2 className="px-5 pb-3 pt-5 font-bold">{t('Soldés')}</h2>
           <Table head={['Tiers', 'Origine', 'Date', 'Montant']} phoneHide={[2, 3]}>
-            {all
-              .filter((d) => outstanding(d) === 0)
+            {settled
+              .slice(0, settledShown)
               .map((d) => (
                 <tr key={d.id} className="row">
                   <td className="td">{d.partyName}</td>
@@ -183,6 +189,14 @@ export default function Debts() {
                 </tr>
               ))}
           </Table>
+          {settled.length > settledShown && (
+            <div className="flex flex-wrap items-center justify-center gap-3 border-t border-hairline px-4 py-3 text-caption text-muted">
+              {t('{n} sur {total}', { n: settledShown, total: settled.length })}
+              <button onClick={() => setSettledShown((n) => n + 50)} className="btn-ghost">
+                {t('Voir plus')}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -197,7 +211,10 @@ export default function Debts() {
               </div>
             </div>
             <div className="space-y-4">
-              <Field label={t('Montant du règlement')}>
+              <Field
+                label={t('Montant du règlement')}
+                hint={overpay ? t('C’est plus que le reste dû : le règlement sera limité à {amount}.', { amount: money(outstanding(target)) }) : undefined}
+              >
                 <input value={amountRaw} onChange={(e) => { setAmountRaw(e.target.value); setShortfall(null); }} inputMode="decimal" className="field num" />
               </Field>
               <Field label={t('Moyen de paiement')}>
@@ -228,11 +245,11 @@ export default function Debts() {
                 {t('Annuler')}
               </button>
               {shortfall ? (
-                <button onClick={() => submit(true)} className="btn-ghost">
+                <button onClick={() => submit(true)} disabled={typed <= 0} className="btn-ghost">
                   {t('Enregistrer quand même')}
                 </button>
               ) : null}
-              <button onClick={() => submit()} className="btn-primary">
+              <button onClick={() => submit()} disabled={typed <= 0} className="btn-primary">
                 <IconCard className="h-4 w-4" />
                 {t('Enregistrer')}
               </button>
