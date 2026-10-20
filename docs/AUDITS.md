@@ -69,6 +69,17 @@ est corrigé ou reste à décider.
     440 px, ramenée à 300 ;
   - le bouton rond de l'assistante recouvrait « Envoyer ». Il est retiré sur
     Messages, comme sur la Discussion.
+- **Faille trouvée après l'audit, en relisant Messages (20/10)** : la règle
+  d'insertion de `finia_chat_messages` accepte un message « appel » avec une
+  adresse libre. Un membre pouvait donc poster un faux appel dont le lien
+  exécute du code au clic, avec la session de la personne qui clique (React 18
+  ne bloque pas les liens `javascript:`).
+  - Production en lecture seule : 0 message, rien d'exploité.
+  - **Corrigé côté écran** (770fe75) : seul un lien `https://meet.jit.si/`
+    devient un bouton. Contrôle `scripts/lien-appel-check.ts`, 10 cas.
+  - **À fermer côté base** (Alpha, migration additive, mot de Beau) : retirer
+    « appel » de la règle d'insertion. La fonction d'appel le crée déjà
+    elle-même.
 
 ### Comptabilité
 
