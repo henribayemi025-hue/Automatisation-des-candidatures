@@ -2311,4 +2311,5 @@ export const EN: Record<string, string> = {
   'Votre devise est {code}. Des montants sont déjà saisis : changer de devise ne les convertirait pas, ils garderaient leur valeur. Si c’est bien voulu, faites-le dans Paramètres.': 'Your currency is {code}. Amounts have already been entered: changing the currency would not convert them, they would keep their value. If that is really what you want, do it in Settings.',
   'Quelle devise ? Dites par exemple « passe la devise en euros », ou choisissez-la dans Paramètres.': 'Which currency? Say for example “change the currency to euros”, or choose it in Settings.',
   'C’est fait : vos montants seront en {label}.': 'Done: your amounts will be in {label}.',
+  'Lien d’appel non reconnu : il n’a pas été créé par Finjaro, il n’est pas ouvert.': 'Unrecognised call link: it was not created by Finjaro, so it is not opened.',
 };

@@ -28,6 +28,23 @@ function domaineDuLien(url: string): string {
   }
 }
 
+/**
+ * Un lien d'appel n'est ouvert que s'il mène à une salle Jitsi en https, la
+ * seule que crée finia_chat_appeler. Les règles d'accès laissent un membre
+ * écrire lui-même un message « appel » avec n'importe quelle adresse : un lien
+ * « javascript: » s'exécuterait au clic dans l'application (React 18 ne le
+ * bloque pas). Relu le 20/10.
+ */
+export function lienAppelSur(url: unknown): string | null {
+  if (typeof url !== 'string') return null;
+  try {
+    const u = new URL(url);
+    return u.protocol === 'https:' && u.hostname === 'meet.jit.si' ? u.href : null;
+  } catch {
+    return null;
+  }
+}
+
 function heure(iso: string) {
   const d = new Date(iso);
   const auj = new Date().toDateString() === d.toDateString();
@@ -282,11 +299,14 @@ function Bulle({ m, moi, nomDe, noms, suite, reacts, epingle, nbReponses, onRepo
       <div id={'msg-' + m.id} className="mx-auto max-w-sm rounded-card border border-teal/30 bg-teal-light px-4 py-3 text-center">
         <p className="text-body font-semibold text-ink">{m.meta.video ? '🎥' : '📞'} {nomDe(m.user_id)} — {m.meta.video ? t('Appel vidéo') : t('Appel vocal')}</p>
         <p className="text-[11px] text-muted">{heure(m.created_at)}</p>
-        {typeof m.meta.url === 'string' && (
+        {typeof m.meta.url === 'string' && !lienAppelSur(m.meta.url) && (
+          <p className="mt-2 text-caption text-muted">{t('Lien d’appel non reconnu : il n’a pas été créé par Finjaro, il n’est pas ouvert.')}</p>
+        )}
+        {lienAppelSur(m.meta.url) && (
           <div className="mt-2 flex flex-wrap items-center gap-2">
-            <a href={m.meta.url} target="_blank" rel="noreferrer" className="btn-primary inline-flex">{t('Rejoindre l’appel')}</a>
+            <a href={lienAppelSur(m.meta.url)!} target="_blank" rel="noreferrer" className="btn-primary inline-flex">{t('Rejoindre l’appel')}</a>
             {/* Le contrat 0245 demande de montrer vers quel site on part avant d'ouvrir le lien. */}
-            <span className="text-caption text-muted">{domaineDuLien(m.meta.url)}</span>
+            <span className="text-caption text-muted">{domaineDuLien(lienAppelSur(m.meta.url)!)}</span>
           </div>
         )}
       </div>
