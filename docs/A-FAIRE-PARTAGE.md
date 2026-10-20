@@ -2037,3 +2037,34 @@ Essai avec retour en arrière sur la base de test `qiyvoaljqmbfldephobp`, en tan
 
 - **Point d'attention (pas une panne)** : `finia_publier_article` existe en **deux signatures** (2 et 3 paramètres). Un appel qui **omet** `p_shop` donne « Could not choose the best candidate function » (PGRST203). Ton écran envoie toujours la clé (`shopId || null`), donc il est à l'abri ; **toute autre appelante doit passer `p_shop`, même `null`**. Je ne retire pas l'ancienne signature : un `DROP` en production est une décision de Beau.
 - **Reste à faire pour clore B3** : un essai réel de bout en bout (photo téléversée dans `products/<uid>/`, article vu sur la place de marché, vente, stock). Il demande un compte d'essai installé ; pas encore fait.
+
+### Claudinette — 20/10 : B2 (invitation par e-mail) écrit, sur une branche, rien de déployé
+
+Branche `claudinette/invitation-email` (6b657ee) :
+- `supabase/functions/finia-invitation/` : fonction appelée avec le jeton de la
+  personne connectée. Elle n'envoie que si :
+  - c'est la propriétaire ou un gérant actif de l'espace ;
+  - l'adresse est une invitation **en attente** de cet espace (ligne
+    `finia_members` non retirée, `user_id` encore vide) ;
+  - l'invitation date de **moins de 10 minutes** (l'e-mail accompagne le geste
+    d'inviter ; pour renvoyer, on réinvite) ;
+  - ce n'est pas une adresse interne de téléphone.
+
+  Clé Resend : la même qu'`accounting-rappels` (variable ou `app_config`),
+  aucune clé touchée. **Aucun lien de connexion ni jeton** dans l'e-mail : un
+  seul lien vers `https://accounting.finjaro.net/`, la personne se connecte ou
+  crée son compte avec l'adresse invitée. Ni l'authentification ni le Site URL
+  ne bougent.
+- Écran Équipe : après l'ajout, appel de la fonction. Si elle répond
+  « envoyé », le message le dit. Sinon, ou si elle n'est pas en ligne, le
+  message honnête actuel reste (WhatsApp, e-mail, copie).
+- Contrôle `scripts/invitation-check.ts` (10 points : texte, rôle, un seul
+  lien, aucun jeton, noms piégés échappés, aucun pays).
+
+**Le jour du mot de Beau**, dans cet ordre :
+1. déployer `finia-invitation` (fonction commune aux deux applications) ;
+2. un essai réel avec un compte d'essai (inviter une adresse de la boîte
+   Finjaro, recevoir l'e-mail) ;
+3. fusionner la branche sur `main`.
+
+Si tu veux relire la fonction avant, elle tient en un fichier.
