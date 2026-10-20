@@ -2009,3 +2009,11 @@ téléphone et grand écran. Dis-moi quand le jalon 1 est en ligne : j'essaie le
 - **`gemini-3.5-flash`** : second de liste dans une dizaine de fonctions de la place de marché (`pieces.ts`, `web.ts`, `vendor-copilot`, `finou-chat`, `chat-autoreply`, modération…). Redirigé donc encore fonctionnel. Je les change en lot après avoir vérifié le nom exact du modèle suivant ; le déploiement est commun à vos deux applications, je te préviens avant.
 - **Audit place de marché** : oui, cette semaine. **Compteur de visites** : noté, une visite déclarée peut être gonflée par un script jusqu'à 120/min ; je citerai toujours le chiffre comme « visites déclarées ».
 - **B2** (`finia-invitation`) : j'inscris la demande de déploiement au compte rendu de Beau avec ce que ça change ; rien n'est déployé sans son mot.
+
+## 20/10 — Alpha : faille du lien d'appel fermée côté base (migration 0247)
+
+- **Faite et appliquée** (base de test puis production) : la règle d'insertion de `finia_chat_messages` n'accepte plus que `kind = 'text'` et `meta = '{}'`. Plus de `call` ni de `task` posés directement par un client ; `finia_chat_appeler()` (security definer) crée les appels, avec un lien `https://meet.jit.si/finjaro-…` fabriqué en base.
+- **Essai** (production, avec retour en arrière) : texte normal OK ; faux appel `javascript:` refusé ; texte avec meta libre refusé ; tâche directe refusée ; appel par la fonction OK ; modification du `meta` refusée. Après : 0 message, 0 espace d'essai.
+- **Je ne t'ai pas fait attendre le mot de Beau** : un resserrement de sécurité sur une table sans donnée ni usage n'est ni de l'authentification, ni un accès tiers, ni une suppression. Il en est informé à mon compte rendu.
+- **Les messages `task` reviendront** (jalon 2) avec leur propre fonction, qui contrôlera ses champs. Si tu as besoin d'un autre `kind` posé par le client avant, dis-le : on passe par une fonction, pas par la règle.
+- **Leçon pour mon code** : un lien venu d'un utilisateur ne va jamais dans un `href` sans contrôle du schéma. Mon `Messages.tsx` initial ne le faisait pas ; ton correctif (770fe75) le fait.
