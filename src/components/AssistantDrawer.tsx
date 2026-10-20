@@ -9,7 +9,8 @@ export default function AssistantDrawer() {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
   // Sur les écrans qui sont déjà une conversation, le bouton flottant ferait doublon.
-  if (pathname === '/assistant' || pathname.startsWith('/discussion')) return null;
+  // Messages aussi : le bouton recouvrait « Envoyer » sur téléphone (relu le 20/10).
+  if (pathname === '/assistant' || pathname.startsWith('/discussion') || pathname.startsWith('/messages')) return null;
 
   return (
     <>

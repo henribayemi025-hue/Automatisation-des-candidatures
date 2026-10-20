@@ -159,7 +159,7 @@ export default function Messages() {
       <PageHeader title={t('Messages')} subtitle={t('À deux, en groupe ou par Espace, avec appels. Privé aux personnes de la discussion.')}
         actions={<Link to="/discussion" className="btn-ghost">{t('Fil de l’espace')}</Link>} />
       {notice && <p className="mb-3 rounded-input bg-[#FDF6E3] px-3 py-2 text-caption text-ink" role="alert">{notice} <button className="ml-2 underline" onClick={() => setNotice('')}>{t('Fermer')}</button></p>}
-      <div className="card grid h-[calc(100dvh-340px)] min-h-[440px] overflow-hidden p-0 lg:grid-cols-[300px_minmax(0,1fr)] lg:h-[calc(100dvh-250px)]">
+      <div className="card grid h-[calc(100dvh-340px)] min-h-[300px] overflow-hidden p-0 lg:grid-cols-[300px_minmax(0,1fr)] lg:h-[calc(100dvh-250px)]">
         <div className={`${ouverte ? 'hidden lg:block' : 'block'} min-h-0 border-hairline lg:border-r`}>{liste}</div>
         <div className={`${ouverte ? 'flex' : 'hidden lg:flex'} min-h-0 min-w-0`}>
           {conv ? (
