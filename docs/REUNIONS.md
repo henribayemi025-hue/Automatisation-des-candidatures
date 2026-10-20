@@ -7,6 +7,62 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 23 — 20/10/2026 (matin ; celle du 19/10 n'a pas eu lieu, la routine est arrivée avec un jour de retard)
+
+**1. Ce qui a bougé depuis le 14/10**
+- **En ligne, version `03e12be8c22c`** (vérifiée), avec :
+  - **mot de passe oublié** : en ligne depuis le 14/10 sur l'ordre de Beau,
+    essai réel réussi par Alpha ;
+  - **audits jours 11 et 12** : rapports imprimables échappés (faille), « 25 000 »
+    n'est plus tronqué à 25, dépenses sur le mois en cours ;
+  - **Publier sur Finjaro (B3)** : depuis la fiche article, avec photo
+    obligatoire ; le stock suit tout seul ; une vente Finjaro reprend le coût de
+    la fiche ;
+  - **appareil neuf (B4)** : plus d'écran de démarrage à tort pendant le
+    chargement de l'espace ou après un échec ; « Réessayer » ;
+  - **l'assistante applique les vrais réglages (B7)** : thème, langue, mode,
+    devise (jamais toute seule une fois des montants saisis) ;
+  - **Messages façon Google Chat** (Alpha) : relu, deux défauts de téléphone
+    corrigés, une faille (faux lien d'appel) fermée à l'écran par moi et en
+    base par Alpha (migration 0247, règle vérifiée).
+- **Mesuré ce matin** (comptes de test exclus) : 9 espaces réels, 1 utilisé ces
+  7 derniers jours, 3 sur 30 jours ; dernier geste le 17/10.
+- **Audit du lundi** (fait le 20/10) : droits en ordre, 47 contrôles verts, 35
+  écrans propres, simulations sans régression.
+- **Veille** : Cloudflare sort un modèle qui lit les reçus (part gratuite) ;
+  Orange Money Cameroun en panne presque chaque jour du 15 au 19/10.
+
+**2. À corriger (yeux d'une commerçante sur téléphone)**
+- **« Publier sur Finjaro » est caché** : on ne le voit qu'en ouvrant la fiche
+  d'un article. Une vendeuse qui a une boutique Finjaro ne saura pas qu'elle
+  peut publier depuis Accounting. Une ligne en haut de la page Produits, pour
+  la propriétaire qui a une boutique active.
+- **Messages sur téléphone** : l'en-tête de la page prend environ 230 px avant
+  la conversation. À tasser quand une conversation est ouverte.
+- Déjà connu, toujours en attente : le retour d'article.
+
+**3. Une idée**
+- **Olist au Brésil (19/10)** : gestion du stock et des factures en parlant à
+  une assistante sur WhatsApp, à la voix. Pour nos commerçantes, WhatsApp est
+  déjà ouvert toute la journée. Mais l'API WhatsApp Business est payante et
+  demande un compte vérifié : pas maintenant. Ce qu'on peut faire sans coût :
+  la dictée existe déjà dans l'assistante, il faut la rendre visible.
+
+**4. Aujourd'hui**
+- **Moi** :
+  - la ligne « Publiez vos articles sur Finjaro » en haut de Produits ;
+  - l'en-tête de Messages tassé sur téléphone ;
+  - audit jour 13 : achats et dettes (mois en cours, « 25 000 » à l'écran) ;
+  - B2 : écrire la fonction d'invitation, sans la déployer.
+- **J'attends d'Alpha** : l'essai réel du circuit B3 (publier, vendre, livrer,
+  stock des deux côtés) ; le passage de `gemini-3.5-flash` à son successeur,
+  annoncé avant déploiement.
+- **J'attends de Beau** : son mot pour B2 ; pour l'essai de lecture des reçus,
+  son mot pour brancher Workers AI sur Accounting et 5 à 10 photos de vrais
+  reçus.
+
+---
+
 ## Réunion n° 22 — 14/10/2026 (matin)
 
 **1. Ce qui a bougé depuis hier**
