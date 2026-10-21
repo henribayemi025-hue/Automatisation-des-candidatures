@@ -25,8 +25,11 @@ export default function CookieConsent({ country }: { country?: string }) {
 
   if (!visible) return null;
 
+  // Au-dessus de la barre du bas (z-40), SOUS les fenêtres (z-50) : à 70, il
+  // cachait les boutons d'une fenêtre ouverte (« Enregistrer », « Publier »)
+  // tant que la personne n'avait pas répondu (réunion n° 24, 21/10).
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[70] flex flex-wrap items-center justify-between gap-3 border-t border-hairline bg-white px-4 py-3 shadow-[0_-8px_24px_rgba(23,27,38,0.08)]">
+    <div className="fixed inset-x-0 bottom-0 z-[45] flex flex-wrap items-center justify-between gap-3 border-t border-hairline bg-white px-4 py-3 shadow-[0_-8px_24px_rgba(23,27,38,0.08)]">
       <p className="max-w-2xl text-caption text-ink">
         {t('Nous mesurons l’effet de nos publicités (Meta). Ça ne change rien à votre utilisation de l’application.')}
       </p>
