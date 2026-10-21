@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { parseQty } from '../lib/parse';
+import { formatQty, parseQty } from '../lib/parse';
 import { useStore } from '../lib/store';
 import { CURRENCIES, factor, formatMoney, toMajor, toMinor } from '../lib/money';
 import { outstanding } from '../lib/metrics';
@@ -16,7 +16,7 @@ const LANDED_KINDS: { id: LandedCostKind; label: string }[] = [
 ];
 import { Badge, Empty, Field, Money, PageHeader, StatCard, Table, Modal } from '../components/UI';
 import { IconCart, IconPlus, IconX } from '../components/Icons';
-import { t } from '../lib/i18n';
+import { getLang, t } from '../lib/i18n';
 import { taxRegime } from '../lib/countries';
 import ProjectSelect from '../components/ProjectSelect';
 
@@ -309,7 +309,7 @@ export default function Purchases() {
               <li key={l.productId} className="flex items-center gap-2 rounded-xl bg-slate-50 p-3 dark:bg-white/5">
                 <span className="min-w-0 flex-1 truncate text-sm font-semibold">{l.name}</span>
                 <input
-                  value={raw[l.productId]?.qty ?? String(l.qty)}
+                  value={raw[l.productId]?.qty ?? formatQty(l.qty, getLang())}
                   onChange={(e) => {
                     setRawField(l.productId, 'qty', e.target.value);
                     const q = parseQty(e.target.value);

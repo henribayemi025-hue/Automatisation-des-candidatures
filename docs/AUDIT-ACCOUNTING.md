@@ -279,9 +279,21 @@ Vérifié au clic à 390 et 1 280 px dans la démonstration : ouverture sur le m
 
 La liste des achats (15 dans la démonstration) n'a pas besoin du mois en cours pour l'instant. Vérifié au clic à 390 et 1 280 px (démos France et Cameroun) : aucune page qui défile sur le côté, aucune erreur JavaScript. Les 47 contrôles passent.
 
-### À faire ensuite (jour 14)
+### Jour 14 — 21/10 : caisse, clients et fournisseurs, caisse du jour (`PointOfSale.tsx`, `Parties.tsx`, `CashRegister.tsx`)
 
-`Customers.tsx` (clients et fournisseurs) et `CashRegister.tsx` (caisse du jour) : saisie des montants à la virgule, listes longues.
+| # | Constat | Gravité | Ce qui a été fait |
+|---|---|---|---|
+| 1 | **À la caisse, effacer la quantité pour en taper une autre retirait l'article du panier** (champ vide = 0 = article supprimé). Taper « 2,5 » (vente au kilo) le retirait aussi. C'est l'écran le plus utilisé. | **Élevé** | La quantité garde ce qui est tapé ; l'article ne se retire qu'avec « − » ou la croix. « 2,5 » et « 1 000 » sont acceptés, l'affichage suit la langue (« 1,5 »). Contrôle `scripts/quantites-check.ts` (10 cas). Vérifié à l'écran : vider puis taper « 3 », taper « 2,5 », « − » donne 1,5. |
+| 2 | Clients et fournisseurs : pas de recherche, liste dans l'ordre de saisie. | Petit | Recherche (nom, téléphone, e-mail) au-delà de 8 fiches ; ceux qui doivent de l'argent d'abord, puis par nom ; « Personne ne correspond » quand la recherche est vide. Pas visible dans la démonstration (4 fiches). |
+| 3 | Le bandeau Meta (personnes en Europe qui n'ont pas encore répondu) passait au-dessus des fenêtres et cachait leurs boutons sur téléphone. | Moyen | Placé sous les fenêtres et au-dessus de la barre du bas. Défaut reproduit sur l'ancienne version, corrigé (e0b93e1). |
+| — | Caisse du jour : la saisie garde déjà le texte brut, et « 25 000 » est lu depuis le 14/10. | — | Rien à changer. |
+
+Vérifié au clic à 390 et 1 280 px : aucune page qui défile sur le côté, aucune erreur JavaScript. Les 49 contrôles passent.
+
+### À faire ensuite (jour 15)
+
+`Appointments.tsx` (rendez-vous), `Subscriptions.tsx` (abonnements), `Projects.tsx` (projets) : mêmes points (saisie à la virgule, listes longues, ordre).
+
 
 
 Alpha a relu le n° 6 le 02/10 : pas d'objection. Les outils serveur (finia_resume_mois, ma_compta_*)

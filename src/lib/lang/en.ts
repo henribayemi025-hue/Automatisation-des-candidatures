@@ -2317,4 +2317,6 @@ export const EN: Record<string, string> = {
   'Compris': 'Got it',
   'C’est plus que le reste dû : le règlement sera limité à {amount}.': 'That is more than the balance due: the payment will be limited to {amount}.',
   '{n} sur {total}': '{n} of {total}',
+  'Chercher un nom, un téléphone, un e-mail…': 'Search a name, phone or e-mail…',
+  'Personne ne correspond à « {q} »': 'Nobody matches “{q}”',
 };

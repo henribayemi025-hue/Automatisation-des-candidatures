@@ -7,7 +7,7 @@ import Receipt from '../components/Receipt';
 import { Badge, Empty, Field, Money, PageHeader } from '../components/UI';
 import { IconBox, IconCart, IconCheck, IconDoc, IconSearch, IconX } from '../components/Icons';
 import { scanFeedback, useBarcodeScanner } from '../lib/scanner';
-import { t } from '../lib/i18n';
+import { getLang, t } from '../lib/i18n';
 import { sectorProfile, tracksStock } from '../lib/sector';
 import { availableQty, holdsStock, isComposed, looksLikeService, missingFor } from '../lib/recipes';
 import ProjectSelect from '../components/ProjectSelect';
@@ -15,6 +15,7 @@ import { outstanding } from '../lib/metrics';
 import { aRendre, billetsProposes } from '../lib/monnaie';
 import { maybeAskNotificationPermission } from '../lib/reminders';
 import { articlesSuggeres } from '../lib/suggestions';
+import { formatQty, parseQty } from '../lib/parse';
 
 const METHODS: { value: PaymentMethod; label: string }[] = [
   { value: 'CASH', label: 'Espèces' },
@@ -56,6 +57,16 @@ export default function PointOfSale() {
   const { db, recordSale, saveCustomer, saveProduct } = useStore();
   const [query, setQuery] = useState('');
   const [cart, setCart] = useState<SaleLine[]>([]);
+  // La quantité telle qu'elle est tapée. Avant (audit jour 14, 21/10) : effacer
+  // le champ pour taper un autre nombre, ou taper « 2,5 », valait 0 et
+  // retirait l'article du panier sur-le-champ.
+  const [qtyRaw, setQtyRaw] = useState<Record<string, string>>({});
+  const clearQtyRaw = (id: string) => setQtyRaw((r) => {
+    if (!(id in r)) return r;
+    const next = { ...r };
+    delete next[id];
+    return next;
+  });
   const [customerId, setCustomerId] = useState('');
   const [projectId, setProjectId] = useState('');
   const [discountRaw, setDiscountRaw] = useState('');
@@ -336,6 +347,7 @@ export default function PointOfSale() {
 
   function reset() {
     setCart([]);
+    setQtyRaw({});
     setDiscountRaw('');
     setPaidRaw('');
     setRecuRaw('');
@@ -611,7 +623,7 @@ export default function PointOfSale() {
                   <div className="flex items-start justify-between gap-2">
                     <span className="text-sm font-semibold">{l.name}</span>
                     <button
-                      onClick={() => setQty(l.productId, 0)}
+                      onClick={() => { clearQtyRaw(l.productId); setQty(l.productId, 0); }}
                       className="text-slate-400 hover:text-rose-600"
                     >
                       <IconX className="h-4 w-4" />
@@ -620,18 +632,27 @@ export default function PointOfSale() {
                   <div className="mt-2 flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1">
                       <button
-                        onClick={() => setQty(l.productId, l.qty - 1)}
+                        onClick={() => { clearQtyRaw(l.productId); setQty(l.productId, l.qty - 1); }}
                         className="h-7 w-7 rounded-lg border border-slate-200 font-bold dark:border-white/10"
                       >
                         −
                       </button>
                       <input
-                        value={l.qty}
-                        onChange={(e) => setQty(l.productId, Number(e.target.value) || 0)}
+                        value={qtyRaw[l.productId] ?? formatQty(l.qty, getLang())}
+                        inputMode="decimal"
+                        aria-label={t('Quantité')}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setQtyRaw((r) => ({ ...r, [l.productId]: v }));
+                          // On ne retire jamais l'article en tapant : seulement avec « − » ou la croix.
+                          const q = parseQty(v);
+                          if (Number.isFinite(q) && q > 0) setQty(l.productId, q);
+                        }}
+                        onBlur={() => clearQtyRaw(l.productId)}
                         className="h-7 w-12 rounded-lg border border-slate-200 text-center text-sm num dark:border-white/10 dark:bg-transparent"
                       />
                       <button
-                        onClick={() => setQty(l.productId, l.qty + 1)}
+                        onClick={() => { clearQtyRaw(l.productId); setQty(l.productId, l.qty + 1); }}
                         className="h-7 w-7 rounded-lg border border-slate-200 font-bold dark:border-white/10"
                       >
                         +

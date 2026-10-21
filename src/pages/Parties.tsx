@@ -20,6 +20,7 @@ export default function Parties() {
   const [showArchived, setShowArchived] = useState(false);
   /** Fiche dont on est en train de demander la suppression. */
   const [target, setTarget] = useState<{ id: string; name: string } | null>(null);
+  const [query, setQuery] = useState('');
 
   const isCustomers = tab === 'CUSTOMERS';
   const all = isCustomers ? db.customers : db.suppliers;
@@ -27,7 +28,6 @@ export default function Parties() {
   // Quand la dernière fiche archivée est réactivée, on revient tout seul aux
   // fiches actives : sinon l'écran reste vide sans bouton pour en sortir.
   const viewingArchived = showArchived && archivedCount > 0;
-  const list = all.filter((p) => (viewingArchived ? p.archived : !p.archived));
   const usage = target ? partyUsage(db, target.id) : null;
 
   function balanceFor(partyId: string) {
@@ -35,6 +35,16 @@ export default function Parties() {
       .filter((d) => d.partyId === partyId && d.party === (isCustomers ? 'CUSTOMER' : 'SUPPLIER'))
       .reduce((s, d) => s + outstanding(d), 0);
   }
+
+  // Une recherche, et ceux qui doivent de l'argent d'abord, puis par nom
+  // (audit jour 14, 21/10 : la liste suivait l'ordre de saisie, sans recherche).
+  const needle = query.trim().toLowerCase();
+  const list = all
+    .filter((p) => (viewingArchived ? p.archived : !p.archived))
+    .filter((p) => !needle || [p.name, p.phone, p.email].some((x) => (x ?? '').toLowerCase().includes(needle)))
+    .map((p) => ({ p, balance: balanceFor(p.id) }))
+    .sort((a, b) => b.balance - a.balance || a.p.name.localeCompare(b.p.name))
+    .map((x) => x.p);
 
   function submit() {
     if (!form.name.trim()) return;
@@ -102,6 +112,17 @@ export default function Parties() {
         )}
       </div>
 
+      {all.length > 8 && (
+        <input
+          id="parties-search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t('Chercher un nom, un téléphone, un e-mail…')}
+          aria-label={t('Chercher un nom, un téléphone, un e-mail…')}
+          className="field mb-4"
+        />
+      )}
+
       <div className="card p-0">
         {list.length ? (
           <Table head={[t('Nom'), t('Téléphone'), t('Email'), t('Adresse'), isCustomers ? t('Créance') : t('Dette'), '']} phoneHide={[3, 4]}>
@@ -167,7 +188,9 @@ export default function Parties() {
         ) : (
           <Empty
             title={
-              viewingArchived
+              needle
+                ? t('Personne ne correspond à « {q} »', { q: query.trim() })
+                : viewingArchived
                 ? t('Aucune fiche archivée')
                 : isCustomers
                   ? t('Aucun client enregistré')
