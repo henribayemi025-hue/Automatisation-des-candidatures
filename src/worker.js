@@ -243,6 +243,7 @@ async function callGemini(apiKey, body) {
 }
 
 const DEEPSEEK_TIMEOUT_MS = 30_000;
+const DEEPSEEK_MODEL = 'deepseek-flash';
 
 // DeepSeek : moteur de secours texte seul (pas de lecture de photo/PDF, l'API
 // DeepSeek ne prend pas d'image en entrée). N'est utilisé que si Google n'a
@@ -256,17 +257,20 @@ async function callDeepSeek(apiKey, systemPromptText, messages) {
       content: String(m.text ?? '').slice(0, 4000),
     })),
   ];
+  // `deepseek-chat` est arrêté depuis le 24/07/2026 (annonce DeepSeek du
+  // 24/04) ; le nom courant est `deepseek-flash`, même gamme. Relevé par la
+  // veille du 21/10 : le repli DeepSeek échouait sans bruit depuis.
   const res = await fetch('https://api.deepseek.com/chat/completions', {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({ model: 'deepseek-chat', messages: chat, temperature: 0.4, max_tokens: 1024 }),
+    body: JSON.stringify({ model: DEEPSEEK_MODEL, messages: chat, temperature: 0.4, max_tokens: 1024 }),
     signal: AbortSignal.timeout(DEEPSEEK_TIMEOUT_MS),
   });
   if (!res.ok) throw new Error(`deepseek ${res.status}`);
   const data = await res.json();
   const text = data?.choices?.[0]?.message?.content ?? '';
   if (!text.trim()) throw new Error('deepseek empty');
-  return { text, model: 'deepseek-chat' };
+  return { text, model: DEEPSEEK_MODEL };
 }
 
 // Groq, offre gratuite (Beau, 07/10 : « Groq partout »). Texte seulement.
