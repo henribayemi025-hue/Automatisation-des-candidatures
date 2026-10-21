@@ -11,6 +11,78 @@ fiscal, un chiffre faux ferait prendre un risque réel à un commerçant.
 
 ---
 
+## 21/10/2026 (couvre du 20 au 21/10)
+
+### Concurrence
+- Rien de daté dans la fenêtre (Afrique francophone, Nigeria, Kenya, Inde,
+  Brésil), recherche faite en français, anglais et portugais.
+- Hors fenêtre, pour mémoire : **Onafriq ferme Baxi** (16/10), son réseau
+  d'agents et de terminaux pour petits commerçants au Nigeria.
+  [Nairametrics](https://nairametrics.com/2026/10/16/onafriq-winds-down-baxi-agent-banking-business-in-nigeria/)
+  → Le seul encaissement rapporte de moins en moins : argument pour un outil qui
+  fait aussi le stock et les comptes.
+
+### Règles et paiements
+- **Orange Money Cameroun, la panne reprend (20 et 21/10/2026)** : pawaPay a
+  rouvert un incident « Cameroon Orange » le 20/10 à 05:18 UTC, trois heures
+  après la clôture de 02:09. Il était encore ouvert le 21/10 vers 05:17 UTC ; la
+  mise à jour de 04:46 parle de « our Orange payment gateways », au pluriel.
+  Chez Pay1st, l'incident ouvert le 19/10 à 17:39 UTC n'est pas clos (« still
+  seeing instability », 20/10 à 16:06 UTC).
+  [pawaPay](https://status.pawapay.io/history.rss) ·
+  [Pay1st](https://pay1st.statuspage.io/history.rss)
+  → Plus de 24 heures sans encaissement fiable par Orange Money au Cameroun,
+  quel que soit l'agrégateur. Renforce encore l'idée « Mobile money à
+  confirmer ».
+- **MTN MoMo (20/10/2026)** : le gestionnaire de la communauté répond
+  « This was resolved » à deux signalements d'erreur 500 sur le bac à sable ;
+  quatre autres restent sans réponse, aucune annonce officielle.
+  [MTN MoMo Developers](https://momodevelopercommunity.mtn.com/momo-api-sand-box-q-a-6/500-internal-server-error-554)
+  → Rien à faire (aucune intégration MTN directe).
+- **Airtel Money Gabon** : maintenance annoncée chez pawaPay le 21/10 de 00:00 à
+  04:00 UTC, terminée à 05:10 UTC.
+  [pawaPay](https://status.pawapay.io/incidents/611k82fp5h0x)
+- Fiscalité : rien de publié dans la fenêtre, pour aucun pays suivi. Le guide
+  français promis le 09/10 n'est toujours pas paru.
+
+### Technologie et IA
+- **DeepSeek : `deepseek-chat` arrêté depuis le 24/07/2026** (annonce du
+  24/04/2026 : « The two legacy API model names, deepseek-chat and
+  deepseek-reasoner, will be discontinued in three months (2026-07-24) »).
+  Lu à la source le 21/10.
+  [DeepSeek](https://api-docs.deepseek.com/updates/)
+  → **Accounting l'appelait encore** : le repli DeepSeek de l'assistante
+  échouait donc sans bruit, et l'on retombait sur le moteur suivant. **Corrigé
+  et en ligne le 21/10** (678efcb) : nom `deepseek-flash`, même gamme, déjà
+  utilisé par la place de marché. Un appel réel n'a pas été fait d'ici (il
+  demanderait la clé et serait payant).
+- **Gemini 2.5 Flash (20/10/2026)** : retiré ce jour-là sur la plateforme
+  entreprise de Google Cloud. Sur l'API développeur, celle qu'Accounting
+  appelle, la page des fins de service dit toujours « No shutdown date
+  announced ». Elle ajoute que les modèles 2.5 ne sont ouverts qu'aux comptes
+  qui les ont déjà utilisés, et conseille « 3.5 Flash-Lite or 3.8 Flash » aux
+  nouveaux projets.
+  [Google](https://ai.google.dev/gemini-api/docs/deprecations)
+  → Rien de cassé. Notre second choix, `gemini-3.6-flash`, reste en place. Sans
+  crédit Gemini de toute façon.
+- **Supabase (20/10/2026)** : consignes prêtes pour qu'un agent vérifie la
+  production à heure fixe, outil `query_logs` en lecture seule, onglet Health
+  des Advisors ; Supabase conseille un accès `read_only=true`.
+  [Supabase](https://supabase.com/blog/operate-with-confidence-check-production-with-your-coding-agent)
+  → À ajouter à l'audit du lundi : lire les erreurs d'Accounting sur la base
+  commune, en lecture seule. Les boutons « couper une connexion » touchent
+  toutes les applications du projet : jamais sans raison.
+- **Cloudflare (20/10/2026)** : Wrangler envoie désormais les source maps par
+  défaut ; les erreurs des Workers pointent vers le vrai code.
+  [Cloudflare](https://developers.cloudflare.com/changelog/post/2026-10-20-source-maps-on-by-default/)
+  → Rien à faire.
+- **Écartés** : Mistral Voxtral 3 (transcription vocale, payante) ; OXR (lecture
+  de documents en open source, à héberger soi-même, donc une machine à payer).
+  DeepSeek V4.1 Flash sur Workers AI lit les images mais demande l'offre
+  payante (veille du 20/10) : la seule piste gratuite reste Clairic.
+
+---
+
 ## 20/10/2026 (couvre du 15 au 20/10 ; les veilles du 15 au 19 n'ont pas eu lieu)
 
 ### Concurrence

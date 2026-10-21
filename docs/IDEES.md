@@ -56,6 +56,8 @@ Chaque idée : le problème, pour qui, ce que ça vaut, l'effort, ce qu'on deman
   plus à chaque vente) ?
 - **Renforcée le 20/10 :** 9 incidents Orange Money Cameroun chez pawaPay du
   15 au 19/10, dont quatre de plus de 11 heures (VEILLE.md, 20/10).
+- **Et le 21/10 :** la panne reprend le 20/10 à 05:18 UTC, toujours ouverte le
+  21/10 au matin, chez pawaPay comme chez Pay1st.
 
 **Renforcé le 12/10** : Orange Money Cameroun est retombé en panne le 12/10, de 06:18 à 11:45 UTC. C'est la troisième panne en six jours.
 
