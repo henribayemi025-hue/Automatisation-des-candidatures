@@ -288,7 +288,7 @@ La liste des achats (15 dans la démonstration) n'a pas besoin du mois en cours 
 | 3 | Le bandeau Meta (personnes en Europe qui n'ont pas encore répondu) passait au-dessus des fenêtres et cachait leurs boutons sur téléphone. | Moyen | Placé sous les fenêtres et au-dessus de la barre du bas. Défaut reproduit sur l'ancienne version, corrigé (e0b93e1). |
 | — | Caisse du jour : la saisie garde déjà le texte brut, et « 25 000 » est lu depuis le 14/10. | — | Rien à changer. |
 
-Vérifié au clic à 390 et 1 280 px : aucune page qui défile sur le côté, aucune erreur JavaScript. Les 49 contrôles passent.
+Vérifié au clic à 390 et 1 280 px : aucune page qui défile sur le côté, aucune erreur JavaScript. Les 48 contrôles passent.
 
 ### À faire ensuite (jour 15)
 
