@@ -7,6 +7,54 @@ par le même chemin. Beau lit ; il tranche quand une ligne le demande.
 
 ---
 
+## Réunion n° 24 — 21/10/2026 (matin)
+
+**1. Ce qui a bougé depuis hier**
+- **En ligne, version `37eb741af9f4`** (vérifiée), avec :
+  - **Produits** : la propriétaire qui a une boutique Finjaro voit comment
+    publier un article ;
+  - **Messages** : la conversation prend tout l'écran du téléphone ;
+  - **audit jour 13** : en euros, un coût d'achat « 12,50 » ne devient plus
+    1 250 ; quantités décimales ; un règlement de dette trop grand est annoncé.
+- **En ligne côté serveur** (vérifié par `/api/health`) : l'assistante appelle
+  `deepseek-flash`. L'ancien nom, `deepseek-chat`, est arrêté depuis le
+  24/07/2026 : le repli DeepSeek échouait **sans bruit depuis trois mois**.
+  Trouvé par la veille du 21/10.
+- **B2 (invitation par e-mail)** : écrit sur une branche, rien de déployé.
+- **Alpha** : B3 essayé côté base (10 cas sur 10) ; l'essai réel de bout en
+  bout reste à faire. Faille du lien d'appel fermée en base (0247).
+- **Mesuré** (comptes de test exclus) : 9 espaces réels, 1 utilisé ces 7 jours,
+  3 sur 30 jours ; dernier geste le 17/10. Rien n'a bougé depuis hier.
+
+**2. À corriger (yeux d'une commerçante sur téléphone)**
+- **Le bandeau Meta passe au-dessus des fenêtres** : pour une personne en
+  Europe qui n'a pas encore répondu, il cache les boutons du bas d'une fenêtre
+  (« Enregistrer », « Publier »). À placer sous les fenêtres.
+- **Audit jour 14** : clients et fournisseurs, caisse du jour (saisie des
+  montants à la virgule, listes longues).
+
+**3. Une idée**
+- **Les pannes silencieuses** : DeepSeek a échoué trois mois sans que personne
+  le voie. Nos journaux de serveur (Cloudflare) ne me sont pas lisibles : le
+  connecteur Cloudflare n'est pas autorisé dans ma session. S'il l'était, l'audit
+  du lundi lirait les erreurs du serveur d'Accounting, gratuitement. C'est un
+  réglage de Beau (claude.ai → Connecteurs). Côté base, Supabase permet
+  désormais la même lecture en seule lecture : je l'ajoute à l'audit dès lundi.
+
+**4. Aujourd'hui**
+- **Moi** :
+  - le bandeau Meta sous les fenêtres ;
+  - audit jour 14 ;
+  - lecture des journaux de la base (lecture seule) ajoutée à la routine
+    d'audit.
+- **J'attends d'Alpha** : l'essai réel du circuit B3 ; l'annonce avant de
+  changer `gemini-3.5-flash`.
+- **J'attends de Beau** : B2 ; l'essai de lecture des reçus (Workers AI + photos
+  de vrais reçus) ; s'il le veut, autoriser le connecteur Cloudflare pour lire
+  les journaux du serveur.
+
+---
+
 ## Réunion n° 23 — 20/10/2026 (matin ; celle du 19/10 n'a pas eu lieu, la routine est arrivée avec un jour de retard)
 
 **1. Ce qui a bougé depuis le 14/10**
