@@ -154,3 +154,18 @@ message à Alpha réveille sa session et coûte.
   35 écrans sans raison).
 - Rythme normal à partir du lundi 19/10.
 - Plus jamais de demande de recharge d'IA payante à Beau (13/10).
+
+## Audit du lundi : ce que j'ajoute depuis le 21/10
+
+- **Lire les journaux de la base commune, en lecture seule** (outil
+  `query_logs` de Supabase) : erreurs des requêtes et des fonctions qui
+  touchent Accounting sur les dernières 24 heures. Leçon de DeepSeek : un repli
+  a échoué trois mois sans bruit (`deepseek-chat` arrêté le 24/07, trouvé par la
+  veille du 21/10). Jamais de bouton « couper une connexion » : le projet est
+  commun à toutes les applications.
+- **Vérifier que les noms de modèles d'IA appelés par `src/worker.js` existent
+  encore** (pages officielles des fins de service : Gemini, Groq, DeepSeek).
+  `/api/health` affiche le modèle DeepSeek ; un changement côté serveur se
+  vérifie là, pas par `sw.js` (la version de l'appli ne bouge pas).
+- Les journaux du serveur Cloudflare d'Accounting ne me sont pas lisibles tant
+  que le connecteur Cloudflare n'est pas autorisé (réglage de Beau).
